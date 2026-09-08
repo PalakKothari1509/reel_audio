@@ -44,13 +44,17 @@ Future<List<ScriptLine>> generateScriptWithGemini({
       ? 'The video is about: $videoDescription'
       : 'Write a general fun preschool story with Ria and Rio.';
   final expectedLines = (videoDuration / 4).floor().clamp(4, 20);
+  final totalSecs = videoDuration.round();
 
   final prompt = '''
 Write a voiceover script for a $totalSecs second preschool video for "Fun Learning With Palak" Instagram Reels.
 
 Characters: Ria (girl), Rio (boy), Cuty (rabbit), Mum, Dad
+$storyNote
 $langNote
 $styleNote
+
+The script must follow the story above. Do not invent a different story.
 
 Output ONLY $expectedLines lines. Each line: timestamp space text. Nothing else. No explanations. No bullet points. No asterisks.
 
