@@ -21,6 +21,18 @@ const _elevenLabsKey = elevenLabsApiKey;
 const _elevenVoiceId = elevenVoiceId;
 
 // ── Gemini Service ────────────────────────────────────────────────────────────
+//
+// One place for the model name. Google retires and renames these, and a name the key
+// can't use fails in a way that looks like a bug in the app. To see what your key is
+// allowed to call:
+//   https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY
+const _geminiModel = 'gemini-3.6-flash';
+
+/// Long enough for a slow first call. Thirty seconds was not: Gemini regularly takes
+/// longer than that to answer the first request of a session, and the old timeout
+/// turned a slow reply into what looked like a broken app.
+const _geminiTimeout = Duration(seconds: 60);
+
 // Writes a timed script from the story you type. It never sees the video or the images —
 // the description is all Gemini gets, which is why that field matters.
 
@@ -80,12 +92,29 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
     }
   });
 
-  final response = await http.post(
-    Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=$_geminiKey'),
-    headers: {'Content-Type': 'application/json'},
-    body: body,
-  ).timeout(const Duration(seconds: 30));
+  final url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+      '$_geminiModel:generateContent?key=$_geminiKey';
 
+  late final http.Response response;
+  try {
+    response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    ).timeout(_geminiTimeout);
+  } on TimeoutException {
+    // A bare TimeoutException says nothing about which of these it was.
+    throw Exception('Gemini did not answer within ${_geminiTimeout.inSeconds}s.\n'
+        'Check the phone has internet, and that "$_geminiModel" is a model your key can use.');
+  } catch (e) {
+    throw Exception('Could not reach Gemini: $e');
+  }
+
+  if (response.statusCode == 404) {
+    throw Exception('Gemini has no model called "$_geminiModel" for this key.\n'
+        'Open the models list in a browser to see the right name:\n'
+        'https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY');
+  }
   if (response.statusCode != 200) {
     throw Exception('Gemini API error ${response.statusCode}: ${response.body}');
   }
