@@ -1,30 +1,23 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// The default Flutter template test referenced MyApp, which this app does not have,
+// so it failed to compile. Replaced with a real check of the script parser — the part
+// most likely to break, since Gemini's output is never quite the same twice.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:reel_audio/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('reads timestamped lines and puts them in order', () {
+    final lines = parseScript('0:08 Rio bhi aa gaya\n0:00 Ek baar ki baat hai');
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(lines.length, 2);
+    expect(lines.first.text, 'Ek baar ki baat hai');
+    expect(lines.last.time, const Duration(seconds: 8));
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('ignores bullets and numbering that Gemini sometimes adds', () {
+    final lines = parseScript('* 0:04 Ria ne dekha ek titli\nsome stray explanation');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(lines.length, 1);
+    expect(lines.first.text, 'Ria ne dekha ek titli');
   });
 }

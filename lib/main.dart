@@ -10,8 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'video_builder.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
@@ -21,7 +21,8 @@ const _elevenLabsKey = elevenLabsApiKey;
 const _elevenVoiceId = elevenVoiceId;
 
 // ── Gemini Service ────────────────────────────────────────────────────────────
-// Extracts frames from video, sends to Gemini Vision, gets timed script back
+// Writes a timed script from the story you type. It never sees the video or the images —
+// the description is all Gemini gets, which is why that field matters.
 
 Future<List<ScriptLine>> generateScriptWithGemini({
   required String videoDescription,
@@ -99,7 +100,7 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
 }
 
 // ── ElevenLabs Service ────────────────────────────────────────────────────────
-// Converts text to natural AI voice, saves to file
+// NOT WIRED UP: nothing calls this. Save Voice uses the phone's own TTS below.
 
 Future<void> elevenLabsSynthesize({
   required String text,
@@ -145,20 +146,6 @@ Future<void> nativeSynthesize({
     'text': text, 'filePath': filePath,
     'lang': lang, 'rate': rate, 'pitch': pitch,
   });
-}
-
-// ── Media helpers ─────────────────────────────────────────────────────────────
-
-/// Length of an audio or video file in seconds; null when it can't be read.
-///
-/// This has to be FFprobe, not FFmpeg. The old code passed ffprobe-only flags
-/// (-show_entries, -of) to FFmpegKit, which rejects them — so the parse always failed
-/// and every spoken line was assumed to be 3 seconds. Anything longer pushed the next
-/// line late, and the error added up down the script.
-Future<double?> getAudioDuration(String path) async {
-  final session = await FFprobeKit.getMediaInformation(path);
-  final seconds = double.tryParse(session.getMediaInformation()?.getDuration() ?? '');
-  return (seconds != null && seconds > 0.05) ? seconds : null;
 }
 
 // ── Text cleaner ──────────────────────────────────────────────────────────────
@@ -297,6 +284,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   videoFile: _video!,
                   videoDuration: _ctrl!.value.duration.inSeconds.toDouble(),
                 )))),
+            const SizedBox(height: 10),
+            // The other way in: no video at all, just pictures and a story.
+            _btn(Icons.photo_library, 'Create From Images', Colors.teal,
+              () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const ImageStoryScreen()))),
           ]),
         ),
       ]),
@@ -316,6 +308,222 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 }
 
+// ── Image Story Screen ────────────────────────────────────────────────────────
+// Make a reel with no video at all: pick pictures, type the story, and Gemini writes
+// the script to fit. Everything after this point is the same path the video flow uses.
+
+class ImageStoryScreen extends StatefulWidget {
+  const ImageStoryScreen({super.key});
+  @override
+  State<ImageStoryScreen> createState() => _ImageStoryScreenState();
+}
+
+class _ImageStoryScreenState extends State<ImageStoryScreen> {
+  final List<String> _images = [];
+  final _descCtrl = TextEditingController();
+  final _languages = ['Hinglish', 'English', 'Hindi'];
+  final _lengths = [20, 30, 45, 60];
+
+  String _style = '❤️ Heartwarming';
+  String _language = 'Hinglish';
+  int _seconds = 30;
+  bool _isGenerating = false;
+  String _status = '';
+
+  @override
+  void dispose() { _descCtrl.dispose(); super.dispose(); }
+
+  Future<void> _pickImages() async {
+    final picked = await ImagePicker().pickMultiImage();
+    if (picked.isEmpty) return;
+    setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
+  }
+
+  void _removeImage(int i) => setState(() => _images.removeAt(i));
+
+  Future<void> _generate() async {
+    if (_images.isEmpty) { setState(() => _status = 'Add at least one image first.'); return; }
+    setState(() { _isGenerating = true; _status = 'Writing the script with Gemini...'; });
+    try {
+      final lines = await generateScriptWithGemini(
+        videoDescription: _descCtrl.text.trim(),
+        language: _language,
+        style: _style,
+        videoDuration: _seconds.toDouble(),
+      );
+      if (!mounted) return;
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => TimedScriptScreen(
+          style: _style, language: _language,
+          videoFile: null, images: List.of(_images), initialLines: lines,
+        ),
+      ));
+    } catch (e) {
+      setState(() => _status = '❌ $e');
+    }
+    if (mounted) setState(() => _isGenerating = false);
+  }
+
+  void _writeManually() {
+    if (_images.isEmpty) { setState(() => _status = 'Add at least one image first.'); return; }
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => TimedScriptScreen(
+        style: _style, language: _language,
+        videoFile: null, images: List.of(_images), initialLines: const [],
+      ),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create From Images')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text('${_images.length} image${_images.length == 1 ? '' : 's'} — shown in this order',
+                style: const TextStyle(fontSize: 13, color: Colors.white70)),
+            ),
+            TextButton.icon(
+              onPressed: _isGenerating ? null : _pickImages,
+              icon: const Icon(Icons.add_photo_alternate, size: 18),
+              label: const Text('Add'),
+            ),
+          ]),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 110,
+            child: _images.isEmpty
+                ? Center(child: Text('No images yet — tap Add',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13)))
+                : ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _images.length,
+                    itemBuilder: (ctx, i) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Stack(children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(File(_images[i]),
+                            width: 62, height: 110, fit: BoxFit.cover),
+                        ),
+                        Positioned(
+                          top: 0, right: 0,
+                          child: GestureDetector(
+                            onTap: () => _removeImage(i),
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black87, shape: BoxShape.circle),
+                              padding: const EdgeInsets.all(3),
+                              child: const Icon(Icons.close, size: 13, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView(children: [
+              const Text('Video length', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 6),
+              Wrap(spacing: 8, children: _lengths.map((s) => ChoiceChip(
+                label: Text('$s sec'),
+                selected: _seconds == s,
+                onSelected: (_) => setState(() => _seconds = s),
+              )).toList()),
+              const SizedBox(height: 16),
+              const Text('Voice style', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 6),
+              Wrap(spacing: 8, children: kVoiceProfiles.keys.map((s) => ChoiceChip(
+                label: Text(s, style: const TextStyle(fontSize: 12)),
+                selected: _style == s,
+                onSelected: (_) => setState(() => _style = s),
+              )).toList()),
+              const SizedBox(height: 16),
+              const Text('Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 6),
+              Wrap(spacing: 8, children: _languages.map((l) => ChoiceChip(
+                label: Text(l),
+                selected: _language == l,
+                onSelected: (_) => setState(() => _language = l),
+              )).toList()),
+              const SizedBox(height: 16),
+              const Text('What happens in the story',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _descCtrl,
+                maxLines: 3,
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai',
+                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
+                  filled: true, fillColor: Colors.grey[900],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.all(10),
+                ),
+              ),
+              if (_status.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[850], borderRadius: BorderRadius.circular(8)),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(child: Text(_status, style: const TextStyle(fontSize: 12))),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 16, color: Colors.white54),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: _status));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied!'), duration: Duration(seconds: 1)));
+                      },
+                    ),
+                  ]),
+                ),
+              ],
+            ]),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isGenerating ? null : _generate,
+              icon: _isGenerating
+                  ? const SizedBox(width: 16, height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.auto_awesome),
+              label: Text(_isGenerating ? 'Writing...' : '✨ Write Script (AI)'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade700, foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                disabledBackgroundColor: Colors.grey.shade800,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _isGenerating ? null : _writeManually,
+              icon: const Icon(Icons.edit),
+              label: const Text('Write Script Manually'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple, foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
 // ── Story Input Screen ────────────────────────────────────────────────────────
 
 class StoryInputScreen extends StatefulWidget {
@@ -327,7 +535,6 @@ class StoryInputScreen extends StatefulWidget {
 }
 
 class _StoryInputScreenState extends State<StoryInputScreen> {
-  final _styles    = kVoiceProfiles.keys.toList();
   final _languages = ['Hinglish', 'English', 'Hindi'];
   String _style    = '❤️ Heartwarming';
   String _language = 'Hinglish';
@@ -475,12 +682,19 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
 class TimedScriptScreen extends StatefulWidget {
   final String style;
   final String language;
-  final File videoFile;
+  /// Null in image mode — there is no source video to lay the voice over.
+  final File? videoFile;
+  /// Empty in video mode. When present the reel is built from these instead.
+  final List<String> images;
   final List<ScriptLine> initialLines;
   const TimedScriptScreen({
     super.key, required this.style, required this.language,
     required this.videoFile, required this.initialLines,
+    this.images = const [],
   });
+
+  /// Which of the two builds runs when the last button is pressed.
+  bool get isImageMode => images.isNotEmpty;
   @override
   State<TimedScriptScreen> createState() => _TimedScriptScreenState();
 }
@@ -626,7 +840,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       // Step 2: how long each spoken line actually is, so the gaps can be worked out.
       final segDurations = <double>[];
       for (final p in segPaths) {
-        segDurations.add(await getAudioDuration(p) ?? 3.0);
+        segDurations.add(await getMediaDuration(p) ?? 3.0);
       }
 
       // Step 3: Build a single audio track using silence + concat
@@ -681,15 +895,56 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         throw Exception('FFmpeg concat failed: $logs');
       }
 
-      setState(() { _status = '✅ AI voice ready! Now tap Merge with Video.'; });
+      // Says which button to press next, and doesn't call the phone's voice "AI".
+      setState(() {
+        _status = widget.isImageMode
+            ? '✅ Voice ready. Now tap Build Video.'
+            : '✅ Voice ready. Now tap Merge with Video.';
+      });
     } catch (e) {
       setState(() { _status = '❌ $e'; _audioPath = null; });
     }
     setState(() => _isSaving = false);
   }
 
+  /// Shown in the header strip, so image mode is obvious without leaving the screen.
+  String get _imageNote {
+    if (!widget.isImageMode) return '';
+    final n = widget.images.length;
+    return n == 1 ? '  •  1 image' : '  •  $n images';
+  }
+
+  /// Builds the reel from the chosen images instead of a source video.
+  Future<void> _buildFromImages() async {
+    if (_audioPath == null) { setState(() => _status = 'Please save voice first!'); return; }
+    _syncLines();
+    setState(() { _isMerging = true; _status = 'Building the video...'; });
+    try {
+      final dir = await getTemporaryDirectory();
+      final outPath = await SlideshowBuilder.build(
+        imagePaths: widget.images,
+        // One image per line, so the picture changes as the story moves on.
+        lineStarts: _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
+        audioPath: _audioPath!,
+        workDir: dir.path,
+        onStatus: (message) { if (mounted) setState(() => _status = message); },
+      );
+      if (!mounted) return;
+      setState(() { _status = ''; _isMerging = false; });
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => PreviewMergedScreen(mergedFile: File(outPath)),
+      ));
+      return;
+    } catch (e) {
+      setState(() { _status = '❌ $e'; });
+    }
+    if (mounted) setState(() => _isMerging = false);
+  }
+
   Future<void> _mergeWithVideo() async {
     if (_audioPath == null) { setState(() => _status = 'Please save voice first!'); return; }
+    final video = widget.videoFile;
+    if (video == null) { setState(() => _status = 'No video to merge with.'); return; }
     setState(() { _isMerging = true; _status = 'Merging voice with video...'; });
     try {
       final dir = await getTemporaryDirectory();
@@ -697,7 +952,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       if (await File(tmpPath).exists()) await File(tmpPath).delete();
 
       final session = await FFmpegKit.executeWithArguments([
-        '-i', widget.videoFile.path,
+        '-i', video.path,
         '-itsoffset', '-0.5',
         '-i', _audioPath!,
         '-map', '0:v:0', '-map', '1:a:0',
@@ -800,7 +1055,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         width: double.infinity,
         color: Colors.orange.shade900.withOpacity(0.4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Text('🎙️ Native TTS Voice  •  ${widget.style}  •  ${widget.language}',
+        child: Text('🎙️ Phone voice  •  ${widget.style}  •  ${widget.language}$_imageNote',
           style: const TextStyle(fontSize: 11, color: Colors.white70)),
       ),
       Expanded(
@@ -901,9 +1156,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           const SizedBox(height: 8),
           _btn(
             icon: Icons.movie_creation,
-            label: _isMerging ? 'Merging...' : 'Merge with Video 🎬',
+            label: _isMerging
+                ? (widget.isImageMode ? 'Building...' : 'Merging...')
+                : (widget.isImageMode ? 'Build Video 🎬' : 'Merge with Video 🎬'),
             color: Colors.deepPurple,
-            onPressed: (busy || _audioPath == null) ? null : _mergeWithVideo,
+            onPressed: (busy || _audioPath == null)
+                ? null
+                : (widget.isImageMode ? _buildFromImages : _mergeWithVideo),
             loading: _isMerging,
           ),
         ]),
