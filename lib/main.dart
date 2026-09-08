@@ -233,7 +233,7 @@ void main() => runApp(MaterialApp(
       title: 'Story Voice Maker',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(brightness: Brightness.dark),
-      home: const HomeScreen(),
+      home: const StoryScreen(),
     ));
 
 // ── Home Screen ───────────────────────────────────────────────────────────────
@@ -284,11 +284,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   videoFile: _video!,
                   videoDuration: _ctrl!.value.duration.inSeconds.toDouble(),
                 )))),
-            const SizedBox(height: 10),
-            // The other way in: no video at all, just pictures and a story.
-            _btn(Icons.photo_library, 'Create From Images', Colors.teal,
-              () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const ImageStoryScreen()))),
           ]),
         ),
       ]),
@@ -308,18 +303,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 }
 
-// ── Image Story Screen ────────────────────────────────────────────────────────
-// Make a reel with no video at all: pick pictures, type the story, and Gemini writes
-// the script to fit. Everything after this point is the same path the video flow uses.
+// ── Story Screen ──────────────────────────────────────────────────────────────
+// Where the app opens. Say what happens in the story and Gemini writes the timed
+// script; the pictures are chosen afterwards, on the script screen, where you can see
+// how many lines there are to fill.
 
-class ImageStoryScreen extends StatefulWidget {
-  const ImageStoryScreen({super.key});
+class StoryScreen extends StatefulWidget {
+  const StoryScreen({super.key});
   @override
-  State<ImageStoryScreen> createState() => _ImageStoryScreenState();
+  State<StoryScreen> createState() => _StoryScreenState();
 }
 
-class _ImageStoryScreenState extends State<ImageStoryScreen> {
-  final List<String> _images = [];
+class _StoryScreenState extends State<StoryScreen> {
   final _descCtrl = TextEditingController();
   final _languages = ['Hinglish', 'English', 'Hindi'];
   final _lengths = [20, 30, 45, 60];
@@ -333,16 +328,20 @@ class _ImageStoryScreenState extends State<ImageStoryScreen> {
   @override
   void dispose() { _descCtrl.dispose(); super.dispose(); }
 
-  Future<void> _pickImages() async {
-    final picked = await ImagePicker().pickMultiImage();
-    if (picked.isEmpty) return;
-    setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
+  void _openScript(List<ScriptLine> lines) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => TimedScriptScreen(
+        style: _style, language: _language,
+        videoFile: null, images: const [], initialLines: lines,
+      ),
+    ));
   }
 
-  void _removeImage(int i) => setState(() => _images.removeAt(i));
-
   Future<void> _generate() async {
-    if (_images.isEmpty) { setState(() => _status = 'Add at least one image first.'); return; }
+    if (_descCtrl.text.trim().isEmpty) {
+      setState(() => _status = 'Type what happens in the story first — without it Gemini makes one up.');
+      return;
+    }
     setState(() { _isGenerating = true; _status = 'Writing the script with Gemini...'; });
     try {
       final lines = await generateScriptWithGemini(
@@ -352,98 +351,56 @@ class _ImageStoryScreenState extends State<ImageStoryScreen> {
         videoDuration: _seconds.toDouble(),
       );
       if (!mounted) return;
-      Navigator.push(context, MaterialPageRoute(
-        builder: (_) => TimedScriptScreen(
-          style: _style, language: _language,
-          videoFile: null, images: List.of(_images), initialLines: lines,
-        ),
-      ));
+      _openScript(lines);
     } catch (e) {
       setState(() => _status = '❌ $e');
     }
     if (mounted) setState(() => _isGenerating = false);
   }
 
-  void _writeManually() {
-    if (_images.isEmpty) { setState(() => _status = 'Add at least one image first.'); return; }
-    Navigator.push(context, MaterialPageRoute(
-      builder: (_) => TimedScriptScreen(
-        style: _style, language: _language,
-        videoFile: null, images: List.of(_images), initialLines: const [],
-      ),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create From Images')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Story Reel Maker')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(
-              child: Text('${_images.length} image${_images.length == 1 ? '' : 's'} — shown in this order',
-                style: const TextStyle(fontSize: 13, color: Colors.white70)),
-            ),
-            TextButton.icon(
-              onPressed: _isGenerating ? null : _pickImages,
-              icon: const Icon(Icons.add_photo_alternate, size: 18),
-              label: const Text('Add'),
-            ),
-          ]),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 110,
-            child: _images.isEmpty
-                ? Center(child: Text('No images yet — tap Add',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 13)))
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _images.length,
-                    itemBuilder: (ctx, i) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Stack(children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(File(_images[i]),
-                            width: 62, height: 110, fit: BoxFit.cover),
-                        ),
-                        Positioned(
-                          top: 0, right: 0,
-                          child: GestureDetector(
-                            onTap: () => _removeImage(i),
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black87, shape: BoxShape.circle),
-                              padding: const EdgeInsets.all(3),
-                              child: const Icon(Icons.close, size: 13, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    ),
-                  ),
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: ListView(children: [
-              const Text('Video length', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+              const Text('What happens in the story?',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _descCtrl,
+                maxLines: 4,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, '
+                      'phir Rio share karta hai aur dono khush ho jaate hain',
+                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
+                  filled: true, fillColor: Colors.grey[900],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.all(12),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text('How long', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(height: 6),
               Wrap(spacing: 8, children: _lengths.map((s) => ChoiceChip(
                 label: Text('$s sec'),
                 selected: _seconds == s,
                 onSelected: (_) => setState(() => _seconds = s),
               )).toList()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const Text('Voice style', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(height: 6),
-              Wrap(spacing: 8, children: kVoiceProfiles.keys.map((s) => ChoiceChip(
+              Wrap(spacing: 8, runSpacing: 4, children: kVoiceProfiles.keys.map((s) => ChoiceChip(
                 label: Text(s, style: const TextStyle(fontSize: 12)),
                 selected: _style == s,
                 onSelected: (_) => setState(() => _style = s),
               )).toList()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const Text('Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(height: 6),
               Wrap(spacing: 8, children: _languages.map((l) => ChoiceChip(
@@ -451,24 +408,8 @@ class _ImageStoryScreenState extends State<ImageStoryScreen> {
                 selected: _language == l,
                 onSelected: (_) => setState(() => _language = l),
               )).toList()),
-              const SizedBox(height: 16),
-              const Text('What happens in the story',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _descCtrl,
-                maxLines: 3,
-                style: const TextStyle(fontSize: 13),
-                decoration: InputDecoration(
-                  hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai',
-                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
-                  filled: true, fillColor: Colors.grey[900],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
               if (_status.isNotEmpty) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
@@ -498,10 +439,10 @@ class _ImageStoryScreenState extends State<ImageStoryScreen> {
                   ? const SizedBox(width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.auto_awesome),
-              label: Text(_isGenerating ? 'Writing...' : '✨ Write Script (AI)'),
+              label: Text(_isGenerating ? 'Writing...' : '✨ Write My Story'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange.shade700, foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 18),
                 disabledBackgroundColor: Colors.grey.shade800,
               ),
             ),
@@ -509,20 +450,30 @@ class _ImageStoryScreenState extends State<ImageStoryScreen> {
           const SizedBox(height: 8),
           SizedBox(width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: _isGenerating ? null : _writeManually,
+              onPressed: _isGenerating ? null : () => _openScript(const []),
               icon: const Icon(Icons.edit),
-              label: const Text('Write Script Manually'),
+              label: const Text('Write The Script Myself'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple, foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
+          // Kept because it still works, but it is no longer what the app is for.
+          TextButton.icon(
+            onPressed: _isGenerating ? null : () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const HomeScreen())),
+            icon: const Icon(Icons.video_library, size: 16),
+            label: const Text('Add voice to a video I already have',
+              style: TextStyle(fontSize: 12)),
+            style: TextButton.styleFrom(foregroundColor: Colors.white54),
+          ),
         ]),
       ),
     );
   }
 }
+
 
 // ── Story Input Screen ────────────────────────────────────────────────────────
 
@@ -694,7 +645,6 @@ class TimedScriptScreen extends StatefulWidget {
   });
 
   /// Which of the two builds runs when the last button is pressed.
-  bool get isImageMode => images.isNotEmpty;
   @override
   State<TimedScriptScreen> createState() => _TimedScriptScreenState();
 }
@@ -715,9 +665,17 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   List<TextEditingController> _timeCtrls = [];
   final List<Timer> _timers = [];
 
+  /// The pictures the reel is built from. Chosen here rather than before the script,
+  /// because until the script exists you don't know how many moments there are to show.
+  List<String> _images = [];
+
+  /// True when there is no source video, so the reel has to be built from pictures.
+  bool get _storyMode => widget.videoFile == null;
+
   @override
   void initState() {
     super.initState();
+    _images = List.of(widget.images);
     _lines = List.from(widget.initialLines);
     _showPaste = _lines.isEmpty;
     _textCtrls = _lines.map((l) => TextEditingController(text: l.text)).toList();
@@ -897,7 +855,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
       // Says which button to press next, and doesn't call the phone's voice "AI".
       setState(() {
-        _status = widget.isImageMode
+        _status = _storyMode
             ? '✅ Voice ready. Now tap Build Video.'
             : '✅ Voice ready. Now tap Merge with Video.';
       });
@@ -909,8 +867,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   /// Shown in the header strip, so image mode is obvious without leaving the screen.
   String get _imageNote {
-    if (!widget.isImageMode) return '';
-    final n = widget.images.length;
+    if (!_storyMode) return '';
+    final n = _images.length;
     return n == 1 ? '  •  1 image' : '  •  $n images';
   }
 
@@ -922,7 +880,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     try {
       final dir = await getTemporaryDirectory();
       final outPath = await SlideshowBuilder.build(
-        imagePaths: widget.images,
+        imagePaths: _images,
         // One image per line, so the picture changes as the story moves on.
         lineStarts: _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
         audioPath: _audioPath!,
@@ -1048,6 +1006,83 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     ]),
   );
 
+  /// The pictures, along the top of the script. Kept beside the lines on purpose —
+  /// image 1 goes with line 1, and seeing both together is the only way to tell whether
+  /// you have enough of them.
+  Widget _buildImageStrip(bool busy) {
+    return Container(
+      height: 92,
+      width: double.infinity,
+      color: Colors.grey.shade900,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: Row(children: [
+        InkWell(
+          onTap: busy ? null : _pickImages,
+          child: Container(
+            width: 54,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.teal.shade400),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.add_photo_alternate, size: 20, color: Colors.teal),
+              SizedBox(height: 2),
+              Text('Add', style: TextStyle(fontSize: 10, color: Colors.teal)),
+            ]),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _images.isEmpty
+              ? Text('Add pictures — one per line of the script',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]))
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _images.length,
+                  itemBuilder: (ctx, i) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Stack(children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.file(File(_images[i]),
+                          width: 46, height: 80, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: 0, right: 0,
+                        child: GestureDetector(
+                          onTap: busy ? null : () => setState(() => _images.removeAt(i)),
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.black87, shape: BoxShape.circle),
+                            padding: const EdgeInsets.all(2),
+                            child: const Icon(Icons.close, size: 11, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      // The line this picture will be shown against.
+                      Positioned(
+                        bottom: 0, left: 0,
+                        child: Container(
+                          color: Colors.black54,
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: Text('${i + 1}',
+                            style: const TextStyle(fontSize: 9, color: Colors.white)),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+        ),
+      ]),
+    );
+  }
+
+  Future<void> _pickImages() async {
+    final picked = await ImagePicker().pickMultiImage();
+    if (picked.isEmpty) return;
+    setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
+  }
+
   Widget _buildEditor() {
     final busy = _isSaving || _isMerging;
     return Column(children: [
@@ -1058,6 +1093,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         child: Text('🎙️ Phone voice  •  ${widget.style}  •  ${widget.language}$_imageNote',
           style: const TextStyle(fontSize: 11, color: Colors.white70)),
       ),
+      if (_storyMode) _buildImageStrip(busy),
       Expanded(
         child: ListView.builder(
           padding: const EdgeInsets.all(8),
@@ -1157,12 +1193,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           _btn(
             icon: Icons.movie_creation,
             label: _isMerging
-                ? (widget.isImageMode ? 'Building...' : 'Merging...')
-                : (widget.isImageMode ? 'Build Video 🎬' : 'Merge with Video 🎬'),
+                ? (_storyMode ? 'Building...' : 'Merging...')
+                : (_storyMode ? 'Build Video 🎬' : 'Merge with Video 🎬'),
             color: Colors.deepPurple,
-            onPressed: (busy || _audioPath == null)
+            // Needs the voice saved first, and in story mode at least one picture.
+            onPressed: (busy || _audioPath == null || (_storyMode && _images.isEmpty))
                 ? null
-                : (widget.isImageMode ? _buildFromImages : _mergeWithVideo),
+                : (_storyMode ? _buildFromImages : _mergeWithVideo),
             loading: _isMerging,
           ),
         ]),
