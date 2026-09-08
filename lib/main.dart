@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
@@ -144,6 +145,20 @@ Future<void> nativeSynthesize({
     'text': text, 'filePath': filePath,
     'lang': lang, 'rate': rate, 'pitch': pitch,
   });
+}
+
+// ── Media helpers ─────────────────────────────────────────────────────────────
+
+/// Length of an audio or video file in seconds; null when it can't be read.
+///
+/// This has to be FFprobe, not FFmpeg. The old code passed ffprobe-only flags
+/// (-show_entries, -of) to FFmpegKit, which rejects them — so the parse always failed
+/// and every spoken line was assumed to be 3 seconds. Anything longer pushed the next
+/// line late, and the error added up down the script.
+Future<double?> getAudioDuration(String path) async {
+  final session = await FFprobeKit.getMediaInformation(path);
+  final seconds = double.tryParse(session.getMediaInformation()?.getDuration() ?? '');
+  return (seconds != null && seconds > 0.05) ? seconds : null;
 }
 
 // ── Text cleaner ──────────────────────────────────────────────────────────────
@@ -608,16 +623,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
       setState(() => _status = 'Building timed audio track...');
 
-      // Step 2: For each segment, get its actual duration via FFmpeg probe
+      // Step 2: how long each spoken line actually is, so the gaps can be worked out.
       final segDurations = <double>[];
       for (final p in segPaths) {
-        final s = await FFmpegKit.executeWithArguments([
-          '-v', 'error', '-show_entries', 'format=duration',
-          '-of', 'default=noprint_wrappers=1:nokey=1', '-i', p,
-        ]);
-        final log = (await s.getAllLogsAsString() ?? '').trim();
-        final dur = double.tryParse(log.split('\n').last.trim()) ?? 0.0;
-        segDurations.add(dur > 0.1 ? dur : 3.0);
+        segDurations.add(await getAudioDuration(p) ?? 3.0);
       }
 
       // Step 3: Build a single audio track using silence + concat
@@ -649,10 +658,16 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       _audioPath = '${dir.path}/narration_final.wav';
       if (await File(_audioPath!).exists()) await File(_audioPath!).delete();
 
-      // Build concat filter
+      // Concat refuses inputs that disagree on sample rate or channel layout, and the TTS
+      // files rarely match the generated silence — so put every input through aformat first.
       final inputs = <String>[];
-      for (final p in parts) inputs.addAll(['-i', p]);
-      final concatFilter = '${List.generate(parts.length, (i) => '[$i:a]').join('')}concat=n=${parts.length}:v=0:a=1[out]';
+      for (final p in parts) {
+        inputs.addAll(['-i', p]);
+      }
+      final normalised = List.generate(parts.length,
+          (i) => '[$i:a]aformat=sample_fmts=s16:sample_rates=44100:channel_layouts=mono[a$i]');
+      final joined = List.generate(parts.length, (i) => '[a$i]').join();
+      final concatFilter = '${normalised.join(';')};${joined}concat=n=${parts.length}:v=0:a=1[out]';
 
       final session = await FFmpegKit.executeWithArguments([
         ...inputs,
