@@ -33,6 +33,31 @@ Future<double?> getMediaDuration(String path) async {
 
 // ── Timing ────────────────────────────────────────────────────────────────────
 
+/// Where each line falls when the whole script was spoken in one pass.
+///
+/// With no per-line audio to measure, length is the best guide available: a line twice
+/// as long takes roughly twice as long to say. It is an estimate, and a line with a
+/// long pause in it will drift — but for changing a picture it lands close enough, and
+/// it buys a voice that flows instead of one stitched from clips.
+List<double> estimatedLineStarts({
+  required List<String> texts,
+  required double totalSeconds,
+}) {
+  if (texts.isEmpty || totalSeconds <= 0) return const [];
+
+  // Every line counts for something, so an empty one can't collapse to zero width.
+  final weights = texts.map((t) => t.trim().isEmpty ? 1 : t.trim().length).toList();
+  final total = weights.fold<int>(0, (sum, w) => sum + w);
+
+  final starts = <double>[];
+  var cursor = 0.0;
+  for (final weight in weights) {
+    starts.add(cursor);
+    cursor += totalSeconds * weight / total;
+  }
+  return starts;
+}
+
 /// How long each line stays on screen: from its own start to the next line's start,
 /// with the last one running to the end of the narration.
 List<double> clipDurations({

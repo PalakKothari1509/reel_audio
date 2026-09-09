@@ -787,6 +787,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// switch, and hear the difference without starting the script again.
   late VoiceEngine _engine;
 
+  /// When each line actually starts in the saved voice, in seconds.
+  ///
+  /// For the line-by-line engines these are the script's own timestamps, because that
+  /// is what the audio was built to. For a single-pass read they are estimated from
+  /// line length, since there are no separate files to measure.
+  List<double> _lineStarts = [];
+
   @override
   void initState() {
     super.initState();
@@ -822,7 +829,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       _lines = parsed;
       _textCtrls = _lines.map((l) => TextEditingController(text: l.text)).toList();
       _timeCtrls = _lines.map((l) => TextEditingController(text: fmtDuration(l.time))).toList();
-      _showPaste = false; _audioPath = null; _status = '';
+      _showPaste = false; _audioPath = null; _lineStarts = []; _status = '';
     });
   }
 
@@ -893,22 +900,59 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   void _cancelTimers() { for (final t in _timers) t.cancel(); _timers.clear(); }
 
+  /// Reads the whole script in one pass. One request instead of ten keeps it inside
+  /// the free tier, and the voice keeps its rhythm across sentences instead of being
+  /// stitched from clips — which is most of what makes stitched speech sound robotic.
+  Future<void> _saveGeminiInOnePass() async {
+    final dir = await getTemporaryDirectory();
+    final style = widget.style.replaceAll(RegExp(r'[^\w\s-]'), '').trim();
+
+    setState(() => _status = 'Reading the whole story in one take...');
+    final path = await synthesizeWholeScript(
+      lines: _lines.map((l) => cleanForTts(l.spoken)).toList(),
+      basePath: '${dir.path}/narration_gemini',
+      apiKey: _geminiKey,
+      styleHint: 'Read this aloud for young children in a $style tone, '
+          'warmly and at an unhurried pace:',
+      onWait: (message) { if (mounted) setState(() => _status = message); },
+    );
+
+    // No per-line files to measure, so where each picture changes is worked out from
+    // how much of the script each line is.
+    final total = await getMediaDuration(path);
+    if (total == null) throw Exception('Could not read the voice that was just made.');
+
+    _audioPath = path;
+    _lineStarts = estimatedLineStarts(
+      texts: _lines.map((l) => l.spoken).toList(),
+      totalSeconds: total,
+    );
+  }
+
   /// Speaks every line to its own file, then lays them out on a timeline with FFmpeg.
   Future<void> _saveAudio() async {
     _syncLines();
     if (_lines.isEmpty) { setState(() => _status = 'No lines to save!'); return; }
 
-    // Gemini's free tier is 3 lines a minute, so a normal script takes minutes rather
-    // than seconds. Say how long before it starts, not after someone has waited.
-    final slow = _engine == VoiceEngine.gemini && _lines.length > geminiSpeechPerMinute;
-    final minutes = (_lines.length / geminiSpeechPerMinute).ceil();
-    setState(() {
-      _isSaving = true;
-      _status = slow
-          ? 'Gemini free tier allows $geminiSpeechPerMinute lines a minute, so this '
-            'will take about $minutes minutes. Leave the screen open.'
-          : 'Generating voice...';
-    });
+    setState(() { _isSaving = true; _status = 'Generating voice...'; });
+
+    // Gemini reads the script in one request; the other engines speak line by line and
+    // are laid out on a timeline below.
+    if (_engine == VoiceEngine.gemini) {
+      try {
+        await _saveGeminiInOnePass();
+        setState(() {
+          _status = _storyMode
+              ? '✅ Voice ready. Now tap Build Video.'
+              : '✅ Voice ready. Now tap Merge with Video.';
+        });
+      } catch (e) {
+        setState(() { _status = '❌ $e'; _audioPath = null; });
+      }
+      setState(() => _isSaving = false);
+      return;
+    }
+
     try {
       final dir = await getTemporaryDirectory();
       final segPaths = <String>[];
@@ -999,6 +1043,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         throw Exception('FFmpeg concat failed: $logs');
       }
 
+      // This track was built to the script's own timestamps, so the pictures follow them.
+      _lineStarts = _lines.map((l) => l.time.inMilliseconds / 1000.0).toList();
+
       // Says which button to press next, and doesn't call the phone's voice "AI".
       setState(() {
         _status = _storyMode
@@ -1028,7 +1075,11 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       final outPath = await SlideshowBuilder.build(
         imagePaths: _images,
         // One image per line, so the picture changes as the story moves on.
-        lineStarts: _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
+        // Set when the voice was saved — either the script's timestamps or, for a
+        // single-pass read, where each line was estimated to fall.
+        lineStarts: _lineStarts.isNotEmpty
+            ? _lineStarts
+            : _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
         audioPath: _audioPath!,
         workDir: dir.path,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
@@ -1251,6 +1302,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
                 onTap: busy ? null : () => setState(() {
                   _engine = e;
                   _audioPath = null;
+                  _lineStarts = [];
                   _status = 'Voice set to ${voiceEngineLabel(e)}. '
                       '${voiceEngineHint(e)} Tap Save Voice again.';
                 }),

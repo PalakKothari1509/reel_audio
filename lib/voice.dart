@@ -27,7 +27,7 @@ String voiceEngineLabel(VoiceEngine engine) {
 String voiceEngineHint(VoiceEngine engine) {
   switch (engine) {
     case VoiceEngine.gemini:
-      return 'Natural voice, free tier. Needs internet.';
+      return 'Natural voice, free. Reads the whole story in one take.';
     case VoiceEngine.elevenLabs:
       return 'Best quality, about 25 reels a month free.';
     case VoiceEngine.phone:
@@ -48,6 +48,37 @@ const geminiTtsModel = 'gemini-2.5-flash-preview-tts';
 const geminiVoiceName = 'Kore';
 
 const _timeout = Duration(seconds: 60);
+
+// ── The whole script in one go ────────────────────────────────────────────────
+
+/// Speaks the entire script as a single request and returns the file path.
+///
+/// Two reasons this beats one request per line, and the second matters more:
+///
+/// 1. The free tier allows three requests a minute. One request per reel fits; ten
+///    do not, and a normal script took minutes of waiting.
+/// 2. It sounds better. Lines spoken separately and stitched together have no rhythm
+///    carrying across sentences — every join is audible. Read in one pass the voice
+///    keeps its pace and breath, which is most of what "robotic" actually means.
+///
+/// The cost is exact timing: there is no per-line file to measure, so where each line
+/// falls is worked out from how much of the script it is.
+Future<String> synthesizeWholeScript({
+  required List<String> lines,
+  required String basePath,
+  required String apiKey,
+  String styleHint = '',
+  void Function(String message)? onWait,
+}) async {
+  final script = lines.map((l) => l.trim()).where((l) => l.isNotEmpty).join('\n');
+  if (script.isEmpty) throw Exception('There is nothing to speak.');
+
+  // Gemini takes a plain-language direction before the text, which is the cheapest
+  // way to change delivery — no settings, no voice swap.
+  final prompt = styleHint.isEmpty ? script : '$styleHint\n\n$script';
+  return _geminiSpeak(
+    text: prompt, outPath: '$basePath.wav', apiKey: apiKey, onWait: onWait);
+}
 
 // ── One call, whichever engine ────────────────────────────────────────────────
 
