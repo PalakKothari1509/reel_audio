@@ -69,16 +69,25 @@ Future<List<ScriptLine>> generateScriptWithGemini({
       ? 'Each line: timestamp, space, Hinglish text, then " | ", then the SAME line '
         'written in Devanagari script.'
       : 'Each line: timestamp space text.';
+  // The examples open on a hook, because Gemini copies the shape of what it is shown
+  // far more reliably than it follows an instruction about it.
   final exampleBlock = isHinglish
       ? '''
-0:00 Ek baar ki baat hai | एक बार की बात है
-0:04 Ria ne dekha ek titli | रिया ने देखा एक तितली
-0:08 Rio bhi aa gaya | रियो भी आ गया'''
+0:00 Arey! Cuty ka gajar kaun le gaya? | अरे! क्यूटी का गाजर कौन ले गया?
+0:04 Ria boli, maine nahi liya | रिया बोली, मैंने नहीं लिया
+0:08 Rio bhi peeche chhup gaya | रियो भी पीछे छुप गया
+0:12 Phir dono ne milkar dhoonda | फिर दोनों ने मिलकर ढूंढा
+0:16 Tum bhi dhoondo, kahan hai? | तुम भी ढूंढो, कहाँ है?'''
       : '''
-0:00 Ek baar ki baat hai
-0:04 Ria ne dekha ek titli
-0:08 Rio bhi aa gaya''';
+0:00 Wait! Who took Cuty's carrot?
+0:04 Ria said, it was not me
+0:08 Rio quietly hid behind the chair
+0:12 Then they looked for it together
+0:16 Can you find it too?''';
 
+  // Reels are won or lost in the first second, and most are watched on mute with the
+  // thumb ready to scroll. So the shape is told to Gemini explicitly — without it the
+  // script reads like a bedtime story, which is pleasant and gets scrolled past.
   final prompt = '''
 Write a voiceover script for a $totalSecs second preschool video for "Fun Learning With Palak" Instagram Reels.
 
@@ -88,6 +97,15 @@ $langNote
 $styleNote
 
 The script must follow the story above. Do not invent a different story.
+
+Shape it like a reel that holds attention:
+- Line 1 is a HOOK. A question, a surprise or a problem. Never "Ek baar ki baat hai".
+- Next lines build the problem and make it worse.
+- Near the end, the turn: what solves it.
+- Last line is a warm one-line ending, or a question to the child watching.
+
+Keep every line under 12 words so it can be spoken in about 4 seconds.
+Write how a person talks, not how a book reads.
 
 Output ONLY $expectedLines lines. $formatNote Nothing else. No explanations. No bullet points. No asterisks.
 
@@ -103,7 +121,11 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
     }],
     'generationConfig': {
       'temperature': 0.8,
-      'maxOutputTokens': 1024,
+      // 1024 was not enough and failed silently: Devanagari costs several tokens per
+      // character, asking for both halves roughly triples the output, and newer models
+      // spend part of the budget thinking before they write anything. The script came
+      // back cut off after a line or two with no error at all.
+      'maxOutputTokens': 8192,
     }
   });
 
@@ -135,11 +157,32 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
   }
 
   final json = jsonDecode(response.body);
-  final text = json['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
-  if (text.isEmpty) throw Exception('Gemini returned empty response.');
+  final candidate = json['candidates']?[0];
+  final text = candidate?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final finish = candidate?['finishReason'] as String? ?? '';
+
+  // Gemini stopping early used to look like a short script rather than a failure.
+  if (text.isEmpty) {
+    throw Exception(finish.isEmpty
+        ? 'Gemini returned nothing.'
+        : 'Gemini returned nothing (stopped because: $finish).');
+  }
+  if (finish == 'MAX_TOKENS') {
+    throw Exception('Gemini ran out of room and the script was cut off. '
+        'Try a shorter video length, or raise maxOutputTokens.');
+  }
+  if (finish == 'SAFETY' || finish == 'RECITATION') {
+    throw Exception('Gemini refused this story ($finish). Try rewording it.');
+  }
 
   final lines = parseScript(text);
   if (lines.isEmpty) throw Exception('Gemini response had no valid timed lines:\n$text');
+
+  // A script far shorter than asked for is a truncation nobody would otherwise notice.
+  if (lines.length < 3 && expectedLines >= 4) {
+    throw Exception('Gemini only returned ${lines.length} line(s) instead of $expectedLines. '
+        'What it sent back:\n$text');
+  }
   return lines;
 }
 
@@ -168,6 +211,21 @@ const Map<String, VoiceProfile> kVoiceProfiles = {
   '🧩 Problem-solving': VoiceProfile(0.48, 0.95),
   '🌱 Independence':    VoiceProfile(0.55, 1.10),
 };
+
+// ── Story format ──────────────────────────────────────────────────────────────
+
+/// The shape a reel story needs, as something anyone can copy and fill in.
+///
+/// Five beats, in the order a reel plays them: hook, trouble, worse, turn, ending.
+/// Written as plain labels rather than prose so it survives being pasted into
+/// WhatsApp or Notes by someone who never opens the app.
+const kStoryTemplate = '''Who: Ria, Rio, Cuty
+Where:
+What starts it:
+What goes wrong:
+How it gets worse:
+How it is solved:
+Ending line: ''';
 
 // ── ScriptLine ────────────────────────────────────────────────────────────────
 
@@ -345,6 +403,25 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   void dispose() { _descCtrl.dispose(); super.dispose(); }
 
+  /// Puts the skeleton in the box AND on the clipboard.
+  ///
+  /// On the clipboard as well because the story usually gets written somewhere else
+  /// first — WhatsApp, Notes, by someone who isn't holding the phone. Filling in blanks
+  /// beats facing an empty field, and a vague story is where Gemini starts inventing.
+  void _useFormat() {
+    final alreadyWritten = _descCtrl.text.trim().isNotEmpty;
+    if (!alreadyWritten) _descCtrl.text = kStoryTemplate;
+
+    Clipboard.setData(const ClipboardData(text: kStoryTemplate));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 2),
+      content: Text(alreadyWritten
+          ? 'Format copied. Your story was left alone.'
+          : 'Format copied, and filled in below.'),
+    ));
+    setState(() => _status = '');
+  }
+
   void _openScript(List<ScriptLine> lines) {
     Navigator.push(context, MaterialPageRoute(
       builder: (_) => TimedScriptScreen(
@@ -385,16 +462,31 @@ class _StoryScreenState extends State<StoryScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: ListView(children: [
-              const Text('What happens in the story?',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Row(children: [
+                const Expanded(
+                  child: Text('What happens in the story?',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+                TextButton.icon(
+                  onPressed: _isGenerating ? null : _useFormat,
+                  icon: const Icon(Icons.copy_all, size: 16),
+                  label: const Text('Copy format', style: TextStyle(fontSize: 12)),
+                ),
+              ]),
+              const SizedBox(height: 4),
+              const Text('A few lines is enough. The more you say about what happens, '
+                  'the closer the script stays to your story.',
+                style: TextStyle(fontSize: 11, color: Colors.white38)),
               const SizedBox(height: 8),
               TextField(
                 controller: _descCtrl,
-                maxLines: 4,
+                maxLines: 8,
+                minLines: 4,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, '
-                      'phir Rio share karta hai aur dono khush ho jaate hain',
+                  hintText: 'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
+                      'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
+                      'neeche mil jaata hai. Sab hass padte hain.',
                   hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
                   filled: true, fillColor: Colors.grey[900],
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
