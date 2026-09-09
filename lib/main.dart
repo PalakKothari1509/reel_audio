@@ -897,7 +897,18 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   Future<void> _saveAudio() async {
     _syncLines();
     if (_lines.isEmpty) { setState(() => _status = 'No lines to save!'); return; }
-    setState(() { _isSaving = true; _status = 'Generating voice...'; });
+
+    // Gemini's free tier is 3 lines a minute, so a normal script takes minutes rather
+    // than seconds. Say how long before it starts, not after someone has waited.
+    final slow = _engine == VoiceEngine.gemini && _lines.length > geminiSpeechPerMinute;
+    final minutes = (_lines.length / geminiSpeechPerMinute).ceil();
+    setState(() {
+      _isSaving = true;
+      _status = slow
+          ? 'Gemini free tier allows $geminiSpeechPerMinute lines a minute, so this '
+            'will take about $minutes minutes. Leave the screen open.'
+          : 'Generating voice...';
+    });
     try {
       final dir = await getTemporaryDirectory();
       final segPaths = <String>[];
@@ -918,6 +929,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           geminiKey: _geminiKey,
           elevenLabsKey: _elevenLabsKey,
           elevenVoiceId: _elevenVoiceId,
+          // Waiting out a rate limit takes longer than the speaking does, so say so
+          // rather than leaving the button spinning with nothing happening.
+          onWait: (message) {
+            if (mounted) {
+              setState(() => _status = 'Line ${i + 1} of ${_lines.length} — $message');
+            }
+          },
         ));
       }
 
