@@ -20,4 +20,18 @@ void main() {
     expect(lines.length, 1);
     expect(lines.first.text, 'Ria ne dekha ek titli');
   });
+
+  test('splits Hinglish to read from Devanagari to speak', () {
+    final lines = parseScript('0:00 Ek baar ki baat hai | एक बार की बात है');
+
+    expect(lines.first.text, 'Ek baar ki baat hai');
+    expect(lines.first.spoken, 'एक बार की बात है');
+  });
+
+  test('a line with no Devanagari half is spoken as written', () {
+    final lines = parseScript('0:00 Once upon a time');
+
+    expect(lines.first.speak, isNull);
+    expect(lines.first.spoken, 'Once upon a time');
+  });
 }

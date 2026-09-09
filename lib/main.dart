@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'video_builder.dart';
+import 'voice.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
@@ -60,6 +61,24 @@ Future<List<ScriptLine>> generateScriptWithGemini({
   final expectedLines = (videoDuration / 4).floor().clamp(4, 20);
   final totalSecs = videoDuration.round();
 
+  // Hinglish only. A Hindi voice reading Latin letters mispronounces the words, so ask
+  // for the same line in Devanagari as well — that half is what gets spoken, while the
+  // Hinglish half stays on screen where it is easier to read and edit.
+  final isHinglish = language == 'Hinglish';
+  final formatNote = isHinglish
+      ? 'Each line: timestamp, space, Hinglish text, then " | ", then the SAME line '
+        'written in Devanagari script.'
+      : 'Each line: timestamp space text.';
+  final exampleBlock = isHinglish
+      ? '''
+0:00 Ek baar ki baat hai | एक बार की बात है
+0:04 Ria ne dekha ek titli | रिया ने देखा एक तितली
+0:08 Rio bhi aa gaya | रियो भी आ गया'''
+      : '''
+0:00 Ek baar ki baat hai
+0:04 Ria ne dekha ek titli
+0:08 Rio bhi aa gaya''';
+
   final prompt = '''
 Write a voiceover script for a $totalSecs second preschool video for "Fun Learning With Palak" Instagram Reels.
 
@@ -70,14 +89,10 @@ $styleNote
 
 The script must follow the story above. Do not invent a different story.
 
-Output ONLY $expectedLines lines. Each line: timestamp space text. Nothing else. No explanations. No bullet points. No asterisks.
+Output ONLY $expectedLines lines. $formatNote Nothing else. No explanations. No bullet points. No asterisks.
 
 Example output:
-0:00 Ek baar ki baat hai
-0:04 Ria ne dekha ek titli
-0:08 Rio bhi aa gaya
-0:12 Cuty ne kaha wah
-0:16 Bye bye dosto
+$exampleBlock
 
 Now output exactly $expectedLines lines for a $totalSecs second video:
 ''';
@@ -128,54 +143,7 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
   return lines;
 }
 
-// ── ElevenLabs Service ────────────────────────────────────────────────────────
-// NOT WIRED UP: nothing calls this. Save Voice uses the phone's own TTS below.
-
-Future<void> elevenLabsSynthesize({
-  required String text,
-  required String filePath,
-}) async {
-  final response = await http.post(
-    Uri.parse('https://api.elevenlabs.io/v1/text-to-speech/$_elevenVoiceId'),
-    headers: {
-      'xi-api-key': _elevenLabsKey,
-      'Content-Type': 'application/json',
-      'Accept': 'audio/mpeg',
-    },
-    body: jsonEncode({
-      'text': text,
-      'model_id': 'eleven_multilingual_v2',
-      'voice_settings': {
-        'stability': 0.5,
-        'similarity_boost': 0.75,
-        'style': 0.3,
-        'use_speaker_boost': true,
-      }
-    }),
-  ).timeout(const Duration(seconds: 30));
-
-  if (response.statusCode != 200) {
-    throw Exception('ElevenLabs error ${response.statusCode}: ${response.body}');
-  }
-  await File(filePath).writeAsBytes(response.bodyBytes);
-}
-
-// ── Native TTS (for preview only) ────────────────────────────────────────────
-
-const _ttsCh = MethodChannel('com.example.reel_audio/tts');
-
-Future<void> nativeSynthesize({
-  required String text,
-  required String filePath,
-  required String lang,
-  required double rate,
-  required double pitch,
-}) async {
-  await _ttsCh.invokeMethod('synthesizeToFile', {
-    'text': text, 'filePath': filePath,
-    'lang': lang, 'rate': rate, 'pitch': pitch,
-  });
-}
+// The speaking itself lives in voice.dart — phone, Gemini and ElevenLabs behind one call.
 
 // ── Text cleaner ──────────────────────────────────────────────────────────────
 
@@ -205,8 +173,19 @@ const Map<String, VoiceProfile> kVoiceProfiles = {
 
 class ScriptLine {
   Duration time;
+  /// What you read and edit on screen.
   String text;
-  ScriptLine(this.time, this.text);
+  /// What the voice actually says, when that differs.
+  ///
+  /// Hinglish is Hindi written in English letters, and a Hindi voice reading Latin
+  /// letters mispronounces it badly. So Gemini returns the same line twice — Hinglish
+  /// to read, Devanagari to speak — and this holds the second one. Null means speak
+  /// [text] as it stands.
+  String? speak;
+  ScriptLine(this.time, this.text, {this.speak});
+
+  /// Cleared when the line is edited, since the two would no longer match.
+  String get spoken => (speak == null || speak!.trim().isEmpty) ? text : speak!;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -231,9 +210,18 @@ List<ScriptLine> parseScript(String raw) {
     final trimmed = line.replaceAll(RegExp(r'^[\*\-\•\d\.\s]+(?=\d+:\d+)'), '').trim();
     if (trimmed.isEmpty) continue;
     final match = RegExp(r'(\d{1,2}:\d{2})\s+(.+)$').firstMatch(trimmed);
-    if (match != null) {
-      lines.add(ScriptLine(parseDuration(match.group(1)!), match.group(2)!.trim()));
-    }
+    if (match == null) continue;
+
+    // "0:04 Ria ne dekha | रिया ने देखा" — the half after the pipe is what gets spoken.
+    // Scripts pasted by hand have no pipe, and still work exactly as before.
+    final rest = match.group(2)!;
+    final pipe = rest.indexOf('|');
+    final display = (pipe >= 0 ? rest.substring(0, pipe) : rest).trim();
+    final spoken = pipe >= 0 ? rest.substring(pipe + 1).trim() : '';
+    if (display.isEmpty) continue;
+
+    lines.add(ScriptLine(parseDuration(match.group(1)!), display,
+        speak: spoken.isEmpty ? null : spoken));
   }
   lines.sort((a, b) => a.time.compareTo(b.time));
   return lines;
@@ -667,13 +655,15 @@ class TimedScriptScreen extends StatefulWidget {
   /// Empty in video mode. When present the reel is built from these instead.
   final List<String> images;
   final List<ScriptLine> initialLines;
+  /// Which voice speaks it. Phone by default, because that one always works.
+  final VoiceEngine engine;
   const TimedScriptScreen({
     super.key, required this.style, required this.language,
     required this.videoFile, required this.initialLines,
     this.images = const [],
+    this.engine = VoiceEngine.phone,
   });
 
-  /// Which of the two builds runs when the last button is pressed.
   @override
   State<TimedScriptScreen> createState() => _TimedScriptScreenState();
 }
@@ -701,9 +691,14 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// True when there is no source video, so the reel has to be built from pictures.
   bool get _storyMode => widget.videoFile == null;
 
+  /// Changeable here rather than only on the story screen, so you can hear one engine,
+  /// switch, and hear the difference without starting the script again.
+  late VoiceEngine _engine;
+
   @override
   void initState() {
     super.initState();
+    _engine = widget.engine;
     _images = List.of(widget.images);
     _lines = List.from(widget.initialLines);
     _showPaste = _lines.isEmpty;
@@ -741,7 +736,11 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   void _syncLines() {
     for (int i = 0; i < _lines.length; i++) {
-      _lines[i].text = _textCtrls[i].text;
+      final edited = _textCtrls[i].text;
+      // An edited line no longer matches its Devanagari twin, so drop that and speak
+      // what is on screen rather than the sentence it used to be.
+      if (edited != _lines[i].text) _lines[i].speak = null;
+      _lines[i].text = edited;
       _lines[i].time = parseDuration(_timeCtrls[i].text);
     }
   }
@@ -764,15 +763,23 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     });
   }
 
-  // Preview uses flutter_tts (free, no API cost)
+  /// Preview always speaks with the phone, whatever engine is selected — it is instant
+  /// and costs nothing, where Gemini and ElevenLabs would mean a network call per line
+  /// every time you tapped it. Say so, or the preview sounds like the engine is broken.
   Future<void> _previewAll() async {
     _syncLines();
     _cancelTimers();
-    setState(() { _isPlaying = true; _activeIdx = -1; });
+    setState(() {
+      _isPlaying = true;
+      _activeIdx = -1;
+      _status = _engine == VoiceEngine.phone
+          ? ''
+          : 'Preview uses the phone voice. Tap Save Voice to hear ${voiceEngineLabel(_engine)}.';
+    });
     await _initTts();
     for (int i = 0; i < _lines.length; i++) {
       final idx = i;
-      final text = cleanForTts(_lines[i].text);
+      final text = cleanForTts(_lines[i].spoken);
       final delay = _lines[i].time;
       _timers.add(Timer(delay, () async {
         if (!_isPlaying || !mounted) return;
@@ -794,7 +801,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   void _cancelTimers() { for (final t in _timers) t.cancel(); _timers.clear(); }
 
-  // Save voice using native TTS (same voice as Preview) — then build timed track with FFmpeg concat
+  /// Speaks every line to its own file, then lays them out on a timeline with FFmpeg.
   Future<void> _saveAudio() async {
     _syncLines();
     if (_lines.isEmpty) { setState(() => _status = 'No lines to save!'); return; }
@@ -803,23 +810,23 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       final dir = await getTemporaryDirectory();
       final segPaths = <String>[];
       final locale = widget.language == 'English' ? 'en-IN' : 'hi-IN';
+      final engineName = voiceEngineLabel(_engine);
 
-      // Step 1: Native TTS generates each line as wav
+      // Step 1: one file per line, from whichever voice is selected.
       for (int i = 0; i < _lines.length; i++) {
-        setState(() => _status = 'Voice: line ${i + 1} of ${_lines.length}...');
-        final p = '${dir.path}/seg_$i.wav';
-        if (await File(p).exists()) await File(p).delete();
-        await nativeSynthesize(
-          text: cleanForTts(_lines[i].text),
-          filePath: p,
-          lang: locale,
+        setState(() => _status = '$engineName voice: line ${i + 1} of ${_lines.length}...');
+        // `spoken` is the Devanagari half for Hinglish, and the plain text otherwise.
+        segPaths.add(await synthesizeLine(
+          engine: _engine,
+          text: cleanForTts(_lines[i].spoken),
+          basePath: '${dir.path}/seg_$i',
+          languageTag: locale,
           rate: _vp.rate,
           pitch: _vp.pitch,
-        );
-        // Wait briefly for TTS to finish writing
-        await Future.delayed(const Duration(milliseconds: 300));
-        if (!await File(p).exists()) throw Exception('TTS failed for line ${i + 1}.');
-        segPaths.add(p);
+          geminiKey: _geminiKey,
+          elevenLabsKey: _elevenLabsKey,
+          elevenVoiceId: _elevenVoiceId,
+        ));
       }
 
       setState(() => _status = 'Building timed audio track...');
@@ -1118,9 +1125,38 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       Container(
         width: double.infinity,
         color: Colors.orange.shade900.withOpacity(0.4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Text('🎙️ Phone voice  •  ${widget.style}  •  ${widget.language}$_imageNote',
-          style: const TextStyle(fontSize: 11, color: Colors.white70)),
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('${widget.style}  •  ${widget.language}$_imageNote',
+            style: const TextStyle(fontSize: 11, color: Colors.white70)),
+          const SizedBox(height: 4),
+          // Switching engine throws away the saved voice: it was spoken by the old one,
+          // so leaving it would build a video with a voice you did not choose.
+          Row(children: [
+            const Text('Voice:', style: TextStyle(fontSize: 11, color: Colors.white54)),
+            const SizedBox(width: 6),
+            ...VoiceEngine.values.map((e) => Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: GestureDetector(
+                onTap: busy ? null : () => setState(() {
+                  _engine = e;
+                  _audioPath = null;
+                  _status = 'Voice set to ${voiceEngineLabel(e)}. '
+                      '${voiceEngineHint(e)} Tap Save Voice again.';
+                }),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: _engine == e ? Colors.deepPurple : Colors.black26,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(voiceEngineLabel(e),
+                    style: const TextStyle(fontSize: 10, color: Colors.white)),
+                ),
+              ),
+            )),
+          ]),
+        ]),
       ),
       if (_storyMode) _buildImageStrip(busy),
       Expanded(
