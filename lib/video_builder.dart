@@ -120,6 +120,8 @@ class SlideshowBuilder {
         outPath: clipPath,
         seconds: durations[i],
         index: i,
+        isFirst: i == 0,
+        isLast: i == durations.length - 1,
       );
       clipPaths.add(clipPath);
     }
@@ -135,45 +137,59 @@ class SlideshowBuilder {
     return finalPath;
   }
 
-  /// One still image as a clip, with a slow zoom so it never looks frozen.
+  /// One still image as a clip: the whole picture, on a blurred version of itself.
+  ///
+  /// The old version scaled each image to FILL the frame and cropped the overflow, so
+  /// anything not already portrait lost its edges — heads and sides cut off. Now the
+  /// picture is scaled to FIT, so nothing is ever lost, and the empty space is filled
+  /// with a soft blurred copy of the same image instead of black bars.
+  ///
+  /// It drifts slowly rather than zooming. A zoom has to crop to have anywhere to go;
+  /// a few pixels of movement keeps it alive without touching the edges.
   static Future<void> _renderClip({
     required String imagePath,
     required String outPath,
     required double seconds,
     required int index,
+    required bool isFirst,
+    required bool isLast,
   }) async {
     if (!await File(imagePath).exists()) {
       throw Exception('Image ${index + 1} is missing: $imagePath');
     }
     await _deleteIfExists(outPath);
 
-    final frames = (seconds * kFps).round().clamp(kFps, 100000);
-    final fadeOutAt = (seconds - 0.4) < 0 ? 0.0 : seconds - 0.4;
+    // Fading every clip in and out meant the video blinked to black between each
+    // picture. Only the very start and the very end fade now; the rest cut straight.
+    final fades = <String>[];
+    if (isFirst) fades.add('fade=t=in:st=0:d=0.5');
+    if (isLast) {
+      final from = (seconds - 0.6) < 0 ? 0.0 : seconds - 0.6;
+      fades.add('fade=t=out:st=${from.toStringAsFixed(2)}:d=0.6');
+    }
+    final fadePart = fades.isEmpty ? '' : ',${fades.join(',')}';
 
-    // Scaled to double size before zoompan on purpose: zooming a 1080-wide source
-    // straight to 1080 output makes the pan judder, because zoompan can only step in
-    // whole source pixels. Alternate images zoom in and out so a long reel doesn't
-    // feel like it's marching in one direction.
-    final zoomIn = index.isEven;
-    final zoomExpr = zoomIn
-        ? "'min(zoom+0.0007,1.25)'"
-        : "'if(lte(zoom,1.0),1.25,max(1.001,zoom-0.0007))'";
-
-    final filter = 'scale=${kVideoWidth * 2}:${kVideoHeight * 2}'
-        ':force_original_aspect_ratio=increase,'
-        'crop=${kVideoWidth * 2}:${kVideoHeight * 2},'
-        'zoompan=z=$zoomExpr'
-        ":x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-        ':d=$frames:s=${kVideoWidth}x$kVideoHeight:fps=$kFps,'
-        'fade=t=in:st=0:d=0.4,'
-        'fade=t=out:st=${fadeOutAt.toStringAsFixed(2)}:d=0.4,'
-        'format=yuv420p';
+    // The backdrop is the same picture shrunk to thumbnail size and scaled back up.
+    // Blowing up 64 pixels to 1080 IS the blur — no blur filter needed, which keeps
+    // this working on ffmpeg builds that leave gblur out, and costs almost nothing.
+    // Drift alternates direction per image so a long reel doesn't slide one way.
+    final drift = index.isEven ? 1 : -1;
+    final filter =
+        '[0:v]split=2[bg][fg];'
+        '[bg]scale=64:114:force_original_aspect_ratio=increase,crop=64:114,'
+        'scale=$kVideoWidth:$kVideoHeight:flags=bilinear,setsar=1[back];'
+        '[fg]scale=$kVideoWidth:$kVideoHeight:force_original_aspect_ratio=decrease,'
+        'scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1[front];'
+        "[back][front]overlay=x='(W-w)/2':"
+        "y='(H-h)/2+$drift*14*sin(2*PI*t/9)'"
+        '$fadePart,format=yuv420p[v]';
 
     final session = await FFmpegKit.executeWithArguments([
       '-loop', '1',
       '-i', imagePath,
       '-t', seconds.toStringAsFixed(3),
-      '-vf', filter,
+      '-filter_complex', filter,
+      '-map', '[v]',
       '-r', '$kFps',
       '-c:v', 'libx264',
       '-preset', 'ultrafast',
