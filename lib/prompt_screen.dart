@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'characters.dart';
 import 'prompt_builder.dart';
 import 'prompts.dart';
+import 'theme.dart';
 
 // ── Prompts screen ────────────────────────────────────────────────────────────
 // Everything here is meant to be copied out and pasted into an image or video
@@ -135,7 +136,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
   Widget _buildCast() {
     return Card(
-      color: Colors.grey[900],
+      color: AppColors.surface,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -152,7 +153,7 @@ class _PromptScreenState extends State<PromptScreen> {
           ]),
           const Text('Tick who is in this story. Tap a face to change the picture, tap the '
               'name to edit the description. Saved on this phone and reused every time.',
-            style: TextStyle(fontSize: 11, color: Colors.white54)),
+            style: TextStyle(fontSize: 11, color: AppColors.textSoft)),
           const SizedBox(height: 10),
           SizedBox(
             height: 128,
@@ -176,11 +177,11 @@ class _PromptScreenState extends State<PromptScreen> {
                             child: Container(
                               height: 92, width: 84,
                               decoration: BoxDecoration(
-                                color: Colors.black26,
+                                color: AppColors.surfaceAlt,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: _inStory.contains(c.name)
-                                      ? Colors.teal : Colors.grey.shade700),
+                                      ? AppColors.primary : AppColors.border),
                               ),
                               clipBehavior: Clip.antiAlias,
                               // A picked face wins; otherwise the one shipped with the
@@ -190,7 +191,7 @@ class _PromptScreenState extends State<PromptScreen> {
                                   : c.assetPath != null
                                       ? Image.asset(c.assetPath!, fit: BoxFit.cover)
                                       : const Center(child: Icon(Icons.add_a_photo,
-                                          color: Colors.white38, size: 22)),
+                                          color: AppColors.textFaint, size: 22)),
                             ),
                           ),
                         ),
@@ -203,7 +204,7 @@ class _PromptScreenState extends State<PromptScreen> {
                             child: Container(
                               decoration: BoxDecoration(
                                 color: _inStory.contains(c.name)
-                                    ? Colors.teal : Colors.black54,
+                                    ? AppColors.primary : AppColors.textSoft,
                                 shape: BoxShape.circle,
                               ),
                               padding: const EdgeInsets.all(3),
@@ -227,7 +228,7 @@ class _PromptScreenState extends State<PromptScreen> {
                             // Amber when there is no description: that character would
                             // be left out of every prompt, and nothing else would say so.
                             color: c.description.trim().isEmpty
-                                ? Colors.amber : Colors.white38),
+                                ? AppColors.warning : AppColors.textFaint),
                         ]),
                       ),
                     ]),
@@ -267,7 +268,7 @@ class _PromptScreenState extends State<PromptScreen> {
     final saved = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: AppColors.surface,
         title: Text(existing == null ? 'New character' : existing.name),
         content: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -293,7 +294,7 @@ class _PromptScreenState extends State<PromptScreen> {
           if (existing != null)
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Remove', style: TextStyle(color: Colors.red)),
+              child: const Text('Remove', style: TextStyle(color: AppColors.danger)),
             ),
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
@@ -324,7 +325,7 @@ class _PromptScreenState extends State<PromptScreen> {
   }
 
   Widget _buildError() => Card(
-        color: Colors.red.shade900.withOpacity(0.3),
+        color: AppColors.danger.withOpacity(0.3),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -400,7 +401,7 @@ class _PromptScreenState extends State<PromptScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
         // Off by default: most generators render text badly, and a misspelt overlay
         // is worse than none. Better to add captions afterwards.
-        const Text('Add caption', style: TextStyle(fontSize: 11, color: Colors.white54)),
+        const Text('Add caption', style: TextStyle(fontSize: 11, color: AppColors.textSoft)),
         Switch(
           value: _withOverlay,
           onChanged: (v) => setState(() => _withOverlay = v),
@@ -414,7 +415,7 @@ class _PromptScreenState extends State<PromptScreen> {
                   'per picture, in order, in the same chat.'
                 : 'Long self-contained prompts. Each one stands alone, for a tool with '
                   'a single prompt box.',
-            style: const TextStyle(fontSize: 11, color: Colors.white54)),
+            style: const TextStyle(fontSize: 11, color: AppColors.textSoft)),
         ),
         const SizedBox(width: 8),
         // Named for the shape of the thing, not for WhatsApp: the same messages work
@@ -481,7 +482,7 @@ class _PromptScreenState extends State<PromptScreen> {
     required String copyLabel,
   }) {
     return Card(
-      color: Colors.grey[900],
+      color: AppColors.surface,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -491,7 +492,7 @@ class _PromptScreenState extends State<PromptScreen> {
                 Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 if (subtitle.isNotEmpty)
                   Text(subtitle,
-                    style: const TextStyle(fontSize: 11, color: Colors.white54)),
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSoft)),
               ]),
             ),
             IconButton(
@@ -504,7 +505,7 @@ class _PromptScreenState extends State<PromptScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.black38, borderRadius: BorderRadius.circular(6)),
+              color: AppColors.surfaceAlt, borderRadius: BorderRadius.circular(6)),
             child: SelectableText(body,
               style: const TextStyle(fontSize: 11, height: 1.35, fontFamily: 'monospace')),
           ),

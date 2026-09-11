@@ -17,6 +17,7 @@ import 'voice.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
 import 'story_ideas.dart';
+import 'theme.dart';
 import 'music.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
@@ -345,11 +346,14 @@ final List<Character> kCharacters = [
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 void main() => runApp(MaterialApp(
-      title: 'Story Voice Maker',
+      title: 'Story Reel Maker',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(brightness: Brightness.dark),
+      theme: buildAppTheme(),
       home: const StoryScreen(),
     ));
+
+/// The five steps, named once so the bar says the same thing on every screen.
+const kSteps = ['Story', 'Script', 'Pictures', 'Voice', 'Reel'];
 
 // ── Home Screen ───────────────────────────────────────────────────────────────
 
@@ -380,20 +384,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Story Voice Maker')),
+      backgroundColor: AppColors.bg,
+      appBar: AppBar(backgroundColor: AppColors.bg, title: const Text('Story Voice Maker')),
       body: Column(children: [
         Expanded(
           child: _ctrl != null && _ctrl!.value.isInitialized
               ? AspectRatio(aspectRatio: _ctrl!.value.aspectRatio, child: VideoPlayer(_ctrl!))
-              : const Center(child: Text('No video selected', style: TextStyle(color: Colors.white54))),
+              : const Center(child: Text('No video selected', style: TextStyle(color: AppColors.textSoft))),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Column(children: [
-            _btn(Icons.video_library, 'Select Reel', Colors.blueGrey, _pickVideo),
+            _btn(Icons.video_library, 'Select Reel', AppColors.textSoft, _pickVideo),
             const SizedBox(height: 10),
-            _btn(Icons.auto_awesome, 'Add Voice', Colors.deepPurple,
+            _btn(Icons.auto_awesome, 'Add Voice', AppColors.primary,
               _video == null ? null : () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => StoryInputScreen(
                   videoFile: _video!,
@@ -412,7 +416,7 @@ class _HomeScreenState extends State<HomeScreen> {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
           backgroundColor: color, foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey.shade800,
+          disabledBackgroundColor: AppColors.border,
         ),
       ),
     );
@@ -459,7 +463,7 @@ class _StoryScreenState extends State<StoryScreen> {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.grey[900],
+          backgroundColor: AppColors.surface,
           title: Row(children: [
             Text('${check.score}/10',
               style: TextStyle(
@@ -468,8 +472,8 @@ class _StoryScreenState extends State<StoryScreen> {
                 // Amber rather than red below 7: it is a nudge to improve, not a
                 // refusal, and the story is still yours to use.
                 color: check.score >= 8
-                    ? Colors.teal
-                    : check.score >= 6 ? Colors.amber : Colors.orange,
+                    ? AppColors.primary
+                    : check.score >= 6 ? AppColors.warning : AppColors.accent,
               )),
             const SizedBox(width: 10),
             const Expanded(child: Text('Story check', style: TextStyle(fontSize: 15))),
@@ -486,7 +490,7 @@ class _StoryScreenState extends State<StoryScreen> {
                 ...check.good.map((g) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Icon(Icons.check, size: 14, color: Colors.teal),
+                        const Icon(Icons.check, size: 14, color: AppColors.primary),
                         const SizedBox(width: 6),
                         Expanded(child: Text(g, style: const TextStyle(fontSize: 12))),
                       ]),
@@ -495,10 +499,10 @@ class _StoryScreenState extends State<StoryScreen> {
                 ...check.missing.map((m) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Icon(Icons.priority_high, size: 14, color: Colors.amber),
+                        const Icon(Icons.priority_high, size: 14, color: AppColors.warning),
                         const SizedBox(width: 6),
                         Expanded(child: Text(m,
-                          style: const TextStyle(fontSize: 12, color: Colors.amber))),
+                          style: const TextStyle(fontSize: 12, color: AppColors.warning))),
                       ]),
                     )),
               ],
@@ -527,13 +531,13 @@ class _StoryScreenState extends State<StoryScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
-          backgroundColor: Colors.grey[900],
+          backgroundColor: AppColors.surface,
           title: const Text('Story idea'),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             DropdownButtonFormField<String>(
               value: age,
               decoration: const InputDecoration(labelText: 'Age'),
-              dropdownColor: Colors.grey[850],
+              dropdownColor: AppColors.surface,
               items: kStoryAges
                   .map((a) => DropdownMenuItem(value: a, child: Text('$a years')))
                   .toList(),
@@ -543,7 +547,7 @@ class _StoryScreenState extends State<StoryScreen> {
             DropdownButtonFormField<String>(
               value: problem,
               decoration: const InputDecoration(labelText: 'Problem'),
-              dropdownColor: Colors.grey[850],
+              dropdownColor: AppColors.surface,
               isExpanded: true,
               items: kStoryProblems
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
@@ -638,142 +642,139 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.black, title: const Text('Story Reel Maker')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(
-            child: ListView(children: [
-              Row(children: [
-                const Expanded(
-                  child: Text('What happens in the story?',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                ),
-                TextButton.icon(
-                  onPressed: _isGenerating ? null : _askForIdea,
-                  icon: const Icon(Icons.lightbulb_outline, size: 16),
-                  label: const Text('Idea', style: TextStyle(fontSize: 12)),
-                ),
-                TextButton.icon(
-                  onPressed: _isGenerating ? null : _checkStory,
-                  icon: const Icon(Icons.fact_check_outlined, size: 16),
-                  label: const Text('Check', style: TextStyle(fontSize: 12)),
-                ),
-                TextButton.icon(
-                  onPressed: _isGenerating ? null : _useFormat,
-                  icon: const Icon(Icons.copy_all, size: 16),
-                  label: const Text('Format', style: TextStyle(fontSize: 12)),
-                ),
-              ]),
-              const SizedBox(height: 4),
-              const Text('A few lines is enough. The more you say about what happens, '
-                  'the closer the script stays to your story.',
-                style: TextStyle(fontSize: 11, color: Colors.white38)),
-              const SizedBox(height: 8),
+      appBar: AppBar(
+        title: const Text('Story Reel Maker'),
+        actions: [
+          // The old-path entry lives up here now. It still works, but it is not what
+          // the app is for, and as a full-width button it read like a main choice.
+          IconButton(
+            tooltip: 'Add voice to a video I already have',
+            icon: const Icon(Icons.video_library_outlined, size: 20),
+            onPressed: _isGenerating ? null : () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const HomeScreen())),
+          ),
+        ],
+      ),
+      body: Column(children: [
+        const StepBar(steps: kSteps, current: 0),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            children: [
+              const Text("What's the story?", style: AppText.screenTitle),
+              Gap.xs,
+              const Text('A few lines is enough. The more you say about what actually '
+                  'happens, the closer the script stays to your story.',
+                style: AppText.hint),
+              Gap.m,
+
               TextField(
                 controller: _descCtrl,
-                maxLines: 8,
-                minLines: 4,
-                style: const TextStyle(fontSize: 14),
-                decoration: InputDecoration(
+                maxLines: 10,
+                minLines: 6,
+                style: AppText.body,
+                decoration: const InputDecoration(
                   hintText: 'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
                       'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
                       'neeche mil jaata hai. Sab hass padte hain.',
-                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
-                  filled: true, fillColor: Colors.grey[900],
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.all(12),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text('How long', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 6),
-              Wrap(spacing: 8, children: _lengths.map((s) => ChoiceChip(
-                label: Text('$s sec'),
-                selected: _seconds == s,
-                onSelected: (_) => setState(() => _seconds = s),
-              )).toList()),
-              const SizedBox(height: 20),
-              const Text('Voice style', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 6),
-              Wrap(spacing: 8, runSpacing: 4, children: kVoiceProfiles.keys.map((s) => ChoiceChip(
-                label: Text(s, style: const TextStyle(fontSize: 12)),
-                selected: _style == s,
-                onSelected: (_) => setState(() => _style = s),
-              )).toList()),
-              const SizedBox(height: 20),
-              const Text('Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 6),
-              Wrap(spacing: 8, children: _languages.map((l) => ChoiceChip(
-                label: Text(l),
-                selected: _language == l,
-                onSelected: (_) => setState(() => _language = l),
-              )).toList()),
-              if (_status.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[850], borderRadius: BorderRadius.circular(8)),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Expanded(child: Text(_status, style: const TextStyle(fontSize: 12))),
-                    IconButton(
-                      icon: const Icon(Icons.copy, size: 16, color: Colors.white54),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: _status));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Copied!'), duration: Duration(seconds: 1)));
-                      },
-                    ),
-                  ]),
-                ),
-              ],
-            ]),
+              Gap.s,
+
+              // Real buttons rather than three tiny text links crammed above the box.
+              // These are the three things worth doing before writing a script, and
+              // they were the least visible controls on the screen.
+              Row(children: [
+                Expanded(child: SecondaryButton(
+                  label: 'Idea', icon: Icons.lightbulb_outline,
+                  colour: AppColors.accent,
+                  onPressed: _isGenerating ? null : _askForIdea)),
+                Gap.wS,
+                Expanded(child: SecondaryButton(
+                  label: 'Check', icon: Icons.fact_check_outlined,
+                  onPressed: _isGenerating ? null : _checkStory)),
+                Gap.wS,
+                Expanded(child: SecondaryButton(
+                  label: 'Form', icon: Icons.list_alt,
+                  onPressed: _isGenerating ? null : _useFormat)),
+              ]),
+              Gap.l,
+
+              const SectionTitle('How long'),
+              _chips(_lengths.map((s) => _Choice('$s sec', _seconds == s,
+                  () => setState(() => _seconds = s)))),
+              Gap.l,
+
+              const SectionTitle('Tone'),
+              _chips(kVoiceProfiles.keys.map((s) => _Choice(s, _style == s,
+                  () => setState(() => _style = s)))),
+              Gap.l,
+
+              const SectionTitle('Language'),
+              _chips(_languages.map((l) => _Choice(l, _language == l,
+                  () => setState(() => _language = l)))),
+            ],
           ),
-          const SizedBox(height: 12),
-          SizedBox(width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _isGenerating ? null : _generate,
-              icon: _isGenerating
-                  ? const SizedBox(width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.auto_awesome),
-              label: Text(_isGenerating ? 'Writing...' : '✨ Write My Story'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade700, foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                disabledBackgroundColor: Colors.grey.shade800,
-              ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(children: [
+            StatusBar(message: _status, onCopy: () {
+              Clipboard.setData(ClipboardData(text: _status));
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text('Copied'), duration: Duration(seconds: 1)));
+            }),
+            PrimaryButton(
+              label: _isGenerating ? 'Writing the script...' : 'Write the script',
+              icon: Icons.auto_awesome,
+              loading: _isGenerating,
+              onPressed: _generate,
             ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(width: double.infinity,
-            child: ElevatedButton.icon(
+            Gap.s,
+            TextButton.icon(
               onPressed: _isGenerating ? null : () => _openScript(const []),
-              icon: const Icon(Icons.edit),
-              label: const Text('Write The Script Myself'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple, foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
+              icon: const Icon(Icons.edit_outlined, size: 17),
+              label: const Text('Or write the script myself',
+                style: TextStyle(fontSize: 14)),
+              style: TextButton.styleFrom(foregroundColor: AppColors.textSoft),
             ),
-          ),
-          // Kept because it still works, but it is no longer what the app is for.
-          TextButton.icon(
-            onPressed: _isGenerating ? null : () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const HomeScreen())),
-            icon: const Icon(Icons.video_library, size: 16),
-            label: const Text('Add voice to a video I already have',
-              style: TextStyle(fontSize: 12)),
-            style: TextButton.styleFrom(foregroundColor: Colors.white54),
-          ),
-        ]),
-      ),
+          ]),
+        ),
+      ]),
     );
   }
+
+  /// A row of choices that wraps. One place, so all three groups look the same —
+  /// they were three different ChoiceChip calls with three different text sizes.
+  Widget _chips(Iterable<_Choice> choices) => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: choices.map((c) => GestureDetector(
+          onTap: c.onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: c.selected ? AppColors.primary : AppColors.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: c.selected ? AppColors.primary : AppColors.border),
+            ),
+            child: Text(c.label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: c.selected ? FontWeight.w700 : FontWeight.w500,
+                color: c.selected ? Colors.white : AppColors.text)),
+          ),
+        )).toList(),
+      );
+}
+
+/// One option in a chip row.
+class _Choice {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _Choice(this.label, this.selected, this.onTap);
 }
 
 
@@ -841,9 +842,9 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
               const Text('Language', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: _language, dropdownColor: Colors.grey[850],
+                value: _language, dropdownColor: AppColors.surface,
                 decoration: InputDecoration(
-                  filled: true, fillColor: Colors.grey[900],
+                  filled: true, fillColor: AppColors.surface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
@@ -859,8 +860,8 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
                 style: const TextStyle(fontSize: 13),
                 decoration: InputDecoration(
                   hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai aur sab khush ho jaate hain',
-                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 12),
-                  filled: true, fillColor: Colors.grey[900],
+                  hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 12),
+                  filled: true, fillColor: AppColors.surface,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   contentPadding: const EdgeInsets.all(10),
                 ),
@@ -869,11 +870,11 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: AppColors.surfaceAlt, borderRadius: BorderRadius.circular(8)),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(child: Text(_genStatus, style: const TextStyle(fontSize: 12))),
                     IconButton(
-                      icon: const Icon(Icons.copy, size: 16, color: Colors.white54),
+                      icon: const Icon(Icons.copy, size: 16, color: AppColors.textSoft),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       onPressed: () {
@@ -898,10 +899,10 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
                   : const Icon(Icons.auto_awesome),
               label: Text(_isGenerating ? 'Analyzing video...' : '✨ Auto-Generate Script (AI)'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade700,
+                backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                disabledBackgroundColor: Colors.grey.shade800,
+                disabledBackgroundColor: AppColors.border,
               ),
             ),
           ),
@@ -918,10 +919,10 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
               icon: const Icon(Icons.edit),
               label: const Text('Write Script Manually'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                disabledBackgroundColor: Colors.grey.shade800,
+                disabledBackgroundColor: AppColors.border,
               ),
             ),
           ),
@@ -1005,6 +1006,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   CaptionSpot _captionSpot = CaptionSpot.high;
   /// The closing brand card. On by default — it should be on every reel.
   bool _endCard = true;
+
+  /// Which of Script, Pictures, Voice, Reel is showing. One screen, four views, so
+  /// nothing about the state or the pipeline had to move to make it step by step.
+  int _step = 0;
   ClipMotion _motion = ClipMotion.drift;
 
   /// Which bundled track plays under the voice. Null means none.
@@ -1238,10 +1243,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.grey[900],
+          backgroundColor: AppColors.surface,
           title: Text(geminiVoiceName, style: const TextStyle(fontSize: 16)),
           content: Text(kVoiceSampleText,
-            style: const TextStyle(fontSize: 13, color: Colors.white70)),
+            style: const TextStyle(fontSize: 13, color: AppColors.textSoft)),
           actions: [
             TextButton(
               onPressed: () { player.seekTo(Duration.zero); player.play(); },
@@ -1260,7 +1265,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   Future<void> _pickVoice() async {
     final chosen = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: Colors.grey[900],
+      backgroundColor: AppColors.surface,
       builder: (ctx) => SafeArea(
         child: ListView(
           shrinkWrap: true,
@@ -1271,10 +1276,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
                   ? Icons.radio_button_checked
                   : Icons.radio_button_unchecked,
               size: 18,
-              color: v.name == geminiVoiceName ? Colors.teal : Colors.white38),
+              color: v.name == geminiVoiceName ? AppColors.primary : AppColors.textFaint),
             title: Text(v.name, style: const TextStyle(fontSize: 14)),
             subtitle: Text(v.note,
-              style: const TextStyle(fontSize: 11, color: Colors.white54)),
+              style: const TextStyle(fontSize: 11, color: AppColors.textSoft)),
             onTap: () => Navigator.pop(ctx, v.name),
           )).toList(),
         ),
@@ -1437,7 +1442,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.grey[900],
+      backgroundColor: AppColors.surface,
       builder: (ctx) => SafeArea(
         child: ListView(shrinkWrap: true, children: [
           ListTile(
@@ -1581,71 +1586,573 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Script Editor'),
+        title: Text(_showPaste ? 'Paste a script' : kSteps[_step + 1]),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (_showPaste) { setState(() => _showPaste = false); return; }
+            if (_step > 0) { setState(() => _step -= 1); return; }
+            Navigator.pop(context);
+          },
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.auto_fix_high), tooltip: 'AI prompts',
-            onPressed: _lines.isEmpty ? null : _openPrompts),
-          IconButton(icon: const Icon(Icons.edit_note), tooltip: 'Paste script',
-            onPressed: () => setState(() => _showPaste = true)),
-          IconButton(icon: const Icon(Icons.add), tooltip: 'Add line',
-            onPressed: (_isSaving || _isMerging) ? null : _addLine),
+          if (!_showPaste && _step == 0)
+            IconButton(icon: const Icon(Icons.edit_note), tooltip: 'Paste a script',
+              onPressed: () => setState(() => _showPaste = true)),
+          if (!_showPaste && _step == 0)
+            IconButton(icon: const Icon(Icons.add), tooltip: 'Add a line',
+              onPressed: (_isSaving || _isMerging) ? null : _addLine),
         ],
       ),
-      body: _showPaste ? _buildPastePanel() : _buildEditor(),
+      body: _showPaste ? _buildPastePanel() : _buildStep(),
     );
   }
 
+  // ── The steps ───────────────────────────────────────────────────────────────
+  //
+  // One screen underneath, shown one job at a time. Everything used to be on this
+  // screen at once — script, pictures, voice engine, voice name, captions, caption
+  // position, motion, end card, music — in rows of ten-pixel grey chips that all
+  // looked equally important, which meant none of them did.
+
+  Widget _buildStep() {
+    final busy = _isSaving || _isMerging;
+    return Column(children: [
+      StepBar(
+        steps: kSteps,
+        current: _step + 1,
+        // Only backwards. A step ahead cannot be jumped to, because the app has no
+        // way of knowing you did the ones in between.
+        onTap: (i) {
+          if (i == 0) { Navigator.pop(context); return; }
+          setState(() => _step = i - 1);
+        },
+      ),
+      Expanded(child: _stepBody(busy)),
+      _buildBottomBar(busy),
+    ]);
+  }
+
+  Widget _stepBody(bool busy) {
+    if (_step == 0) return _stepScript(busy);
+    if (_step == 1) return _stepPictures(busy);
+    if (_step == 2) return _stepVoice(busy);
+    return _stepReel(busy);
+  }
+
+  /// Status and the one action for this step, always in the same place.
+  Widget _buildBottomBar(bool busy) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      decoration: const BoxDecoration(
+        color: AppColors.bg,
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        StatusBar(message: _status, onCopy: () {
+          Clipboard.setData(ClipboardData(text: _status));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Copied'), duration: Duration(seconds: 1)));
+        }),
+        if (_step < 3)
+          PrimaryButton(
+            label: 'Next: ${kSteps[_step + 2].toLowerCase()}',
+            onPressed: busy ? null : () => setState(() => _step += 1),
+          )
+        else ...[
+          if (_notReadyReason.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(children: [
+                const Icon(Icons.info_outline, size: 16, color: AppColors.warning),
+                const SizedBox(width: 6),
+                Expanded(child: Text(_notReadyReason,
+                  style: const TextStyle(fontSize: 13, color: AppColors.warning))),
+              ]),
+            ),
+          PrimaryButton(
+            label: _isSaving
+                ? 'Recording the voice...'
+                : _isMerging
+                    ? (_storyMode ? 'Building the reel...' : 'Merging...')
+                    : (_storyMode ? 'Make the reel' : 'Merge with video'),
+            icon: Icons.movie_creation_outlined,
+            loading: _isMerging || _isSaving,
+            onPressed: (busy || _lines.isEmpty || (_storyMode && _images.isEmpty))
+                ? null : _makeReel,
+          ),
+        ],
+      ]),
+    );
+  }
+
+  // ── Step 1: the script ──────────────────────────────────────────────────────
+
+  Widget _stepScript(bool busy) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        const Text('Your script', style: AppText.screenTitle),
+        Gap.xs,
+        const Text('Edit any line. The time beside it is when its picture appears.',
+          style: AppText.hint),
+        Gap.m,
+
+        // The first line gets its own card and its own label, because it is not just
+        // another line — it is the three seconds that decide whether the rest is seen.
+        if (_lines.isNotEmpty) ...[
+          AppCard(
+            colour: AppColors.accentSoft,
+            borderColour: AppColors.accent,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const Icon(Icons.bolt, size: 16, color: AppColors.accent),
+                const SizedBox(width: 6),
+                Text('FIRST 3 SECONDS',
+                  style: AppText.section.copyWith(color: AppColors.accent)),
+              ]),
+              Gap.s,
+              TextField(
+                controller: _textCtrls[0],
+                maxLines: null,
+                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700,
+                  color: AppColors.text, height: 1.35),
+                decoration: const InputDecoration(
+                  hintText: 'The line that stops someone scrolling',
+                  isDense: true,
+                ),
+              ),
+            ]),
+          ),
+          Gap.m,
+        ],
+
+        SectionTitle('The rest', trailing: '${_lines.length} lines'),
+        ...List.generate(_lines.length, (i) => i == 0
+            ? const SizedBox.shrink()
+            : Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _lineCard(i, busy),
+              )),
+        Gap.s,
+        SecondaryButton(
+          label: 'Add a line', icon: Icons.add,
+          onPressed: busy ? null : _addLine),
+      ],
+    );
+  }
+
+  Widget _lineCard(int i, bool busy) {
+    final isActive = _activeIdx == i;
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(10, 4, 4, 4),
+      borderColour: isActive ? AppColors.primary : AppColors.border,
+      colour: isActive ? AppColors.primarySoft : AppColors.surface,
+      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        SizedBox(
+          width: 52,
+          child: TextField(
+            controller: _timeCtrls[i],
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700,
+              color: AppColors.primary),
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.datetime,
+            decoration: const InputDecoration(
+              isDense: true,
+              fillColor: AppColors.surfaceAlt,
+              contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+            ),
+          ),
+        ),
+        Gap.wS,
+        Expanded(
+          child: TextField(
+            controller: _textCtrls[i],
+            maxLines: null,
+            style: AppText.body,
+            decoration: const InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              filled: false,
+              hintText: 'Type the line',
+              contentPadding: EdgeInsets.symmetric(vertical: 10),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.close, size: 18, color: AppColors.textFaint),
+          onPressed: busy ? null : () => _removeLine(i),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        ),
+      ]),
+    );
+  }
+
+  // ── Step 2: the pictures ────────────────────────────────────────────────────
+
+  Widget _stepPictures(bool busy) {
+    if (!_storyMode) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: Text(
+          'Not needed here — you are adding a voice to a video you already have.',
+          textAlign: TextAlign.center, style: AppText.hint)),
+      );
+    }
+
+    final missing = _lines.length - _images.length;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        const Text('Pictures', style: AppText.screenTitle),
+        Gap.xs,
+        const Text('One per line, in the order the story happens. Fewer than lines is '
+            'fine — they repeat from the start.', style: AppText.hint),
+        Gap.m,
+
+        Row(children: [
+          Expanded(child: SecondaryButton(
+            label: 'Get prompts', icon: Icons.auto_fix_high,
+            colour: AppColors.accent,
+            onPressed: _lines.isEmpty ? null : _openPrompts)),
+          Gap.wS,
+          Expanded(child: SecondaryButton(
+            label: 'Add pictures', icon: Icons.add_photo_alternate_outlined,
+            onPressed: busy ? null : _pickImages)),
+        ]),
+        Gap.m,
+
+        if (_images.isEmpty)
+          AppCard(
+            colour: AppColors.accentSoft,
+            borderColour: AppColors.accent,
+            child: const Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.info_outline, size: 18, color: AppColors.accent),
+              SizedBox(width: 10),
+              Expanded(child: Text(
+                'No pictures yet. Tap Get prompts, make them in Meta AI, then come '
+                'back and tap Add pictures.',
+                style: TextStyle(fontSize: 13, color: AppColors.text, height: 1.4))),
+            ]),
+          )
+        else ...[
+          SectionTitle('Which picture goes where',
+            trailing: missing > 0 ? '$missing repeat' : '${_images.length} pictures'),
+          // Line and picture side by side, because the only question worth answering
+          // here is whether the picture matches the words that play over it.
+          ...List.generate(_lines.length, (i) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: AppCard(
+              padding: const EdgeInsets.all(8),
+              child: Row(children: [
+                _lineStatus(i),
+                Gap.wS,
+                Expanded(child: Text(
+                  _lines[i].text.isEmpty ? '(empty line)' : _lines[i].text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.body)),
+              ]),
+            ),
+          )),
+          Gap.s,
+          const SectionTitle('All pictures', trailing: 'tap one to remove it'),
+          Wrap(spacing: 8, runSpacing: 8, children:
+            List.generate(_images.length, (i) => GestureDetector(
+              onTap: busy ? null : () => setState(() {
+                _images.removeAt(i);
+                _status = '';
+              }),
+              child: Stack(children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(File(_images[i]),
+                    width: 66, height: 94, fit: BoxFit.cover),
+                ),
+                Positioned(top: 3, left: 3, child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: AppColors.text.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(8)),
+                  child: Text('${i + 1}', style: const TextStyle(
+                    fontSize: 11, color: Colors.white, fontWeight: FontWeight.w700)),
+                )),
+              ]),
+            )),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ── Step 3: the voice ───────────────────────────────────────────────────────
+
+  Widget _stepVoice(bool busy) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        const Text('The voice', style: AppText.screenTitle),
+        Gap.xs,
+        const Text('Gemini reads the whole script in one take, which is what keeps it '
+            'sounding like a person rather than clips stitched together.',
+          style: AppText.hint),
+        Gap.m,
+
+        ...VoiceEngine.values.map((e) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: GestureDetector(
+            onTap: busy ? null : () => setState(() {
+              _engine = e;
+              _audioPath = null;
+              _lineStarts = [];
+              _status = '';
+            }),
+            child: AppCard(
+              colour: _engine == e ? AppColors.primarySoft : AppColors.surface,
+              borderColour: _engine == e ? AppColors.primary : AppColors.border,
+              child: Row(children: [
+                Icon(_engine == e ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                  size: 20, color: _engine == e ? AppColors.primary : AppColors.textFaint),
+                Gap.wM,
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(voiceEngineLabel(e), style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.text)),
+                    const SizedBox(height: 2),
+                    Text(voiceEngineHint(e), style: AppText.small),
+                  ])),
+              ]),
+            ),
+          ),
+        )),
+
+        if (_engine == VoiceEngine.gemini) ...[
+          Gap.s,
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+            child: Column(children: [
+              SettingRow(
+                icon: Icons.record_voice_over_outlined,
+                label: 'Voice',
+                value: geminiVoiceName,
+                onTap: busy ? null : _pickVoice,
+              ),
+              const Divider(height: 1, color: AppColors.border),
+              SettingRow(
+                icon: Icons.play_circle_outline,
+                label: 'Hear a sample',
+                value: 'Play',
+                onTap: busy ? null : _hearVoiceSample,
+              ),
+            ]),
+          ),
+        ],
+
+        Gap.m,
+        if (_audioPath != null)
+          AppCard(
+            colour: AppColors.primarySoft,
+            borderColour: AppColors.primary,
+            child: const Row(children: [
+              Icon(Icons.check_circle, size: 18, color: AppColors.primary),
+              SizedBox(width: 10),
+              Expanded(child: Text('Voice recorded and ready.',
+                style: TextStyle(fontSize: 14, color: AppColors.text))),
+            ]),
+          )
+        else
+          const Text('You can record it here, or just tap Make the reel on the next '
+              'step and it records for you.', style: AppText.hint),
+
+        Gap.m,
+        Row(children: [
+          Expanded(child: SecondaryButton(
+            label: _isPlaying ? 'Stop' : 'Read it out',
+            icon: _isPlaying ? Icons.stop : Icons.play_arrow,
+            colour: _isPlaying ? AppColors.danger : AppColors.primary,
+            onPressed: busy ? null : (_isPlaying ? _stopPreview : _previewAll))),
+          Gap.wS,
+          Expanded(child: SecondaryButton(
+            label: _isSaving ? 'Recording...' : 'Record voice',
+            icon: Icons.mic_none,
+            onPressed: busy ? null : _saveAudio)),
+        ]),
+      ],
+    );
+  }
+
+  // ── Step 4: how the reel looks ──────────────────────────────────────────────
+
+  Widget _stepReel(bool busy) {
+    final hasMusic = kMusicLibrary.isNotEmpty;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      children: [
+        const Text('How it looks', style: AppText.screenTitle),
+        Gap.xs,
+        const Text('None of these change the voice, so you can adjust them and build '
+            'again without recording anything.', style: AppText.hint),
+        Gap.m,
+
+        AppCard(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+          child: Column(children: [
+            SettingRow(
+              icon: Icons.subtitles_outlined,
+              label: 'Captions',
+              value: _captions ? 'On' : 'Off',
+              valueColour: _captions ? AppColors.primary : AppColors.textFaint,
+              onTap: busy ? null : () => setState(() => _captions = !_captions),
+            ),
+            if (_captions) ...[
+              const Divider(height: 1, color: AppColors.border),
+              SettingRow(
+                icon: Icons.vertical_align_top,
+                label: 'Caption position',
+                value: captionSpotLabel(_captionSpot),
+                onTap: busy ? null : () => setState(() {
+                  _captionSpot = CaptionSpot.values[
+                      (_captionSpot.index + 1) % CaptionSpot.values.length];
+                }),
+              ),
+            ],
+            const Divider(height: 1, color: AppColors.border),
+            SettingRow(
+              icon: Icons.animation,
+              label: 'Movement',
+              value: clipMotionLabel(_motion),
+              onTap: busy ? null : () => setState(() {
+                _motion = ClipMotion.values[
+                    (_motion.index + 1) % ClipMotion.values.length];
+              }),
+            ),
+            const Divider(height: 1, color: AppColors.border),
+            SettingRow(
+              icon: Icons.branding_watermark_outlined,
+              label: 'End card',
+              value: _endCard ? 'On' : 'Off',
+              valueColour: _endCard ? AppColors.primary : AppColors.textFaint,
+              onTap: busy ? null : () => setState(() => _endCard = !_endCard),
+            ),
+            if (hasMusic) ...[
+              const Divider(height: 1, color: AppColors.border),
+              SettingRow(
+                icon: Icons.music_note_outlined,
+                label: 'Background music',
+                value: _music?.name ?? 'None',
+                valueColour: _music == null ? AppColors.textFaint : AppColors.primary,
+                onTap: busy ? null : _pickMusic,
+              ),
+            ],
+          ]),
+        ),
+
+        Gap.l,
+        const SectionTitle('Ready to build'),
+        AppCard(
+          child: Column(children: [
+            _summaryRow(Icons.notes, '${_lines.length} lines', _lines.isNotEmpty),
+            const SizedBox(height: 10),
+            if (_storyMode) ...[
+              _summaryRow(Icons.image_outlined, '${_images.length} pictures',
+                _images.isNotEmpty),
+              const SizedBox(height: 10),
+            ],
+            _summaryRow(Icons.mic_none,
+              _audioPath == null ? 'Voice will be recorded now' : 'Voice ready',
+              _audioPath != null),
+            const SizedBox(height: 10),
+            _summaryRow(Icons.branding_watermark_outlined,
+              _endCard ? 'Ends with your brand card' : 'No end card', _endCard),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget _summaryRow(IconData icon, String text, bool ok) => Row(children: [
+        Icon(ok ? Icons.check_circle : Icons.radio_button_unchecked,
+          size: 17, color: ok ? AppColors.primary : AppColors.textFaint),
+        const SizedBox(width: 10),
+        Icon(icon, size: 16, color: AppColors.textSoft),
+        const SizedBox(width: 8),
+        Expanded(child: Text(text, style: AppText.body)),
+      ]);
   Widget _buildPastePanel() => Padding(
     padding: const EdgeInsets.all(16),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.deepPurple.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.deepPurple.shade300),
-        ),
-        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Format: M:SS your text', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber)),
-          SizedBox(height: 4),
-          Text('0:00 Ek Teddy Do Dost', style: TextStyle(fontSize: 13, color: Colors.white70)),
-          Text('0:05 Arey chhodo ye mera Teddy hai', style: TextStyle(fontSize: 13, color: Colors.white70)),
-          Text('0:10 Dono ladne lage', style: TextStyle(fontSize: 13, color: Colors.white70)),
+      AppCard(
+        colour: AppColors.primarySoft,
+        borderColour: AppColors.primary,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('One line each, starting with the time',
+            style: AppText.section.copyWith(color: AppColors.primary)),
+          Gap.s,
+          const Text('0:00  Ek Teddy Do Dost\n'
+              '0:05  Arey chhodo ye mera Teddy hai\n'
+              '0:10  Dono ladne lage',
+            style: TextStyle(fontSize: 13, height: 1.6, color: AppColors.text)),
         ]),
       ),
-      const SizedBox(height: 12),
+      Gap.m,
       Expanded(
         child: TextField(
-          controller: _pasteCtrl, maxLines: null, expands: true,
-          style: const TextStyle(fontSize: 14, height: 1.6),
-          decoration: InputDecoration(
-            hintText: 'Paste your script here...',
-            hintStyle: const TextStyle(color: Colors.white24),
-            filled: true, fillColor: Colors.grey[900],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+          controller: _pasteCtrl,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
+          style: AppText.body,
+          decoration: const InputDecoration(hintText: 'Paste your script here'),
         ),
       ),
-      const SizedBox(height: 12),
-      SizedBox(width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: _applyPaste,
-          icon: const Icon(Icons.check),
-          label: const Text('Apply Script', style: TextStyle(fontSize: 16)),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple, foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-        ),
+      Gap.m,
+      PrimaryButton(
+        label: 'Use this script',
+        icon: Icons.check,
+        onPressed: _applyPaste,
       ),
     ]),
   );
 
-  /// What still has to happen before the video can be built, or empty when ready.
-  /// What is still missing before a reel can be made.
+  /// The picture this line will use, as a small numbered thumbnail.
   ///
-  /// A missing voice is no longer listed: Make Reel records it for you, so naming it
-  /// here would be telling you to go and do something the button already does.
+  /// Pictures cycle when there are fewer than lines, so line 8 with 3 pictures shows
+  /// picture 2 — which is worth seeing before building rather than after.
+  Widget _lineStatus(int index) {
+    if (_images.isEmpty) {
+      return Container(
+        width: 34, height: 46,
+        decoration: BoxDecoration(
+          color: AppColors.accentSoft,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: AppColors.accent),
+        ),
+        child: const Icon(Icons.priority_high, size: 16, color: AppColors.accent),
+      );
+    }
+
+    final picture = index % _images.length;
+    return Stack(children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: Image.file(File(_images[picture]),
+          width: 34, height: 46, fit: BoxFit.cover),
+      ),
+      Positioned(bottom: 0, right: 0, child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: AppColors.text.withOpacity(0.8),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(6))),
+        child: Text('${picture + 1}', style: const TextStyle(
+          fontSize: 9, color: Colors.white, fontWeight: FontWeight.w700)),
+      )),
+    ]);
+  }
   String get _notReadyReason {
     if (_lines.isEmpty) return 'Write or paste a script first.';
     if (_storyMode && _images.isEmpty) return 'Add at least one picture.';
@@ -1673,103 +2180,6 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     await (_storyMode ? _buildFromImages() : _mergeWithVideo());
   }
 
-  /// The picture this line will use, as a small numbered thumbnail.
-  ///
-  /// Pictures cycle when there are fewer than lines, so line 8 with 3 pictures shows
-  /// picture 2 — which is worth seeing before building rather than after.
-  Widget _lineStatus(int index) {
-    if (_images.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(right: 6, top: 4),
-        child: Icon(Icons.image_not_supported, size: 16, color: Colors.amber),
-      );
-    }
-
-    final picture = index % _images.length;
-    return Padding(
-      padding: const EdgeInsets.only(right: 6, top: 2),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Image.file(File(_images[picture]),
-            width: 26, height: 34, fit: BoxFit.cover),
-        ),
-        Text('${picture + 1}',
-          style: const TextStyle(fontSize: 8, color: Colors.white38)),
-      ]),
-    );
-  }
-
-  /// The pictures, along the top of the script. Kept beside the lines on purpose —
-  /// image 1 goes with line 1, and seeing both together is the only way to tell whether
-  /// you have enough of them.
-  Widget _buildImageStrip(bool busy) {
-    return Container(
-      height: 92,
-      width: double.infinity,
-      color: Colors.grey.shade900,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      child: Row(children: [
-        InkWell(
-          onTap: busy ? null : _pickImages,
-          child: Container(
-            width: 54,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.teal.shade400),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.add_photo_alternate, size: 20, color: Colors.teal),
-              SizedBox(height: 2),
-              Text('Add', style: TextStyle(fontSize: 10, color: Colors.teal)),
-            ]),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _images.isEmpty
-              ? Text('Add pictures — one per line of the script',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]))
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _images.length,
-                  itemBuilder: (ctx, i) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Stack(children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: Image.file(File(_images[i]),
-                          width: 46, height: 80, fit: BoxFit.cover),
-                      ),
-                      Positioned(
-                        top: 0, right: 0,
-                        child: GestureDetector(
-                          onTap: busy ? null : () => setState(() => _images.removeAt(i)),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.black87, shape: BoxShape.circle),
-                            padding: const EdgeInsets.all(2),
-                            child: const Icon(Icons.close, size: 11, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      // The line this picture will be shown against.
-                      Positioned(
-                        bottom: 0, left: 0,
-                        child: Container(
-                          color: Colors.black54,
-                          padding: const EdgeInsets.symmetric(horizontal: 3),
-                          child: Text('${i + 1}',
-                            style: const TextStyle(fontSize: 9, color: Colors.white)),
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-        ),
-      ]),
-    );
-  }
 
   Future<void> _pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
@@ -1777,298 +2187,6 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
   }
 
-  Widget _buildEditor() {
-    final busy = _isSaving || _isMerging;
-    return Column(children: [
-      Container(
-        width: double.infinity,
-        color: Colors.orange.shade900.withOpacity(0.4),
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('${widget.style}  •  ${widget.language}$_imageNote',
-            style: const TextStyle(fontSize: 11, color: Colors.white70)),
-          const SizedBox(height: 4),
-          // Switching engine throws away the saved voice: it was spoken by the old one,
-          // so leaving it would build a video with a voice you did not choose.
-          Row(children: [
-            // Captions live beside the voice because they are the same decision seen
-            // twice: the voice is for people listening, the captions for everyone else.
-            GestureDetector(
-              onTap: busy ? null : () => setState(() => _captions = !_captions),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Row(children: [
-                  Icon(_captions ? Icons.closed_caption : Icons.closed_caption_off,
-                    size: 16, color: _captions ? Colors.teal : Colors.white38),
-                  const SizedBox(width: 3),
-                  Text(_captions ? 'Captions on' : 'Captions off',
-                    style: TextStyle(fontSize: 10,
-                      color: _captions ? Colors.teal : Colors.white38)),
-                ]),
-              ),
-            ),
-            // Hidden entirely when no tracks are bundled, rather than shown as a
-            // dropdown with nothing in it.
-            if (hasMusic)
-              GestureDetector(
-                onTap: busy ? null : _pickMusic,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Row(children: [
-                    Icon(_music == null ? Icons.music_off : Icons.music_note,
-                      size: 16, color: _music == null ? Colors.white38 : Colors.teal),
-                    const SizedBox(width: 3),
-                    Text(_music?.name ?? 'No music',
-                      style: TextStyle(fontSize: 10,
-                        color: _music == null ? Colors.white38 : Colors.teal)),
-                  ]),
-                ),
-              ),
-            const Text('Voice:', style: TextStyle(fontSize: 11, color: Colors.white54)),
-            const SizedBox(width: 6),
-            ...VoiceEngine.values.map((e) => Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: GestureDetector(
-                onTap: busy ? null : () => setState(() {
-                  _engine = e;
-                  _audioPath = null;
-                  _lineStarts = [];
-                  _status = 'Voice set to ${voiceEngineLabel(e)}. '
-                      '${voiceEngineHint(e)} Tap Save Voice again.';
-                }),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _engine == e ? Colors.deepPurple : Colors.black26,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(voiceEngineLabel(e),
-                    style: const TextStyle(fontSize: 10, color: Colors.white)),
-                ),
-              ),
-            )),
-          ]),
-          // Its own row rather than beside the engines: the row above is already full
-          // on a narrow phone. Only Gemini has a voice to choose — the phone uses
-          // whatever is installed, and ElevenLabs is pinned to one voice id.
-          if (_engine == VoiceEngine.gemini) ...[
-            const SizedBox(height: 4),
-            Row(children: [
-              GestureDetector(
-                onTap: busy ? null : _pickVoice,
-                child: Row(children: [
-                  const Icon(Icons.record_voice_over, size: 14, color: Colors.white54),
-                  const SizedBox(width: 4),
-                  Text(geminiVoiceName,
-                    style: const TextStyle(fontSize: 11, color: Colors.teal)),
-                  const Icon(Icons.arrow_drop_down, size: 16, color: Colors.white38),
-                ]),
-              ),
-              const SizedBox(width: 14),
-              GestureDetector(
-                onTap: busy ? null : _hearVoiceSample,
-                child: const Row(children: [
-                  Icon(Icons.play_circle_outline, size: 14, color: Colors.white54),
-                  SizedBox(width: 4),
-                  Text('Hear it', style: TextStyle(fontSize: 11, color: Colors.white54)),
-                ]),
-              ),
-            ]),
-          ],
-          // How it is rendered rather than what is said, so both tap through their
-          // options instead of opening a sheet for three choices.
-          const SizedBox(height: 4),
-          Row(children: [
-            if (_captions) ...[
-              GestureDetector(
-                onTap: busy ? null : () => setState(() {
-                  _captionSpot = CaptionSpot.values[
-                      (_captionSpot.index + 1) % CaptionSpot.values.length];
-                }),
-                child: Row(children: [
-                  const Icon(Icons.subtitles, size: 14, color: Colors.white54),
-                  const SizedBox(width: 4),
-                  Text('Caption ${captionSpotLabel(_captionSpot)}',
-                    style: const TextStyle(fontSize: 11, color: Colors.white54)),
-                ]),
-              ),
-              const SizedBox(width: 14),
-            ],
-            GestureDetector(
-              onTap: busy ? null : () => setState(() {
-                _motion = ClipMotion.values[
-                    (_motion.index + 1) % ClipMotion.values.length];
-              }),
-              child: Row(children: [
-                const Icon(Icons.animation, size: 14, color: Colors.white54),
-                const SizedBox(width: 4),
-                Text('Motion ${clipMotionLabel(_motion)}',
-                  style: const TextStyle(fontSize: 11, color: Colors.white54)),
-              ]),
-            ),
-            const SizedBox(width: 14),
-            GestureDetector(
-              onTap: busy ? null : () => setState(() => _endCard = !_endCard),
-              child: Row(children: [
-                Icon(_endCard ? Icons.branding_watermark : Icons.branding_watermark_outlined,
-                  size: 14, color: _endCard ? Colors.teal : Colors.white38),
-                const SizedBox(width: 4),
-                Text(_endCard ? 'End card' : 'No end card',
-                  style: TextStyle(fontSize: 11,
-                    color: _endCard ? Colors.teal : Colors.white38)),
-              ]),
-            ),
-          ]),
-        ]),
-      ),
-      if (_storyMode) _buildImageStrip(busy),
-      Expanded(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: _lines.length,
-          itemBuilder: (ctx, i) {
-            final isActive = _activeIdx == i;
-            return Card(
-              color: isActive ? Colors.deepPurple.shade800 : Colors.grey[900],
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  // Which picture this line will use, or a warning that there is none.
-                  // Finding out at line 6 of a render that line 6 had no picture is a
-                  // wasted minute and an error where a glance would have done.
-                  if (_storyMode) _lineStatus(i),
-                  SizedBox(width: 52,
-                    child: TextField(
-                      controller: _timeCtrls[i],
-                      style: const TextStyle(fontSize: 13, color: Colors.amber),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                        filled: true, fillColor: Colors.black38,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                      keyboardType: TextInputType.datetime,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: _textCtrls[i], maxLines: null,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isActive ? Colors.white : Colors.white70,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                      ),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        filled: true, fillColor: Colors.black26,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                        hintText: 'Type line here...',
-                        hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                    onPressed: busy ? null : () => _removeLine(i),
-                    padding: EdgeInsets.zero, constraints: const BoxConstraints(),
-                  ),
-                ]),
-              ),
-            );
-          },
-        ),
-      ),
-      if (_status.isNotEmpty)
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 12),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(8)),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: Text(_status, style: const TextStyle(fontSize: 12))),
-            IconButton(
-              icon: const Icon(Icons.copy, size: 16, color: Colors.white54),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: _status));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Copied!'), duration: Duration(seconds: 1)));
-              },
-            ),
-          ]),
-        ),
-      Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(children: [
-          Row(children: [
-            Expanded(child: _btn(
-              icon: _isPlaying ? Icons.stop : Icons.play_arrow,
-              label: _isPlaying ? 'Stop' : 'Preview',
-              color: _isPlaying ? Colors.red : Colors.blueGrey,
-              onPressed: busy ? null : (_isPlaying ? _stopPreview : _previewAll),
-            )),
-            const SizedBox(width: 8),
-            Expanded(child: _btn(
-              icon: Icons.record_voice_over,
-              label: _isSaving ? 'Generating...' : 'Save Voice 🎙️',
-              color: Colors.teal,
-              onPressed: busy ? null : _saveAudio,
-              loading: _isSaving,
-            )),
-          ]),
-          const SizedBox(height: 6),
-          // Says what is still missing rather than leaving a greyed-out button with no
-          // explanation — the commonest way a disabled control wastes someone's time.
-          if (_notReadyReason.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(children: [
-                const Icon(Icons.info_outline, size: 13, color: Colors.amber),
-                const SizedBox(width: 4),
-                Expanded(child: Text(_notReadyReason,
-                  style: const TextStyle(fontSize: 11, color: Colors.amber))),
-              ]),
-            ),
-          _btn(
-            icon: Icons.movie_creation,
-            label: _isSaving
-                ? 'Recording the voice...'
-                : _isMerging
-                    ? (_storyMode ? 'Building...' : 'Merging...')
-                    : (_storyMode ? 'Make Reel 🎬' : 'Merge with Video 🎬'),
-            color: Colors.deepPurple,
-            // The voice is no longer a condition: this button records it when it has
-            // to. Only a script, and in story mode a picture, are actually needed.
-            onPressed: (busy || _lines.isEmpty || (_storyMode && _images.isEmpty))
-                ? null
-                : _makeReel,
-            loading: _isMerging || _isSaving,
-          ),
-        ]),
-      ),
-    ]);
-  }
-
-  Widget _btn({required IconData icon, required String label, required Color color,
-      required VoidCallback? onPressed, bool loading = false}) =>
-    SizedBox(width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: loading ? const SizedBox(width: 16, height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(icon),
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color, foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          disabledBackgroundColor: Colors.grey.shade800,
-        ),
-      ),
-    );
 }
 
 // ── Preview Merged Screen ─────────────────────────────────────────────────────
@@ -2119,13 +2237,10 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
   @override
   void dispose() { _ctrl?.dispose(); super.dispose(); }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text('Preview Reel'),
+        title: const Text('Your reel'),
         actions: [
           IconButton(
             icon: Icon(_ctrl?.value.isPlaying == true ? Icons.pause : Icons.play_arrow),
@@ -2137,46 +2252,47 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
         ],
       ),
       body: Column(children: [
+        const StepBar(steps: kSteps, current: 4),
+        // The video sits on near-black whatever the rest of the app looks like: a
+        // 9:16 reel never fills a phone screen, and cream bars either side change
+        // how the colours in it read.
         Expanded(
-          child: _ctrl != null && _ctrl!.value.isInitialized
-              ? AspectRatio(aspectRatio: _ctrl!.value.aspectRatio, child: VideoPlayer(_ctrl!))
-              : const Center(child: CircularProgressIndicator()),
-        ),
-        if (_status.isNotEmpty)
-          Container(
+          child: Container(
+            color: const Color(0xFF17140F),
             width: double.infinity,
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: Colors.grey[850], borderRadius: BorderRadius.circular(8)),
-            child: Text(_status, style: const TextStyle(fontSize: 12)),
-          ),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(children: [
-            SizedBox(width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isSaving ? null : _saveToGallery,
-                icon: _isSaving ? const SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Icon(Icons.save),
-                label: Text(_isSaving ? 'Saving...' : 'Save to Gallery 💾'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  disabledBackgroundColor: Colors.grey.shade800,
-                ),
-              ),
+            child: Center(
+              child: _ctrl != null && _ctrl!.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _ctrl!.value.aspectRatio,
+                      child: VideoPlayer(_ctrl!))
+                  : const CircularProgressIndicator(),
             ),
-            const SizedBox(height: 8),
-            SizedBox(width: double.infinity,
-              child: ElevatedButton.icon(
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          decoration: const BoxDecoration(
+            color: AppColors.bg,
+            border: Border(top: BorderSide(color: AppColors.border)),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            StatusBar(message: _status),
+            PrimaryButton(
+              label: _isSaving ? 'Saving...' : 'Save to gallery',
+              icon: Icons.download,
+              loading: _isSaving,
+              onPressed: _saveToGallery,
+            ),
+            Gap.s,
+            // Worth its own button rather than leaving people to find the back
+            // arrow: a timing nudge no longer costs a re-recording, so coming back
+            // to fix one is now the cheap thing to do.
+            SizedBox(
+              width: double.infinity,
+              child: SecondaryButton(
+                label: 'Go back and adjust',
+                icon: Icons.tune,
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.edit),
-                label: const Text('Go Back & Edit'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey, foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
               ),
             ),
           ]),
