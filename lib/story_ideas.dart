@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
+import 'gemini_call.dart';
 import 'secrets.dart';
 
 // ── Story ideas ───────────────────────────────────────────────────────────────
@@ -39,26 +38,42 @@ const _timeout = Duration(seconds: 60);
 class StoryIdea {
   final String title;
   final String hook;
+  final String who;
+  final String where;
   final String problem;
   final String twist;
+  final String worse;
   final String solution;
+  final String endingLine;
   final String moral;
 
   const StoryIdea({
     required this.title,
     required this.hook,
+    required this.who,
+    required this.where,
     required this.problem,
     required this.twist,
+    required this.worse,
     required this.solution,
+    required this.endingLine,
     required this.moral,
   });
 
   /// Laid out the way the story box expects, so it can be dropped straight in.
-  String get asStoryText => 'Who: Ria, Rio, Cuty\n'
+  ///
+  /// Every field the blank template has, in the same order. It used to fill five of
+  /// them and leave the rest out, so an idea and a hand-written story arrived at the
+  /// script generator in two different shapes and the idea always had less to work on.
+  String get asStoryText => 'Hook: $hook\n'
+      'Who: $who\n'
+      'Where: $where\n'
       'What starts it: $problem\n'
       'What goes wrong: $twist\n'
+      'How it gets worse: $worse\n'
       'How it is solved: $solution\n'
-      'Ending line: $moral';
+      'Ending line: $endingLine\n'
+      'Moral: $moral';
 }
 
 // ── Checking a story before it costs anything ─────────────────────────────────
@@ -84,7 +99,8 @@ class StoryCheck {
 /// Worth doing before the script, not after: a weak story produces a weak script, a
 /// weak voiceover and seven weak pictures, and by then it has cost twenty minutes.
 /// Ten seconds here saves all of that.
-Future<StoryCheck> checkStory(String story) async {
+Future<StoryCheck> checkStory(String story,
+    {void Function(String message)? onWait}) async {
   if (story.trim().length < 15) {
     throw Exception('Write a bit more of the story first.');
   }
@@ -113,10 +129,11 @@ age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 mi
 "score" is 1 to 10.
 ''';
 
-  final response = await http.post(
-    Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-        '$_model:generateContent?key=$geminiApiKey'),
-    headers: {'Content-Type': 'application/json'},
+  final response = await geminiPost(
+    model: _model,
+    apiKey: geminiApiKey,
+    timeout: _timeout,
+    onWait: onWait,
     body: jsonEncode({
       'contents': [{'parts': [{'text': prompt}]}],
       'generationConfig': {
@@ -127,10 +144,14 @@ age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 mi
         'responseMimeType': 'application/json',
       },
     }),
-  ).timeout(_timeout);
+  );
 
   if (response.statusCode != 200) {
-    throw Exception('Gemini error ${response.statusCode}: ${response.body}');
+    // Still busy after every retry. Say that plainly — the raw JSON reads like the
+    // app is broken when the only thing wrong is Google's load at this minute.
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode)
+        : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 
   final body = jsonDecode(response.body);
@@ -162,6 +183,7 @@ age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 mi
 Future<StoryIdea> generateStoryIdea({
   required String age,
   required String problem,
+  void Function(String message)? onWait,
 }) async {
   final prompt = '''
 Think of one short story for an Instagram reel for Indian parents of preschoolers.
@@ -180,19 +202,27 @@ Return ONLY valid JSON:
 {
   "title": "short Hinglish title",
   "hook": "the first line, said out loud, that makes a parent stop scrolling",
+  "who": "only the characters this story actually needs, comma separated",
+  "where": "where it happens, e.g. Indian home kitchen, warm morning light",
   "problem": "what the child does, one sentence",
-  "twist": "what makes it worse or funnier, one sentence",
+  "twist": "what goes wrong, one sentence",
+  "worse": "how it gets worse or funnier after that, one sentence",
   "solution": "how it resolves, one sentence, no adult lecturing",
-  "moral": "one short warm line in Hinglish"
+  "ending_line": "the last line said out loud in the story, in Hinglish",
+  "moral": "the lesson in one short warm Hinglish line"
 }
+
+"ending_line" is spoken by a character. "moral" is what the reel leaves the parent
+with. They are not the same sentence.
 
 The child should work it out or be shown, not told off. Keep every value under 25 words.
 ''';
 
-  final response = await http.post(
-    Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-        '$_model:generateContent?key=$geminiApiKey'),
-    headers: {'Content-Type': 'application/json'},
+  final response = await geminiPost(
+    model: _model,
+    apiKey: geminiApiKey,
+    timeout: _timeout,
+    onWait: onWait,
     body: jsonEncode({
       'contents': [{'parts': [{'text': prompt}]}],
       'generationConfig': {
@@ -203,10 +233,14 @@ The child should work it out or be shown, not told off. Keep every value under 2
         'responseMimeType': 'application/json',
       },
     }),
-  ).timeout(_timeout);
+  );
 
   if (response.statusCode != 200) {
-    throw Exception('Gemini error ${response.statusCode}: ${response.body}');
+    // Still busy after every retry. Say that plainly — the raw JSON reads like the
+    // app is broken when the only thing wrong is Google's load at this minute.
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode)
+        : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 
   final body = jsonDecode(response.body);
@@ -228,9 +262,15 @@ The child should work it out or be shown, not told off. Keep every value under 2
   return StoryIdea(
     title: read('title', 'Ria aur Rio'),
     hook: read('hook', ''),
+    who: read('who', 'Ria, Rio, Cuty'),
+    where: read('where', 'Indian home, warm daylight'),
     problem: read('problem', ''),
     twist: read('twist', ''),
+    worse: read('worse', ''),
     solution: read('solution', ''),
+    // Falls back to the moral rather than to nothing: a blank ending line in the box
+    // reads as a field you forgot to fill in.
+    endingLine: read('ending_line', read('moral', '')),
     moral: read('moral', ''),
   );
 }

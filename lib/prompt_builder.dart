@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-
+import 'gemini_call.dart';
 import 'prompts.dart';
 import 'secrets.dart';
 
@@ -31,6 +30,7 @@ Future<PromptSet> generatePrompts({
   required String storyDescription,
   required List<String> scriptLines,
   required int seconds,
+  void Function(String message)? onWait,
 }) async {
   if (scriptLines.isEmpty) throw Exception('Write the script first.');
 
@@ -91,10 +91,11 @@ moral. They come from the story above. Your job is to show that story, not write
 different one.
 ''';
 
-  final response = await http.post(
-    Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-        '$_model:generateContent?key=$geminiApiKey'),
-    headers: {'Content-Type': 'application/json'},
+  final response = await geminiPost(
+    model: _model,
+    apiKey: geminiApiKey,
+    timeout: _timeout,
+    onWait: onWait,
     body: jsonEncode({
       'contents': [{'parts': [{'text': prompt}]}],
       'generationConfig': {
@@ -107,10 +108,12 @@ different one.
         'responseMimeType': 'application/json',
       },
     }),
-  ).timeout(_timeout);
+  );
 
   if (response.statusCode != 200) {
-    throw Exception('Gemini error ${response.statusCode}: ${response.body}');
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode)
+        : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 
   final body = jsonDecode(response.body);

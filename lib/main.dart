@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'gemini_call.dart';
 import 'video_builder.dart';
 import 'voice.dart';
 import 'prompt_screen.dart';
@@ -46,6 +47,7 @@ Future<List<ScriptLine>> generateScriptWithGemini({
   required String language,
   required String style,
   required double videoDuration,
+  void Function(String message)? onWait,
 }) async {
   final langNote = language == 'Hinglish'
       ? 'Write in Hinglish (Hindi words in English script, e.g. "Ek baar ki baat hai"). Natural, fun, kid-friendly for 3-5 year old Indian children.'
@@ -133,16 +135,15 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
     }
   });
 
-  final url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-      '$_geminiModel:generateContent?key=$_geminiKey';
-
   late final http.Response response;
   try {
-    response = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+    response = await geminiPost(
+      model: _geminiModel,
+      apiKey: _geminiKey,
       body: body,
-    ).timeout(_geminiTimeout);
+      timeout: _geminiTimeout,
+      onWait: onWait,
+    );
   } on TimeoutException {
     // A bare TimeoutException says nothing about which of these it was.
     throw Exception('Gemini did not answer within ${_geminiTimeout.inSeconds}s.\n'
@@ -157,7 +158,10 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
         'https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY');
   }
   if (response.statusCode != 200) {
-    throw Exception('Gemini API error ${response.statusCode}: ${response.body}');
+    // Still busy after the retries. Say so plainly rather than handing over the JSON.
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode)
+        : 'Gemini API error ${response.statusCode}: ${response.body}');
   }
 
   final json = jsonDecode(response.body);
@@ -223,13 +227,24 @@ const Map<String, VoiceProfile> kVoiceProfiles = {
 /// Five beats, in the order a reel plays them: hook, trouble, worse, turn, ending.
 /// Written as plain labels rather than prose so it survives being pasted into
 /// WhatsApp or Notes by someone who never opens the app.
-const kStoryTemplate = '''Who: Ria, Rio, Cuty
+/// The blank story form.
+///
+/// Hook first and Moral last because those are the two the script generator most often
+/// invents when they are missing — and an invented hook is the line that decides
+/// whether anyone watches. The Idea button fills exactly these fields, in this order,
+/// so a generated story and a hand-written one arrive in the same shape.
+///
+/// "Ending line" is what a character says out loud at the end. "Moral" is what the reel
+/// leaves the parent with. They are usually not the same sentence.
+const kStoryTemplate = '''Hook:
+Who: Ria, Rio, Cuty
 Where:
 What starts it:
 What goes wrong:
 How it gets worse:
 How it is solved:
-Ending line: ''';
+Ending line:
+Moral: ''';
 
 // ── ScriptLine ────────────────────────────────────────────────────────────────
 
@@ -415,7 +430,8 @@ class _StoryScreenState extends State<StoryScreen> {
     setState(() { _isGenerating = true; _status = 'Reading the story...'; });
 
     try {
-      final check = await checkStory(_descCtrl.text);
+      final check = await checkStory(_descCtrl.text,
+        onWait: (message) { if (mounted) setState(() => _status = message); });
       if (!mounted) return;
       setState(() => _isGenerating = false);
 
@@ -529,7 +545,8 @@ class _StoryScreenState extends State<StoryScreen> {
 
     setState(() { _isGenerating = true; _status = 'Thinking of a story...'; });
     try {
-      final idea = await generateStoryIdea(age: age, problem: problem);
+      final idea = await generateStoryIdea(age: age, problem: problem,
+        onWait: (message) { if (mounted) setState(() => _status = message); });
       if (!mounted) return;
       // Dropped straight into the box rather than shown for approval: it is a starting
       // point to edit, and an extra "use this?" step helps nobody.
@@ -587,6 +604,7 @@ class _StoryScreenState extends State<StoryScreen> {
         language: _language,
         style: _style,
         videoDuration: _seconds.toDouble(),
+        onWait: (message) { if (mounted) setState(() => _status = message); },
       );
       if (!mounted) return;
       _openScript(lines);
@@ -767,6 +785,7 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
         language: _language,
         style: _style,
         videoDuration: widget.videoDuration,
+        onWait: (message) { if (mounted) setState(() => _genStatus = message); },
       );
       if (!mounted) return;
       Navigator.push(context, MaterialPageRoute(

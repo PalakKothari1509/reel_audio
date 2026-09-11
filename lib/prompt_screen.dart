@@ -39,6 +39,8 @@ class _PromptScreenState extends State<PromptScreen> {
   /// self-contained prompt, which is what a generator with a single prompt box needs.
   bool _chatMode = true;
   String _error = '';
+  /// Replaces "Working out the scenes..." while a retry is being waited out.
+  String _waiting = '';
 
   /// Only the ticked characters go into the prompts. Sending the whole cast every
   /// time describes people who never appear, and generators dutifully draw them.
@@ -62,6 +64,8 @@ class _PromptScreenState extends State<PromptScreen> {
         storyDescription: widget.storyDescription,
         scriptLines: widget.scriptLines,
         seconds: widget.seconds,
+        // Shown under the spinner: a silent thirty second wait reads as a hang.
+        onWait: (message) { if (mounted) setState(() => _waiting = message); },
       );
       if (!mounted) return;
       setState(() { _prompts = prompts; _loading = false; });
@@ -109,10 +113,12 @@ class _PromptScreenState extends State<PromptScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 12),
-              Text('Working out the scenes...', style: TextStyle(fontSize: 13)),
+          ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 12),
+              Text(_waiting.isEmpty ? 'Working out the scenes...' : _waiting,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 13)),
             ]))
           : ListView(
               padding: const EdgeInsets.all(12),
