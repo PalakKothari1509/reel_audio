@@ -17,6 +17,10 @@ const double kMinClipSeconds = 1.0;
 /// Held after the last spoken word so the video doesn't cut on the final syllable.
 const double kTailSeconds = 1.5;
 
+/// Where a caption sits, as a share of frame height from the top. Low enough to clear
+/// a face, high enough to stay above Instagram's own overlay at the bottom.
+const double kCaptionFromTop = 0.70;
+
 // ── Probing ───────────────────────────────────────────────────────────────────
 
 /// Length of an audio or video file in seconds; null when it can't be read.
@@ -95,6 +99,8 @@ class SlideshowBuilder {
     required List<double> lineStarts,
     required String audioPath,
     required String workDir,
+    /// One PNG per line, null for a line with no caption. Empty means no captions.
+    List<String?> captionPngs = const [],
     void Function(String message)? onStatus,
   }) async {
     if (imagePaths.isEmpty) throw Exception('Add at least one image first.');
@@ -122,6 +128,7 @@ class SlideshowBuilder {
         index: i,
         isFirst: i == 0,
         isLast: i == durations.length - 1,
+        captionPng: i < captionPngs.length ? captionPngs[i] : null,
       );
       clipPaths.add(clipPath);
     }
@@ -153,11 +160,18 @@ class SlideshowBuilder {
     required int index,
     required bool isFirst,
     required bool isLast,
+    String? captionPng,
   }) async {
     if (!await File(imagePath).exists()) {
       throw Exception('Image ${index + 1} is missing: $imagePath');
     }
     await _deleteIfExists(outPath);
+
+    // A caption whose file has gone is skipped rather than failing the whole build —
+    // a reel without one caption still beats no reel.
+    final caption = (captionPng != null && await File(captionPng).exists())
+        ? captionPng
+        : null;
 
     // Fading every clip in and out meant the video blinked to black between each
     // picture. Only the very start and the very end fade now; the rest cut straight.
@@ -174,6 +188,15 @@ class SlideshowBuilder {
     // this working on ffmpeg builds that leave gblur out, and costs almost nothing.
     // Drift alternates direction per image so a long reel doesn't slide one way.
     final drift = index.isEven ? 1 : -1;
+
+    // The caption comes in as input 1 and goes on AFTER the drift, so it stays still
+    // while the picture moves behind it — a caption that floats is hard to read. The
+    // fade still covers both, because it is applied after this.
+    final captionPart = caption == null
+        ? ''
+        : "[withpic];[withpic][1:v]overlay=x='(W-w)/2':"
+          "y='H*$kCaptionFromTop-h/2'";
+
     final filter =
         '[0:v]split=2[bg][fg];'
         '[bg]scale=64:114:force_original_aspect_ratio=increase,crop=64:114,'
@@ -182,11 +205,12 @@ class SlideshowBuilder {
         'scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1[front];'
         "[back][front]overlay=x='(W-w)/2':"
         "y='(H-h)/2+$drift*14*sin(2*PI*t/9)'"
-        '$fadePart,format=yuv420p[v]';
+        '$captionPart$fadePart,format=yuv420p[v]';
 
     final session = await FFmpegKit.executeWithArguments([
       '-loop', '1',
       '-i', imagePath,
+      if (caption != null) ...['-i', caption],
       '-t', seconds.toStringAsFixed(3),
       '-filter_complex', filter,
       '-map', '[v]',

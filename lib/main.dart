@@ -14,6 +14,7 @@ import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'video_builder.dart';
 import 'voice.dart';
 import 'prompt_screen.dart';
+import 'caption_renderer.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
@@ -806,6 +807,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// line length, since there are no separate files to measure.
   List<double> _lineStarts = [];
 
+  /// Burn the script onto the video. On by default — most reels are watched muted,
+  /// so a reel with no text on screen is a reel nobody understands.
+  bool _captions = true;
+
   @override
   void initState() {
     super.initState();
@@ -1110,6 +1115,12 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             : _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
         audioPath: _audioPath!,
         workDir: dir.path,
+        // Drawn by Flutter, not FFmpeg's drawtext: drawtext does no complex-script
+        // shaping, so Devanagari conjuncts and matras come out in the wrong places.
+        captionPngs: _captions
+            ? await renderCaptions(
+                lines: _lines.map((l) => l.text).toList(), workDir: dir.path)
+            : const [],
         onStatus: (message) { if (mounted) setState(() => _status = message); },
       );
       if (!mounted) return;
@@ -1324,6 +1335,22 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           // Switching engine throws away the saved voice: it was spoken by the old one,
           // so leaving it would build a video with a voice you did not choose.
           Row(children: [
+            // Captions live beside the voice because they are the same decision seen
+            // twice: the voice is for people listening, the captions for everyone else.
+            GestureDetector(
+              onTap: busy ? null : () => setState(() => _captions = !_captions),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Row(children: [
+                  Icon(_captions ? Icons.closed_caption : Icons.closed_caption_off,
+                    size: 16, color: _captions ? Colors.teal : Colors.white38),
+                  const SizedBox(width: 3),
+                  Text(_captions ? 'Captions on' : 'Captions off',
+                    style: TextStyle(fontSize: 10,
+                      color: _captions ? Colors.teal : Colors.white38)),
+                ]),
+              ),
+            ),
             const Text('Voice:', style: TextStyle(fontSize: 11, color: Colors.white54)),
             const SizedBox(width: 6),
             ...VoiceEngine.values.map((e) => Padding(
