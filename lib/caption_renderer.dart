@@ -116,7 +116,16 @@ Future<String?> renderCaptionPng({
 ///
 /// Same on every reel, which is the entire point of it — a closing card that varies is
 /// decoration, one that repeats is a channel people start to recognise.
-Future<String?> renderBrandCard(String outPath) async {
+Future<String?> renderBrandCard(
+  String outPath, {
+  /// The question left on screen at the end. Comments are what keep a reel alive
+  /// after its first hour, and people answer a question far more readily than they
+  /// volunteer an opinion at a closing card that only says the channel's name.
+  String question = '',
+  /// A reason to keep the reel. Above the brand, because a reason to save is worth
+  /// more than a name nobody has any reason to remember yet.
+  String cta = '',
+}) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
 
@@ -136,25 +145,112 @@ Future<String?> renderBrandCard(String outPath) async {
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: w * 0.84);
 
-  final name = line(kBrandName, 74, FontWeight.w900, Colors.white);
-  final tagline = line(kBrandTagline, 40, FontWeight.w600, Colors.tealAccent);
+  // The question first and biggest. On a closing screen the channel's name is the
+  // least interesting thing present — it asks for nothing and gives nothing back.
+  final ask = question.trim().isEmpty ? null : line(question.trim(), 58, FontWeight.w800, Colors.white);
+  final keep = cta.trim().isEmpty ? null : line(cta.trim(), 40, FontWeight.w600, Colors.tealAccent);
+  final name = line(kBrandName, 46, FontWeight.w800, Colors.white);
+  final tagline = line(kBrandTagline, 30, FontWeight.w500, Colors.white70);
+
+  const gapAfterAsk = 40.0;
+  const gapAfterKeep = 46.0;
+  const gapBeforeName = 14.0;
+
+  var blockHeight = name.height + gapBeforeName + tagline.height;
+  if (keep != null) blockHeight += keep.height + gapAfterKeep;
+  if (ask != null) blockHeight += ask.height + gapAfterAsk;
 
   // Sat a little above centre: the eye reads the top half of a frame first, and the
   // bottom of a reel is where Instagram puts its own username and caption.
-  final blockHeight = name.height + 34 + tagline.height;
-  final top = h * 0.42 - blockHeight / 2;
+  var y = h * 0.44 - blockHeight / 2;
 
-  name.paint(canvas, Offset((w - name.width) / 2, top));
+  if (ask != null) {
+    ask.paint(canvas, Offset((w - ask.width) / 2, y));
+    y += ask.height + gapAfterAsk;
+  }
+  if (keep != null) {
+    keep.paint(canvas, Offset((w - keep.width) / 2, y));
+    y += keep.height + gapAfterKeep;
+  }
 
-  final ruleY = top + name.height + 17;
   canvas.drawRect(
-    Rect.fromLTWH(w / 2 - 90, ruleY, 180, 3),
-    Paint()..color = Colors.tealAccent.withOpacity(0.85),
+    Rect.fromLTWH(w / 2 - 70, y - 22, 140, 2),
+    Paint()..color = Colors.tealAccent.withOpacity(0.7),
   );
 
-  tagline.paint(canvas, Offset((w - tagline.width) / 2, ruleY + 17));
+  name.paint(canvas, Offset((w - name.width) / 2, y));
+  tagline.paint(canvas, Offset((w - tagline.width) / 2, y + name.height + gapBeforeName));
 
   final image = await recorder.endRecording().toImage(kVideoWidth, kVideoHeight);
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  image.dispose();
+  if (bytes == null) return null;
+
+  final file = File(outPath);
+  if (await file.exists()) await file.delete();
+  await file.writeAsBytes(bytes.buffer.asUint8List());
+  return outPath;
+}
+
+// ── The cover ─────────────────────────────────────────────────────────────────
+
+/// The hook, drawn big across the first picture.
+///
+/// Its own renderer rather than a bigger caption, because this is the only screen
+/// most people ever see: it is the thumbnail. Two to four words at nearly twice the
+/// caption size, in a bold panel that survives being shrunk to a grid square.
+///
+/// Drawn here and not asked of the image generator, for the same reason the captions
+/// are: a generator will misspell Hinglish, and a misspelt hook is worse than none.
+Future<String?> renderCoverHook(String hook, String outPath) async {
+  final text = hook.trim();
+  if (text.isEmpty) return null;
+
+  const fontSize = 96.0;
+  const padding = EdgeInsets.symmetric(horizontal: 44, vertical: 30);
+  const border = 7.0;
+
+  final painter = TextPainter(
+    text: TextSpan(text: text,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: fontSize,
+        fontWeight: FontWeight.w900,
+        height: 1.15,
+      )),
+    textAlign: TextAlign.center,
+    textDirection: TextDirection.ltr,
+    maxLines: 3,
+    ellipsis: '…',
+  )..layout(maxWidth: kVideoWidth * kSafeCaptionWidth - padding.horizontal);
+
+  final boxWidth = painter.width + padding.horizontal;
+  final boxHeight = painter.height + padding.vertical;
+  final imageWidth = (boxWidth + border * 2).ceil();
+  final imageHeight = (boxHeight + border * 2).ceil();
+
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+
+  final box = RRect.fromRectAndRadius(
+    Rect.fromLTWH(border, border, boxWidth, boxHeight),
+    const Radius.circular(30),
+  );
+
+  // Dark panel with a white rule, the reverse of the captions, so the cover reads as
+  // a different kind of thing at a glance instead of a caption that happens to be big.
+  canvas.drawRRect(box, Paint()..color = const Color(0xE6141210));
+  canvas.drawRRect(
+    box,
+    Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = border,
+  );
+
+  painter.paint(canvas, Offset(border + padding.left, border + padding.top));
+
+  final image = await recorder.endRecording().toImage(imageWidth, imageHeight);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   image.dispose();
   if (bytes == null) return null;

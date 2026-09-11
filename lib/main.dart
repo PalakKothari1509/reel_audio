@@ -1619,6 +1619,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     setState(() { _isMerging = true; _status = 'Building the video...'; });
     try {
       final dir = await getTemporaryDirectory();
+      // The cover hook and the closing question were written when the prompts were,
+      // and are read back off the phone here. Nothing is asked of Gemini to build a
+      // reel — that would be a request spent on words already written down.
+      final post = await _savedPost();
       final outPath = await SlideshowBuilder.build(
         imagePaths: _images,
         // One image per line, so the picture changes as the story moves on.
@@ -1634,12 +1638,15 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         // Drawn by Flutter, not FFmpeg's drawtext: drawtext does no complex-script
         // shaping, so Devanagari conjuncts and matras come out in the wrong places.
         captionPngs: _captions
-            ? await renderCaptions(
-                lines: _lines.map((l) => l.text).toList(), workDir: dir.path)
+            ? await _captionPngs(dir.path, post)
             : const [],
-        // The same closing card on every reel, which is the point of it — a channel
+        // The same closing shape on every reel, which is the point of it — a channel
         // gets recognised by what repeats, not by what varies.
-        brandPng: _endCard ? await renderBrandCard('${dir.path}/brand_card.png') : null,
+        brandPng: _endCard
+            ? await renderBrandCard('${dir.path}/brand_card.png',
+                question: post?.endQuestion ?? '',
+                cta: post?.ctaLine ?? kDefaultCtaLine)
+            : null,
         captionSpot: _captionSpot,
         motion: _motion,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
@@ -2310,6 +2317,43 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     if (picked.isEmpty) return;
     setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
     _saveProject();
+  }
+
+  /// The cover hook, closing question and CTA saved with this story, or null.
+  ///
+  /// Null is fine and common: a pasted script never went through the prompts screen,
+  /// so it has none of this. The reel is built without them rather than refusing.
+  Future<PostDetails?> _savedPost() async {
+    if (widget.projectId.isEmpty) return null;
+    try {
+      final all = await ProjectStore.load();
+      final matches = all.where((p) => p.id == widget.projectId);
+      if (matches.isEmpty || matches.first.promptsJson.isEmpty) return null;
+      return promptsFromSaved(
+        matches.first.promptsJson, _lines.map((l) => l.text).toList()).post;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The captions, with the first one swapped for the cover.
+  ///
+  /// Picture 1 is the thumbnail, and a thumbnail carrying an ordinary caption is a
+  /// wasted thumbnail. The hook goes there instead, at nearly twice the size.
+  Future<List<String?>> _captionPngs(String workDir, PostDetails? post) async {
+    final captions = await renderCaptions(
+      lines: _lines.map((l) => l.text).toList(), workDir: workDir);
+    if (captions.isEmpty) return captions;
+
+    // Falls back to the first script line, which is the hook anyway — just longer
+    // than the two to four words a cover wants.
+    final hook = (post?.coverHook.trim().isNotEmpty == true)
+        ? post!.coverHook.trim()
+        : _lines.first.text;
+
+    final cover = await renderCoverHook(hook, '$workDir/cover_hook.png');
+    if (cover != null) captions[0] = cover;
+    return captions;
   }
 
   /// Writes the script and pictures back onto the saved story.

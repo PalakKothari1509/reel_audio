@@ -106,6 +106,8 @@ Characters: Ria (toddler girl), Rio (toddler boy), Cuty (white bunny), Mumma, Pa
 
 $kScriptShapeRules
 
+$kReelShapeRules
+
 Keep every spoken line under 12 words so it takes about 4 seconds to say.
 Write how a person talks, not how a book reads.
 
@@ -125,11 +127,15 @@ Return ONLY valid JSON in exactly this shape:
   "how_it_is_solved": "one sentence",
   "ending_line": "the moral, one short line in Hinglish",
   "closing_cta": "a short follow line in Hinglish",
+  "cover_hook": "2 to 4 Hinglish words for screen 1, taken from what happens, e.g. Tractor Gayab?!",
   "cover_title": "3 to 5 words for the reel cover, big and curious",
-  "caption": "2 or 3 lines for Instagram, warm, speaking to parents",
+  "moral_line": "the lesson for the second-to-last screen, one warm line a parent would say out loud",
+  "cta_line": "the reason to keep this reel, on the last screen, e.g. Save this for tonight's bedtime story",
+  "end_question": "one question on the last screen a parent can answer in four words, about their own child",
+  "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
-  "pin_comment": "a first comment to pin - ask parents something they will answer",
-  "reply_question": "one short question to reply to commenters with, Hinglish",
+  "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs. Something answerable in a few words, never yes or no",
+  "reply_question": "what to reply to a comment with. Warm, Hinglish, and it ends in a question of its own so the conversation carries on — a reply that only says thank you ends it",
   "best_time": "a posting window for Indian parents of small children, e.g. Weekdays 8-9 pm IST",
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
@@ -252,6 +258,8 @@ The story: $storyDescription
 The finished voiceover script, one line per moment:
 $numbered
 
+$kReelShapeRules
+
 Return ONLY valid JSON, no markdown fence, in exactly this shape:
 
 {
@@ -265,11 +273,15 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "how_it_is_solved": "one sentence",
   "ending_line": "the moral, one short line in Hinglish",
   "closing_cta": "a short follow line in Hinglish",
+  "cover_hook": "2 to 4 Hinglish words for screen 1, taken from what happens, e.g. Tractor Gayab?!",
   "cover_title": "3 to 5 words for the reel cover, big and curious",
-  "caption": "2 or 3 lines for Instagram, warm, speaking to parents",
+  "moral_line": "the lesson for the second-to-last screen, one warm line a parent would say out loud",
+  "cta_line": "the reason to keep this reel, on the last screen, e.g. Save this for tonight's bedtime story",
+  "end_question": "one question on the last screen a parent can answer in four words, about their own child",
+  "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
-  "pin_comment": "a first comment to pin - ask parents something they will answer",
-  "reply_question": "one short question to reply to every comment with, Hinglish",
+  "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs. Something answerable in a few words, never yes or no",
+  "reply_question": "what to reply to a comment with. Warm, Hinglish, and it ends in a question of its own so the conversation carries on — a reply that only says thank you ends it",
   "best_time": "a suggested posting window for Indian parents of small children, with the day part, e.g. Weekdays 8-9 pm IST",
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
@@ -386,6 +398,14 @@ PromptSet _toPromptSet(
       pinComment: (json['pin_comment'] as String?)?.trim() ?? '',
       replyQuestion: (json['reply_question'] as String?)?.trim() ?? '',
       bestTime: (json['best_time'] as String?)?.trim() ?? '',
+      coverHook: (json['cover_hook'] as String?)?.trim() ?? '',
+      moralLine: (json['moral_line'] as String?)?.trim() ?? '',
+      // Falls back to the channel's own line rather than to nothing: a closing screen
+      // with no reason to keep the reel is a wasted screen, and every reel has one.
+      ctaLine: (json['cta_line'] as String?)?.trim().isNotEmpty == true
+          ? (json['cta_line'] as String).trim()
+          : kDefaultCtaLine,
+      endQuestion: (json['end_question'] as String?)?.trim() ?? '',
     ),
   );
 }

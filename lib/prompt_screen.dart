@@ -438,35 +438,52 @@ class _PromptScreenState extends State<PromptScreen> {
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
       const SizedBox(height: 8),
       _promptCard(
-        title: '1. Cover title',
-        subtitle: 'For the reel thumbnail',
-        body: p.post.coverTitle,
-        copyLabel: 'Cover title',
+        title: '1. Cover hook',
+        subtitle: 'Drawn on picture 1 by the app — this is the thumbnail',
+        body: p.post.coverHook.isEmpty ? p.post.coverTitle : p.post.coverHook,
+        copyLabel: 'Cover hook',
       ),
       const SizedBox(height: 10),
       _promptCard(
-        title: '2. Caption',
+        title: '2. The lesson',
+        subtitle: 'What the reel leaves a parent with',
+        body: p.post.moralLine.isEmpty ? p.beats.endingLine : p.post.moralLine,
+        copyLabel: 'Lesson',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
+        title: '3. Last screen',
+        // Both on one card because they are one screen, and reading them apart is
+        // how you end up with a question that does not sit with the line above it.
+        subtitle: 'Drawn on the closing card by the app',
+        body: '${p.post.ctaLine.isEmpty ? kDefaultCtaLine : p.post.ctaLine}'
+            '${p.post.endQuestion.isEmpty ? '' : '\n\n${p.post.endQuestion}'}',
+        copyLabel: 'Last screen',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
+        title: '4. Caption',
         subtitle: '${p.post.hashtags.length} hashtags included',
         body: p.post.forInstagram,
         copyLabel: 'Caption',
       ),
       const SizedBox(height: 10),
       _promptCard(
-        title: '3. Pin this comment',
+        title: '5. Pin this comment',
         subtitle: 'Post it yourself, then pin it',
         body: p.post.pinComment,
         copyLabel: 'Pin comment',
       ),
       const SizedBox(height: 10),
       _promptCard(
-        title: '4. Reply to every comment with this',
+        title: '6. Reply to every comment with this',
         subtitle: 'A question keeps the conversation going; "thank you!" ends it',
         body: p.post.replyQuestion,
         copyLabel: 'Reply question',
       ),
       const SizedBox(height: 10),
       _promptCard(
-        title: '5. When to post',
+        title: '7. When to post',
         // The caveat is part of the card, not a footnote, because a time presented as
         // fact would stop anyone checking the real answer in their own Insights.
         subtitle: kBestTimeCaveat,

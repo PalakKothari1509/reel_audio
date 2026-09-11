@@ -112,6 +112,13 @@ class ScenePrompt {
 const kBrandName = 'Fun Learning With Palak';
 const kBrandTagline = 'Little Stories • Big Lessons';
 
+/// Used on the closing screen when Gemini does not write one.
+///
+/// A reason to keep the reel rather than an instruction to follow. Saving is the
+/// thing Instagram counts hardest, and a parent will save a bedtime story long
+/// before they will follow a stranger who told them to.
+const kDefaultCtaLine = 'Save this for tonight\'s bedtime story';
+
 /// Everything needed to actually post the reel.
 class PostDetails {
   final String coverTitle;
@@ -126,6 +133,24 @@ class PostDetails {
   /// A suggested posting window — a starting point, not a fact. See the note below.
   final String bestTime;
 
+  /// Two to four words, drawn from what actually happens. Drawn big across the first
+  /// picture, which doubles as the cover — the only thing most people ever see.
+  final String coverHook;
+
+  /// The lesson, on its own screen near the end. Separate from the last spoken line
+  /// because a moral read aloud and a moral shown in writing are not the same length.
+  final String moralLine;
+
+  /// The line on the closing screen that gives a parent a reason to keep the reel:
+  /// saving it for bedtime, showing it to a child later. A reason to save beats an
+  /// instruction to follow, because saving is the thing Instagram counts hardest.
+  final String ctaLine;
+
+  /// A question on the last screen. Comments are what keep a reel alive after the
+  /// first hour, and people answer a question far more readily than they volunteer
+  /// an opinion.
+  final String endQuestion;
+
   const PostDetails({
     required this.coverTitle,
     required this.caption,
@@ -133,6 +158,10 @@ class PostDetails {
     this.pinComment = '',
     this.replyQuestion = '',
     this.bestTime = '',
+    this.coverHook = '',
+    this.moralLine = '',
+    this.ctaLine = '',
+    this.endQuestion = '',
   });
 
   /// Caption and hashtags as one block, which is how they get pasted into Instagram.
@@ -181,6 +210,31 @@ If the story has a "Hook:" line, line 1 is built from it.
 
 Never introduce a problem, character, event or moral that is not in the story you were
 given. Improve how it is told; never replace what it is about.''';
+
+/// The shape every reel on this channel follows, screen by screen.
+///
+/// Written down and repeated so the channel looks like one thing. A viewer who has
+/// seen three of these should know what is coming next, and the last screen should
+/// always be the same kind of invitation — that repetition is what turns someone who
+/// watched one reel into someone who follows.
+const kReelShapeRules = '''
+The reel is a fixed run of screens. Every one of them is a picture:
+
+SCREEN 1 — THE COVER. The most eye-catching picture of the whole set, because this is
+the thumbnail and for most people it is the only thing they ever see. Two to four words
+of Hinglish across it, taken from what actually happens — "Tractor Gayab?!",
+"Bath Se Darr?", "Zidd vs Mumma". Never bait: not "Wait for the end", not "You won't
+believe". A hook that is not true of the story wins one view and loses a follower.
+
+SCREENS 2 to N-2 — THE STORY. The problem, worse, then the turn. Pictures that carry
+the moment on their own, because a great many people watch with the sound off.
+
+SCREEN N-1 — THE LESSON. What the child in the story learned, in one warm line a
+parent would actually say out loud.
+
+SCREEN N — THE INVITATION. A reason to keep the reel — saving it for bedtime, showing
+it to a child later — and one question a parent can answer in four words. Warm, never
+demanding. No "LIKE COMMENT SHARE NOW".''';
 
 // ── The two templates ─────────────────────────────────────────────────────────
 
