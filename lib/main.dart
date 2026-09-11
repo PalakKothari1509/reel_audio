@@ -407,6 +407,76 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   void dispose() { _descCtrl.dispose(); super.dispose(); }
 
+  /// Reads the story back and says whether it will make a reel worth watching.
+  ///
+  /// Before the script rather than after: a weak story makes a weak script, a weak
+  /// voiceover and seven weak pictures, and by then it has cost twenty minutes.
+  Future<void> _checkStory() async {
+    setState(() { _isGenerating = true; _status = 'Reading the story...'; });
+
+    try {
+      final check = await checkStory(_descCtrl.text);
+      if (!mounted) return;
+      setState(() => _isGenerating = false);
+
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Row(children: [
+            Text('${check.score}/10',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                // Amber rather than red below 7: it is a nudge to improve, not a
+                // refusal, and the story is still yours to use.
+                color: check.score >= 8
+                    ? Colors.teal
+                    : check.score >= 6 ? Colors.amber : Colors.orange,
+              )),
+            const SizedBox(width: 10),
+            const Expanded(child: Text('Story check', style: TextStyle(fontSize: 15))),
+          ]),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (check.verdict.isNotEmpty) ...[
+                  Text(check.verdict, style: const TextStyle(fontSize: 13)),
+                  const SizedBox(height: 12),
+                ],
+                ...check.good.map((g) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        const Icon(Icons.check, size: 14, color: Colors.teal),
+                        const SizedBox(width: 6),
+                        Expanded(child: Text(g, style: const TextStyle(fontSize: 12))),
+                      ]),
+                    )),
+                if (check.missing.isNotEmpty) const SizedBox(height: 8),
+                ...check.missing.map((m) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        const Icon(Icons.priority_high, size: 14, color: Colors.amber),
+                        const SizedBox(width: 6),
+                        Expanded(child: Text(m,
+                          style: const TextStyle(fontSize: 12, color: Colors.amber))),
+                      ]),
+                    )),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (mounted) setState(() { _isGenerating = false; _status = '❌ $e'; });
+    }
+  }
+
   /// Asks for a story idea: pick an age and a problem, get one written up.
   ///
   /// Exists so the next reel does not start at a blank field. The problem list is real
@@ -545,6 +615,11 @@ class _StoryScreenState extends State<StoryScreen> {
                   onPressed: _isGenerating ? null : _askForIdea,
                   icon: const Icon(Icons.lightbulb_outline, size: 16),
                   label: const Text('Idea', style: TextStyle(fontSize: 12)),
+                ),
+                TextButton.icon(
+                  onPressed: _isGenerating ? null : _checkStory,
+                  icon: const Icon(Icons.fact_check_outlined, size: 16),
+                  label: const Text('Check', style: TextStyle(fontSize: 12)),
                 ),
                 TextButton.icon(
                   onPressed: _isGenerating ? null : _useFormat,

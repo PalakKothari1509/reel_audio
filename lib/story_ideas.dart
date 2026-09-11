@@ -61,6 +61,103 @@ class StoryIdea {
       'Ending line: $moral';
 }
 
+// ── Checking a story before it costs anything ─────────────────────────────────
+
+class StoryCheck {
+  final int score;
+  /// What the story already does, so the check is not only a list of complaints.
+  final List<String> good;
+  /// What is weak, in the order worth fixing.
+  final List<String> missing;
+  final String verdict;
+
+  const StoryCheck({
+    required this.score,
+    required this.good,
+    required this.missing,
+    required this.verdict,
+  });
+}
+
+/// Reads a story and says whether it will make a reel worth watching.
+///
+/// Worth doing before the script, not after: a weak story produces a weak script, a
+/// weak voiceover and seven weak pictures, and by then it has cost twenty minutes.
+/// Ten seconds here saves all of that.
+Future<StoryCheck> checkStory(String story) async {
+  if (story.trim().length < 15) {
+    throw Exception('Write a bit more of the story first.');
+  }
+
+  final prompt = '''
+Judge this story for a 30 second Instagram reel for Indian parents of preschoolers.
+
+$story
+
+Be honest and specific. A story that is merely pleasant scores low — the test is
+whether a parent stops scrolling and recognises their own house.
+
+Return ONLY valid JSON:
+
+{
+  "score": 7,
+  "good": ["what already works, short phrases"],
+  "missing": ["what is weak, most important first, short phrases"],
+  "verdict": "one sentence saying whether to use it or rework it"
+}
+
+Check for: a real everyday problem, a clear start, the problem actually shown, a moment
+of feeling, a turn where it changes, a solution the child reaches, a warm ending,
+age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 minutes.
+
+"score" is 1 to 10.
+''';
+
+  final response = await http.post(
+    Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
+        '$_model:generateContent?key=$geminiApiKey'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'contents': [{'parts': [{'text': prompt}]}],
+      'generationConfig': {
+        // Low: a critique should be the same twice for the same story, or it is
+        // not a judgement, it is a mood.
+        'temperature': 0.3,
+        'maxOutputTokens': 2048,
+        'responseMimeType': 'application/json',
+      },
+    }),
+  ).timeout(_timeout);
+
+  if (response.statusCode != 200) {
+    throw Exception('Gemini error ${response.statusCode}: ${response.body}');
+  }
+
+  final body = jsonDecode(response.body);
+  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  if (text.trim().isEmpty) throw Exception('Gemini returned no answer.');
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(text.trim()) as Map<String, dynamic>;
+  } catch (_) {
+    throw Exception('Gemini did not return usable JSON.\n$text');
+  }
+
+  List<String> list(String key) => ((json[key] as List?) ?? const [])
+      .whereType<String>()
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty)
+      .toList();
+
+  return StoryCheck(
+    score: (json['score'] is num) ? (json['score'] as num).round().clamp(1, 10) : 5,
+    good: list('good'),
+    missing: list('missing'),
+    verdict: (json['verdict'] as String?)?.trim() ?? '',
+  );
+}
+
 /// Asks Gemini for one story built on a real problem at a real age.
 Future<StoryIdea> generateStoryIdea({
   required String age,
