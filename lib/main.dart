@@ -1312,6 +1312,41 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     ]),
   );
 
+  /// What still has to happen before the video can be built, or empty when ready.
+  String get _notReadyReason {
+    if (_lines.isEmpty) return 'Write or paste a script first.';
+    if (_storyMode && _images.isEmpty) return 'Add at least one picture.';
+    if (_audioPath == null) return 'Tap Save Voice.';
+    return '';
+  }
+
+  /// The picture this line will use, as a small numbered thumbnail.
+  ///
+  /// Pictures cycle when there are fewer than lines, so line 8 with 3 pictures shows
+  /// picture 2 — which is worth seeing before building rather than after.
+  Widget _lineStatus(int index) {
+    if (_images.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.only(right: 6, top: 4),
+        child: Icon(Icons.image_not_supported, size: 16, color: Colors.amber),
+      );
+    }
+
+    final picture = index % _images.length;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6, top: 2),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Image.file(File(_images[picture]),
+            width: 26, height: 34, fit: BoxFit.cover),
+        ),
+        Text('${picture + 1}',
+          style: const TextStyle(fontSize: 8, color: Colors.white38)),
+      ]),
+    );
+  }
+
   /// The pictures, along the top of the script. Kept beside the lines on purpose —
   /// image 1 goes with line 1, and seeing both together is the only way to tell whether
   /// you have enough of them.
@@ -1475,6 +1510,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  // Which picture this line will use, or a warning that there is none.
+                  // Finding out at line 6 of a render that line 6 had no picture is a
+                  // wasted minute and an error where a glance would have done.
+                  if (_storyMode) _lineStatus(i),
                   SizedBox(width: 52,
                     child: TextField(
                       controller: _timeCtrls[i],
@@ -1558,7 +1597,19 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               loading: _isSaving,
             )),
           ]),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
+          // Says what is still missing rather than leaving a greyed-out button with no
+          // explanation — the commonest way a disabled control wastes someone's time.
+          if (_notReadyReason.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(children: [
+                const Icon(Icons.info_outline, size: 13, color: Colors.amber),
+                const SizedBox(width: 4),
+                Expanded(child: Text(_notReadyReason,
+                  style: const TextStyle(fontSize: 11, color: Colors.amber))),
+              ]),
+            ),
           _btn(
             icon: Icons.movie_creation,
             label: _isMerging
