@@ -855,13 +855,30 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   }
 
   void _syncLines() {
+    var changed = false;
+
     for (int i = 0; i < _lines.length; i++) {
       final edited = _textCtrls[i].text;
       // An edited line no longer matches its Devanagari twin, so drop that and speak
       // what is on screen rather than the sentence it used to be.
-      if (edited != _lines[i].text) _lines[i].speak = null;
+      if (edited != _lines[i].text) {
+        _lines[i].speak = null;
+        changed = true;
+      }
+      final time = parseDuration(_timeCtrls[i].text);
+      if (time != _lines[i].time) changed = true;
+
       _lines[i].text = edited;
-      _lines[i].time = parseDuration(_timeCtrls[i].text);
+      _lines[i].time = time;
+    }
+
+    // The saved voice was spoken from the old words at the old times, so it no longer
+    // matches. Keeping it would build a reel whose captions say one thing and whose
+    // narration says another — which looks like a sync bug and isn't one.
+    if (changed && _audioPath != null) {
+      _audioPath = null;
+      _lineStarts = [];
+      _status = 'Script changed — tap Save Voice again.';
     }
   }
 
@@ -1139,8 +1156,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   /// Builds the reel from the chosen images instead of a source video.
   Future<void> _buildFromImages() async {
-    if (_audioPath == null) { setState(() => _status = 'Please save voice first!'); return; }
+    // Sync FIRST: it clears the saved voice when the script has changed since, so
+    // checking before it would pass and then hand a null path to the builder.
     _syncLines();
+    if (_audioPath == null) {
+      setState(() => _status = 'Tap Save Voice first.');
+      return;
+    }
     setState(() { _isMerging = true; _status = 'Building the video...'; });
     try {
       final dir = await getTemporaryDirectory();
@@ -1177,7 +1199,12 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   }
 
   Future<void> _mergeWithVideo() async {
-    if (_audioPath == null) { setState(() => _status = 'Please save voice first!'); return; }
+    // Same order as above: sync can clear the voice, so check after it.
+    _syncLines();
+    if (_audioPath == null) {
+      setState(() => _status = 'Tap Save Voice first.');
+      return;
+    }
     final video = widget.videoFile;
     if (video == null) { setState(() => _status = 'No video to merge with.'); return; }
     setState(() { _isMerging = true; _status = 'Merging voice with video...'; });
