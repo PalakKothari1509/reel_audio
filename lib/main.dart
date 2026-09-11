@@ -19,6 +19,10 @@ import 'caption_renderer.dart';
 import 'story_ideas.dart';
 import 'music.dart';
 
+/// Android side of saving a finished reel. Its own channel rather than the voice one,
+/// because saving a video has nothing to do with speech.
+const _mediaChannel = MethodChannel('com.example.reel_audio/media');
+
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
 const _geminiKey     = geminiApiKey;
@@ -2008,14 +2012,22 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
     setState(() => _ctrl = c);
   }
 
+  /// Hands the file to Android to put in the gallery, rather than copying it into the
+  /// Movies folder ourselves.
+  ///
+  /// Copying it was the bug. Gallery, Photos and Instagram do not read the filesystem,
+  /// they read MediaStore, so a file copied in by hand is on the phone but invisible to
+  /// every app you would actually want to post it from. A folder-scanning player like
+  /// MX finds it, which is why it looked saved and missing at the same time.
   Future<void> _saveToGallery() async {
-    setState(() { _isSaving = true; _status = 'Saving to Movies folder...'; });
+    setState(() { _isSaving = true; _status = 'Saving to your gallery...'; });
     try {
-      final outDir = Directory('/storage/emulated/0/Movies');
-      if (!await outDir.exists()) await outDir.create(recursive: true);
-      final outPath = '${outDir.path}/reel_${DateTime.now().millisecondsSinceEpoch}.mp4';
-      await widget.mergedFile.copy(outPath);
-      setState(() { _status = '🎉 Saved! Open Files app → Movies folder.'; });
+      await _mediaChannel.invokeMethod('saveVideoToGallery', {
+        'path': widget.mergedFile.path,
+        'name': 'reel_${DateTime.now().millisecondsSinceEpoch}.mp4',
+      });
+      setState(() => _status = '🎉 Saved. Look in Gallery → Movies → Reels, '
+          'or pick it straight from Instagram.');
     } catch (e) { setState(() { _status = '❌ $e'; }); }
     setState(() => _isSaving = false);
   }

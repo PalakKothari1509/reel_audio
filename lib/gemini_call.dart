@@ -16,9 +16,12 @@ import 'package:http/http.dart' as http;
 /// 500 is Google's own fault, 503 is Google being busy, 429 is too many too quickly.
 const _retryable = {429, 500, 503};
 
-/// How long to wait before each retry. Two goes after the first attempt, which covers
-/// the ordinary blip without leaving someone staring at a frozen button for a minute.
-const _backoff = [Duration(seconds: 3), Duration(seconds: 7)];
+/// How long to wait before each retry.
+///
+/// Lengthening: a real demand spike on a popular model lasts longer than ten seconds,
+/// and giving up at ten meant the retry rarely got to do its job. Half a minute of
+/// waiting beats retyping the story, as long as the screen keeps saying why it waits.
+const _backoff = [Duration(seconds: 3), Duration(seconds: 8), Duration(seconds: 20)];
 
 /// Posts to a Gemini text model and hands back the response.
 ///

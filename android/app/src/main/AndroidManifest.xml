@@ -46,5 +46,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <!-- All-files access is gone: it was only ever needed to copy a video into Movies
+         by hand, and that copy is what stopped the gallery seeing it. Saving through
+         MediaStore needs no storage permission on Android 10 and up. -->
+
 </manifest>
