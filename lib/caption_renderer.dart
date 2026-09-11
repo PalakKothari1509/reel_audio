@@ -21,13 +21,16 @@ import 'video_builder.dart';
 /// White rounded box with a black border, the style the reels already use.
 class CaptionStyle {
   /// Share of the frame width the caption may fill.
-  static const double widthFraction = 0.86;
+  ///
+  /// Taken from the safe width rather than set here: it is not a look, it is how wide
+  /// the caption can be before Instagram's own buttons cover the end of every line.
+  static const double widthFraction = kSafeCaptionWidth;
   static const double fontSize = 54;
   static const double borderWidth = 5;
   static const double cornerRadius = 26;
   static const EdgeInsets padding = EdgeInsets.symmetric(horizontal: 34, vertical: 22);
-  // Where it sits on screen is kCaptionFromTop in video_builder.dart — the overlay
-  // filter is what actually places it, so the number lives with the filter.
+  // Where it sits on screen is CaptionSpot in video_builder.dart — the overlay filter
+  // is what actually places it, so the position lives with the filter.
 }
 
 /// Draws one caption and returns the PNG path, or null when there's nothing to draw.
@@ -53,7 +56,10 @@ Future<String?> renderCaptionPng({
     ),
     textAlign: TextAlign.center,
     textDirection: TextDirection.ltr,
-    maxLines: 3,
+    // Four rather than three: the box is narrower now that it has to clear the button
+    // column, so the same line of Hinglish wraps once more than it used to and three
+    // would start cutting real words off the end.
+    maxLines: 4,
     ellipsis: '…',
   )..layout(maxWidth: maxTextWidth);
 

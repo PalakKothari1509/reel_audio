@@ -958,6 +958,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// Burn the script onto the video. On by default — most reels are watched muted,
   /// so a reel with no text on screen is a reel nobody understands.
   bool _captions = true;
+  /// Both only affect rendering, so changing either does not throw away the voice.
+  CaptionSpot _captionSpot = CaptionSpot.low;
+  ClipMotion _motion = ClipMotion.drift;
 
   /// Which bundled track plays under the voice. Null means none.
   MusicTrack? _music;
@@ -1440,6 +1443,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             ? await renderCaptions(
                 lines: _lines.map((l) => l.text).toList(), workDir: dir.path)
             : const [],
+        captionSpot: _captionSpot,
+        motion: _motion,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
       );
       if (!mounted) return;
@@ -1778,6 +1783,38 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               ),
             ]),
           ],
+          // How it is rendered rather than what is said, so both tap through their
+          // options instead of opening a sheet for three choices.
+          const SizedBox(height: 4),
+          Row(children: [
+            if (_captions) ...[
+              GestureDetector(
+                onTap: busy ? null : () => setState(() {
+                  _captionSpot = CaptionSpot.values[
+                      (_captionSpot.index + 1) % CaptionSpot.values.length];
+                }),
+                child: Row(children: [
+                  const Icon(Icons.subtitles, size: 14, color: Colors.white54),
+                  const SizedBox(width: 4),
+                  Text('Caption ${captionSpotLabel(_captionSpot)}',
+                    style: const TextStyle(fontSize: 11, color: Colors.white54)),
+                ]),
+              ),
+              const SizedBox(width: 14),
+            ],
+            GestureDetector(
+              onTap: busy ? null : () => setState(() {
+                _motion = ClipMotion.values[
+                    (_motion.index + 1) % ClipMotion.values.length];
+              }),
+              child: Row(children: [
+                const Icon(Icons.animation, size: 14, color: Colors.white54),
+                const SizedBox(width: 4),
+                Text('Motion ${clipMotionLabel(_motion)}',
+                  style: const TextStyle(fontSize: 11, color: Colors.white54)),
+              ]),
+            ),
+          ]),
         ]),
       ),
       if (_storyMode) _buildImageStrip(busy),

@@ -19,9 +19,94 @@ const double kMinClipSeconds = 1.0;
 /// Held after the last spoken word so the video doesn't cut on the final syllable.
 const double kTailSeconds = 1.5;
 
-/// Where a caption sits, as a share of frame height from the top. Low enough to clear
-/// a face, high enough to stay above Instagram's own overlay at the bottom.
-const double kCaptionFromTop = 0.70;
+// ── Staying out of Instagram's way ────────────────────────────────────────────
+//
+// Instagram draws its own things on top of the reel: a header at the top, the
+// username, caption and audio ticker along the bottom, and the like/comment/share
+// column down the right. Anything of ours underneath is invisible on the phone even
+// though the preview looks perfect — which is the worst kind of bug, because nothing
+// looks wrong until it is posted.
+//
+// These are the shares of a 1080x1920 frame that are actually ours to draw in.
+
+const double kSafeTop = 0.13;
+const double kSafeBottom = 0.78;
+
+/// Widest a caption may be before its right end slides under the button column.
+///
+/// The old 0.86 put the last few characters of every caption directly beneath the
+/// like button. Nobody reading the reel ever saw the end of a line.
+const double kSafeCaptionWidth = 0.72;
+
+/// Where the caption sits down the frame. Which one is right depends on the pictures,
+/// so it is a choice rather than a constant — a caption that clears Instagram can
+/// still land across somebody's face.
+enum CaptionSpot { high, middle, low }
+
+double captionSpotFraction(CaptionSpot spot) {
+  switch (spot) {
+    case CaptionSpot.high:
+      return 0.24;
+    case CaptionSpot.middle:
+      return 0.50;
+    case CaptionSpot.low:
+      return 0.68;
+  }
+}
+
+String captionSpotLabel(CaptionSpot spot) {
+  switch (spot) {
+    case CaptionSpot.high:
+      return 'high';
+    case CaptionSpot.middle:
+      return 'middle';
+    case CaptionSpot.low:
+      return 'low';
+  }
+}
+
+/// How much the picture moves while it is on screen.
+///
+/// No zoom in the list, and that is deliberate: zooming has to crop to have anywhere
+/// to go, which cuts the edges off the picture — the exact thing the fit-not-fill
+/// change was made to stop. These all move the whole picture instead.
+enum ClipMotion { still, drift, sway }
+
+// Sway is the same idea as drift, just further and slower, and moving sideways as
+// well so it does not read as one up-and-down wobble. [swing] flips per picture so a
+// long reel does not slide steadily in one direction.
+
+String _motionX(ClipMotion motion, int swing) {
+  switch (motion) {
+    case ClipMotion.sway:
+      return "'(W-w)/2+$swing*20*sin(2*PI*t/11)'";
+    case ClipMotion.still:
+    case ClipMotion.drift:
+      return "'(W-w)/2'";
+  }
+}
+
+String _motionY(ClipMotion motion, int swing) {
+  switch (motion) {
+    case ClipMotion.still:
+      return "'(H-h)/2'";
+    case ClipMotion.drift:
+      return "'(H-h)/2+$swing*14*sin(2*PI*t/9)'";
+    case ClipMotion.sway:
+      return "'(H-h)/2+$swing*32*sin(2*PI*t/14)'";
+  }
+}
+
+String clipMotionLabel(ClipMotion motion) {
+  switch (motion) {
+    case ClipMotion.still:
+      return 'still';
+    case ClipMotion.drift:
+      return 'drift';
+    case ClipMotion.sway:
+      return 'sway';
+  }
+}
 
 // ── Probing ───────────────────────────────────────────────────────────────────
 
@@ -239,6 +324,8 @@ class SlideshowBuilder {
     String? musicPath,
     /// One PNG per line, null for a line with no caption. Empty means no captions.
     List<String?> captionPngs = const [],
+    CaptionSpot captionSpot = CaptionSpot.low,
+    ClipMotion motion = ClipMotion.drift,
     void Function(String message)? onStatus,
   }) async {
     if (imagePaths.isEmpty) throw Exception('Add at least one image first.');
@@ -267,6 +354,8 @@ class SlideshowBuilder {
         isFirst: i == 0,
         isLast: i == durations.length - 1,
         captionPng: i < captionPngs.length ? captionPngs[i] : null,
+        captionSpot: captionSpot,
+        motion: motion,
       );
       clipPaths.add(clipPath);
     }
@@ -300,6 +389,8 @@ class SlideshowBuilder {
     required bool isFirst,
     required bool isLast,
     String? captionPng,
+    CaptionSpot captionSpot = CaptionSpot.low,
+    ClipMotion motion = ClipMotion.drift,
   }) async {
     if (!await File(imagePath).exists()) {
       throw Exception('Image ${index + 1} is missing: $imagePath');
@@ -325,16 +416,24 @@ class SlideshowBuilder {
     // The backdrop is the same picture shrunk to thumbnail size and scaled back up.
     // Blowing up 64 pixels to 1080 IS the blur — no blur filter needed, which keeps
     // this working on ffmpeg builds that leave gblur out, and costs almost nothing.
-    // Drift alternates direction per image so a long reel doesn't slide one way.
-    final drift = index.isEven ? 1 : -1;
+    // Movement alternates direction per image so a long reel doesn't slide one way.
+    final swing = index.isEven ? 1 : -1;
 
-    // The caption comes in as input 1 and goes on AFTER the drift, so it stays still
+    final moveX = _motionX(motion, swing);
+    final moveY = _motionY(motion, swing);
+
+    // The caption comes in as input 1 and goes on AFTER the movement, so it stays put
     // while the picture moves behind it — a caption that floats is hard to read. The
     // fade still covers both, because it is applied after this.
+    //
+    // min/max keep it inside the band Instagram leaves alone whatever height it turns
+    // out to be: a three-line caption placed low would otherwise hang down into the
+    // username and audio ticker and lose its bottom line.
+    final spot = captionSpotFraction(captionSpot);
     final captionPart = caption == null
         ? ''
         : "[withpic];[withpic][1:v]overlay=x='(W-w)/2':"
-          "y='H*$kCaptionFromTop-h/2'";
+          "y='max(H*$kSafeTop,min(H*$spot-h/2,H*$kSafeBottom-h))'";
 
     final filter =
         '[0:v]split=2[bg][fg];'
@@ -342,8 +441,7 @@ class SlideshowBuilder {
         'scale=$kVideoWidth:$kVideoHeight:flags=bilinear,setsar=1[back];'
         '[fg]scale=$kVideoWidth:$kVideoHeight:force_original_aspect_ratio=decrease,'
         'scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1[front];'
-        "[back][front]overlay=x='(W-w)/2':"
-        "y='(H-h)/2+$drift*14*sin(2*PI*t/9)'"
+        '[back][front]overlay=x=$moveX:y=$moveY'
         '$captionPart$fadePart,format=yuv420p[v]';
 
     final session = await FFmpegKit.executeWithArguments([
