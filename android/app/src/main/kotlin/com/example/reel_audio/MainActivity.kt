@@ -1,6 +1,7 @@
 package com.example.reel_audio
 
 import android.content.ContentValues
+import android.content.Intent
 import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Environment
@@ -38,6 +39,11 @@ class MainActivity : FlutterActivity() {
                         call.argument<String>("name") ?: "reel.mp4",
                         result
                     )
+                    "writeBackup" -> writeBackup(
+                        call.argument<String>("json") ?: "",
+                        result
+                    )
+                    "pickBackup" -> pickBackup(result)
                     else -> result.notImplemented()
                 }
             }
@@ -142,6 +148,125 @@ class MainActivity : FlutterActivity() {
             result.success(uri.toString())
         } catch (e: Exception) {
             result.error("SAVE_FAILED", e.message ?: "Saving to the gallery failed.", null)
+        }
+    }
+
+    // ── Backup ────────────────────────────────────────────────────────────────
+    //
+    // Saved stories live in the app's private folder, which Android deletes the moment
+    // the app is uninstalled. Everything written so far — stories, scripts, captions,
+    // edits — goes with it, and nothing in the app can prevent that from inside.
+    //
+    // Downloads is the one place that survives. A file written there through MediaStore
+    // stays after an uninstall and can be handed back on the way in.
+
+    private val PICK_BACKUP = 4711
+    private var pickResult: MethodChannel.Result? = null
+
+    /**
+     * Writes the backup into Downloads, replacing the previous one.
+     *
+     * Always the same filename so there is one current backup rather than forty dated
+     * ones, and so somebody looking for it a month later knows what to look for.
+     */
+    private fun writeBackup(json: String, result: MethodChannel.Result) {
+        try {
+            val name = "fun-learning-stories-backup.json"
+            val resolver = applicationContext.contentResolver
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val folder = Environment.DIRECTORY_DOWNLOADS + "/Fun Learning With Palak"
+
+                // Replace rather than pile up: MediaStore is happy to keep writing
+                // "backup (1).json" forever, and then nobody knows which is current.
+                resolver.delete(
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    "${MediaStore.Downloads.DISPLAY_NAME} = ? AND ${MediaStore.Downloads.RELATIVE_PATH} LIKE ?",
+                    arrayOf(name, "$folder%")
+                )
+
+                val values = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, name)
+                    put(MediaStore.Downloads.MIME_TYPE, "application/json")
+                    put(MediaStore.Downloads.RELATIVE_PATH, folder)
+                    put(MediaStore.Downloads.IS_PENDING, 1)
+                }
+
+                val uri = resolver.insert(
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    values
+                ) ?: run {
+                    result.error("NO_ROW", "Downloads would not take the backup.", null)
+                    return
+                }
+
+                resolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+                values.clear()
+                values.put(MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+
+                result.success("Downloads/Fun Learning With Palak/$name")
+                return
+            }
+
+            val dir = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "Fun Learning With Palak"
+            )
+            if (!dir.exists()) dir.mkdirs()
+            File(dir, name).writeText(json)
+            result.success("Downloads/Fun Learning With Palak/$name")
+        } catch (e: Exception) {
+            result.error("BACKUP_FAILED", e.message ?: "Could not write the backup.", null)
+        }
+    }
+
+    /**
+     * Opens the system file picker and reads the chosen backup.
+     *
+     * A picker rather than reading Downloads directly, because after a reinstall the
+     * app no longer owns the file it wrote and cannot see it any more. Letting you
+     * point at it is one tap and needs no storage permission at all.
+     */
+    private fun pickBackup(result: MethodChannel.Result) {
+        pickResult?.error("CANCELLED", "Another pick was already open.", null)
+        pickResult = result
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            // Not "application/json": plenty of file managers hand back a .json as
+            // octet-stream or text/plain, and a filter that strict hides the file.
+            type = "*/*"
+        }
+        try {
+            startActivityForResult(intent, PICK_BACKUP)
+        } catch (e: Exception) {
+            pickResult = null
+            result.error("NO_PICKER", "This phone has no file picker.", null)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != PICK_BACKUP) return
+
+        val pending = pickResult ?: return
+        pickResult = null
+
+        val uri = data?.data
+        if (resultCode != RESULT_OK || uri == null) {
+            // Backing out of the picker is a choice, not a failure.
+            pending.success(null)
+            return
+        }
+
+        try {
+            val text = contentResolver.openInputStream(uri)?.use {
+                it.readBytes().toString(Charsets.UTF_8)
+            }
+            pending.success(text)
+        } catch (e: Exception) {
+            pending.error("READ_FAILED", e.message ?: "Could not read that file.", null)
         }
     }
 

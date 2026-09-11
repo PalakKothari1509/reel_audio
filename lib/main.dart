@@ -349,6 +349,15 @@ void main() => runApp(MaterialApp(
 /// The five steps, named once so the bar says the same thing on every screen.
 const kSteps = ['Story', 'Script', 'Pictures', 'Voice', 'Reel'];
 
+/// The words the app draws onto the reel itself, after your edits are applied.
+class _ReelText {
+  /// Two to four words across picture 1, which is the thumbnail.
+  final String coverHook;
+  /// The last screen: the question, a blank line, then the reason to keep the reel.
+  final String closing;
+  const _ReelText({this.coverHook = '', this.closing = ''});
+}
+
 // ── Home Screen ───────────────────────────────────────────────────────────────
 
 class HomeScreen extends StatefulWidget {
@@ -1644,8 +1653,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         // gets recognised by what repeats, not by what varies.
         brandPng: _endCard
             ? await renderBrandCard('${dir.path}/brand_card.png',
-                question: post?.endQuestion ?? '',
-                cta: post?.ctaLine ?? kDefaultCtaLine)
+                message: post.closing)
             : null,
         captionSpot: _captionSpot,
         motion: _motion,
@@ -2319,20 +2327,44 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     _saveProject();
   }
 
-  /// The cover hook, closing question and CTA saved with this story, or null.
+  /// What goes on the cover and the last screen, with your own rewrites applied.
   ///
-  /// Null is fine and common: a pasted script never went through the prompts screen,
+  /// Empty is fine and common: a pasted script never went through the prompts screen,
   /// so it has none of this. The reel is built without them rather than refusing.
-  Future<PostDetails?> _savedPost() async {
-    if (widget.projectId.isEmpty) return null;
+  Future<_ReelText> _savedPost() async {
+    if (widget.projectId.isEmpty) return const _ReelText();
     try {
       final all = await ProjectStore.load();
       final matches = all.where((p) => p.id == widget.projectId);
-      if (matches.isEmpty || matches.first.promptsJson.isEmpty) return null;
-      return promptsFromSaved(
-        matches.first.promptsJson, _lines.map((l) => l.text).toList()).post;
+      if (matches.isEmpty) return const _ReelText();
+
+      final project = matches.first;
+      final edits = project.edits;
+
+      PostDetails? post;
+      if (project.promptsJson.isNotEmpty) {
+        post = promptsFromSaved(
+          project.promptsJson, _lines.map((l) => l.text).toList()).post;
+      }
+
+      // What you typed always wins over what was generated — that is the whole point
+      // of keeping edits in their own place rather than writing over the reply.
+      final hook = edits['cover_hook']?.trim();
+      final closing = edits['last_screen']?.trim();
+
+      return _ReelText(
+        coverHook: (hook != null && hook.isNotEmpty) ? hook : (post?.coverHook ?? ''),
+        // Question first, then the reason to keep it. A closing screen that asks
+        // nothing gets no comments.
+        closing: (closing != null && closing.isNotEmpty)
+            ? closing
+            : [
+                if ((post?.endQuestion ?? '').isNotEmpty) post!.endQuestion,
+                post?.ctaLine.isNotEmpty == true ? post!.ctaLine : kDefaultCtaLine,
+              ].join('\n\n'),
+      );
     } catch (_) {
-      return null;
+      return const _ReelText();
     }
   }
 
@@ -2340,15 +2372,15 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   ///
   /// Picture 1 is the thumbnail, and a thumbnail carrying an ordinary caption is a
   /// wasted thumbnail. The hook goes there instead, at nearly twice the size.
-  Future<List<String?>> _captionPngs(String workDir, PostDetails? post) async {
+  Future<List<String?>> _captionPngs(String workDir, _ReelText post) async {
     final captions = await renderCaptions(
       lines: _lines.map((l) => l.text).toList(), workDir: workDir);
     if (captions.isEmpty) return captions;
 
     // Falls back to the first script line, which is the hook anyway — just longer
     // than the two to four words a cover wants.
-    final hook = (post?.coverHook.trim().isNotEmpty == true)
-        ? post!.coverHook.trim()
+    final hook = post.coverHook.trim().isNotEmpty
+        ? post.coverHook.trim()
         : _lines.first.text;
 
     final cover = await renderCoverHook(hook, '$workDir/cover_hook.png');
@@ -2505,6 +2537,45 @@ class SavedStoriesScreen extends StatefulWidget {
 class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
   List<Project> _projects = [];
   bool _loading = true;
+  bool _busy = false;
+  String _note = '';
+
+  /// Reads a backup you point at and puts back anything missing.
+  ///
+  /// A file picker rather than the app finding it on its own: after a reinstall the
+  /// app no longer owns the file it wrote last week and cannot see it any more.
+  Future<void> _restore() async {
+    setState(() { _busy = true; _note = ''; });
+    try {
+      final added = await ProjectBackup.restore();
+      if (!mounted) return;
+      if (added == null) {
+        setState(() { _busy = false; _note = ''; });
+        return;
+      }
+      await _load();
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _note = added == 0
+            ? 'Nothing new in that backup — everything in it is already here.'
+            : added == 1 ? '1 story restored.' : '$added stories restored.';
+      });
+    } catch (e) {
+      if (mounted) setState(() { _busy = false; _note = '❌ $e'; });
+    }
+  }
+
+  /// Writes the backup now, for when you want to be sure before uninstalling.
+  Future<void> _backUpNow() async {
+    setState(() { _busy = true; _note = ''; });
+    try {
+      final where = await ProjectBackup.write();
+      if (mounted) setState(() { _busy = false; _note = '✅ Saved to $where'; });
+    } catch (e) {
+      if (mounted) setState(() { _busy = false; _note = '❌ $e'; });
+    }
+  }
 
   @override
   void initState() {
@@ -2550,10 +2621,46 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Saved stories')),
+      appBar: AppBar(
+        title: const Text('Saved stories'),
+        actions: [
+          IconButton(
+            tooltip: 'Restore from a backup file',
+            icon: const Icon(Icons.restore, size: 21),
+            onPressed: _busy ? null : _restore,
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : _projects.isEmpty
+          : Column(children: [
+        if (_note.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: StatusBar(message: _note),
+          ),
+        // Said plainly rather than hidden in a settings screen, because the one time
+        // it matters is the moment before somebody uninstalls the app.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: AppCard(
+            colour: AppColors.surfaceAlt,
+            child: Row(children: [
+              const Icon(Icons.shield_outlined, size: 18, color: AppColors.textSoft),
+              const SizedBox(width: 10),
+              const Expanded(child: Text(
+                'A copy of everything is kept in Downloads, so it survives the app '
+                'being uninstalled.',
+                style: AppText.small)),
+              TextButton(
+                onPressed: _busy ? null : _backUpNow,
+                child: const Text('Back up now', style: TextStyle(fontSize: 12)),
+              ),
+            ]),
+          ),
+        ),
+        Expanded(
+          child: _projects.isEmpty
               ? const Padding(
                   padding: EdgeInsets.all(32),
                   child: Center(child: Text(
@@ -2596,6 +2703,23 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                                   ],
                                 ]),
                               ])),
+                            // Straight to the caption, hook and prompts without
+                            // rebuilding anything. They were written down when the
+                            // story was, so this costs nothing and needs no reel.
+                            if (p.script.isNotEmpty)
+                              IconButton(
+                                tooltip: 'Caption, hook and prompts',
+                                icon: const Icon(Icons.description_outlined, size: 20,
+                                  color: AppColors.primary),
+                                onPressed: () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => PromptScreen(
+                                    storyDescription: p.story,
+                                    scriptLines: parseScript(p.script.join('\n'))
+                                        .map((l) => l.text).toList(),
+                                    seconds: p.seconds,
+                                    projectId: p.id,
+                                  ))),
+                              ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline, size: 20,
                                 color: AppColors.textFaint),
@@ -2607,6 +2731,8 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                     );
                   },
                 ),
+        ),
+      ]),
     );
   }
 }

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ── Saved stories ─────────────────────────────────────────────────────────────
@@ -52,6 +54,13 @@ class Project {
   /// asking for again; if it has not, they are as good as the day they arrived.
   final List<String> promptsScript;
 
+  /// Anything you rewrote yourself, by field name.
+  ///
+  /// Kept apart from Gemini's reply rather than written over it, so an edit survives
+  /// asking for new prompts, and so the original is still there if the edit turns out
+  /// worse. What you typed always wins over what was generated.
+  final Map<String, String> edits;
+
   const Project({
     required this.id,
     required this.title,
@@ -64,6 +73,7 @@ class Project {
     this.images = const [],
     this.promptsJson = '',
     this.promptsScript = const [],
+    this.edits = const {},
   });
 
   /// First few words of the story, which is what you will recognise it by.
@@ -99,6 +109,7 @@ class Project {
         'images': images,
         'promptsJson': promptsJson,
         'promptsScript': promptsScript,
+        'edits': edits,
       };
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
@@ -113,6 +124,8 @@ class Project {
         images: ((json['images'] as List?) ?? const []).whereType<String>().toList(),
         promptsJson: json['promptsJson'] as String? ?? '',
         promptsScript: ((json['promptsScript'] as List?) ?? const []).whereType<String>().toList(),
+        edits: ((json['edits'] as Map?) ?? const {})
+            .map((k, v) => MapEntry('$k', '$v')),
       );
 
   /// Every field has to be carried through here, including the ones nothing calls
@@ -128,6 +141,7 @@ class Project {
     List<String>? images,
     String? promptsJson,
     List<String>? promptsScript,
+    Map<String, String>? edits,
   }) =>
       Project(
         id: id,
@@ -141,6 +155,7 @@ class Project {
         images: images ?? this.images,
         promptsJson: promptsJson ?? this.promptsJson,
         promptsScript: promptsScript ?? this.promptsScript,
+        edits: edits ?? this.edits,
       );
 }
 
@@ -180,6 +195,12 @@ class ProjectStore {
       await File('${dir.path}/${project.id}.json')
           .writeAsString(jsonEncode(project.toJson()));
     } catch (_) {}
+
+    // The copy in Downloads is the only one that survives an uninstall, so it is kept
+    // up to date automatically rather than waiting for anyone to remember a backup
+    // button. Not awaited: the story is already safe on the phone by this line, and
+    // the editor should not pause for a file write it does not depend on.
+    unawaited(ProjectBackup.writeQuietly());
   }
 
   static Future<void> delete(String id) async {
@@ -201,4 +222,80 @@ class ProjectStore {
 
   static Future<Directory> _dir() async =>
       Directory('${(await getApplicationDocumentsDirectory()).path}/$_folder');
+}
+
+// ── Surviving an uninstall ────────────────────────────────────────────────────
+//
+// Everything above is written to the app's own folder, and Android deletes that folder
+// the moment the app is uninstalled. Reinstalling gives you a clean, empty app —
+// stories, scripts, captions and edits all gone, with nothing in the app able to stop
+// it from the inside.
+//
+// Downloads is the one place on the phone that survives. Every save also drops a copy
+// of everything there, and Restore reads it back.
+//
+// The restore is a file picker rather than the app just reading Downloads on its own,
+// and that is not laziness: after a reinstall the app no longer owns the file it wrote
+// last week and genuinely cannot see it any more. Pointing at it is one tap and needs
+// no storage permission at all.
+
+const _mediaChannel = MethodChannel('com.example.reel_audio/media');
+
+class ProjectBackup {
+  /// Writes every story to Downloads. Returns where it landed.
+  static Future<String> write() async {
+    final all = await ProjectStore.load();
+    final json = jsonEncode({
+      'app': 'reel_audio',
+      'version': 1,
+      'savedAt': DateTime.now().toIso8601String(),
+      'stories': all.map((p) => p.toJson()).toList(),
+    });
+
+    final where = await _mediaChannel.invokeMethod<String>(
+      'writeBackup', {'json': json});
+    return where ?? 'Downloads';
+  }
+
+  /// Called after every save, and never allowed to interrupt anything.
+  ///
+  /// A backup that throws while you are typing would be worse than the problem it
+  /// exists to solve, so a failure here is silent — the next save tries again.
+  static Future<void> writeQuietly() async {
+    try {
+      await write();
+    } catch (_) {}
+  }
+
+  /// Reads a backup the user picks and puts the stories back.
+  ///
+  /// Returns how many were restored, or null if the picker was dismissed. Stories
+  /// already on the phone are kept: a restore adds what is missing rather than
+  /// replacing what is there, because the commonest mistake is restoring an old
+  /// backup over newer work.
+  static Future<int?> restore() async {
+    final text = await _mediaChannel.invokeMethod<String>('pickBackup');
+    if (text == null || text.trim().isEmpty) return null;
+
+    final raw = jsonDecode(text);
+    if (raw is! Map || raw['stories'] is! List) {
+      throw Exception('That file is not a stories backup.');
+    }
+
+    final existing = (await ProjectStore.load()).map((p) => p.id).toSet();
+    var added = 0;
+
+    for (final entry in raw['stories'] as List) {
+      if (entry is! Map<String, dynamic>) continue;
+      final project = Project.fromJson(entry);
+      if (project.id.isEmpty || existing.contains(project.id)) continue;
+
+      // Pictures were in a cache folder that is long gone, so drop the paths rather
+      // than restore a story that fails at the render with a missing file.
+      await ProjectStore.save(project.copyWith(
+        images: await ProjectStore.existingImages(project.images)));
+      added++;
+    }
+    return added;
+  }
 }

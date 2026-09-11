@@ -118,13 +118,14 @@ Future<String?> renderCaptionPng({
 /// decoration, one that repeats is a channel people start to recognise.
 Future<String?> renderBrandCard(
   String outPath, {
-  /// The question left on screen at the end. Comments are what keep a reel alive
-  /// after its first hour, and people answer a question far more readily than they
-  /// volunteer an opinion at a closing card that only says the channel's name.
-  String question = '',
-  /// A reason to keep the reel. Above the brand, because a reason to save is worth
-  /// more than a name nobody has any reason to remember yet.
-  String cta = '',
+  /// What the last screen says, above the brand. One or two paragraphs: the question
+  /// first, then the reason to keep the reel.
+  ///
+  /// One string rather than two named fields because it is one thing you can rewrite,
+  /// and splitting it here would mean an edit could only be half applied. The question
+  /// leads because a closing screen that asks nothing gets no comments, and comments
+  /// are what keep a reel alive after its first hour.
+  String message = '',
 }) async {
   final recorder = ui.PictureRecorder();
   final canvas = Canvas(recorder);
@@ -145,10 +146,21 @@ Future<String?> renderBrandCard(
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: w * 0.84);
 
-  // The question first and biggest. On a closing screen the channel's name is the
-  // least interesting thing present — it asks for nothing and gives nothing back.
-  final ask = question.trim().isEmpty ? null : line(question.trim(), 58, FontWeight.w800, Colors.white);
-  final keep = cta.trim().isEmpty ? null : line(cta.trim(), 40, FontWeight.w600, Colors.tealAccent);
+  // Split on the blank line between paragraphs, so an edited message keeps the same
+  // shape as a generated one without anything here needing to know which it is.
+  final parts = message
+      .trim()
+      .split(RegExp(r'\n\s*\n'))
+      .map((p) => p.trim().replaceAll('\n', ' '))
+      .where((p) => p.isNotEmpty)
+      .toList();
+
+  // The first line biggest. On a closing screen the channel's name is the least
+  // interesting thing present — it asks for nothing and gives nothing back.
+  final ask = parts.isEmpty ? null : line(parts.first, 58, FontWeight.w800, Colors.white);
+  final keep = parts.length < 2
+      ? null
+      : line(parts.sublist(1).join('  '), 40, FontWeight.w600, Colors.tealAccent);
   final name = line(kBrandName, 46, FontWeight.w800, Colors.white);
   final tagline = line(kBrandTagline, 30, FontWeight.w500, Colors.white70);
 

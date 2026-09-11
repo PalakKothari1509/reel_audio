@@ -50,6 +50,9 @@ class _PromptScreenState extends State<PromptScreen> {
   /// True when these came off the phone rather than from a fresh request. Worth
   /// saying, so nobody wonders why the wording is identical to yesterday's.
   bool _fromSaved = false;
+  /// Your own wording, by field. Read at the top of every card, so what you typed is
+  /// what you see and what you copy.
+  Map<String, String> _edits = {};
 
   /// Only the ticked characters go into the prompts. Sending the whole cast every
   /// time describes people who never appear, and generators dutifully draw them.
@@ -93,6 +96,8 @@ class _PromptScreenState extends State<PromptScreen> {
       if (matches.isEmpty) return null;
 
       final project = matches.first;
+      // Loaded whether or not there are prompts: your own wording outlives them.
+      _edits = Map.of(project.edits);
       if (project.promptsJson.isEmpty) return null;
 
       // One picture per line, so a changed script means prompts that describe
@@ -440,15 +445,17 @@ class _PromptScreenState extends State<PromptScreen> {
       _promptCard(
         title: '1. Cover hook',
         subtitle: 'Drawn on picture 1 by the app — this is the thumbnail',
-        body: p.post.coverHook.isEmpty ? p.post.coverTitle : p.post.coverHook,
+        body: _shown('cover_hook', p.post.coverHook.isEmpty ? p.post.coverTitle : p.post.coverHook),
         copyLabel: 'Cover hook',
+        editField: 'cover_hook',
       ),
       const SizedBox(height: 10),
       _promptCard(
         title: '2. The lesson',
         subtitle: 'What the reel leaves a parent with',
-        body: p.post.moralLine.isEmpty ? p.beats.endingLine : p.post.moralLine,
+        body: _shown('moral_line', p.post.moralLine.isEmpty ? p.beats.endingLine : p.post.moralLine),
         copyLabel: 'Lesson',
+        editField: 'moral_line',
       ),
       const SizedBox(height: 10),
       _promptCard(
@@ -456,30 +463,37 @@ class _PromptScreenState extends State<PromptScreen> {
         // Both on one card because they are one screen, and reading them apart is
         // how you end up with a question that does not sit with the line above it.
         subtitle: 'Drawn on the closing card by the app',
-        body: '${p.post.ctaLine.isEmpty ? kDefaultCtaLine : p.post.ctaLine}'
-            '${p.post.endQuestion.isEmpty ? '' : '\n\n${p.post.endQuestion}'}',
+        // Question first, then the reason to keep it — the same order it is drawn in,
+        // so what you read here is what ends up on the screen.
+        body: _shown('last_screen',
+            '${p.post.endQuestion.isEmpty ? '' : '${p.post.endQuestion}\n\n'}'
+            '${p.post.ctaLine.isEmpty ? kDefaultCtaLine : p.post.ctaLine}'),
         copyLabel: 'Last screen',
+        editField: 'last_screen',
       ),
       const SizedBox(height: 10),
       _promptCard(
         title: '4. Caption',
         subtitle: '${p.post.hashtags.length} hashtags included',
-        body: p.post.forInstagram,
+        body: _shown('caption', p.post.forInstagram),
         copyLabel: 'Caption',
+        editField: 'caption',
       ),
       const SizedBox(height: 10),
       _promptCard(
         title: '5. Pin this comment',
         subtitle: 'Post it yourself, then pin it',
-        body: p.post.pinComment,
+        body: _shown('pin_comment', p.post.pinComment),
         copyLabel: 'Pin comment',
+        editField: 'pin_comment',
       ),
       const SizedBox(height: 10),
       _promptCard(
         title: '6. Reply to every comment with this',
         subtitle: 'A question keeps the conversation going; "thank you!" ends it',
-        body: p.post.replyQuestion,
+        body: _shown('reply_question', p.post.replyQuestion),
         copyLabel: 'Reply question',
+        editField: 'reply_question',
       ),
       const SizedBox(height: 10),
       _promptCard(
@@ -487,8 +501,9 @@ class _PromptScreenState extends State<PromptScreen> {
         // The caveat is part of the card, not a footnote, because a time presented as
         // fact would stop anyone checking the real answer in their own Insights.
         subtitle: kBestTimeCaveat,
-        body: p.post.bestTime,
+        body: _shown('best_time', p.post.bestTime),
         copyLabel: 'Posting time',
+        editField: 'best_time',
       ),
       const SizedBox(height: 18),
       const Text('The prompts',
@@ -580,12 +595,70 @@ class _PromptScreenState extends State<PromptScreen> {
     return blocks.join('\n\n────────────────\n\n');
   }
 
+  /// Whatever you rewrote for [field], or what was generated.
+  String _shown(String field, String generated) =>
+      (_edits[field]?.trim().isNotEmpty == true) ? _edits[field]! : generated;
+
+  /// Rewrite one of these in your own words.
+  ///
+  /// Saved beside the reply rather than over it, so the edit survives asking for new
+  /// prompts and the original is still there if the rewrite turns out worse. Reset
+  /// puts the generated one back.
+  Future<void> _editField(String field, String title, String current) async {
+    final ctrl = TextEditingController(text: current);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit $title', style: const TextStyle(fontSize: 16)),
+        content: TextField(
+          controller: ctrl,
+          maxLines: 8,
+          minLines: 2,
+          autofocus: true,
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          if (_edits.containsKey(field))
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, ''),
+              child: const Text('Reset')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Save')),
+        ],
+      ),
+    );
+    if (result == null || !mounted) return;
+
+    setState(() {
+      if (result.trim().isEmpty) {
+        _edits.remove(field);
+      } else {
+        _edits[field] = result.trim();
+      }
+    });
+    await _saveEdits();
+  }
+
+  Future<void> _saveEdits() async {
+    if (widget.projectId.isEmpty) return;
+    final all = await ProjectStore.load();
+    final matches = all.where((p) => p.id == widget.projectId);
+    if (matches.isEmpty) return;
+    await ProjectStore.save(matches.first.copyWith(edits: Map.of(_edits)));
+  }
+
   Widget _promptCard({
     required String title,
     required String subtitle,
     required String body,
     required String copyLabel,
+    /// Set on anything you might want to word differently yourself. Null on the
+    /// picture prompts — those are instructions to a generator, not your writing.
+    String? editField,
   }) {
+    final edited = editField != null && _edits.containsKey(editField);
     return Card(
       color: AppColors.surface,
       child: Padding(
@@ -594,12 +667,26 @@ class _PromptScreenState extends State<PromptScreen> {
           Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Row(children: [
+                  Flexible(child: Text(title,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                  if (edited) ...[
+                    const SizedBox(width: 6),
+                    const Text('edited',
+                      style: TextStyle(fontSize: 10, color: AppColors.primary,
+                        fontWeight: FontWeight.w700)),
+                  ],
+                ]),
                 if (subtitle.isNotEmpty)
                   Text(subtitle,
                     style: const TextStyle(fontSize: 11, color: AppColors.textSoft)),
               ]),
             ),
+            if (editField != null)
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                onPressed: () => _editField(editField, title, body),
+              ),
             IconButton(
               icon: const Icon(Icons.copy, size: 18),
               onPressed: () => _copy(body, copyLabel),
