@@ -1,3 +1,5 @@
+import 'characters.dart';
+
 // ── Prompts for the AI tools that make the pictures and the video ─────────────
 //
 // The app writes the story and the script; these turn that into prompts you paste
@@ -9,11 +11,17 @@
 // her the same person from one reel to the next, so it is written once here and never
 // paraphrased.
 
-/// Ria, Rio and Cuty, word for word. Do not reword this — the wording IS the consistency.
-const kCharacterBlock = '''
-- RIA: toddler girl, black wavy hair in two pigtails with small pink star-shaped clips, large round expressive dark brown eyes, warm light-medium tan skin, pink short-sleeve dress with small white star pattern, pink shoes, chubby toddler body proportions
-- RIO: toddler boy, short tousled black hair, large round expressive dark brown eyes, warm light-medium tan skin (matching Ria), blue short-sleeve t-shirt with small white star pattern, navy blue shorts, red sneakers with white stripes, chubby toddler body proportions, slightly taller than Ria
-- CUTY: fluffy white bunny, long upright ears with pink inner colouring, pink bow tied around neck like a bowtie, large round expressive dark brown eyes matching Ria and Rio's style, chubby rounded body standing upright like a toddler, cheeks with soft pink blush''';
+/// The cast, written out for a prompt. Descriptions go in exactly as saved.
+///
+/// Only characters that actually have a description are listed — an empty one would
+/// read as "- MUM:" and leave the generator to invent her, which is the problem this
+/// whole file exists to avoid.
+String buildCharacterBlock(List<CharacterRef> cast) {
+  final lines = cast
+      .where((c) => c.description.trim().isNotEmpty)
+      .map((c) => '- ${c.name.toUpperCase()}: ${c.description.trim()}');
+  return lines.isEmpty ? '(no characters saved yet)' : lines.join('\n');
+}
 
 const _style = 'Soft 3D Pixar/Disney-style render, warm natural lighting, '
     'semi-realistic quality. NOT flat 2D, NOT kawaii-chibi.';
@@ -86,7 +94,7 @@ class ScenePrompt {
 ///
 /// Timings are scaled to the real length rather than hard-coded, so a 45 second reel
 /// doesn't get a prompt describing a 28 second one.
-String buildVideoPrompt(StoryBeats beats, int seconds) {
+String buildVideoPrompt(StoryBeats beats, int seconds, List<CharacterRef> cast) {
   String at(double fraction) {
     final s = (seconds * fraction).round();
     return '0:${s.toString().padLeft(2, '0')}';
@@ -98,7 +106,7 @@ Create a $seconds second animated story video in 3D Pixar-style cartoon animatio
 TITLE: ${beats.title}
 
 CHARACTERS (must stay visually consistent every time):
-$kCharacterBlock
+${buildCharacterBlock(cast)}
 
 IN THIS STORY: ${beats.who}
 
@@ -119,7 +127,7 @@ TEXT OVERLAYS: Bold rounded font, white speech-bubble shape with a black border,
 }
 
 /// Prompt for a single still, for the slideshow or as a reference frame.
-String buildImagePrompt(ScenePrompt scene, {bool withOverlay = false}) {
+String buildImagePrompt(ScenePrompt scene, List<CharacterRef> cast, {bool withOverlay = false}) {
   final overlay = withOverlay && scene.overlayText.trim().isNotEmpty
       ? '\n\nTEXT OVERLAY: "${scene.overlayText.trim()}" — bold rounded sans-serif '
         'inside a white speech-bubble banner with a black border, at the top of the image.'
@@ -129,7 +137,7 @@ String buildImagePrompt(ScenePrompt scene, {bool withOverlay = false}) {
 Generate a single high-quality illustration in 3D Pixar/Disney-style cartoon animation, vertical 9:16 format.
 
 CHARACTERS (maintain exact visual consistency):
-$kCharacterBlock
+${buildCharacterBlock(cast)}
 
 SCENE: ${scene.scene}
 

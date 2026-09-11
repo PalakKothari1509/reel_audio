@@ -94,7 +94,7 @@ class _PromptScreenState extends State<PromptScreen> {
               icon: const Icon(Icons.copy_all),
               onPressed: () => _copy(
                 _prompts!.scenes
-                    .map((s) => buildImagePrompt(s, withOverlay: _withOverlay))
+                    .map((s) => buildImagePrompt(s, _cast, withOverlay: _withOverlay))
                     .join('\n\n────────────────\n\n'),
                 'All ${_prompts!.scenes.length} image prompts',
               ),
@@ -126,47 +126,139 @@ class _PromptScreenState extends State<PromptScreen> {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Character faces',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-          const SizedBox(height: 4),
-          const Text('Saved on this phone and reused every time. Attach these to the '
-              'image generator alongside the prompt so the faces stay the same.',
+          Row(children: [
+            const Expanded(
+              child: Text('Your characters',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
+            TextButton.icon(
+              onPressed: () => _editCharacter(null),
+              icon: const Icon(Icons.person_add, size: 16),
+              label: const Text('Add', style: TextStyle(fontSize: 12)),
+            ),
+          ]),
+          const Text('Saved on this phone and reused in every prompt. Tap a face to '
+              'change the picture, tap the name to edit the description.',
             style: TextStyle(fontSize: 11, color: Colors.white54)),
           const SizedBox(height: 10),
-          Row(children: _cast.asMap().entries.map((entry) {
-            final i = entry.key;
-            final c = entry.value;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Column(children: [
-                  GestureDetector(
-                    onTap: () => _pickFace(i),
-                    child: Container(
-                      height: 92,
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: c.hasImage ? Colors.teal : Colors.grey.shade700),
+          SizedBox(
+            height: 128,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _cast.length,
+              itemBuilder: (ctx, i) {
+                final c = _cast[i];
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: SizedBox(
+                    width: 84,
+                    child: Column(children: [
+                      GestureDetector(
+                        onTap: () => _pickFace(i),
+                        child: Container(
+                          height: 92, width: 84,
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: c.hasImage ? Colors.teal : Colors.grey.shade700),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: c.hasImage
+                              ? Image.file(File(c.imagePath!), fit: BoxFit.cover)
+                              : const Center(child: Icon(Icons.add_a_photo,
+                                  color: Colors.white38, size: 22)),
+                        ),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: c.hasImage
-                          ? Image.file(File(c.imagePath!), fit: BoxFit.cover,
-                              width: double.infinity)
-                          : const Center(child: Icon(Icons.add_a_photo,
-                              color: Colors.white38, size: 22)),
-                    ),
+                      const SizedBox(height: 2),
+                      GestureDetector(
+                        onTap: () => _editCharacter(i),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Flexible(child: Text(c.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12))),
+                          const SizedBox(width: 2),
+                          Icon(Icons.edit, size: 11,
+                            // Amber when there is no description: that character would
+                            // be left out of every prompt, and nothing else would say so.
+                            color: c.description.trim().isEmpty
+                                ? Colors.amber : Colors.white38),
+                        ]),
+                      ),
+                    ]),
                   ),
-                  const SizedBox(height: 4),
-                  Text(c.name, style: const TextStyle(fontSize: 12)),
-                ]),
-              ),
-            );
-          }).toList()),
+                );
+              },
+            ),
+          ),
         ]),
       ),
     );
+  }
+
+  /// Add a character, or edit one. Null index means a new one.
+  Future<void> _editCharacter(int? index) async {
+    final existing = index == null ? null : _cast[index];
+    final nameCtrl = TextEditingController(text: existing?.name ?? '');
+    final descCtrl = TextEditingController(text: existing?.description ?? '');
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text(existing == null ? 'New character' : existing.name),
+        content: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descCtrl,
+              maxLines: 6,
+              style: const TextStyle(fontSize: 12),
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                helperText: 'Hair, eyes, skin, clothes, build. This exact wording goes '
+                    'into every prompt.',
+                helperMaxLines: 3,
+              ),
+            ),
+          ]),
+        ),
+        actions: [
+          if (existing != null)
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Remove', style: TextStyle(color: Colors.red)),
+            ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
+        ],
+      ),
+    );
+
+    if (saved == null) return;
+
+    if (saved == false && existing != null) {
+      await CharacterStore.removeFace(existing);
+      setState(() => _cast.removeAt(index!));
+    } else if (saved == true) {
+      final name = nameCtrl.text.trim();
+      if (name.isEmpty) return;
+      final updated = (existing ?? const CharacterRef(name: ''))
+          .copyWith(name: name, description: descCtrl.text.trim());
+      setState(() {
+        if (index == null) {
+          _cast.add(updated);
+        } else {
+          _cast[index] = updated;
+        }
+      });
+    }
+
+    await CharacterStore.save(_cast);
   }
 
   Widget _buildError() => Card(
@@ -187,7 +279,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
   List<Widget> _buildPrompts() {
     final p = _prompts!;
-    final video = buildVideoPrompt(p.beats, widget.seconds);
+    final video = buildVideoPrompt(p.beats, widget.seconds, _cast);
 
     return [
       const SizedBox(height: 12),
@@ -217,7 +309,7 @@ class _PromptScreenState extends State<PromptScreen> {
             child: _promptCard(
               title: 'Picture ${e.key + 1}',
               subtitle: e.value.overlayText,
-              body: buildImagePrompt(e.value, withOverlay: _withOverlay),
+              body: buildImagePrompt(e.value, _cast, withOverlay: _withOverlay),
               copyLabel: 'Picture ${e.key + 1} prompt',
             ),
           )),

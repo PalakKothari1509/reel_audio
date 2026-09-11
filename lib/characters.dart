@@ -3,52 +3,105 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-// ── Saved character faces ─────────────────────────────────────────────────────
+// ── The cast ──────────────────────────────────────────────────────────────────
 //
-// One reference picture per character, kept for good so every future reel uses the
-// same faces. The written description in prompts.dart keeps the wording identical;
-// these keep the FACE identical, which words alone never manage — describe "toddler
-// girl with pigtails" ten times and you get ten different children.
+// Every character the stories use, saved on the phone with a description and a face,
+// and reused in every prompt from now on.
 //
-// Pictures are copied into the app's own documents folder, not referenced where the
-// gallery put them: an image_picker path lives in a cache the phone clears whenever
-// it feels like it, and a reference that vanishes next week is worse than none.
+// Two halves, and you need both. The DESCRIPTION is repeated word for word in every
+// prompt — that repetition is what keeps the clothes, the hair and the colours the
+// same, and it only works if the wording never drifts. The FACE is the part words
+// can never pin down: describe "toddler girl with pigtails" ten times and you get
+// ten different children.
 
 class CharacterRef {
   final String name;
+  /// Pasted into every prompt exactly as written. Rewording it breaks the likeness.
+  final String description;
   /// Absolute path to the saved copy, or null when no face has been chosen yet.
   final String? imagePath;
 
-  const CharacterRef({required this.name, this.imagePath});
+  const CharacterRef({
+    required this.name,
+    this.description = '',
+    this.imagePath,
+  });
 
   bool get hasImage => imagePath != null && imagePath!.isNotEmpty;
 
-  CharacterRef withImage(String? path) => CharacterRef(name: name, imagePath: path);
+  CharacterRef copyWith({String? name, String? description, String? imagePath, bool clearImage = false}) =>
+      CharacterRef(
+        name: name ?? this.name,
+        description: description ?? this.description,
+        imagePath: clearImage ? null : (imagePath ?? this.imagePath),
+      );
 
-  Map<String, dynamic> toJson() => {'name': name, 'image': imagePath};
+  Map<String, dynamic> toJson() =>
+      {'name': name, 'description': description, 'image': imagePath};
 
   factory CharacterRef.fromJson(Map<String, dynamic> json) => CharacterRef(
         name: json['name'] as String? ?? '',
+        description: json['description'] as String? ?? '',
         imagePath: json['image'] as String?,
       );
 }
 
-/// The cast. Matches the names used in the prompt text, which is what ties a saved
-/// face to the character it describes.
-const kDefaultCharacterNames = ['Ria', 'Rio', 'Cuty'];
+/// The starting cast, ready to use before anyone sets anything up.
+///
+/// Ria, Rio and Cuty are worded exactly as the reels already use them. Mum and Dad
+/// are here because the stories mention them and a character with no description
+/// comes out looking different in every picture.
+const kDefaultCast = <CharacterRef>[
+  CharacterRef(
+    name: 'Ria',
+    description: 'toddler girl, black wavy hair in two pigtails with small pink '
+        'star-shaped clips, large round expressive dark brown eyes, warm light-medium '
+        'tan skin, pink short-sleeve dress with small white star pattern, pink shoes, '
+        'chubby toddler body proportions',
+  ),
+  CharacterRef(
+    name: 'Rio',
+    description: 'toddler boy, short tousled black hair, large round expressive dark '
+        'brown eyes, warm light-medium tan skin (matching Ria), blue short-sleeve '
+        't-shirt with small white star pattern, navy blue shorts, red sneakers with '
+        'white stripes, chubby toddler body proportions, slightly taller than Ria',
+  ),
+  CharacterRef(
+    name: 'Cuty',
+    description: 'fluffy white bunny, long upright ears with pink inner colouring, '
+        'pink bow tied around neck like a bowtie, large round expressive dark brown '
+        "eyes matching Ria and Rio's style, chubby rounded body standing upright like "
+        'a toddler, cheeks with soft pink blush',
+  ),
+  CharacterRef(
+    name: 'Mum',
+    description: 'young Indian mother, long dark brown hair tied back loosely, warm '
+        'light-medium tan skin, kind dark brown eyes, simple teal kurta with white '
+        'leggings, small gold earrings, gentle warm smile',
+  ),
+  CharacterRef(
+    name: 'Dad',
+    description: 'young Indian father, short black hair, neatly trimmed beard, warm '
+        'light-medium tan skin, dark brown eyes, light grey casual shirt with sleeves '
+        'rolled up, dark blue jeans, friendly relaxed expression',
+  ),
+];
 
 class CharacterStore {
   static const _fileName = 'characters.json';
   static const _folder = 'character_faces';
 
-  /// Loads the saved cast, falling back to the three defaults with no pictures yet.
+  /// Loads the saved cast, seeding the defaults the first time the app runs.
   static Future<List<CharacterRef>> load() async {
     try {
       final file = await _indexFile();
-      if (!await file.exists()) return _blankCast();
+      if (!await file.exists()) {
+        await save(kDefaultCast);
+        return List.of(kDefaultCast);
+      }
 
       final raw = jsonDecode(await file.readAsString());
-      if (raw is! List) return _blankCast();
+      if (raw is! List) return List.of(kDefaultCast);
 
       final saved = raw
           .whereType<Map<String, dynamic>>()
@@ -56,19 +109,19 @@ class CharacterStore {
           .where((c) => c.name.isNotEmpty)
           .toList();
 
-      if (saved.isEmpty) return _blankCast();
+      if (saved.isEmpty) return List.of(kDefaultCast);
 
       // A picture can go missing if the phone is wiped or the app reinstalled, so
       // check rather than hand back a path that points at nothing.
       final checked = <CharacterRef>[];
       for (final c in saved) {
         final stillThere = c.hasImage && await File(c.imagePath!).exists();
-        checked.add(stillThere ? c : c.withImage(null));
+        checked.add(stillThere ? c : c.copyWith(clearImage: true));
       }
       return checked;
     } catch (_) {
       // A corrupt index must not stop the app opening; start the cast again instead.
-      return _blankCast();
+      return List.of(kDefaultCast);
     }
   }
 
@@ -79,9 +132,10 @@ class CharacterStore {
 
   /// Copies a picked image into permanent storage and returns its new path.
   ///
-  /// Named after the character rather than given a unique name on purpose: choosing a
-  /// new face for Ria should replace the old one, not leave the phone collecting
-  /// every picture ever picked.
+  /// An image_picker path lives in a cache the phone clears whenever it likes, so a
+  /// reference kept there is gone by next week. Named after the character rather than
+  /// given a unique name, so choosing a new face replaces the old one instead of
+  /// leaving the phone collecting every picture ever picked.
   static Future<String> saveFace(String characterName, String pickedPath) async {
     final dir = Directory('${(await getApplicationDocumentsDirectory()).path}/$_folder');
     if (!await dir.exists()) await dir.create(recursive: true);
@@ -103,9 +157,6 @@ class CharacterStore {
     final file = File(character.imagePath!);
     if (await file.exists()) await file.delete();
   }
-
-  static List<CharacterRef> _blankCast() =>
-      kDefaultCharacterNames.map((n) => CharacterRef(name: n)).toList();
 
   static Future<File> _indexFile() async =>
       File('${(await getApplicationDocumentsDirectory()).path}/$_fileName');
