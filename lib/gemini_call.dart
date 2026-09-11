@@ -41,6 +41,11 @@ Duration? _googlesOwnDelay(String body) {
   return Duration(seconds: seconds.clamp(1, 60) + 1);
 }
 
+/// Models this key has already answered 404 for, so a name Google has renamed or
+/// never offered is tried once and then left alone rather than wasting a request
+/// before every single call.
+final Set<String> _missingModels = {};
+
 /// Posts to a Gemini text model and hands back the response.
 ///
 /// Times out rather than retrying on a timeout: a request that took too long once will
@@ -50,17 +55,42 @@ Future<http.Response> geminiPost({
   required String apiKey,
   required String body,
   required Duration timeout,
+  /// A model to fall back to when [model] does not exist for this key.
+  ///
+  /// Free-tier limits are counted per model, so the small jobs are pointed at a
+  /// lighter one to keep them out of the budget the script needs. Google renames
+  /// models often enough that hard-coding a name is a bet, and this is the hedge:
+  /// a name that is not there costs one 404 and then never gets used again.
+  String? fallbackModel,
   /// Called between tries, so a wait does not look like a hang.
   void Function(String message)? onWait,
 }) async {
-  final url = Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-      '$model:generateContent?key=$apiKey');
+  var chosen = model;
+  if (_missingModels.contains(chosen) && fallbackModel != null) {
+    chosen = fallbackModel;
+  }
 
+  Uri urlFor(String m) =>
+      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
+          '$m:generateContent?key=$apiKey');
+
+  var url = urlFor(chosen);
   http.Response response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
     body: body,
   ).timeout(timeout);
+
+  if (response.statusCode == 404 && fallbackModel != null && chosen != fallbackModel) {
+    _missingModels.add(chosen);
+    chosen = fallbackModel;
+    url = urlFor(chosen);
+    response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    ).timeout(timeout);
+  }
 
   for (final fallback in _backoff) {
     if (!_retryable.contains(response.statusCode)) return response;

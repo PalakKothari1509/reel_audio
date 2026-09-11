@@ -40,6 +40,18 @@ class Project {
   /// in rather than trusted.
   final List<String> images;
 
+  /// Gemini's reply to the prompts request, saved word for word.
+  ///
+  /// The prompts screen used to ask Gemini again every single time it was opened,
+  /// which meant paying for an identical answer twice — and on a free tier, paying
+  /// means running out. Kept here, reopening it costs nothing.
+  final String promptsJson;
+
+  /// The script those prompts were written for. Prompts describe one picture per
+  /// line, so if the script has changed they no longer match it and are worth
+  /// asking for again; if it has not, they are as good as the day they arrived.
+  final List<String> promptsScript;
+
   const Project({
     required this.id,
     required this.title,
@@ -50,6 +62,8 @@ class Project {
     this.language = '',
     this.seconds = 30,
     this.images = const [],
+    this.promptsJson = '',
+    this.promptsScript = const [],
   });
 
   /// First few words of the story, which is what you will recognise it by.
@@ -83,6 +97,8 @@ class Project {
         'language': language,
         'seconds': seconds,
         'images': images,
+        'promptsJson': promptsJson,
+        'promptsScript': promptsScript,
       };
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
@@ -95,8 +111,13 @@ class Project {
         language: json['language'] as String? ?? '',
         seconds: (json['seconds'] as num?)?.toInt() ?? 30,
         images: ((json['images'] as List?) ?? const []).whereType<String>().toList(),
+        promptsJson: json['promptsJson'] as String? ?? '',
+        promptsScript: ((json['promptsScript'] as List?) ?? const []).whereType<String>().toList(),
       );
 
+  /// Every field has to be carried through here, including the ones nothing calls
+  /// with — a field left out is not left alone, it is silently emptied on the next
+  /// save, and the saved prompts would have been wiped by the next keystroke.
   Project copyWith({
     String? title,
     String? story,
@@ -105,6 +126,8 @@ class Project {
     String? language,
     int? seconds,
     List<String>? images,
+    String? promptsJson,
+    List<String>? promptsScript,
   }) =>
       Project(
         id: id,
@@ -116,6 +139,8 @@ class Project {
         language: language ?? this.language,
         seconds: seconds ?? this.seconds,
         images: images ?? this.images,
+        promptsJson: promptsJson ?? this.promptsJson,
+        promptsScript: promptsScript ?? this.promptsScript,
       );
 }
 

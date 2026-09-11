@@ -18,11 +18,29 @@ class PromptSet {
   final StoryBeats beats;
   final List<ScenePrompt> scenes;
   final PostDetails post;
+
+  /// Exactly what Gemini sent back, kept so the whole set can be written to the phone
+  /// and read again without spending another request on an identical answer.
+  ///
+  /// The raw reply rather than the parsed objects on purpose: saving the objects would
+  /// mean a second writer and a second reader that have to agree with the parsing
+  /// below forever, and the day they stop agreeing is the day old stories break.
+  final String rawJson;
+
   const PromptSet({
     required this.beats,
     required this.scenes,
     required this.post,
+    this.rawJson = '',
   });
+}
+
+/// Rebuilds a prompt set from a reply saved earlier, spending nothing.
+///
+/// Throws if the saved text is not usable, so the caller can simply ask Gemini again.
+PromptSet promptsFromSaved(String rawJson, List<String> scriptLines) {
+  final json = jsonDecode(rawJson) as Map<String, dynamic>;
+  return _toPromptSet(json, scriptLines, rawJson);
 }
 
 /// Asks Gemini to break the story into beats and to describe a picture per line.
@@ -120,13 +138,21 @@ different one.
   final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing for the prompts.');
 
+  final clean = _stripFence(text);
   final Map<String, dynamic> json;
   try {
-    json = jsonDecode(_stripFence(text)) as Map<String, dynamic>;
+    json = jsonDecode(clean) as Map<String, dynamic>;
   } catch (e) {
     throw Exception('Gemini did not return usable JSON.\n$text');
   }
 
+  return _toPromptSet(json, scriptLines, clean);
+}
+
+/// Turns Gemini's reply into the prompt set. Shared by a fresh call and a saved one,
+/// so a story saved last week parses exactly the way it did when it was made.
+PromptSet _toPromptSet(
+    Map<String, dynamic> json, List<String> scriptLines, String rawJson) {
   final rawScenes = (json['scenes'] as List?) ?? const [];
   final scenes = <ScenePrompt>[];
   for (var i = 0; i < scriptLines.length; i++) {
@@ -161,6 +187,7 @@ different one.
       .toList();
 
   return PromptSet(
+    rawJson: rawJson,
     beats: StoryBeats.fromJson(json),
     scenes: scenes,
     post: PostDetails(

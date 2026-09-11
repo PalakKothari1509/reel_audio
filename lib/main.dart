@@ -1576,6 +1576,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             : _lines.map((l) => l.text).join(' '),
         scriptLines: _lines.map((l) => l.text).toList(),
         seconds: widget.seconds,
+        // So the prompts are written down against this story and read back next time
+        // instead of being asked for again.
+        projectId: widget.projectId,
       ),
     ));
   }

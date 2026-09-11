@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'characters.dart';
 import 'prompt_builder.dart';
+import 'projects.dart';
 import 'prompts.dart';
 import 'theme.dart';
 
@@ -17,12 +18,16 @@ class PromptScreen extends StatefulWidget {
   final String storyDescription;
   final List<String> scriptLines;
   final int seconds;
+  /// The saved story these belong to, so the prompts are written down once and read
+  /// back on every later visit instead of being bought again. Empty in video mode.
+  final String projectId;
 
   const PromptScreen({
     super.key,
     required this.storyDescription,
     required this.scriptLines,
     required this.seconds,
+    this.projectId = '',
   });
 
   @override
@@ -42,6 +47,9 @@ class _PromptScreenState extends State<PromptScreen> {
   String _error = '';
   /// Replaces "Working out the scenes..." while a retry is being waited out.
   String _waiting = '';
+  /// True when these came off the phone rather than from a fresh request. Worth
+  /// saying, so nobody wonders why the wording is identical to yesterday's.
+  bool _fromSaved = false;
 
   /// Only the ticked characters go into the prompts. Sending the whole cast every
   /// time describes people who never appear, and generators dutifully draw them.
@@ -60,6 +68,48 @@ class _PromptScreenState extends State<PromptScreen> {
     _inStory = _guessWhoIsInIt();
     if (mounted) setState(() {});
 
+    // Read before asking. This screen used to fire a request every single time it
+    // opened, so looking at your own prompts a second time cost the same as making
+    // them — which on a free tier is the difference between working and blocked.
+    final saved = await _savedPrompts();
+    if (saved != null) {
+      if (!mounted) return;
+      setState(() { _prompts = saved; _loading = false; _fromSaved = true; });
+      return;
+    }
+
+    await _askGemini();
+  }
+
+  /// The prompts written down last time, if they still match this script.
+  ///
+  /// Null when there are none, when the script has been edited since, or when the
+  /// saved text will not parse — all of which mean the same thing to the caller.
+  Future<PromptSet?> _savedPrompts() async {
+    if (widget.projectId.isEmpty) return null;
+    try {
+      final all = await ProjectStore.load();
+      final matches = all.where((p) => p.id == widget.projectId);
+      if (matches.isEmpty) return null;
+
+      final project = matches.first;
+      if (project.promptsJson.isEmpty) return null;
+
+      // One picture per line, so a changed script means prompts that describe
+      // pictures for words that are no longer there.
+      final sameScript = project.promptsScript.length == widget.scriptLines.length &&
+          List.generate(widget.scriptLines.length,
+              (i) => project.promptsScript[i] == widget.scriptLines[i]).every((m) => m);
+      if (!sameScript) return null;
+
+      return promptsFromSaved(project.promptsJson, widget.scriptLines);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _askGemini() async {
+    setState(() { _loading = true; _error = ''; _waiting = ''; _fromSaved = false; });
     try {
       final prompts = await generatePrompts(
         storyDescription: widget.storyDescription,
@@ -70,10 +120,23 @@ class _PromptScreenState extends State<PromptScreen> {
       );
       if (!mounted) return;
       setState(() { _prompts = prompts; _loading = false; });
+      await _savePrompts(prompts);
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = '$e'; _loading = false; });
     }
+  }
+
+  Future<void> _savePrompts(PromptSet prompts) async {
+    if (widget.projectId.isEmpty || prompts.rawJson.isEmpty) return;
+    final all = await ProjectStore.load();
+    final matches = all.where((p) => p.id == widget.projectId);
+    if (matches.isEmpty) return;
+
+    await ProjectStore.save(matches.first.copyWith(
+      promptsJson: prompts.rawJson,
+      promptsScript: List.of(widget.scriptLines),
+    ));
   }
 
   Future<void> _pickFace(int index) async {
@@ -111,6 +174,15 @@ class _PromptScreenState extends State<PromptScreen> {
               onPressed: () => _copy(_allImagePrompts(),
                 'All ${_prompts!.scenes.length} image prompts'),
             ),
+          // Only offered once there is something to replace, and it says plainly that
+          // it spends a request — otherwise the cheap path and the expensive one look
+          // identical and people tap the expensive one out of habit.
+          if (_prompts != null)
+            IconButton(
+              tooltip: 'Write new prompts (uses a Gemini request)',
+              icon: const Icon(Icons.refresh),
+              onPressed: _loading ? null : _askGemini,
+            ),
         ],
       ),
       body: _loading
@@ -126,6 +198,22 @@ class _PromptScreenState extends State<PromptScreen> {
               children: [
                 _buildCast(),
                 if (_error.isNotEmpty) _buildError(),
+                if (_fromSaved)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: AppCard(
+                      colour: AppColors.primarySoft,
+                      borderColour: AppColors.primary,
+                      child: const Row(children: [
+                        Icon(Icons.bookmark_outline, size: 17, color: AppColors.primary),
+                        SizedBox(width: 10),
+                        Expanded(child: Text(
+                          'Saved from last time — no request used. Tap refresh above '
+                          'for different ones.',
+                          style: TextStyle(fontSize: 13, color: AppColors.text))),
+                      ]),
+                    ),
+                  ),
                 if (_prompts != null) ..._buildPrompts(),
               ],
             ),

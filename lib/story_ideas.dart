@@ -32,7 +32,20 @@ const kStoryProblems = [
   'Saying sorry',
 ];
 
-const _model = 'gemini-3.6-flash';
+// ── Which model does the small jobs ───────────────────────────────────────────
+//
+// Idea and Check are short: a paragraph in, a paragraph out. They do not need the
+// model the script uses, and pointing them at it was costing more than quality.
+//
+// The real gain is not price, it is the quota. Free-tier limits are counted PER
+// MODEL, so every Idea and every Check was eating requests the script and the
+// prompts needed — and running out mid-reel is what that feels like from the
+// outside. On a separate model they come out of a separate allowance.
+//
+// If this name is not available on the key, the first call 404s once and everything
+// falls back to the full model from then on. Never worse than before, usually better.
+const _lightModel = 'gemini-3.6-flash-lite';
+const _fullModel = 'gemini-3.6-flash';
 const _timeout = Duration(seconds: 60);
 
 class StoryIdea {
@@ -130,7 +143,8 @@ age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 mi
 ''';
 
   final response = await geminiPost(
-    model: _model,
+    model: _lightModel,
+    fallbackModel: _fullModel,
     apiKey: geminiApiKey,
     timeout: _timeout,
     onWait: onWait,
@@ -219,7 +233,8 @@ The child should work it out or be shown, not told off. Keep every value under 2
 ''';
 
   final response = await geminiPost(
-    model: _model,
+    model: _lightModel,
+    fallbackModel: _fullModel,
     apiKey: geminiApiKey,
     timeout: _timeout,
     onWait: onWait,
