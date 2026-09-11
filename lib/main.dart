@@ -15,6 +15,7 @@ import 'video_builder.dart';
 import 'voice.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
+import 'story_ideas.dart';
 import 'music.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
@@ -406,6 +407,72 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   void dispose() { _descCtrl.dispose(); super.dispose(); }
 
+  /// Asks for a story idea: pick an age and a problem, get one written up.
+  ///
+  /// Exists so the next reel does not start at a blank field. The problem list is real
+  /// preschool arguments, because a story invented without one to hang on comes out as
+  /// a fable — pleasant, and nothing a parent recognises.
+  Future<void> _askForIdea() async {
+    var age = kStoryAges[1];
+    var problem = kStoryProblems.first;
+
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text('Story idea'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            DropdownButtonFormField<String>(
+              value: age,
+              decoration: const InputDecoration(labelText: 'Age'),
+              dropdownColor: Colors.grey[850],
+              items: kStoryAges
+                  .map((a) => DropdownMenuItem(value: a, child: Text('$a years')))
+                  .toList(),
+              onChanged: (v) => setLocal(() => age = v ?? age),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: problem,
+              decoration: const InputDecoration(labelText: 'Problem'),
+              dropdownColor: Colors.grey[850],
+              isExpanded: true,
+              items: kStoryProblems
+                  .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                  .toList(),
+              onChanged: (v) => setLocal(() => problem = v ?? problem),
+            ),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Give me one'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (go != true || !mounted) return;
+
+    setState(() { _isGenerating = true; _status = 'Thinking of a story...'; });
+    try {
+      final idea = await generateStoryIdea(age: age, problem: problem);
+      if (!mounted) return;
+      // Dropped straight into the box rather than shown for approval: it is a starting
+      // point to edit, and an extra "use this?" step helps nobody.
+      setState(() {
+        _descCtrl.text = idea.asStoryText;
+        _status = '💡 ${idea.title} — edit anything, then write the script.';
+      });
+    } catch (e) {
+      if (mounted) setState(() => _status = '❌ $e');
+    }
+    if (mounted) setState(() => _isGenerating = false);
+  }
+
   /// Puts the skeleton in the box AND on the clipboard.
   ///
   /// On the clipboard as well because the story usually gets written somewhere else
@@ -475,9 +542,14 @@ class _StoryScreenState extends State<StoryScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
                 TextButton.icon(
+                  onPressed: _isGenerating ? null : _askForIdea,
+                  icon: const Icon(Icons.lightbulb_outline, size: 16),
+                  label: const Text('Idea', style: TextStyle(fontSize: 12)),
+                ),
+                TextButton.icon(
                   onPressed: _isGenerating ? null : _useFormat,
                   icon: const Icon(Icons.copy_all, size: 16),
-                  label: const Text('Copy format', style: TextStyle(fontSize: 12)),
+                  label: const Text('Format', style: TextStyle(fontSize: 12)),
                 ),
               ]),
               const SizedBox(height: 4),
