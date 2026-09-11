@@ -85,6 +85,12 @@ const kDefaultCast = <CharacterRef>[
         'light-medium tan skin, dark brown eyes, light grey casual shirt with sleeves '
         'rolled up, dark blue jeans, friendly relaxed expression',
   ),
+  CharacterRef(
+    name: 'Teacher',
+    description: 'friendly Indian school teacher, shoulder-length dark hair tied in a '
+        'low bun, warm light-medium tan skin, kind dark brown eyes, round glasses, '
+        'soft yellow kurta with a light shawl, holding a small book, encouraging smile',
+  ),
 ];
 
 class CharacterStore {

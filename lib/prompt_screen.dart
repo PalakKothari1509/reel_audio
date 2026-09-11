@@ -31,9 +31,16 @@ class PromptScreen extends StatefulWidget {
 class _PromptScreenState extends State<PromptScreen> {
   PromptSet? _prompts;
   List<CharacterRef> _cast = [];
+  /// Who is in THIS story. Names, because the list can be reordered or edited.
+  Set<String> _inStory = {};
   bool _loading = true;
   bool _withOverlay = false;
   String _error = '';
+
+  /// Only the ticked characters go into the prompts. Sending the whole cast every
+  /// time describes people who never appear, and generators dutifully draw them.
+  List<CharacterRef> get _selectedCast =>
+      _cast.where((c) => _inStory.contains(c.name)).toList();
 
   @override
   void initState() {
@@ -44,6 +51,7 @@ class _PromptScreenState extends State<PromptScreen> {
   Future<void> _start() async {
     // The cast is on the phone already, so show it while Gemini is still thinking.
     _cast = await CharacterStore.load();
+    _inStory = _guessWhoIsInIt();
     if (mounted) setState(() {});
 
     try {
@@ -65,7 +73,7 @@ class _PromptScreenState extends State<PromptScreen> {
     if (picked == null) return;
 
     final saved = await CharacterStore.saveFace(_cast[index].name, picked.path);
-    setState(() => _cast[index] = _cast[index].withImage(saved));
+    setState(() => _cast[index] = _cast[index].copyWith(imagePath: saved));
     await CharacterStore.save(_cast);
 
     // The old file is gone but Flutter still holds its pixels, so the tile would
@@ -94,7 +102,7 @@ class _PromptScreenState extends State<PromptScreen> {
               icon: const Icon(Icons.copy_all),
               onPressed: () => _copy(
                 _prompts!.scenes
-                    .map((s) => buildImagePrompt(s, _cast, withOverlay: _withOverlay))
+                    .map((s) => buildImagePrompt(s, _selectedCast, withOverlay: _withOverlay))
                     .join('\n\n────────────────\n\n'),
                 'All ${_prompts!.scenes.length} image prompts',
               ),
@@ -137,8 +145,8 @@ class _PromptScreenState extends State<PromptScreen> {
               label: const Text('Add', style: TextStyle(fontSize: 12)),
             ),
           ]),
-          const Text('Saved on this phone and reused in every prompt. Tap a face to '
-              'change the picture, tap the name to edit the description.',
+          const Text('Tick who is in this story. Tap a face to change the picture, tap the '
+              'name to edit the description. Saved on this phone and reused every time.',
             style: TextStyle(fontSize: 11, color: Colors.white54)),
           const SizedBox(height: 10),
           SizedBox(
@@ -153,23 +161,51 @@ class _PromptScreenState extends State<PromptScreen> {
                   child: SizedBox(
                     width: 84,
                     child: Column(children: [
-                      GestureDetector(
-                        onTap: () => _pickFace(i),
-                        child: Container(
-                          height: 92, width: 84,
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: c.hasImage ? Colors.teal : Colors.grey.shade700),
+                      Stack(children: [
+                        GestureDetector(
+                          onTap: () => _pickFace(i),
+                          child: Opacity(
+                            // Dimmed when not in this story, so the ticked ones read
+                            // at a glance without having to check every box.
+                            opacity: _inStory.contains(c.name) ? 1 : 0.35,
+                            child: Container(
+                              height: 92, width: 84,
+                              decoration: BoxDecoration(
+                                color: Colors.black26,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: _inStory.contains(c.name)
+                                      ? Colors.teal : Colors.grey.shade700),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: c.hasImage
+                                  ? Image.file(File(c.imagePath!), fit: BoxFit.cover)
+                                  : const Center(child: Icon(Icons.add_a_photo,
+                                      color: Colors.white38, size: 22)),
+                            ),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: c.hasImage
-                              ? Image.file(File(c.imagePath!), fit: BoxFit.cover)
-                              : const Center(child: Icon(Icons.add_a_photo,
-                                  color: Colors.white38, size: 22)),
                         ),
-                      ),
+                        Positioned(
+                          top: 2, left: 2,
+                          child: GestureDetector(
+                            onTap: () => setState(() {
+                              if (!_inStory.remove(c.name)) _inStory.add(c.name);
+                            }),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _inStory.contains(c.name)
+                                    ? Colors.teal : Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Icon(
+                                _inStory.contains(c.name)
+                                    ? Icons.check : Icons.circle_outlined,
+                                size: 13, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ]),
                       const SizedBox(height: 2),
                       GestureDetector(
                         onTap: () => _editCharacter(i),
@@ -194,6 +230,23 @@ class _PromptScreenState extends State<PromptScreen> {
         ]),
       ),
     );
+  }
+
+  /// Ticks the characters whose name appears in the story or the script.
+  ///
+  /// Saves unticking four people on most stories. Falls back to everyone when no name
+  /// is mentioned — better to describe one character too many than to send a prompt
+  /// with nobody in it.
+  Set<String> _guessWhoIsInIt() {
+    final haystack =
+        '${widget.storyDescription} ${widget.scriptLines.join(' ')}'.toLowerCase();
+
+    final found = _cast
+        .where((c) => haystack.contains(c.name.toLowerCase()))
+        .map((c) => c.name)
+        .toSet();
+
+    return found.isEmpty ? _cast.map((c) => c.name).toSet() : found;
   }
 
   /// Add a character, or edit one. Null index means a new one.
@@ -279,7 +332,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
   List<Widget> _buildPrompts() {
     final p = _prompts!;
-    final video = buildVideoPrompt(p.beats, widget.seconds, _cast);
+    final video = buildVideoPrompt(p.beats, widget.seconds, _selectedCast);
 
     return [
       const SizedBox(height: 12),
@@ -309,7 +362,7 @@ class _PromptScreenState extends State<PromptScreen> {
             child: _promptCard(
               title: 'Picture ${e.key + 1}',
               subtitle: e.value.overlayText,
-              body: buildImagePrompt(e.value, _cast, withOverlay: _withOverlay),
+              body: buildImagePrompt(e.value, _selectedCast, withOverlay: _withOverlay),
               copyLabel: 'Picture ${e.key + 1} prompt',
             ),
           )),
