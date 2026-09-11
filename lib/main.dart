@@ -1003,6 +1003,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// Top by default. Across the middle it sits on the faces and the thing the picture
   /// is of, which breaks the moment the picture exists to carry.
   CaptionSpot _captionSpot = CaptionSpot.high;
+  /// The closing brand card. On by default — it should be on every reel.
+  bool _endCard = true;
   ClipMotion _motion = ClipMotion.drift;
 
   /// Which bundled track plays under the voice. Null means none.
@@ -1506,6 +1508,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             ? await renderCaptions(
                 lines: _lines.map((l) => l.text).toList(), workDir: dir.path)
             : const [],
+        // The same closing card on every reel, which is the point of it — a channel
+        // gets recognised by what repeats, not by what varies.
+        brandPng: _endCard ? await renderBrandCard('${dir.path}/brand_card.png') : null,
         captionSpot: _captionSpot,
         motion: _motion,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
@@ -1899,6 +1904,18 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
                 const SizedBox(width: 4),
                 Text('Motion ${clipMotionLabel(_motion)}',
                   style: const TextStyle(fontSize: 11, color: Colors.white54)),
+              ]),
+            ),
+            const SizedBox(width: 14),
+            GestureDetector(
+              onTap: busy ? null : () => setState(() => _endCard = !_endCard),
+              child: Row(children: [
+                Icon(_endCard ? Icons.branding_watermark : Icons.branding_watermark_outlined,
+                  size: 14, color: _endCard ? Colors.teal : Colors.white38),
+                const SizedBox(width: 4),
+                Text(_endCard ? 'End card' : 'No end card',
+                  style: TextStyle(fontSize: 11,
+                    color: _endCard ? Colors.teal : Colors.white38)),
               ]),
             ),
           ]),

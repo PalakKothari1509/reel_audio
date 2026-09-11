@@ -19,6 +19,12 @@ const double kMinClipSeconds = 1.0;
 /// Held after the last spoken word so the video doesn't cut on the final syllable.
 const double kTailSeconds = 1.5;
 
+/// How long the closing brand card stays up.
+///
+/// Long enough to read two lines, short enough that nobody scrolls away during it —
+/// an end card people skip teaches Instagram the reel was not finished.
+const double kEndCardSeconds = 2.0;
+
 // ── Staying out of Instagram's way ────────────────────────────────────────────
 //
 // Instagram draws its own things on top of the reel: a header at the top, the
@@ -324,6 +330,9 @@ class SlideshowBuilder {
     String? musicPath,
     /// One PNG per line, null for a line with no caption. Empty means no captions.
     List<String?> captionPngs = const [],
+    /// The closing brand card, already drawn, or null for no end card. Drawn by the
+    /// caller like the captions are, so this file never has to know what it says.
+    String? brandPng,
     CaptionSpot captionSpot = CaptionSpot.high,
     ClipMotion motion = ClipMotion.drift,
     void Function(String message)? onStatus,
@@ -335,7 +344,10 @@ class SlideshowBuilder {
     // The narration decides the length of the video, so the two can never disagree.
     final narration = await getMediaDuration(audioPath);
     if (narration == null) throw Exception('Could not read the narration audio.');
-    final totalSeconds = narration + kTailSeconds;
+
+    // The end card IS the tail when there is one, so the reel does not sit in silence
+    // on the last picture and then sit in silence again on the card.
+    final totalSeconds = narration + (brandPng == null ? kTailSeconds : 0.6);
 
     final durations = clipDurations(lineStarts: lineStarts, totalSeconds: totalSeconds);
 
@@ -352,12 +364,28 @@ class SlideshowBuilder {
         seconds: durations[i],
         index: i,
         isFirst: i == 0,
-        isLast: i == durations.length - 1,
+        // The fade to black belongs on whatever is genuinely last. With an end card
+        // following, fading the final picture would black out and then come back.
+        isLast: brandPng == null && i == durations.length - 1,
         captionPng: i < captionPngs.length ? captionPngs[i] : null,
         captionSpot: captionSpot,
         motion: motion,
       );
       clipPaths.add(clipPath);
+    }
+
+    if (brandPng != null) {
+      onStatus?.call('Adding the end card...');
+      final cardPath = '$workDir/clip_end.mp4';
+      await _renderEndCard(
+        // The last picture, blurred behind the card, so the reel ends inside the story
+        // rather than cutting to a title screen.
+        imagePath: imageForLine(imagePaths, durations.length - 1),
+        brandPng: brandPng,
+        outPath: cardPath,
+        seconds: kEndCardSeconds,
+      );
+      clipPaths.add(cardPath);
     }
 
     onStatus?.call('Joining ${clipPaths.length} clips...');
@@ -463,6 +491,48 @@ class SlideshowBuilder {
     if (!await File(outPath).exists()) {
       throw Exception('Image ${index + 1} produced no clip.');
     }
+  }
+
+  /// The closing card: the brand PNG over a blurred copy of the last picture.
+  ///
+  /// Encoder settings are copied from _renderClip word for word, and have to be — the
+  /// join below is a stream copy, and a clip encoded even slightly differently either
+  /// fails the concat or plays as a glitch at the seam.
+  static Future<void> _renderEndCard({
+    required String imagePath,
+    required String brandPng,
+    required String outPath,
+    required double seconds,
+  }) async {
+    await _deleteIfExists(outPath);
+
+    final fadeOutFrom = (seconds - 0.6) < 0 ? 0.0 : seconds - 0.6;
+
+    // Same shrink-and-blow-up trick as the picture clips use for their backdrop, so
+    // this needs no blur filter either.
+    final filter =
+        '[0:v]scale=64:114:force_original_aspect_ratio=increase,crop=64:114,'
+        'scale=$kVideoWidth:$kVideoHeight:flags=bilinear,setsar=1[back];'
+        '[back][1:v]overlay=x=0:y=0,'
+        'fade=t=in:st=0:d=0.4,'
+        'fade=t=out:st=${fadeOutFrom.toStringAsFixed(2)}:d=0.6,'
+        'format=yuv420p[v]';
+
+    final session = await FFmpegKit.executeWithArguments([
+      '-loop', '1', '-i', imagePath,
+      '-loop', '1', '-i', brandPng,
+      '-t', seconds.toStringAsFixed(3),
+      '-filter_complex', filter,
+      '-map', '[v]',
+      '-r', '$kFps',
+      '-c:v', 'libx264',
+      '-preset', 'ultrafast',
+      '-crf', '26',
+      '-pix_fmt', 'yuv420p',
+      '-y', outPath,
+    ]);
+
+    await _check(session, 'Rendering the end card failed');
   }
 
   /// Joins the clips. They all come out of the step above with identical settings,

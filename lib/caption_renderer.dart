@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'prompts.dart';
 import 'video_builder.dart';
 
 // ── Captions ──────────────────────────────────────────────────────────────────
@@ -94,6 +95,66 @@ Future<String?> renderCaptionPng({
   );
 
   final image = await recorder.endRecording().toImage(imageWidth, imageHeight);
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  image.dispose();
+  if (bytes == null) return null;
+
+  final file = File(outPath);
+  if (await file.exists()) await file.delete();
+  await file.writeAsBytes(bytes.buffer.asUint8List());
+  return outPath;
+}
+
+// ── The end card ──────────────────────────────────────────────────────────────
+
+/// The closing card, drawn full frame: name, a rule, tagline, over a dark scrim.
+///
+/// The scrim is part of the PNG rather than an FFmpeg filter on purpose. Darkening in
+/// the filter graph means depending on `eq` being compiled into whichever ffmpeg build
+/// ships with the app; drawing it here cannot fail on a device that was built without
+/// it, and it costs nothing.
+///
+/// Same on every reel, which is the entire point of it — a closing card that varies is
+/// decoration, one that repeats is a channel people start to recognise.
+Future<String?> renderBrandCard(String outPath) async {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+
+  final w = kVideoWidth.toDouble();
+  final h = kVideoHeight.toDouble();
+
+  // Not fully opaque: the last picture stays faintly visible behind it, so the reel
+  // ends in the story rather than cutting to a title screen.
+  canvas.drawRect(Rect.fromLTWH(0, 0, w, h),
+    Paint()..color = Colors.black.withOpacity(0.76));
+
+  TextPainter line(String text, double size, FontWeight weight, Color colour) =>
+      TextPainter(
+        text: TextSpan(text: text,
+          style: TextStyle(color: colour, fontSize: size, fontWeight: weight, height: 1.2)),
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: w * 0.84);
+
+  final name = line(kBrandName, 74, FontWeight.w900, Colors.white);
+  final tagline = line(kBrandTagline, 40, FontWeight.w600, Colors.tealAccent);
+
+  // Sat a little above centre: the eye reads the top half of a frame first, and the
+  // bottom of a reel is where Instagram puts its own username and caption.
+  final blockHeight = name.height + 34 + tagline.height;
+  final top = h * 0.42 - blockHeight / 2;
+
+  name.paint(canvas, Offset((w - name.width) / 2, top));
+
+  final ruleY = top + name.height + 17;
+  canvas.drawRect(
+    Rect.fromLTWH(w / 2 - 90, ruleY, 180, 3),
+    Paint()..color = Colors.tealAccent.withOpacity(0.85),
+  );
+
+  tagline.paint(canvas, Offset((w - tagline.width) / 2, ruleY + 17));
+
+  final image = await recorder.endRecording().toImage(kVideoWidth, kVideoHeight);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   image.dispose();
   if (bytes == null) return null;
