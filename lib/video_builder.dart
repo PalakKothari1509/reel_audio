@@ -4,6 +4,8 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 
+import 'music.dart';
+
 // ── Video settings ────────────────────────────────────────────────────────────
 
 /// Portrait 1080x1920 — the shape Reels, Shorts and TikTok expect.
@@ -99,6 +101,8 @@ class SlideshowBuilder {
     required List<double> lineStarts,
     required String audioPath,
     required String workDir,
+    /// A bundled track already unpacked to a file, or null for no music.
+    String? musicPath,
     /// One PNG per line, null for a line with no caption. Empty means no captions.
     List<String?> captionPngs = const [],
     void Function(String message)? onStatus,
@@ -139,7 +143,8 @@ class SlideshowBuilder {
 
     onStatus?.call('Adding the voice...');
     final finalPath = '$workDir/reel_slideshow.mp4';
-    await _addAudio(videoPath: silentPath, audioPath: audioPath, outPath: finalPath);
+    await _addAudio(videoPath: silentPath, audioPath: audioPath,
+        outPath: finalPath, musicPath: musicPath);
 
     return finalPath;
   }
@@ -253,19 +258,37 @@ class SlideshowBuilder {
     await _check(session, 'Joining the clips failed');
   }
 
-  /// Lays the narration over the silent slideshow.
+  /// Lays the narration over the silent slideshow, with music under it when chosen.
   static Future<void> _addAudio({
     required String videoPath,
     required String audioPath,
     required String outPath,
+    String? musicPath,
   }) async {
     await _deleteIfExists(outPath);
+
+    final music = (musicPath != null && await File(musicPath).exists())
+        ? musicPath
+        : null;
+
+    // normalize=0 matters more than it looks: amix divides every input by the number
+    // of inputs by default, so adding music would quietly halve the narration. The
+    // usual "why did the voice go quiet when I added music" bug.
+    //
+    // aloop keeps a short track going for a longer reel; duration=first ties the mix
+    // to the narration, which is already what decides the video's length.
+    final mixFilter = '[1:a]volume=1.0[voice];'
+        '[2:a]aloop=loop=-1:size=2e9,volume=$kMusicGain[music];'
+        '[voice][music]amix=inputs=2:duration=first:'
+        'dropout_transition=0:normalize=0[out]';
 
     final session = await FFmpegKit.executeWithArguments([
       '-i', videoPath,
       '-i', audioPath,
+      if (music != null) ...['-i', music],
       '-map', '0:v:0',
-      '-map', '1:a:0',
+      if (music != null) ...['-filter_complex', mixFilter, '-map', '[out]']
+      else ...['-map', '1:a:0'],
       '-c:v', 'copy',
       '-c:a', 'aac',
       '-b:a', '128k',
@@ -274,7 +297,9 @@ class SlideshowBuilder {
       '-y', outPath,
     ]);
 
-    await _check(session, 'Adding the voice failed');
+    await _check(session, music == null
+        ? 'Adding the voice failed'
+        : 'Mixing the voice and music failed');
   }
 
   /// FFmpeg reports failure through the return code, not an exception — without this

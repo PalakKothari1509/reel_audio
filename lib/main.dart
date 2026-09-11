@@ -15,6 +15,7 @@ import 'video_builder.dart';
 import 'voice.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
+import 'music.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
@@ -811,6 +812,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// so a reel with no text on screen is a reel nobody understands.
   bool _captions = true;
 
+  /// Which bundled track plays under the voice. Null means none.
+  MusicTrack? _music;
+
   @override
   void initState() {
     super.initState();
@@ -1082,6 +1086,41 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     return n == 1 ? '  •  1 image' : '  •  $n images';
   }
 
+  /// Picks the background track, or turns music off.
+  Future<void> _pickMusic() async {
+    // "No music" and swiping the sheet away would both come back as null, and they
+    // mean different things — one is a choice, the other is cancelling. So the choice
+    // is recorded as it happens rather than read from the return value.
+    MusicTrack? picked;
+    var didChoose = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      builder: (ctx) => SafeArea(
+        child: ListView(shrinkWrap: true, children: [
+          ListTile(
+            leading: const Icon(Icons.music_off),
+            title: const Text('No music'),
+            selected: _music == null,
+            onTap: () { didChoose = true; picked = null; Navigator.pop(ctx); },
+          ),
+          const Divider(height: 1),
+          ...kMusicLibrary.map((t) => ListTile(
+                leading: const Icon(Icons.music_note),
+                title: Text(t.name),
+                subtitle: Text(t.mood, style: const TextStyle(fontSize: 11)),
+                selected: _music?.asset == t.asset,
+                onTap: () { didChoose = true; picked = t; Navigator.pop(ctx); },
+              )),
+        ]),
+      ),
+    );
+
+    if (!mounted || !didChoose) return;
+    setState(() => _music = picked);
+  }
+
   /// Prompts for an image or video generator, built from this script.
   void _openPrompts() {
     _syncLines();
@@ -1115,6 +1154,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             : _lines.map((l) => l.time.inMilliseconds / 1000.0).toList(),
         audioPath: _audioPath!,
         workDir: dir.path,
+        // Unpacked from the APK to a real file, because FFmpeg needs a path.
+        musicPath: _music == null ? null : await unpackTrack(_music!, dir.path),
         // Drawn by Flutter, not FFmpeg's drawtext: drawtext does no complex-script
         // shaping, so Devanagari conjuncts and matras come out in the wrong places.
         captionPngs: _captions
@@ -1351,6 +1392,23 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
                 ]),
               ),
             ),
+            // Hidden entirely when no tracks are bundled, rather than shown as a
+            // dropdown with nothing in it.
+            if (hasMusic)
+              GestureDetector(
+                onTap: busy ? null : _pickMusic,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: Row(children: [
+                    Icon(_music == null ? Icons.music_off : Icons.music_note,
+                      size: 16, color: _music == null ? Colors.white38 : Colors.teal),
+                    const SizedBox(width: 3),
+                    Text(_music?.name ?? 'No music',
+                      style: TextStyle(fontSize: 10,
+                        color: _music == null ? Colors.white38 : Colors.teal)),
+                  ]),
+                ),
+              ),
             const Text('Voice:', style: TextStyle(fontSize: 11, color: Colors.white54)),
             const SizedBox(width: 6),
             ...VoiceEngine.values.map((e) => Padding(
