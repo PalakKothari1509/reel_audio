@@ -82,6 +82,10 @@ class ScenePrompt {
   /// only the wording a generator understands. Without it every picture comes out as the
   /// same flat mid-shot and the reel looks static.
   final String shot;
+  /// Where this moment sits in the story: Hook, Problem, Conflict, Turn, Solution or
+  /// Ending. Told which job a picture is doing, a generator draws it differently — a
+  /// Hook has to stop someone scrolling, an Ending has to feel warm.
+  final String beat;
   /// The props the story turns on — the teddy, the carrot, the spilt milk. Named so
   /// they actually appear, rather than being implied by the action and then missing.
   final String keyObjects;
@@ -97,6 +101,7 @@ class ScenePrompt {
     required this.overlayText,
     this.shot = '',
     this.keyObjects = '',
+    this.beat = '',
     this.dialogue = '',
   });
 }
@@ -190,6 +195,7 @@ String buildImagePrompt(ScenePrompt scene, List<CharacterRef> cast, {bool withOv
         'inside a white speech-bubble banner with a black border, at the top of the image.'
       : '';
 
+  final beatPart = scene.beat.isEmpty ? '' : 'MOMENT IN THE STORY: ${scene.beat}\n\n';
   final shotPart = scene.shot.isEmpty ? '' : '\n\nSHOT: ${scene.shot}';
   final objectsPart =
       scene.keyObjects.isEmpty ? '' : '\n\nMUST BE VISIBLE: ${scene.keyObjects}';
@@ -200,7 +206,7 @@ Generate a single high-quality illustration in 3D Pixar/Disney-style cartoon ani
 CHARACTERS (maintain exact visual consistency):
 ${buildCharacterBlock(cast)}
 
-SCENE: ${scene.scene}
+${beatPart}SCENE: ${scene.scene}
 
 EXPRESSION: ${scene.expression}$shotPart$objectsPart
 

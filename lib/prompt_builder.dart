@@ -69,6 +69,7 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
      "expression": "the main character's face, e.g. worried, laughing, proud",
+     "beat": "one of Hook, Problem, Conflict, Turn, Solution, Ending",
      "shot": "wide / close-up on face / from above / looking up",
      "key_objects": "the props this moment turns on, e.g. red teddy, spilt milk",
      "dialogue": "what a character says out loud here in Hinglish, or empty"}
@@ -79,6 +80,8 @@ Rules:
 - "scenes" must have exactly ${scriptLines.length} entries, one per script line, in order.
 - Each "scene" describes what is VISIBLE. Framing words go in "shot", not in "scene".
 - Vary "shot" across the scenes. All one framing makes a reel look static.
+- "beat" must run in order across the scenes: Hook first, Ending last, and every
+  story needs a Turn - the moment it changes - somewhere in the middle.
 - Do not describe what the characters look like. That is handled elsewhere.
 - "hashtags" must have exactly five entries, each starting with #.
 - Keep every value under 25 words.
@@ -136,7 +139,8 @@ different one.
     scenes.add(ScenePrompt(
       scene: read('scene', scriptLines[i]),
       expression: read('expression', 'cheerful'),
-      shot: read("shot"),
+      beat: read('beat'),
+      shot: read('shot'),
       keyObjects: read('key_objects'),
       dialogue: read('dialogue'),
       overlayText: scriptLines[i],

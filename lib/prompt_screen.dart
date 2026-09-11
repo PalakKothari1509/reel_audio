@@ -407,7 +407,9 @@ class _PromptScreenState extends State<PromptScreen> {
       ...p.scenes.asMap().entries.map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _promptCard(
-              title: 'Picture ${e.key + 1}',
+              title: e.value.beat.isEmpty
+                  ? 'Picture ${e.key + 1}'
+                  : 'Picture ${e.key + 1} · ${e.value.beat}',
               subtitle: e.value.dialogue.isEmpty
                   ? e.value.overlayText
                   : '${e.value.overlayText}   💬 ${e.value.dialogue}',
