@@ -43,6 +43,193 @@ PromptSet promptsFromSaved(String rawJson, List<String> scriptLines) {
   return _toPromptSet(json, scriptLines, rawJson);
 }
 
+// ── Everything in one request ─────────────────────────────────────────────────
+//
+// The script and the prompts were two calls on purpose: asking for everything at once
+// used to fail whole, and losing the script because a hashtag came back wrong is a bad
+// trade. Two things have changed since. JSON mode means a reply is either parseable or
+// it is not, rather than prose that has to be guessed at; and on a free tier the second
+// request is the one that runs you out, which is a cost the split did not have then.
+//
+// So it is tried first and the two-call path is still there underneath. When this
+// works it is one request for the whole reel, and the prompts arrive already written
+// down, so opening that screen later costs nothing either.
+
+/// A whole reel from one reply: the script, and the prompts that go with it.
+class StoryPackage {
+  /// Script lines as "0:04 text | spoken", which is the shape parseScript already
+  /// reads — so nothing new parses a script, and nothing new can disagree about it.
+  final List<String> scriptLines;
+  final PromptSet prompts;
+  const StoryPackage({required this.scriptLines, required this.prompts});
+}
+
+/// Thrown when the combined reply cannot be used, so the caller can quietly fall back
+/// to the two separate calls instead of showing anyone an error about it.
+class CombinedCallFailed implements Exception {
+  final String reason;
+  const CombinedCallFailed(this.reason);
+  @override
+  String toString() => 'Combined call failed: $reason';
+}
+
+/// How many script lines this is worth attempting for.
+///
+/// A long script plus a scene for each of its lines plus the post details can run past
+/// what the model will return in one go, and a truncated reply costs a request and
+/// gives nothing. Short reels fit comfortably; 45 and 60 second ones go the old way.
+const kCombinedLineLimit = 10;
+
+/// Writes the script AND the prompts in a single request.
+Future<StoryPackage> generateEverything({
+  required String storyDescription,
+  required String language,
+  required String style,
+  required int seconds,
+  required int expectedLines,
+  void Function(String message)? onWait,
+}) async {
+  final isHinglish = language == 'Hinglish';
+
+  final scriptShape = isHinglish
+      ? '"text" is Hinglish (Hindi words in English letters). "speak" is the SAME line '
+        'written in Devanagari — that half is what gets spoken aloud, so it must match.'
+      : '"text" is the line. Leave "speak" as an empty string.';
+
+  final prompt = '''
+Write a complete $seconds second preschool reel for "Fun Learning With Palak".
+
+THE STORY (this is the source of truth, follow it):
+$storyDescription
+
+Characters: Ria (toddler girl), Rio (toddler boy), Cuty (white bunny), Mumma, Papa.
+
+$kScriptShapeRules
+
+Keep every spoken line under 12 words so it takes about 4 seconds to say.
+Write how a person talks, not how a book reads.
+
+Return ONLY valid JSON in exactly this shape:
+
+{
+  "script": [
+    {"at": 0, "text": "the line on screen", "speak": "the same line in Devanagari"}
+  ],
+  "title": "short title in Hinglish",
+  "hook": "the opening line as a text overlay",
+  "who": "which characters appear",
+  "where": "the setting, e.g. sunny Indian kitchen",
+  "what_starts_it": "one sentence",
+  "what_goes_wrong": "one sentence",
+  "how_it_gets_worse": "one sentence",
+  "how_it_is_solved": "one sentence",
+  "ending_line": "the moral, one short line in Hinglish",
+  "closing_cta": "a short follow line in Hinglish",
+  "cover_title": "3 to 5 words for the reel cover, big and curious",
+  "caption": "2 or 3 lines for Instagram, warm, speaking to parents",
+  "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
+  "pin_comment": "a first comment to pin - ask parents something they will answer",
+  "reply_question": "one short question to reply to commenters with, Hinglish",
+  "best_time": "a posting window for Indian parents of small children, e.g. Weekdays 8-9 pm IST",
+  "scenes": [
+    {"scene": "what the picture shows, one sentence, name the characters in it",
+     "expression": "the main character's face, e.g. worried, laughing, proud",
+     "beat": "one of Hook, Problem, Conflict, Turn, Solution, Ending",
+     "shot": "wide / close-up on face / from above / looking up",
+     "key_objects": "the props this moment turns on, e.g. red teddy, spilt milk",
+     "dialogue": "what a character says out loud here in Hinglish, or empty"}
+  ]
+}
+
+Rules:
+- "script" must have exactly $expectedLines entries.
+- "at" is the second that line starts, counting from 0, roughly 4 seconds apart.
+- $scriptShape
+- "scenes" must have exactly $expectedLines entries, one per script line, in order.
+- Scene 1 is the hook and must be the most eye-catching picture of the set.
+- Describe pictures, not camera equipment. No text or writing inside the pictures.
+- Keep it all compact. Short sentences everywhere.
+''';
+
+  final response = await geminiPost(
+    model: _model,
+    apiKey: geminiApiKey,
+    timeout: _timeout,
+    onWait: onWait,
+    body: jsonEncode({
+      'contents': [{'parts': [{'text': prompt}]}],
+      'generationConfig': {
+        'temperature': 0.8,
+        'maxOutputTokens': 8192,
+        'responseMimeType': 'application/json',
+      },
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    // A busy or rate-limited Gemini is not a reason to try again immediately with a
+    // second call, so this one is passed up as a real error rather than a fallback.
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode)
+        : 'Gemini error ${response.statusCode}: ${response.body}');
+  }
+
+  final body = jsonDecode(response.body);
+  final candidate = body['candidates']?[0];
+  final text = candidate?['content']?['parts']?[0]?['text'] as String? ?? '';
+
+  // Ran out of room mid-reply. The JSON is half-written and unusable, and the two
+  // smaller calls will fit where this one did not.
+  if (candidate?['finishReason'] == 'MAX_TOKENS') {
+    throw const CombinedCallFailed('the reply was too long to finish');
+  }
+  if (text.trim().isEmpty) {
+    throw const CombinedCallFailed('nothing came back');
+  }
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(_stripFence(text)) as Map<String, dynamic>;
+  } catch (_) {
+    throw const CombinedCallFailed('the reply was not usable JSON');
+  }
+
+  final rawScript = (json['script'] as List?) ?? const [];
+  if (rawScript.length < 3) {
+    throw const CombinedCallFailed('the script came back too short');
+  }
+
+  final lines = <String>[];
+  final display = <String>[];
+  for (var i = 0; i < rawScript.length; i++) {
+    final entry = rawScript[i];
+    final map = entry is Map<String, dynamic> ? entry : const <String, dynamic>{};
+
+    final textLine = (map['text'] as String?)?.trim() ?? '';
+    if (textLine.isEmpty) continue;
+
+    final spoken = (map['speak'] as String?)?.trim() ?? '';
+    // Falls back to four seconds apart rather than dropping the line: a missing
+    // timestamp is a detail, and the timings get corrected from the real voice later.
+    final at = (map['at'] as num?)?.round() ?? (i * 4);
+    final stamp = '${at ~/ 60}:${(at % 60).toString().padLeft(2, '0')}';
+
+    lines.add(spoken.isEmpty ? '$stamp $textLine' : '$stamp $textLine | $spoken');
+    display.add(textLine);
+  }
+
+  if (display.length < 3) {
+    throw const CombinedCallFailed('too few usable script lines');
+  }
+
+  // The prompts are built against the on-screen text, because that is what the
+  // prompts screen will later compare its cache to.
+  return StoryPackage(
+    scriptLines: lines,
+    prompts: _toPromptSet(json, display, _stripFence(text)),
+  );
+}
+
 /// Asks Gemini to break the story into beats and to describe a picture per line.
 Future<PromptSet> generatePrompts({
   required String storyDescription,

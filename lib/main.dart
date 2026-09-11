@@ -15,6 +15,7 @@ import 'gemini_call.dart';
 import 'video_builder.dart';
 import 'voice.dart';
 import 'projects.dart';
+import 'prompt_builder.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
 import 'story_ideas.dart';
@@ -111,27 +112,7 @@ $styleNote
 The script must follow the story above. Do not invent a different story.
 
 Shape it like a reel that holds attention:
-
-LINE 1 IS THE HOOK AND IT DECIDES EVERYTHING.
-It is heard in the first three seconds. If it does not stop a parent's thumb, nothing
-after it is ever seen, so treat it as the hardest line in the script.
-- Start in the MIDDLE of the trouble. When the reel begins, the thing has already
-  happened. Do not set the scene. Do not introduce anyone.
-- It must open a question in the watcher's head that only watching answers.
-- Say what happened, never what it means, and NEVER answer it in the same line.
-- Good shapes: "Ria ne jo kiya, Mumma dekh ke jam gayi!" or "Cuty subah se gayab hai."
-  or "Rio ne woh cheez chhupa di... aur ab sab dhoondh rahe hain."
-- Banned openings: "Ek baar ki baat hai", "Aaj hum sikhenge", "Ria aur Rio do dost
-  the", anything that begins at the beginning, any greeting, any introduction.
-
-MIDDLE LINES: show the problem and make it worse. Show it happening, do not explain it.
-Somewhere in here the turn: what the child works out, or is shown. No adult lecturing.
-
-THE LAST LINE IS THE MORAL.
-One short warm Hinglish line saying what the child watching should take away. It is a
-lesson, not a summary — "Sharing se dosti badhti hai", not "Aur phir woh khush ho gaye".
-If the story above has a "Moral:" line, the last line says that moral in your own words.
-If the story above has a "Hook:" line, line 1 is built from it.
+$kScriptShapeRules
 
 Keep every line under 12 words so it can be spoken in about 4 seconds.
 Write how a person talks, not how a book reads.
@@ -678,7 +659,9 @@ class _StoryScreenState extends State<StoryScreen> {
     setState(() => _status = '');
   }
 
-  void _openScript(List<ScriptLine> lines) {
+  /// [prompts] is set when the script and the prompts arrived in the same reply, so
+  /// they can be written down now and the prompts screen never has to ask for them.
+  void _openScript(List<ScriptLine> lines, {PromptSet? prompts}) {
     // Saved before leaving rather than after coming back: the whole point is that a
     // failure on the next screen cannot take the story with it.
     _saveTimer?.cancel();
@@ -690,6 +673,11 @@ class _StoryScreenState extends State<StoryScreen> {
           title: Project.titleFrom(story), story: story,
           style: _style, language: _language, seconds: _seconds,
           script: lines.map(scriptLineToText).toList(),
+          promptsJson: prompts?.rawJson,
+          // Matched against the on-screen text later, so it has to be that and not
+          // the timestamped form, or the cache never recognises itself.
+          promptsScript: prompts == null
+              ? null : lines.map((l) => l.text).toList(),
         );
     ProjectStore.save(_project!);
 
@@ -714,9 +702,44 @@ class _StoryScreenState extends State<StoryScreen> {
       return;
     }
     setState(() { _isGenerating = true; _status = 'Writing the script with Gemini...'; });
+    final story = _descCtrl.text.trim();
+    final expectedLines = (_seconds / 4).floor().clamp(4, 20);
+
     try {
+      // One request for the whole reel where it fits, rather than one for the script
+      // and another for the prompts. On a free tier the second request is the one
+      // that runs you out, and the prompts arrive already written down so opening
+      // that screen later costs nothing either.
+      if (expectedLines <= kCombinedLineLimit) {
+        try {
+          final package = await generateEverything(
+            storyDescription: story,
+            language: _language,
+            style: _style,
+            seconds: _seconds,
+            expectedLines: expectedLines,
+            onWait: (message) { if (mounted) setState(() => _status = message); },
+          );
+          final lines = parseScript(package.scriptLines.join('\n'));
+          if (lines.isNotEmpty) {
+            if (!mounted) return;
+            _openScript(lines, prompts: package.prompts);
+            if (mounted) setState(() => _isGenerating = false);
+            return;
+          }
+          // Parsed to nothing, which is the same as not having worked.
+        } on CombinedCallFailed catch (e) {
+          // Expected often enough not to be an error anyone should read. The two
+          // smaller calls fit where the big one did not, so just take that road.
+          if (mounted) {
+            setState(() => _status = 'Writing it in two steps instead '
+                '(${e.reason})...');
+          }
+        }
+      }
+
       final lines = await generateScriptWithGemini(
-        videoDescription: _descCtrl.text.trim(),
+        videoDescription: story,
         language: _language,
         style: _style,
         videoDuration: _seconds.toDouble(),

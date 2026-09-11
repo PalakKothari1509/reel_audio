@@ -150,6 +150,38 @@ const kBestTimeCaveat =
     'A starting point only. Instagram › Insights › Total followers › Most active times '
     'shows when your own followers are online — that beats any general advice.';
 
+// ── How a reel script is shaped ───────────────────────────────────────────────
+
+/// The rules for the script itself, in one place.
+///
+/// Used by the script call and by the combined call. Two copies of this would drift
+/// within a week, and the half that drifted would be the half producing weak hooks
+/// with nobody able to say why.
+const kScriptShapeRules = '''
+LINE 1 IS THE HOOK AND IT DECIDES EVERYTHING.
+It is heard in the first three seconds. If it does not stop a parent's thumb, nothing
+after it is ever seen, so treat it as the hardest line in the script.
+- Start in the MIDDLE of the trouble. When the reel begins, the thing has already
+  happened. Do not set the scene. Do not introduce anyone.
+- It must open a question in the watcher's head that only watching answers.
+- Say what happened, never what it means, and NEVER answer it in the same line.
+- Good shapes: "Ria ne jo kiya, Mumma dekh ke jam gayi!" or "Cuty subah se gayab hai."
+  or "Rio ne woh cheez chhupa di... aur ab sab dhoondh rahe hain."
+- Banned openings: "Ek baar ki baat hai", "Aaj hum sikhenge", "Ria aur Rio do dost
+  the", anything that begins at the beginning, any greeting, any introduction.
+
+MIDDLE LINES: show the problem and make it worse. Show it happening, do not explain it.
+Somewhere in here the turn: what the child works out, or is shown. No adult lecturing.
+
+THE LAST LINE IS THE MORAL.
+One short warm Hinglish line saying what the child watching should take away. It is a
+lesson, not a summary — "Sharing se dosti badhti hai", not "Aur phir woh khush ho gaye".
+If the story has a "Moral:" line, the last line says that moral in your own words.
+If the story has a "Hook:" line, line 1 is built from it.
+
+Never introduce a problem, character, event or moral that is not in the story you were
+given. Improve how it is told; never replace what it is about.''';
+
 // ── The two templates ─────────────────────────────────────────────────────────
 
 /// Prompt for a video generator, with the beats filled in and the timings worked out.
