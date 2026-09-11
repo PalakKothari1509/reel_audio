@@ -7,8 +7,8 @@ one, so any of them can be changed without a new build.
 
 ## Adding one
 
-1. Save the picture here as the character's name in lower case: `ria.png`, `rio.png`,
-   `cuty.png`, `mum.png`, `dad.png`, `teacher.png`
+1. Save the picture here named exactly as the character is named in kDefaultCast: `Ria.jpg`, `Rio.jpg`,
+   `Cuty.jpg`, `Mumma.jpg`, `Papa.jpg`, `Daadi.jpg`, `Teacher.jpg`
 2. List it in `pubspec.yaml` under `flutter: assets:`
 3. Set `assetPath` on that character in `kDefaultCast` in `lib/characters.dart`:
 
@@ -16,7 +16,7 @@ one, so any of them can be changed without a new build.
 CharacterRef(
   name: 'Ria',
   description: '...',
-  assetPath: 'assets/characters/ria.png',
+  assetPath: 'assets/characters/Ria.jpg',
 ),
 ```
 
