@@ -16,12 +16,30 @@ import 'package:http/http.dart' as http;
 /// 500 is Google's own fault, 503 is Google being busy, 429 is too many too quickly.
 const _retryable = {429, 500, 503};
 
-/// How long to wait before each retry.
+/// How long to wait before each retry, when Google does not say.
 ///
-/// Lengthening: a real demand spike on a popular model lasts longer than ten seconds,
-/// and giving up at ten meant the retry rarely got to do its job. Half a minute of
-/// waiting beats retyping the story, as long as the screen keeps saying why it waits.
-const _backoff = [Duration(seconds: 3), Duration(seconds: 8), Duration(seconds: 20)];
+/// A real demand spike on a popular model lasts longer than a few seconds, so giving
+/// up quickly meant the retry rarely got to do its job at all. Waiting a minute beats
+/// retyping the story, as long as the screen keeps saying why it is waiting.
+const _backoff = [
+  Duration(seconds: 4),
+  Duration(seconds: 10),
+  Duration(seconds: 20),
+  Duration(seconds: 30),
+];
+
+/// How long Google asked us to wait, from the retryDelay in the body ("19s").
+///
+/// Worth reading rather than guessing: on a 429 Google says exactly when the quota
+/// frees up, and waiting our own made-up interval either gives up too early or sits
+/// there longer than it had to. A second is added because retrying on the exact
+/// boundary tends to come back 429 again.
+Duration? _googlesOwnDelay(String body) {
+  final match = RegExp(r'"retryDelay"\s*:\s*"(\d+)').firstMatch(body);
+  final seconds = int.tryParse(match?.group(1) ?? '');
+  if (seconds == null) return null;
+  return Duration(seconds: seconds.clamp(1, 60) + 1);
+}
 
 /// Posts to a Gemini text model and hands back the response.
 ///
@@ -44,11 +62,21 @@ Future<http.Response> geminiPost({
     body: body,
   ).timeout(timeout);
 
-  for (final wait in _backoff) {
+  for (final fallback in _backoff) {
     if (!_retryable.contains(response.statusCode)) return response;
 
-    onWait?.call('Gemini is busy — trying again in ${wait.inSeconds}s...');
-    await Future<void>.delayed(wait);
+    // Google's own number wins when it gives one.
+    final wait = _googlesOwnDelay(response.body) ?? fallback;
+    final why = response.statusCode == 429
+        ? 'Gemini is rate limiting this key'
+        : 'Gemini is busy';
+
+    // Counted down rather than one message and a long silence: without this, a
+    // thirty second wait is indistinguishable from the app having hung.
+    for (var left = wait.inSeconds; left > 0; left--) {
+      onWait?.call('$why — trying again in ${left}s...');
+      await Future<void>.delayed(const Duration(seconds: 1));
+    }
 
     response = await http.post(
       url,
@@ -66,5 +94,6 @@ Future<http.Response> geminiPost({
 /// broken", and the raw JSON says the opposite to anyone reading it.
 String geminiBusyMessage(int statusCode) => statusCode == 503
     ? 'Gemini is overloaded right now. This is at their end and usually passes in a '
-        'minute or two — try again shortly.'
-    : 'Gemini is rate limiting this key. Wait a minute and try again.';
+        'minute or two. Your story is saved — try again shortly.'
+    : 'Gemini has run out of free requests for the moment. Your story is saved, so '
+        'nothing is lost — wait a minute and tap it again.';

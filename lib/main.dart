@@ -14,6 +14,7 @@ import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'gemini_call.dart';
 import 'video_builder.dart';
 import 'voice.dart';
+import 'projects.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
 import 'story_ideas.dart';
@@ -303,6 +304,17 @@ Duration parseDuration(String s) {
   return Duration.zero;
 }
 
+/// One script line as a single string, for saving.
+///
+/// The same "0:04 text | spoken" shape parseScript already reads, so a saved script
+/// goes back in through the code that was already there rather than a second reader
+/// that could drift away from the first.
+String scriptLineToText(ScriptLine line) {
+  final spoken = line.speak;
+  final tail = (spoken == null || spoken.trim().isEmpty) ? '' : ' | ${spoken.trim()}';
+  return '${fmtDuration(line.time)} ${line.text}$tail';
+}
+
 List<ScriptLine> parseScript(String raw) {
   final lines = <ScriptLine>[];
   for (final line in raw.split('\n')) {
@@ -444,8 +456,70 @@ class _StoryScreenState extends State<StoryScreen> {
   bool _isGenerating = false;
   String _status = '';
 
+  /// The story being written, saved to the phone as it is typed.
+  Project? _project;
+  Timer? _saveTimer;
+
   @override
-  void dispose() { _descCtrl.dispose(); super.dispose(); }
+  void initState() {
+    super.initState();
+    _descCtrl.addListener(_autoSave);
+  }
+
+  @override
+  void dispose() {
+    _saveTimer?.cancel();
+    _descCtrl.removeListener(_autoSave);
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  /// Writes the story to the phone a moment after typing stops.
+  ///
+  /// No save button, deliberately. A save button gets pressed once you already know
+  /// the work was worth keeping, and the work people lose is always the work they had
+  /// not decided about yet — which here is every story, right up until the reel is made.
+  ///
+  /// Debounced because writing a file on every keystroke is wasteful, and 1.2 seconds
+  /// is long enough to stop that without being long enough to lose a sentence.
+  void _autoSave() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 1200), () {
+      final story = _descCtrl.text.trim();
+      if (story.length < 12) return;
+
+      _project = (_project ?? Project(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            title: '',
+            savedAt: DateTime.now(),
+            story: '',
+          ))
+          .copyWith(
+            title: Project.titleFrom(story),
+            story: story,
+            style: _style,
+            language: _language,
+            seconds: _seconds,
+          );
+      ProjectStore.save(_project!);
+    });
+  }
+
+  /// Opens the saved stories, and puts the chosen one back in the box.
+  Future<void> _openSaved() async {
+    final chosen = await Navigator.push<Project>(context,
+      MaterialPageRoute(builder: (_) => const SavedStoriesScreen()));
+    if (chosen == null || !mounted) return;
+
+    setState(() {
+      _project = chosen;
+      _descCtrl.text = chosen.story;
+      if (chosen.style.isNotEmpty) _style = chosen.style;
+      if (chosen.language.isNotEmpty) _language = chosen.language;
+      _seconds = chosen.seconds;
+      _status = 'Opened "${chosen.title}".';
+    });
+  }
 
   /// Reads the story back and says whether it will make a reel worth watching.
   ///
@@ -605,14 +679,31 @@ class _StoryScreenState extends State<StoryScreen> {
   }
 
   void _openScript(List<ScriptLine> lines) {
+    // Saved before leaving rather than after coming back: the whole point is that a
+    // failure on the next screen cannot take the story with it.
+    _saveTimer?.cancel();
+    final story = _descCtrl.text.trim();
+    _project = (_project ?? Project(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: '', savedAt: DateTime.now(), story: ''))
+        .copyWith(
+          title: Project.titleFrom(story), story: story,
+          style: _style, language: _language, seconds: _seconds,
+          script: lines.map(scriptLineToText).toList(),
+        );
+    ProjectStore.save(_project!);
+
     Navigator.push(context, MaterialPageRoute(
       builder: (_) => TimedScriptScreen(
         style: _style, language: _language,
         videoFile: null, images: const [], initialLines: lines,
         // Carried through for the AI prompts, which describe the story you typed
         // rather than reverse-engineering it from the finished script lines.
-        storyDescription: _descCtrl.text.trim(),
+        storyDescription: story,
         seconds: _seconds,
+        // So the next screen saves the script and pictures onto the same story
+        // rather than starting a second copy of it.
+        projectId: _project!.id,
       ),
     ));
   }
@@ -645,6 +736,11 @@ class _StoryScreenState extends State<StoryScreen> {
       appBar: AppBar(
         title: const Text('Story Reel Maker'),
         actions: [
+          IconButton(
+            tooltip: 'Saved stories',
+            icon: const Icon(Icons.folder_open, size: 21),
+            onPressed: _isGenerating ? null : _openSaved,
+          ),
           // The old-path entry lives up here now. It still works, but it is not what
           // the app is for, and as a full-width button it read like a main choice.
           IconButton(
@@ -949,6 +1045,9 @@ class TimedScriptScreen extends StatefulWidget {
   final String storyDescription;
   /// Target length, for the timings in the video prompt.
   final int seconds;
+  /// The saved story this belongs to, so edits here are written back to it rather
+  /// than being lost the moment anything on this screen fails. Empty in video mode.
+  final String projectId;
   const TimedScriptScreen({
     super.key, required this.style, required this.language,
     required this.videoFile, required this.initialLines,
@@ -956,6 +1055,7 @@ class TimedScriptScreen extends StatefulWidget {
     this.engine = VoiceEngine.phone,
     this.storyDescription = '',
     this.seconds = 30,
+    this.projectId = '',
   });
 
   @override
@@ -1072,6 +1172,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       _lines[i].text = edited;
       _lines[i].time = time;
     }
+
+    // Written back on every edit, so a failure later on this screen — a busy Gemini,
+    // a render that dies — costs the render and nothing else.
+    _saveProject();
 
     // Words and times are not the same kind of change, and treating them as one was
     // making every small timing fix cost a whole re-recording.
@@ -1423,13 +1527,6 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       setState(() { _status = '❌ $e'; _audioPath = null; });
     }
     setState(() => _isSaving = false);
-  }
-
-  /// Shown in the header strip, so image mode is obvious without leaving the screen.
-  String get _imageNote {
-    if (!_storyMode) return '';
-    final n = _images.length;
-    return n == 1 ? '  •  1 image' : '  •  $n images';
   }
 
   /// Picks the background track, or turns music off.
@@ -2185,6 +2282,24 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     final picked = await ImagePicker().pickMultiImage();
     if (picked.isEmpty) return;
     setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
+    _saveProject();
+  }
+
+  /// Writes the script and pictures back onto the saved story.
+  ///
+  /// Reads the file first rather than keeping a copy in memory: the story text itself
+  /// belongs to the previous screen, and overwriting it from a stale copy held here
+  /// would lose an edit made there.
+  Future<void> _saveProject() async {
+    if (widget.projectId.isEmpty) return;
+    final all = await ProjectStore.load();
+    final matches = all.where((p) => p.id == widget.projectId);
+    if (matches.isEmpty) return;
+
+    await ProjectStore.save(matches.first.copyWith(
+      script: _lines.map(scriptLineToText).toList(),
+      images: List.of(_images),
+    ));
   }
 
 }
@@ -2298,6 +2413,128 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
           ]),
         ),
       ]),
+    );
+  }
+}
+
+// ── Saved stories ─────────────────────────────────────────────────────────────
+
+/// Every story the app has written down, newest first.
+///
+/// Tapping one hands it back to the story screen. Nothing is ever deleted on your
+/// behalf, including stories you abandoned halfway — those are often the ones worth
+/// coming back to.
+class SavedStoriesScreen extends StatefulWidget {
+  const SavedStoriesScreen({super.key});
+  @override
+  State<SavedStoriesScreen> createState() => _SavedStoriesScreenState();
+}
+
+class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
+  List<Project> _projects = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final all = await ProjectStore.load();
+    if (!mounted) return;
+    setState(() { _projects = all; _loading = false; });
+  }
+
+  Future<void> _delete(Project p) async {
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete this story?'),
+        content: Text('"${p.title}" will be gone for good.',
+          style: AppText.hint),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Keep it')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete',
+              style: TextStyle(color: AppColors.danger))),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    await ProjectStore.delete(p.id);
+    await _load();
+  }
+
+  String _when(DateTime t) {
+    final days = DateTime.now().difference(t).inDays;
+    if (days == 0) return 'today';
+    if (days == 1) return 'yesterday';
+    if (days < 7) return '$days days ago';
+    return '${t.day}/${t.month}/${t.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Saved stories')),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _projects.isEmpty
+              ? const Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Center(child: Text(
+                    'Nothing saved yet.\n\nStories are written down on their own as '
+                    'you type, so this fills up by itself.',
+                    textAlign: TextAlign.center, style: AppText.hint)),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _projects.length,
+                  itemBuilder: (ctx, i) {
+                    final p = _projects[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context, p),
+                        child: AppCard(
+                          child: Row(children: [
+                            Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(p.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.text, height: 1.3)),
+                                const SizedBox(height: 6),
+                                Row(children: [
+                                  Text(_when(p.savedAt), style: AppText.small),
+                                  if (p.script.isNotEmpty) ...[
+                                    const Text('  •  ', style: AppText.small),
+                                    Text('${p.script.length} lines',
+                                      style: AppText.small),
+                                  ],
+                                  if (p.images.isNotEmpty) ...[
+                                    const Text('  •  ', style: AppText.small),
+                                    Text('${p.images.length} pictures',
+                                      style: AppText.small),
+                                  ],
+                                ]),
+                              ])),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, size: 20,
+                                color: AppColors.textFaint),
+                              onPressed: () => _delete(p),
+                            ),
+                          ]),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
