@@ -35,6 +35,9 @@ class _PromptScreenState extends State<PromptScreen> {
   Set<String> _inStory = {};
   bool _loading = true;
   bool _withOverlay = false;
+  /// On by default, because a chat is what these get pasted into. Off gives the long
+  /// self-contained prompt, which is what a generator with a single prompt box needs.
+  bool _chatMode = true;
   String _error = '';
 
   /// Only the ticked characters go into the prompts. Sending the whole cast every
@@ -100,12 +103,8 @@ class _PromptScreenState extends State<PromptScreen> {
             IconButton(
               tooltip: 'Copy every image prompt',
               icon: const Icon(Icons.copy_all),
-              onPressed: () => _copy(
-                _prompts!.scenes
-                    .map((s) => buildImagePrompt(s, _selectedCast, withOverlay: _withOverlay))
-                    .join('\n\n────────────────\n\n'),
-                'All ${_prompts!.scenes.length} image prompts',
-              ),
+              onPressed: () => _copy(_allImagePrompts(),
+                'All ${_prompts!.scenes.length} image prompts'),
             ),
         ],
       ),
@@ -401,9 +400,38 @@ class _PromptScreenState extends State<PromptScreen> {
           onChanged: (v) => setState(() => _withOverlay = v),
         ),
       ]),
-      const Text('One per line of the script, in order.',
-        style: TextStyle(fontSize: 11, color: Colors.white54)),
+      Row(children: [
+        Expanded(
+          child: Text(
+            _chatMode
+                ? 'Short messages for a chat. Send the setup first, then one message '
+                  'per picture, in order, in the same chat.'
+                : 'Long self-contained prompts. Each one stands alone, for a tool with '
+                  'a single prompt box.',
+            style: const TextStyle(fontSize: 11, color: Colors.white54)),
+        ),
+        const SizedBox(width: 8),
+        // Named for the shape of the thing, not for WhatsApp: the same messages work
+        // in any chat that makes pictures, and naming it after one app would age badly.
+        ChoiceChip(
+          label: Text(_chatMode ? 'Chat' : 'Full',
+            style: const TextStyle(fontSize: 11)),
+          selected: _chatMode,
+          onSelected: (_) => setState(() => _chatMode = !_chatMode),
+        ),
+      ]),
       const SizedBox(height: 8),
+      // Only in chat mode, and first, because every picture message below depends on
+      // it having been sent. Out of order, the pictures come back as strangers.
+      if (_chatMode) ...[
+        _promptCard(
+          title: 'Send this first',
+          subtitle: 'Once per story. Wait for it to reply before the pictures.',
+          body: buildCastSetupMessage(_selectedCast),
+          copyLabel: 'Setup message',
+        ),
+        const SizedBox(height: 10),
+      ],
       ...p.scenes.asMap().entries.map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _promptCard(
@@ -413,11 +441,31 @@ class _PromptScreenState extends State<PromptScreen> {
               subtitle: e.value.dialogue.isEmpty
                   ? e.value.overlayText
                   : '${e.value.overlayText}   💬 ${e.value.dialogue}',
-              body: buildImagePrompt(e.value, _selectedCast, withOverlay: _withOverlay),
+              body: _sceneBody(e.value, e.key, p.scenes.length),
               copyLabel: 'Picture ${e.key + 1} prompt',
             ),
           )),
     ];
+  }
+
+  /// One picture, written for whichever place it is going to be pasted.
+  String _sceneBody(ScenePrompt scene, int index, int total) => _chatMode
+      ? buildSceneMessage(scene, index + 1, total, withOverlay: _withOverlay)
+      : buildImagePrompt(scene, _selectedCast, withOverlay: _withOverlay);
+
+  /// Everything in one go. In chat mode the setup comes first, since without it the
+  /// picture messages refer to characters that were never described.
+  String _allImagePrompts() {
+    final scenes = _prompts!.scenes
+        .asMap()
+        .entries
+        .map((e) => _sceneBody(e.value, e.key, _prompts!.scenes.length));
+
+    final blocks = _chatMode
+        ? [buildCastSetupMessage(_selectedCast), ...scenes]
+        : scenes.toList();
+
+    return blocks.join('\n\n────────────────\n\n');
   }
 
   Widget _promptCard({

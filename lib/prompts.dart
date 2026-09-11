@@ -188,6 +188,60 @@ TEXT OVERLAYS: Bold rounded font, white speech-bubble shape with a black border,
 ''';
 }
 
+// ── Prompts for a chat, not a prompt box ──────────────────────────────────────
+//
+// Meta AI in WhatsApp is a conversation, and that changes what a good prompt is.
+// Pasting every character's description before every picture is unreadable in a chat
+// window and pointless besides: the thread already remembers what you told it. So the
+// cast goes in once, and each picture after that is a short message pointing back.
+//
+// Every picture message still repeats the format and "same characters as above",
+// because a chat model drifts over a long thread. The aspect ratio is the first thing
+// it forgets, and a square picture is no use in a reel.
+
+/// Sent once, before any picture, to fix the cast and the style for the whole thread.
+String buildCastSetupMessage(List<CharacterRef> cast) => '''
+I am going to ask you for several pictures in this chat, one at a time. They are all for
+the same children's story, so the characters and the style must stay exactly the same in
+every picture.
+
+CHARACTERS:
+${buildCharacterBlock(cast)}
+
+STYLE for every picture: $_style Warm bright colour palette, joyful mood.
+
+FORMAT for every picture: vertical 9:16 portrait.
+
+Do not draw anything yet. Reply OK and wait for the first picture.''';
+
+/// One picture as a short chat message, leaning on the setup message above it.
+String buildSceneMessage(ScenePrompt scene, int number, int total,
+    {bool withOverlay = false}) {
+  final parts = <String>['Picture $number of $total. Vertical 9:16 portrait.'];
+
+  if (scene.beat.trim().isNotEmpty) {
+    parts.add('This is the ${scene.beat.trim().toLowerCase()} of the story.');
+  }
+  parts.add(scene.scene.trim());
+
+  if (scene.expression.trim().isNotEmpty) {
+    parts.add('Expression: ${scene.expression.trim()}');
+  }
+  if (scene.shot.trim().isNotEmpty) parts.add('Shot: ${scene.shot.trim()}');
+  if (scene.keyObjects.trim().isNotEmpty) {
+    parts.add('Must be visible: ${scene.keyObjects.trim()}');
+  }
+  if (withOverlay && scene.overlayText.trim().isNotEmpty) {
+    parts.add('Text across the top in a white speech bubble: '
+        '"${scene.overlayText.trim()}"');
+  }
+
+  // Last line, not first: it is the instruction most likely to be dropped, and the
+  // end of a message is what a chat model weighs most.
+  parts.add('Same characters, same style as above.');
+  return parts.join('\n');
+}
+
 /// Prompt for a single still, for the slideshow or as a reference frame.
 String buildImagePrompt(ScenePrompt scene, List<CharacterRef> cast, {bool withOverlay = false}) {
   final overlay = withOverlay && scene.overlayText.trim().isNotEmpty
