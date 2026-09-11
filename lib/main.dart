@@ -16,6 +16,7 @@ import 'video_builder.dart';
 import 'voice.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
+import 'prompts.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
 import 'story_ideas.dart';
@@ -2378,6 +2379,7 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
   @override
   void dispose() { _ctrl?.dispose(); super.dispose(); }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
