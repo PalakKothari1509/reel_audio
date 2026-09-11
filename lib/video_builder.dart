@@ -64,6 +64,140 @@ List<double> estimatedLineStarts({
   return starts;
 }
 
+// ── Finding the joins by listening ────────────────────────────────────────────
+//
+// Guessing from line length is only ever close. A short line with an exclamation in
+// it takes longer to say than a long flat one, Gemini breathes where it likes, and
+// every small error pushes every later picture further out — which is what "the
+// pictures don't match the voice" actually is.
+//
+// The voice itself knows where the joins are: it pauses at the end of each line. So
+// rather than estimating, listen for the pauses and put the picture changes there.
+
+/// A stretch of quiet in the narration.
+class VoicePause {
+  final double start;
+  final double end;
+  const VoicePause(this.start, this.end);
+  double get length => end - start;
+}
+
+/// Every pause in the narration longer than [minSeconds], found by FFmpeg.
+///
+/// -32dB rather than silence: a recording is never truly silent, and a stricter
+/// threshold finds nothing at all. Returns an empty list if anything goes wrong,
+/// because a failure here should fall back to the estimate, not break the build.
+Future<List<VoicePause>> findVoicePauses(String audioPath,
+    {double minSeconds = 0.18}) async {
+  try {
+    final session = await FFmpegKit.executeWithArguments([
+      '-hide_banner',
+      '-i', audioPath,
+      '-af', 'silencedetect=noise=-32dB:d=${minSeconds.toStringAsFixed(2)}',
+      '-f', 'null', '-',
+    ]);
+    final logs = await session.getAllLogsAsString() ?? '';
+
+    final starts = RegExp(r'silence_start:\s*(-?[\d.]+)')
+        .allMatches(logs)
+        .map((m) => double.tryParse(m.group(1) ?? '') ?? 0.0)
+        .toList();
+    final ends = RegExp(r'silence_end:\s*([\d.]+)')
+        .allMatches(logs)
+        .map((m) => double.tryParse(m.group(1) ?? '') ?? 0.0)
+        .toList();
+
+    final pauses = <VoicePause>[];
+    for (int i = 0; i < starts.length && i < ends.length; i++) {
+      // The quiet before the first word is not a join between two lines, and a
+      // pause that ends before it starts is a parse that went wrong.
+      if (starts[i] < 0.15 || ends[i] <= starts[i]) continue;
+      pauses.add(VoicePause(starts[i], ends[i]));
+    }
+    return pauses;
+  } catch (_) {
+    return const [];
+  }
+}
+
+/// Where each line starts, taken from where the voice actually paused.
+///
+/// The estimate is still worked out first and used as the map: a pause is only
+/// believed to be the join for a line when it falls near where that line was
+/// expected. A pause far from any expected join is a breath in the middle of a
+/// sentence, and moving a picture onto it would be worse than the estimate.
+///
+/// Joins with no pause to match keep their estimated share of the time between the
+/// two nearest joins that did match — so one missed pause costs one picture, instead
+/// of pushing every picture after it out of step.
+List<double> alignedLineStarts({
+  required List<String> texts,
+  required double totalSeconds,
+  required List<VoicePause> pauses,
+}) {
+  final estimate = estimatedLineStarts(texts: texts, totalSeconds: totalSeconds);
+  if (estimate.length < 2 || pauses.isEmpty) return estimate;
+
+  // How far a pause may sit from the estimate and still count as that join. Scaled to
+  // the reel: a long reel drifts further before the pause turns up.
+  final window = (totalSeconds / estimate.length).clamp(0.8, 2.5);
+
+  // The first line always starts at zero; only the joins after it can move.
+  final anchors = <int, double>{0: 0.0};
+  var lastAnchored = 0.0;
+  var next = 0;
+
+  for (int i = 1; i < estimate.length; i++) {
+    while (next < pauses.length) {
+      final at = pauses[next].end;
+      // Too early to be this join, or too close behind the last one to leave a
+      // picture any time on screen — skip it and look at the following pause.
+      if (at < estimate[i] - window || at <= lastAnchored + kMinClipSeconds) {
+        next++;
+        continue;
+      }
+      // Past the window: this pause belongs to a later line, so leave it for one.
+      if (at > estimate[i] + window) break;
+
+      anchors[i] = at;
+      lastAnchored = at;
+      next++;
+      break;
+    }
+  }
+
+  // Nothing matched beyond the opening, so the estimate is all there is.
+  if (anchors.length < 2) return estimate;
+
+  final starts = List<double>.filled(estimate.length, 0);
+  final indices = anchors.keys.toList()..sort();
+
+  for (int a = 0; a < indices.length; a++) {
+    final from = indices[a];
+    starts[from] = anchors[from]!;
+
+    // Everything up to the next matched join, or to the end of the narration.
+    final hasNext = a + 1 < indices.length;
+    final to = hasNext ? indices[a + 1] : estimate.length;
+    final endTime = hasNext ? anchors[indices[a + 1]]! : totalSeconds;
+    final endEstimate = hasNext ? estimate[indices[a + 1]] : totalSeconds;
+
+    final span = endEstimate - estimate[from];
+    for (int i = from + 1; i < to; i++) {
+      // Keep the estimate's own shape inside the run, stretched to fit the gap the
+      // two matched joins leave.
+      final share = span <= 0 ? 0.0 : (estimate[i] - estimate[from]) / span;
+      starts[i] = anchors[from]! + (endTime - anchors[from]!) * share;
+    }
+  }
+
+  // Never let a rounding slip put a picture before the one in front of it.
+  for (int i = 1; i < starts.length; i++) {
+    if (starts[i] <= starts[i - 1]) starts[i] = starts[i - 1] + 0.05;
+  }
+  return starts;
+}
+
 /// How long each line stays on screen: from its own start to the next line's start,
 /// with the last one running to the end of the narration.
 List<double> clipDurations({

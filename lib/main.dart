@@ -1097,21 +1097,130 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       lines: _lines.map((l) => cleanForTts(l.spoken)).toList(),
       basePath: '${dir.path}/narration_gemini',
       apiKey: _geminiKey,
-      styleHint: 'Read this aloud for young children in a $style tone, '
-          'warmly and at an unhurried pace:',
+      styleHint: voiceDirection(style),
       onWait: (message) { if (mounted) setState(() => _status = message); },
     );
 
-    // No per-line files to measure, so where each picture changes is worked out from
-    // how much of the script each line is.
     final total = await getMediaDuration(path);
     if (total == null) throw Exception('Could not read the voice that was just made.');
 
+    // Where the voice actually stopped between lines, rather than where a line of that
+    // length was expected to end. This is what keeps the pictures on the story.
+    setState(() => _status = 'Listening for where each line ends...');
+    final pauses = await findVoicePauses(path);
+
     _audioPath = path;
-    _lineStarts = estimatedLineStarts(
+    _lineStarts = alignedLineStarts(
       texts: _lines.map((l) => l.spoken).toList(),
       totalSeconds: total,
+      pauses: pauses,
     );
+
+    // The timeline on screen is what the line cards show, so move it onto the real
+    // timings too — otherwise the numbers say one thing and the reel does another.
+    //
+    // Rounded to the second, and the line and its box are set from the same rounded
+    // value on purpose: _syncLines treats any difference between the two as an edit
+    // and throws the voice away, so writing 3.4 into a box that reads back as 3 would
+    // clear the audio the moment anything else was tapped.
+    for (int i = 0; i < _lines.length && i < _lineStarts.length; i++) {
+      final shown = Duration(seconds: _lineStarts[i].round());
+      _lines[i].time = shown;
+      _timeCtrls[i].text = fmtDuration(shown);
+    }
+  }
+
+  /// Speaks one line in the chosen voice so it can be heard before a reel is built.
+  Future<void> _hearVoiceSample() async {
+    setState(() { _isSaving = true; _status = 'Making a sample in $geminiVoiceName...'; });
+    try {
+      final dir = await getTemporaryDirectory();
+      final style = widget.style.replaceAll(RegExp(r'[^\w\s-]'), '').trim();
+      final wav = await speakSample(
+        basePath: '${dir.path}/sample_voice',
+        apiKey: _geminiKey,
+        style: style,
+        onWait: (message) { if (mounted) setState(() => _status = message); },
+      );
+
+      // Converted before playing: the player is happy with m4a everywhere, and a raw
+      // WAV with no video track is the kind of thing it sometimes refuses.
+      final playable = '${dir.path}/sample_voice.m4a';
+      final old = File(playable);
+      if (await old.exists()) await old.delete();
+      await FFmpegKit.executeWithArguments(
+        ['-i', wav, '-c:a', 'aac', '-b:a', '128k', '-y', playable]);
+
+      if (!mounted) return;
+      setState(() { _isSaving = false; _status = ''; });
+      await _playSample(File(playable));
+    } catch (e) {
+      if (mounted) setState(() { _isSaving = false; _status = '❌ $e'; });
+    }
+  }
+
+  /// Plays the sample and holds the dialog open until it is closed, so the player is
+  /// always disposed — a left-running player keeps speaking over the next screen.
+  Future<void> _playSample(File file) async {
+    final player = VideoPlayerController.file(file);
+    try {
+      await player.initialize();
+      await player.play();
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text(geminiVoiceName, style: const TextStyle(fontSize: 16)),
+          content: Text(kVoiceSampleText,
+            style: const TextStyle(fontSize: 13, color: Colors.white70)),
+          actions: [
+            TextButton(
+              onPressed: () { player.seekTo(Duration.zero); player.play(); },
+              child: const Text('Again')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
+          ],
+        ),
+      );
+    } finally {
+      await player.dispose();
+    }
+  }
+
+  /// The voice list, with what each one actually sounds like next to it.
+  Future<void> _pickVoice() async {
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: kGeminiVoices.map((v) => ListTile(
+            dense: true,
+            leading: Icon(
+              v.name == geminiVoiceName
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              size: 18,
+              color: v.name == geminiVoiceName ? Colors.teal : Colors.white38),
+            title: Text(v.name, style: const TextStyle(fontSize: 14)),
+            subtitle: Text(v.note,
+              style: const TextStyle(fontSize: 11, color: Colors.white54)),
+            onTap: () => Navigator.pop(ctx, v.name),
+          )).toList(),
+        ),
+      ),
+    );
+
+    if (chosen == null || !mounted) return;
+    setState(() {
+      geminiVoiceName = chosen;
+      // The saved voice was spoken by the old one, so it no longer matches the choice.
+      _audioPath = null;
+      _lineStarts = [];
+      _status = 'Voice set to $chosen. Tap Hear it, or Save Voice to use it.';
+    });
   }
 
   /// Speaks every line to its own file, then lays them out on a timeline with FFmpeg.
@@ -1642,6 +1751,33 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               ),
             )),
           ]),
+          // Its own row rather than beside the engines: the row above is already full
+          // on a narrow phone. Only Gemini has a voice to choose — the phone uses
+          // whatever is installed, and ElevenLabs is pinned to one voice id.
+          if (_engine == VoiceEngine.gemini) ...[
+            const SizedBox(height: 4),
+            Row(children: [
+              GestureDetector(
+                onTap: busy ? null : _pickVoice,
+                child: Row(children: [
+                  const Icon(Icons.record_voice_over, size: 14, color: Colors.white54),
+                  const SizedBox(width: 4),
+                  Text(geminiVoiceName,
+                    style: const TextStyle(fontSize: 11, color: Colors.teal)),
+                  const Icon(Icons.arrow_drop_down, size: 16, color: Colors.white38),
+                ]),
+              ),
+              const SizedBox(width: 14),
+              GestureDetector(
+                onTap: busy ? null : _hearVoiceSample,
+                child: const Row(children: [
+                  Icon(Icons.play_circle_outline, size: 14, color: Colors.white54),
+                  SizedBox(width: 4),
+                  Text('Hear it', style: TextStyle(fontSize: 11, color: Colors.white54)),
+                ]),
+              ),
+            ]),
+          ],
         ]),
       ),
       if (_storyMode) _buildImageStrip(busy),

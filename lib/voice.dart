@@ -44,8 +44,38 @@ String voiceEngineHint(VoiceEngine engine) {
 // that comes back in quota errors. Either appears to be accepted.
 const geminiTtsModel = 'gemini-2.5-flash-preview-tts';
 
-/// Gemini's prebuilt voices. Kore is warm and even, which suits a children's story.
-const geminiVoiceName = 'Kore';
+// ── Which of Gemini's voices ──────────────────────────────────────────────────
+//
+// Gemini has about thirty prebuilt voices and they are not interchangeable. Google
+// gives each one a character, and the app used to be pinned to Kore — whose character
+// is "firm". Firm is right for a news bulletin and wrong for a bedtime story, which
+// is most of why the voice sounded flat however good the script was.
+//
+// These six are the ones worth having for children's stories. The name is Google's
+// and goes in the request as-is; the note is what it actually sounds like.
+
+class GeminiVoice {
+  final String name;
+  final String note;
+  const GeminiVoice(this.name, this.note);
+}
+
+const kGeminiVoices = <GeminiVoice>[
+  GeminiVoice('Sulafat', 'Warm — like telling it to your own child'),
+  GeminiVoice('Leda', 'Young and bright, close to a storyteller for kids'),
+  GeminiVoice('Vindemiatrix', 'Gentle and soft, good for bedtime'),
+  GeminiVoice('Achird', 'Friendly and chatty'),
+  GeminiVoice('Aoede', 'Light and breezy, a little playful'),
+  GeminiVoice('Kore', 'Even and firm — clear, but not very warm'),
+];
+
+/// The voice in use. Not saved to the phone, so it starts warm every time rather than
+/// starting on whatever was picked once and forgotten.
+String geminiVoiceName = kGeminiVoices.first.name;
+
+/// Spoken by the Hear-it button, in both scripts so either language is a fair test.
+const kVoiceSampleText = 'Ria ne dekha ki Cuty ro raha hai. '
+    'रिया ने देखा कि क्यूटी रो रहा है।';
 
 const _timeout = Duration(seconds: 60);
 
@@ -79,6 +109,37 @@ Future<String> synthesizeWholeScript({
   return _geminiSpeak(
     text: prompt, outPath: '$basePath.wav', apiKey: apiKey, onWait: onWait);
 }
+
+/// The direction Gemini is given before the text.
+///
+/// One place, so the Hear-it button and the real read use exactly the same wording —
+/// a sample spoken differently from the reel is worse than no sample at all.
+///
+/// The last sentence earns its keep twice. It slows the delivery down, and the pauses
+/// it asks for are what the picture timing is later found from, so asking for them
+/// makes the reel line up as well as sound better.
+String voiceDirection(String style) =>
+    'You are telling a story to a four year old sitting next to you. '
+    'Read it warmly and unhurried in a $style tone, sounding genuinely worried at the '
+    'sad parts and delighted at the happy ones. '
+    'Leave a clear pause at the end of every line.';
+
+/// Speaks one short line so a voice can be heard before a whole reel is made with it.
+///
+/// Worth a request: picking the voice by its description alone means finding out it
+/// was wrong after the script, the pictures and five minutes of rendering.
+Future<String> speakSample({
+  required String basePath,
+  required String apiKey,
+  required String style,
+  void Function(String message)? onWait,
+}) =>
+    _geminiSpeak(
+      text: '${voiceDirection(style)}\n\n$kVoiceSampleText',
+      outPath: '$basePath.wav',
+      apiKey: apiKey,
+      onWait: onWait,
+    );
 
 // ── One call, whichever engine ────────────────────────────────────────────────
 
