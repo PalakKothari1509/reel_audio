@@ -18,7 +18,12 @@ const _timeout = Duration(seconds: 90);
 class PromptSet {
   final StoryBeats beats;
   final List<ScenePrompt> scenes;
-  const PromptSet({required this.beats, required this.scenes});
+  final PostDetails post;
+  const PromptSet({
+    required this.beats,
+    required this.scenes,
+    required this.post,
+  });
 }
 
 /// Asks Gemini to break the story into beats and to describe a picture per line.
@@ -55,17 +60,29 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "how_it_is_solved": "one sentence",
   "ending_line": "the moral, one short line in Hinglish",
   "closing_cta": "a short follow line in Hinglish",
+  "cover_title": "3 to 5 words for the reel cover, big and curious",
+  "caption": "2 or 3 lines for Instagram, warm, speaking to parents",
+  "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
-     "expression": "the main character's face, e.g. worried, laughing, proud"}
+     "expression": "the main character's face, e.g. worried, laughing, proud",
+     "shot": "wide / close-up on face / from above / looking up",
+     "key_objects": "the props this moment turns on, e.g. red teddy, spilt milk",
+     "dialogue": "what a character says out loud here in Hinglish, or empty"}
   ]
 }
 
 Rules:
 - "scenes" must have exactly ${scriptLines.length} entries, one per script line, in order.
-- Each "scene" describes what is VISIBLE. No dialogue, no camera directions.
+- Each "scene" describes what is VISIBLE. Framing words go in "shot", not in "scene".
+- Vary "shot" across the scenes. All one framing makes a reel look static.
 - Do not describe what the characters look like. That is handled elsewhere.
+- "hashtags" must have exactly five entries, each starting with #.
 - Keep every value under 25 words.
+
+Do not change, replace or invent the problem, the characters, the solution or the
+moral. They come from the story above. Your job is to show that story, not write a
+different one.
 ''';
 
   final response = await http.post(
@@ -108,18 +125,42 @@ Rules:
     // dropping the picture, since every line needs one.
     final entry = i < rawScenes.length ? rawScenes[i] : null;
     final map = entry is Map<String, dynamic> ? entry : const <String, dynamic>{};
+    String read(String key, [String fallback = '']) {
+      final value = map[key];
+      return (value is String && value.trim().isNotEmpty) ? value.trim() : fallback;
+    }
+
     scenes.add(ScenePrompt(
-      scene: (map['scene'] as String?)?.trim().isNotEmpty == true
-          ? (map['scene'] as String).trim()
-          : scriptLines[i],
-      expression: (map['expression'] as String?)?.trim().isNotEmpty == true
-          ? (map['expression'] as String).trim()
-          : 'cheerful',
+      scene: read('scene', scriptLines[i]),
+      expression: read('expression', 'cheerful'),
+      shot: read("shot"),
+      keyObjects: read('key_objects'),
+      dialogue: read('dialogue'),
       overlayText: scriptLines[i],
     ));
   }
 
-  return PromptSet(beats: StoryBeats.fromJson(json), scenes: scenes);
+  // Exactly five hashtags is asked for; trim or pad rather than trust it.
+  final rawTags = (json['hashtags'] as List?) ?? const [];
+  final tags = rawTags
+      .whereType<String>()
+      .map((t) => t.trim())
+      .where((t) => t.isNotEmpty)
+      .map((t) => t.startsWith('#') ? t : '#$t')
+      .take(5)
+      .toList();
+
+  return PromptSet(
+    beats: StoryBeats.fromJson(json),
+    scenes: scenes,
+    post: PostDetails(
+      coverTitle: (json['cover_title'] as String?)?.trim().isNotEmpty == true
+          ? (json['cover_title'] as String).trim()
+          : 'Ria aur Rio',
+      caption: (json['caption'] as String?)?.trim() ?? '',
+      hashtags: tags,
+    ),
+  );
 }
 
 /// Removes a ```json fence when one turns up despite responseMimeType.

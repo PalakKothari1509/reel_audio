@@ -78,6 +78,16 @@ class StoryBeats {
 class ScenePrompt {
   final String scene;
   final String expression;
+  /// How the picture is framed — close-up, wide, from above. Nothing is filmed; this is
+  /// only the wording a generator understands. Without it every picture comes out as the
+  /// same flat mid-shot and the reel looks static.
+  final String shot;
+  /// The props the story turns on — the teddy, the carrot, the spilt milk. Named so
+  /// they actually appear, rather than being implied by the action and then missing.
+  final String keyObjects;
+  /// What the character says out loud in this moment, in Hinglish. Empty when nobody
+  /// speaks. Separate from the narration, which is the voice over the top.
+  final String dialogue;
   /// The script line this picture belongs to, so the overlay text matches the voice.
   final String overlayText;
 
@@ -85,7 +95,33 @@ class ScenePrompt {
     required this.scene,
     required this.expression,
     required this.overlayText,
+    this.shot = '',
+    this.keyObjects = '',
+    this.dialogue = '',
   });
+}
+
+// ── The brand ─────────────────────────────────────────────────────────────────
+
+/// Closing card, the same on every reel so the channel is recognisable.
+const kBrandName = 'Fun Learning With Palak';
+const kBrandTagline = 'Little Stories • Big Lessons';
+
+/// Everything needed to actually post the reel.
+class PostDetails {
+  final String coverTitle;
+  final String caption;
+  final List<String> hashtags;
+
+  const PostDetails({
+    required this.coverTitle,
+    required this.caption,
+    required this.hashtags,
+  });
+
+  /// Caption and hashtags as one block, which is how they get pasted into Instagram.
+  String get forInstagram =>
+      hashtags.isEmpty ? caption : '$caption\n\n${hashtags.join(' ')}';
 }
 
 // ── The two templates ─────────────────────────────────────────────────────────
@@ -118,7 +154,7 @@ ${at(0.11)}-${at(0.29)} — Set up the situation: ${beats.whatStartsIt}
 ${at(0.29)}-${at(0.57)} — The problem gets worse: ${beats.whatGoesWrong} ${beats.howItGetsWorse} Show the emotional reaction clearly on the character's face.
 ${at(0.57)}-${at(0.86)} — The resolution: ${beats.howItIsSolved} Warm, positive tone.
 ${at(0.86)}-${at(0.93)} — Moral as a text overlay: "${beats.endingLine}"
-${at(0.93)}-${at(1.0)} — Closing text overlay: "${beats.closingCta}"
+${at(0.93)}-${at(1.0)} — END CARD, on every reel: "$kBrandName" above "$kBrandTagline"
 
 AUDIO: Warm, upbeat background music that follows the mood — playful, then concerned, then resolved, then happy. Hinglish narration matching the beats above.
 
@@ -133,6 +169,10 @@ String buildImagePrompt(ScenePrompt scene, List<CharacterRef> cast, {bool withOv
         'inside a white speech-bubble banner with a black border, at the top of the image.'
       : '';
 
+  final shotPart = scene.shot.isEmpty ? '' : '\n\nSHOT: ${scene.shot}';
+  final objectsPart =
+      scene.keyObjects.isEmpty ? '' : '\n\nMUST BE VISIBLE: ${scene.keyObjects}';
+
   return '''
 Generate a single high-quality illustration in 3D Pixar/Disney-style cartoon animation, vertical 9:16 format.
 
@@ -141,7 +181,7 @@ ${buildCharacterBlock(cast)}
 
 SCENE: ${scene.scene}
 
-EXPRESSION: ${scene.expression}
+EXPRESSION: ${scene.expression}$shotPart$objectsPart
 
 STYLE: $_style Warm bright colour palette, joyful mood.$overlay
 ''';

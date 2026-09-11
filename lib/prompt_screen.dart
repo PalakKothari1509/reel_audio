@@ -341,6 +341,20 @@ class _PromptScreenState extends State<PromptScreen> {
     return [
       const SizedBox(height: 12),
       _promptCard(
+        title: 'Cover title',
+        subtitle: 'For the reel thumbnail',
+        body: p.post.coverTitle,
+        copyLabel: 'Cover title',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
+        title: 'Instagram caption',
+        subtitle: '${p.post.hashtags.length} hashtags included',
+        body: p.post.forInstagram,
+        copyLabel: 'Caption',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
         title: 'Video prompt',
         subtitle: 'One prompt for the whole reel. Paste into a video generator.',
         body: video,
@@ -365,7 +379,9 @@ class _PromptScreenState extends State<PromptScreen> {
             padding: const EdgeInsets.only(bottom: 10),
             child: _promptCard(
               title: 'Picture ${e.key + 1}',
-              subtitle: e.value.overlayText,
+              subtitle: e.value.dialogue.isEmpty
+                  ? e.value.overlayText
+                  : '${e.value.overlayText}   💬 ${e.value.dialogue}',
               body: buildImagePrompt(e.value, _selectedCast, withOverlay: _withOverlay),
               copyLabel: 'Picture ${e.key + 1} prompt',
             ),
