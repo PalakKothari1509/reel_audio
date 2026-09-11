@@ -1,0 +1,58 @@
+# Compiles the app on every push.
+#
+# Worth having because the code is often written on a machine with no Flutter SDK,
+# so a rename that misses one call site, or an import that was never added, only
+# shows up when somebody pulls and runs it. This catches that in about five minutes
+# without anyone having to install anything.
+
+name: build
+
+on:
+  push:
+    branches: [main, video-slideshow]
+  pull_request:
+  # So a check can be run by hand without pushing.
+  workflow_dispatch:
+
+jobs:
+  analyze-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # secrets.dart holds the API keys and is gitignored, so it is never in a clone.
+      # Without it nothing compiles. The example file has the same names with empty
+      # values, which is all the compiler needs — no key is required to check the code.
+      - name: Create a placeholder secrets.dart
+        run: cp lib/secrets.example.dart lib/secrets.dart
+
+      - name: Install packages
+        run: flutter pub get
+
+      # --no-fatal-infos so style notices (deprecations, missing braces) report without
+      # failing the build. Real errors and warnings still stop it, which is the point.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      # The real check. analyze catches most things, but only a build proves the
+      # Android side compiles too — the TTS method channel lives in Kotlin.
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      # Downloadable from the run's page, so a build can be put on a phone without
+      # a development machine.
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: reel-audio-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
