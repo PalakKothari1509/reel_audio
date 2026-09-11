@@ -69,55 +69,37 @@ const kDefaultCast = <CharacterRef>[
   CharacterRef(
     name: "Ria",
     assetPath: "assets/characters/Ria.jpg",
-    description: "toddler girl, black wavy hair in two pigtails with small pink "
-        "star-shaped clips, large round expressive dark brown eyes, warm light-medium "
-        "tan skin, pink short-sleeve dress with small white star pattern, pink shoes, "
-        "chubby toddler body proportions",
+    description: "toddler girl, light brown hair in two short pigtails tied with pink bows, soft fringe across the forehead, large round dark brown eyes with long lashes, fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, chubby toddler body proportions",
   ),
   CharacterRef(
     name: "Rio",
     assetPath: "assets/characters/Rio.jpg",
-    description: "toddler boy, short tousled black hair, large round expressive dark "
-        "brown eyes, warm light-medium tan skin (matching Ria), blue short-sleeve "
-        "t-shirt with small white star pattern, navy blue shorts, red sneakers with "
-        "white stripes, chubby toddler body proportions, slightly taller than Ria",
+    description: "toddler boy, tousled medium brown hair, large round amber-brown eyes with long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black lace-up sneakers with white soles, chubby toddler body proportions, slightly taller than Ria",
   ),
   CharacterRef(
     name: "Cuty",
     assetPath: "assets/characters/Cuty.jpg",
-    description: "fluffy white bunny, long upright ears with pink inner colouring, "
-        "pink bow tied around neck like a bowtie, large round expressive dark brown "
-        "eyes matching Ria and Rio style, chubby rounded body standing upright like "
-        "a toddler, cheeks with soft pink blush",
+    description: "fluffy white bunny, long upright ears with soft pink inner colouring, coral-pink fabric bow tied at the neck, very large round dark brown eyes with lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing upright like a toddler",
   ),
   CharacterRef(
     name: "Mumma",
     assetPath: "assets/characters/Mumma.jpg",
-    description: "young Indian mother, long dark brown hair tied back loosely, warm "
-        "light-medium tan skin, kind dark brown eyes, simple teal kurta with white "
-        "leggings, small gold earrings, gentle warm smile",
+    description: "young Indian mother, medium brown hair in a high rounded bun with a few loose strands, fair-medium skin, large dark brown eyes, small red bindi, gold jhumka earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari floral embroidery, blue jeans, brown flip-flop sandals, gentle warm smile",
   ),
   CharacterRef(
     name: "Papa",
     assetPath: "assets/characters/Papa.jpg",
-    description: "young Indian father, short black hair, neatly trimmed beard, warm "
-        "light-medium tan skin, dark brown eyes, light grey casual shirt with sleeves "
-        "rolled up, dark blue jeans, friendly relaxed expression",
+    description: "young Indian father, short spiky black hair, thick dark eyebrows, light stubble beard, warm tan skin, dark brown eyes, light blue full-sleeve kurta with blue and gold embroidery at the mandarin collar and cuffs, matching light blue pyjama trousers, brown embroidered juttis, friendly closed-mouth smile",
   ),
   CharacterRef(
     name: "Daadi",
     assetPath: "assets/characters/Daadi.jpg",
-    description: "Indian grandmother, silver-grey hair in a neat low bun, warm "
-        "light-medium tan skin with soft laugh lines, kind dark brown eyes, small "
-        "round glasses, cream cotton saree with a maroon border, thin gold bangles, "
-        "gentle affectionate smile",
+    description: "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with soft wrinkles and laugh lines, dark brown eyes, round gold-rimmed glasses, small red bindi, gold jhumka earrings, cream saree with a gold woven border and small gold floral motifs, cream embroidered juttis, warm affectionate smile",
   ),
   CharacterRef(
     name: "Teacher",
     assetPath: "assets/characters/Teacher.jpg",
-    description: "friendly Indian school teacher, shoulder-length dark hair tied in a "
-        "low bun, warm light-medium tan skin, kind dark brown eyes, round glasses, "
-        "soft yellow kurta with a light shawl, holding a small book, encouraging smile",
+    description: "Indian school teacher, dark hair in a low bun with small white gajra flowers, warm tan skin, dark brown eyes, round gold-rimmed glasses, small red bindi, small gold earrings, blue three-quarter-sleeve kurta with white block-printed floral motifs, white leggings, blue juttis, holding a blue hardback book, encouraging smile",
   ),
 ];
 
