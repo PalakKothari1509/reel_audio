@@ -60,6 +60,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # Character faces: assets/characters/ria.png etc. See that folder's README.
   # Background music. Each track has to be listed by name once it is added — a bare
   # "assets/music/" folder entry would also ship README.md into the APK.
   # See assets/music/README.md for how to normalise a track before adding it.

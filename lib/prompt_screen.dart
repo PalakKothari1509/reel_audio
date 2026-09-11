@@ -178,10 +178,14 @@ class _PromptScreenState extends State<PromptScreen> {
                                       ? Colors.teal : Colors.grey.shade700),
                               ),
                               clipBehavior: Clip.antiAlias,
+                              // A picked face wins; otherwise the one shipped with the
+                              // app; otherwise the prompt to add one.
                               child: c.hasImage
                                   ? Image.file(File(c.imagePath!), fit: BoxFit.cover)
-                                  : const Center(child: Icon(Icons.add_a_photo,
-                                      color: Colors.white38, size: 22)),
+                                  : c.assetPath != null
+                                      ? Image.asset(c.assetPath!, fit: BoxFit.cover)
+                                      : const Center(child: Icon(Icons.add_a_photo,
+                                          color: Colors.white38, size: 22)),
                             ),
                           ),
                         ),

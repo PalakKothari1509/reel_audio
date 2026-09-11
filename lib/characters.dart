@@ -18,14 +18,24 @@ class CharacterRef {
   final String name;
   /// Pasted into every prompt exactly as written. Rewording it breaks the likeness.
   final String description;
-  /// Absolute path to the saved copy, or null when no face has been chosen yet.
+  /// Absolute path to a face picked from the gallery, or null when none was picked.
   final String? imagePath;
+  /// A face shipped inside the app, used when nothing has been picked.
+  ///
+  /// Means the cast has faces from the moment the app is installed — nothing to set
+  /// up, and they survive a reinstall or a new phone, which a picked one does not.
+  /// A picked face still wins, so any of them can be swapped without a new build.
+  final String? assetPath;
 
   const CharacterRef({
     required this.name,
     this.description = '',
     this.imagePath,
+    this.assetPath,
   });
+
+  /// True when there is a face to show, from either source.
+  bool get hasFace => hasImage || (assetPath != null && assetPath!.isNotEmpty);
 
   bool get hasImage => imagePath != null && imagePath!.isNotEmpty;
 
@@ -34,8 +44,12 @@ class CharacterRef {
         name: name ?? this.name,
         description: description ?? this.description,
         imagePath: clearImage ? null : (imagePath ?? this.imagePath),
+        assetPath: assetPath,
       );
 
+  // assetPath is deliberately not saved: it comes from the build, not the phone, so
+  // reading it back from an old file would pin the app to a picture that has since
+  // been renamed or removed.
   Map<String, dynamic> toJson() =>
       {'name': name, 'description': description, 'image': imagePath};
 
@@ -118,11 +132,23 @@ class CharacterStore {
       if (saved.isEmpty) return List.of(kDefaultCast);
 
       // A picture can go missing if the phone is wiped or the app reinstalled, so
-      // check rather than hand back a path that points at nothing.
+      // check rather than hand back a path that points at nothing. The bundled face
+      // is re-attached from the build by name, since it is not saved — that way a
+      // character whose picked face has gone falls back to the shipped one instead
+      // of showing an empty tile.
       final checked = <CharacterRef>[];
       for (final c in saved) {
         final stillThere = c.hasImage && await File(c.imagePath!).exists();
-        checked.add(stillThere ? c : c.copyWith(clearImage: true));
+        final matches = kDefaultCast
+            .where((d) => d.name.toLowerCase() == c.name.toLowerCase());
+        final bundled = matches.isEmpty ? null : matches.first.assetPath;
+
+        checked.add(CharacterRef(
+          name: c.name,
+          description: c.description,
+          imagePath: stillThere ? c.imagePath : null,
+          assetPath: bundled,
+        ));
       }
       return checked;
     } catch (_) {
