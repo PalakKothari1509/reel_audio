@@ -43,6 +43,13 @@ jobs:
       - name: Test
         run: flutter test
 
+      # android/app/build.gradle.kts pins ndkVersion 30.0.16138531 (ffmpeg_kit needs
+      # a matching NDK). A fresh runner will not install it until the SDK licences are
+      # accepted, and fails with "sdkmanager did not install NDK". `yes |` answers the
+      # prompts; || true because it exits non-zero once everything is already accepted.
+      - name: Accept Android SDK licences
+        run: yes | flutter doctor --android-licenses || true
+
       # The real check. analyze catches most things, but only a build proves the
       # Android side compiles too — the TTS method channel lives in Kotlin.
       - name: Build debug APK
