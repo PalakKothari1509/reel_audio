@@ -63,6 +63,9 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "cover_title": "3 to 5 words for the reel cover, big and curious",
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
+  "pin_comment": "a first comment to pin - ask parents something they will answer",
+  "reply_question": "one short question to reply to every comment with, Hinglish",
+  "best_time": "a suggested posting window for Indian parents of small children, with the day part, e.g. Weekdays 8-9 pm IST",
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
      "expression": "the main character's face, e.g. worried, laughing, proud",
@@ -159,6 +162,9 @@ different one.
           : 'Ria aur Rio',
       caption: (json['caption'] as String?)?.trim() ?? '',
       hashtags: tags,
+      pinComment: (json['pin_comment'] as String?)?.trim() ?? '',
+      replyQuestion: (json['reply_question'] as String?)?.trim() ?? '',
+      bestTime: (json['best_time'] as String?)?.trim() ?? '',
     ),
   );
 }

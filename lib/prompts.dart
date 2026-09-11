@@ -112,17 +112,38 @@ class PostDetails {
   final String coverTitle;
   final String caption;
   final List<String> hashtags;
+  /// Posted as your own first comment and pinned. Somewhere to put a question or an
+  /// invitation without making the caption longer than anyone will read.
+  final String pinComment;
+  /// One question to reply to commenters with. A reply that asks something keeps the
+  /// conversation going, where "thank you!" ends it.
+  final String replyQuestion;
+  /// A suggested posting window — a starting point, not a fact. See the note below.
+  final String bestTime;
 
   const PostDetails({
     required this.coverTitle,
     required this.caption,
     required this.hashtags,
+    this.pinComment = '',
+    this.replyQuestion = '',
+    this.bestTime = '',
   });
 
   /// Caption and hashtags as one block, which is how they get pasted into Instagram.
   String get forInstagram =>
       hashtags.isEmpty ? caption : '$caption\n\n${hashtags.join(' ')}';
 }
+
+/// Said next to any suggested posting time.
+///
+/// Nobody outside Instagram knows how the ranking works, and the best time depends on
+/// when YOUR followers are awake, not on a general rule. Presenting a guess as fact
+/// would be worse than useless — it would stop anyone checking the real answer, which
+/// is sitting in their own Insights.
+const kBestTimeCaveat =
+    'A starting point only. Instagram › Insights › Total followers › Most active times '
+    'shows when your own followers are online — that beats any general advice.';
 
 // ── The two templates ─────────────────────────────────────────────────────────
 

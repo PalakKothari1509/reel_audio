@@ -339,21 +339,50 @@ class _PromptScreenState extends State<PromptScreen> {
     final video = buildVideoPrompt(p.beats, widget.seconds, _selectedCast);
 
     return [
-      const SizedBox(height: 12),
+      const SizedBox(height: 14),
+      const Text('Posting it',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+      const SizedBox(height: 8),
       _promptCard(
-        title: 'Cover title',
+        title: '1. Cover title',
         subtitle: 'For the reel thumbnail',
         body: p.post.coverTitle,
         copyLabel: 'Cover title',
       ),
       const SizedBox(height: 10),
       _promptCard(
-        title: 'Instagram caption',
+        title: '2. Caption',
         subtitle: '${p.post.hashtags.length} hashtags included',
         body: p.post.forInstagram,
         copyLabel: 'Caption',
       ),
       const SizedBox(height: 10),
+      _promptCard(
+        title: '3. Pin this comment',
+        subtitle: 'Post it yourself, then pin it',
+        body: p.post.pinComment,
+        copyLabel: 'Pin comment',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
+        title: '4. Reply to every comment with this',
+        subtitle: 'A question keeps the conversation going; "thank you!" ends it',
+        body: p.post.replyQuestion,
+        copyLabel: 'Reply question',
+      ),
+      const SizedBox(height: 10),
+      _promptCard(
+        title: '5. When to post',
+        // The caveat is part of the card, not a footnote, because a time presented as
+        // fact would stop anyone checking the real answer in their own Insights.
+        subtitle: kBestTimeCaveat,
+        body: p.post.bestTime,
+        copyLabel: 'Posting time',
+      ),
+      const SizedBox(height: 18),
+      const Text('The prompts',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+      const SizedBox(height: 8),
       _promptCard(
         title: 'Video prompt',
         subtitle: 'One prompt for the whole reel. Paste into a video generator.',
