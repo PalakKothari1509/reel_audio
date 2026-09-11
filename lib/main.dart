@@ -109,10 +109,27 @@ $styleNote
 The script must follow the story above. Do not invent a different story.
 
 Shape it like a reel that holds attention:
-- Line 1 is a HOOK. A question, a surprise or a problem. Never "Ek baar ki baat hai".
-- Next lines build the problem and make it worse.
-- Near the end, the turn: what solves it.
-- Last line is a warm one-line ending, or a question to the child watching.
+
+LINE 1 IS THE HOOK AND IT DECIDES EVERYTHING.
+It is heard in the first three seconds. If it does not stop a parent's thumb, nothing
+after it is ever seen, so treat it as the hardest line in the script.
+- Start in the MIDDLE of the trouble. When the reel begins, the thing has already
+  happened. Do not set the scene. Do not introduce anyone.
+- It must open a question in the watcher's head that only watching answers.
+- Say what happened, never what it means, and NEVER answer it in the same line.
+- Good shapes: "Ria ne jo kiya, Mumma dekh ke jam gayi!" or "Cuty subah se gayab hai."
+  or "Rio ne woh cheez chhupa di... aur ab sab dhoondh rahe hain."
+- Banned openings: "Ek baar ki baat hai", "Aaj hum sikhenge", "Ria aur Rio do dost
+  the", anything that begins at the beginning, any greeting, any introduction.
+
+MIDDLE LINES: show the problem and make it worse. Show it happening, do not explain it.
+Somewhere in here the turn: what the child works out, or is shown. No adult lecturing.
+
+THE LAST LINE IS THE MORAL.
+One short warm Hinglish line saying what the child watching should take away. It is a
+lesson, not a summary — "Sharing se dosti badhti hai", not "Aur phir woh khush ho gaye".
+If the story above has a "Moral:" line, the last line says that moral in your own words.
+If the story above has a "Hook:" line, line 1 is built from it.
 
 Keep every line under 12 words so it can be spoken in about 4 seconds.
 Write how a person talks, not how a book reads.
@@ -982,7 +999,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// so a reel with no text on screen is a reel nobody understands.
   bool _captions = true;
   /// Both only affect rendering, so changing either does not throw away the voice.
-  CaptionSpot _captionSpot = CaptionSpot.low;
+  ///
+  /// Top by default. Across the middle it sits on the faces and the thing the picture
+  /// is of, which breaks the moment the picture exists to carry.
+  CaptionSpot _captionSpot = CaptionSpot.high;
   ClipMotion _motion = ClipMotion.drift;
 
   /// Which bundled track plays under the voice. Null means none.
@@ -1028,7 +1048,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   }
 
   void _syncLines() {
-    var changed = false;
+    var wordsChanged = false;
+    var timesChanged = false;
 
     for (int i = 0; i < _lines.length; i++) {
       final edited = _textCtrls[i].text;
@@ -1036,22 +1057,41 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       // what is on screen rather than the sentence it used to be.
       if (edited != _lines[i].text) {
         _lines[i].speak = null;
-        changed = true;
+        wordsChanged = true;
       }
       final time = parseDuration(_timeCtrls[i].text);
-      if (time != _lines[i].time) changed = true;
+      if (time != _lines[i].time) timesChanged = true;
 
       _lines[i].text = edited;
       _lines[i].time = time;
     }
 
-    // The saved voice was spoken from the old words at the old times, so it no longer
-    // matches. Keeping it would build a reel whose captions say one thing and whose
-    // narration says another — which looks like a sync bug and isn't one.
-    if (changed && _audioPath != null) {
+    // Words and times are not the same kind of change, and treating them as one was
+    // making every small timing fix cost a whole re-recording.
+    //
+    // A one-take Gemini read is one continuous recording. The times only say when the
+    // picture changes, so nudging one does not make the voice wrong — nothing about
+    // the audio depends on them. The phone and ElevenLabs are different: their track
+    // is BUILT to those timestamps with silence between the lines, so there a time
+    // change really does make the saved audio wrong.
+    final voiceIsOneTake = _engine == VoiceEngine.gemini;
+    final voiceStale = wordsChanged || (timesChanged && !voiceIsOneTake);
+
+    if (_audioPath == null) return;
+
+    if (voiceStale) {
       _audioPath = null;
       _lineStarts = [];
-      _status = 'Script changed — tap Save Voice again.';
+      _status = wordsChanged
+          ? 'Script changed — tap Save Voice again.'
+          : 'Times changed — tap Save Voice again.';
+      return;
+    }
+
+    // Times moved and the voice still stands: keep it, and just move the pictures.
+    if (timesChanged) {
+      _lineStarts = _lines.map((l) => l.time.inMilliseconds / 1000.0).toList();
+      _status = 'Picture times updated — tap Make Reel to build it again.';
     }
   }
 
@@ -1597,11 +1637,35 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   );
 
   /// What still has to happen before the video can be built, or empty when ready.
+  /// What is still missing before a reel can be made.
+  ///
+  /// A missing voice is no longer listed: Make Reel records it for you, so naming it
+  /// here would be telling you to go and do something the button already does.
   String get _notReadyReason {
     if (_lines.isEmpty) return 'Write or paste a script first.';
     if (_storyMode && _images.isEmpty) return 'Add at least one picture.';
-    if (_audioPath == null) return 'Tap Save Voice.';
     return '';
+  }
+
+  /// Records the voice if it is not recorded, then builds the reel.
+  ///
+  /// Three taps in a fixed order, where getting the order wrong was the only way to
+  /// fail, is not a choice worth offering. Save Voice is still there on its own for
+  /// when you change the voice and want to hear it before spending a render on it.
+  Future<void> _makeReel() async {
+    _syncLines();
+    if (_notReadyReason.isNotEmpty) {
+      setState(() => _status = _notReadyReason);
+      return;
+    }
+
+    if (_audioPath == null) {
+      await _saveAudio();
+      // _saveAudio puts the reason in _status itself, so a failure here just stops.
+      if (_audioPath == null || !mounted) return;
+    }
+
+    await (_storyMode ? _buildFromImages() : _mergeWithVideo());
   }
 
   /// The picture this line will use, as a small numbered thumbnail.
@@ -1955,15 +2019,18 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             ),
           _btn(
             icon: Icons.movie_creation,
-            label: _isMerging
-                ? (_storyMode ? 'Building...' : 'Merging...')
-                : (_storyMode ? 'Build Video 🎬' : 'Merge with Video 🎬'),
+            label: _isSaving
+                ? 'Recording the voice...'
+                : _isMerging
+                    ? (_storyMode ? 'Building...' : 'Merging...')
+                    : (_storyMode ? 'Make Reel 🎬' : 'Merge with Video 🎬'),
             color: Colors.deepPurple,
-            // Needs the voice saved first, and in story mode at least one picture.
-            onPressed: (busy || _audioPath == null || (_storyMode && _images.isEmpty))
+            // The voice is no longer a condition: this button records it when it has
+            // to. Only a script, and in story mode a picture, are actually needed.
+            onPressed: (busy || _lines.isEmpty || (_storyMode && _images.isEmpty))
                 ? null
-                : (_storyMode ? _buildFromImages : _mergeWithVideo),
-            loading: _isMerging,
+                : _makeReel,
+            loading: _isMerging || _isSaving,
           ),
         ]),
       ),

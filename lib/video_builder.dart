@@ -324,7 +324,7 @@ class SlideshowBuilder {
     String? musicPath,
     /// One PNG per line, null for a line with no caption. Empty means no captions.
     List<String?> captionPngs = const [],
-    CaptionSpot captionSpot = CaptionSpot.low,
+    CaptionSpot captionSpot = CaptionSpot.high,
     ClipMotion motion = ClipMotion.drift,
     void Function(String message)? onStatus,
   }) async {
@@ -389,7 +389,7 @@ class SlideshowBuilder {
     required bool isFirst,
     required bool isLast,
     String? captionPng,
-    CaptionSpot captionSpot = CaptionSpot.low,
+    CaptionSpot captionSpot = CaptionSpot.high,
     ClipMotion motion = ClipMotion.drift,
   }) async {
     if (!await File(imagePath).exists()) {

@@ -201,7 +201,7 @@ Return ONLY valid JSON:
 
 {
   "title": "short Hinglish title",
-  "hook": "the first line, said out loud, that makes a parent stop scrolling",
+  "hook": "the first line said out loud. It starts in the middle of the trouble, already happened, and opens a question it does not answer. No introductions, no 'Ek baar ki baat hai'",
   "who": "only the characters this story actually needs, comma separated",
   "where": "where it happens, e.g. Indian home kitchen, warm morning light",
   "problem": "what the child does, one sentence",
@@ -209,7 +209,7 @@ Return ONLY valid JSON:
   "worse": "how it gets worse or funnier after that, one sentence",
   "solution": "how it resolves, one sentence, no adult lecturing",
   "ending_line": "the last line said out loud in the story, in Hinglish",
-  "moral": "the lesson in one short warm Hinglish line"
+  "moral": "the lesson the child watching takes away, one short warm Hinglish line. A lesson, not a summary of what happened"
 }
 
 "ending_line" is spoken by a character. "moral" is what the reel leaves the parent
