@@ -13,6 +13,7 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'video_builder.dart';
 import 'voice.dart';
+import 'prompt_screen.dart';
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
 
@@ -427,6 +428,10 @@ class _StoryScreenState extends State<StoryScreen> {
       builder: (_) => TimedScriptScreen(
         style: _style, language: _language,
         videoFile: null, images: const [], initialLines: lines,
+        // Carried through for the AI prompts, which describe the story you typed
+        // rather than reverse-engineering it from the finished script lines.
+        storyDescription: _descCtrl.text.trim(),
+        seconds: _seconds,
       ),
     ));
   }
@@ -749,11 +754,18 @@ class TimedScriptScreen extends StatefulWidget {
   final List<ScriptLine> initialLines;
   /// Which voice speaks it. Phone by default, because that one always works.
   final VoiceEngine engine;
+  /// What you typed on the story screen. Carried through so the AI prompts can
+  /// describe the same story rather than guessing it back from the script lines.
+  final String storyDescription;
+  /// Target length, for the timings in the video prompt.
+  final int seconds;
   const TimedScriptScreen({
     super.key, required this.style, required this.language,
     required this.videoFile, required this.initialLines,
     this.images = const [],
     this.engine = VoiceEngine.phone,
+    this.storyDescription = '',
+    this.seconds = 30,
   });
 
   @override
@@ -1065,6 +1077,22 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     return n == 1 ? '  •  1 image' : '  •  $n images';
   }
 
+  /// Prompts for an image or video generator, built from this script.
+  void _openPrompts() {
+    _syncLines();
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => PromptScreen(
+        // Falls back to the script itself, so prompts still work for a pasted script
+        // that never went through the story screen.
+        storyDescription: widget.storyDescription.trim().isNotEmpty
+            ? widget.storyDescription
+            : _lines.map((l) => l.text).join(' '),
+        scriptLines: _lines.map((l) => l.text).toList(),
+        seconds: widget.seconds,
+      ),
+    ));
+  }
+
   /// Builds the reel from the chosen images instead of a source video.
   Future<void> _buildFromImages() async {
     if (_audioPath == null) { setState(() => _status = 'Please save voice first!'); return; }
@@ -1147,6 +1175,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       appBar: AppBar(
         title: const Text('Script Editor'),
         actions: [
+          IconButton(icon: const Icon(Icons.auto_fix_high), tooltip: 'AI prompts',
+            onPressed: _lines.isEmpty ? null : _openPrompts),
           IconButton(icon: const Icon(Icons.edit_note), tooltip: 'Paste script',
             onPressed: () => setState(() => _showPaste = true)),
           IconButton(icon: const Icon(Icons.add), tooltip: 'Add line',
