@@ -685,6 +685,20 @@ class _StoryScreenState extends State<StoryScreen> {
                           style: const TextStyle(fontSize: 12, color: AppColors.warning))),
                       ]),
                     )),
+                // Five hooks from the same request, so one can be chosen before the
+                // script is written — and the script then uses it word for word.
+                if (check.hooks.isNotEmpty) ...[
+                  const Padding(
+                    padding: EdgeInsets.only(top: 14, bottom: 4),
+                    child: Text('Pick a hook', style: TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w800)),
+                  ),
+                  _HookPicker(
+                    hooks: check.hooks,
+                    chosen: _coverHookInStory,
+                    onUse: _setCoverHook,
+                  ),
+                ],
               ],
             ),
           ),
@@ -760,6 +774,30 @@ class _StoryScreenState extends State<StoryScreen> {
       await _startNewStory(
         text: idea.asStoryText,
         status: '💡 ${idea.title} — edit anything, then write the script.');
+
+      // The idea came with five hooks; offer them now rather than locking in the first.
+      if (idea.hooks.isNotEmpty && mounted) {
+        setState(() => _isGenerating = false);
+        await showModalBottomSheet<void>(
+          context: context,
+          showDragHandle: true,
+          builder: (ctx) => SafeArea(child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('Pick a hook', style: AppText.screenTitle),
+              Gap.xs,
+              const Text('Drawn big on picture 1. You can change it later on the Script '
+                  'step or in the posting kit.', style: AppText.hint),
+              Gap.m,
+              _HookPicker(hooks: idea.hooks, chosen: _coverHookInStory, onUse: (h) {
+                _setCoverHook(h);
+                Navigator.pop(ctx);
+              }),
+            ]),
+          )),
+        );
+      }
     } catch (e) {
       if (mounted) setState(() => _status = '❌ $e');
     }
@@ -824,6 +862,25 @@ class _StoryScreenState extends State<StoryScreen> {
         projectId: _project!.id,
       ),
     ));
+  }
+
+  static final _coverHookLine = RegExp(r'^Cover hook:\s*(.*)$', multiLine: true);
+
+  /// The hook written into the story, or empty.
+  String get _coverHookInStory =>
+      _coverHookLine.firstMatch(_descCtrl.text)?.group(1)?.trim() ?? '';
+
+  /// Writes the chosen hook into the story as its "Cover hook:" line. The script request
+  /// uses that line word for word as the cover, so choosing it here decides the cover
+  /// before anything is spent on the script.
+  void _setCoverHook(String hook) {
+    final text = _descCtrl.text;
+    setState(() {
+      _descCtrl.text = _coverHookLine.hasMatch(text)
+          ? text.replaceFirst(_coverHookLine, 'Cover hook: $hook')
+          : 'Cover hook: $hook\n$text';
+      _status = '✅ Hook chosen: $hook';
+    });
   }
 
   static final _purposeLine = RegExp(r'^Purpose:\s*(.*)$', multiLine: true);
@@ -1085,6 +1142,49 @@ class _StoryScreenState extends State<StoryScreen> {
                 color: c.selected ? Colors.white : AppColors.text)),
           ),
         )).toList(),
+      );
+}
+
+/// Five hooks, each with its type and a Use this button; the chosen one is marked.
+class _HookPicker extends StatefulWidget {
+  final List<HookChoice> hooks;
+  final String chosen;
+  final void Function(String hook) onUse;
+  const _HookPicker({required this.hooks, required this.chosen, required this.onUse});
+
+  @override
+  State<_HookPicker> createState() => _HookPickerState();
+}
+
+class _HookPickerState extends State<_HookPicker> {
+  late String _chosen = widget.chosen;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: widget.hooks.map((h) {
+          final isChosen = h.text == _chosen;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(children: [
+              Icon(isChosen ? Icons.check_circle : Icons.circle_outlined,
+                size: 18, color: isChosen ? AppColors.primary : AppColors.textFaint),
+              const SizedBox(width: 8),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(h.text, style: TextStyle(fontSize: 15,
+                  fontWeight: isChosen ? FontWeight.w800 : FontWeight.w600)),
+                if (h.type.isNotEmpty) Text(h.type, style: AppText.small),
+              ])),
+              if (!isChosen)
+                TextButton(
+                  onPressed: () {
+                    setState(() => _chosen = h.text);
+                    widget.onUse(h.text);
+                  },
+                  child: const Text('Use this')),
+            ]),
+          );
+        }).toList(),
       );
 }
 
@@ -2547,6 +2647,22 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           ]),
         ),
 
+        // Here, before the build, because the hook and the ending are drawn onto the
+        // video — choosing them after the reel is made means making it again.
+        if (widget.projectId.isNotEmpty) ...[
+          Gap.m,
+          SizedBox(
+            width: double.infinity,
+            child: SecondaryButton(
+              label: 'Posting kit — hook, ending, pinned comment',
+              icon: Icons.checklist,
+              colour: AppColors.accent,
+              onPressed: busy ? null : () => showPostingKit(context, widget.projectId)
+                  .then((_) { _loadHookChoices(); _checkSavedReel(); }),
+            ),
+          ),
+        ],
+
         Gap.l,
         const SectionTitle('Ready to build'),
         AppCard(
@@ -2728,12 +2844,12 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         coverHook: (hook != null && hook.isNotEmpty) ? hook : (post?.coverHook ?? ''),
         // Question first, then the reason to keep it. A closing screen that asks
         // nothing gets no comments.
+        // The ending you picked; otherwise the first one offered; and for stories written
+        // before endings were offered, the question and save lines they always had —
+        // the same rule the posting kit shows, so the two never disagree.
         closing: (closing != null && closing.isNotEmpty)
             ? closing
-            : [
-                if ((post?.endQuestion ?? '').isNotEmpty) post!.endQuestion,
-                post?.ctaLine.isNotEmpty == true ? post!.ctaLine : kDefaultCtaLine,
-              ].join('\n\n'),
+            : post == null ? kDefaultCtaLine : defaultEnding(post),
       );
     } catch (_) {
       return const _ReelText();

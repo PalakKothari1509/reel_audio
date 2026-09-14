@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'plan_data.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
+import 'prompts.dart';
+import 'reply_assistant.dart';
 import 'theme.dart';
 
 // ── Everything needed to post, in one sheet ───────────────────────────────────
@@ -67,24 +69,50 @@ class _PostingKitState extends State<_PostingKit> {
     // table you control and can check against results, instead of a new guess per post.
     final nextSlot = nextPostingTime(await ScheduleStore.load());
 
+    final options = <String, List<String>>{};
+    var storyContext = '';
+
     if (project != null && project.promptsJson.isNotEmpty) {
       try {
         final post = promptsFromSaved(project.promptsJson, project.promptsScript).post;
-        // In the order you actually use them: write the post, pin, then reply.
+        storyContext = [
+          project.title,
+          if (post.moralLine.isNotEmpty) 'Lesson: ${post.moralLine}',
+        ].join('. ');
+
+        // The things drawn onto the reel first, because they have to be settled before
+        // it is built; then what gets pasted into Instagram, in the order it is pasted.
         items.addAll([
+          _Item('cover_hook', 'Hook', 'Drawn big on picture 1 — pick below',
+            post.coverHook.isEmpty ? post.coverTitle : post.coverHook),
+          _Item('last_screen', 'Ending', 'The line on the closing card, under Little '
+            'Stories, Big Lessons ❤️ — pick below', defaultEnding(post)),
+          _Item('cover_title', 'Cover title', 'For the reel cover in Instagram',
+            post.coverTitle),
           _Item('caption', 'Caption', 'Paste as the post caption, hashtags included',
             post.forInstagram),
-          _Item('pin_comment', 'Pin this comment', 'Post it yourself, then pin it',
-            post.pinComment),
-          _Item('reply_question', 'Reply to comments with', 'Ends in a question so the '
-            'conversation carries on', post.replyQuestion),
-          _Item('cover_hook', 'Cover hook', 'Already drawn on the reel — here for the '
-            'cover title', post.coverHook.isEmpty ? post.coverTitle : post.coverHook),
+          _Item('hashtags', 'Hashtags', 'Also inside the caption above',
+            post.hashtags.join(' ')),
+          _Item('pin_comment', 'Pinned comment', 'Post it yourself, then pin it — pick below',
+            // The first of the five when there are five, so one is always marked as
+            // chosen; the single older suggestion for stories written before them.
+            post.pinCommentOptions.isNotEmpty ? post.pinCommentOptions.first : post.pinComment),
+          _Item('reply_question', 'A reply to start with', 'For your first few comments',
+            post.replyQuestion),
           _Item('best_time', 'When to post', 'Next slot from your schedule in Plan',
             nextSlot.isEmpty ? post.bestTime : nextSlot),
         ]);
+
+        options['cover_hook'] = [
+          for (final h in post.coverHookOptions) h.text,
+        ];
+        _hookTypes = {for (final h in post.coverHookOptions) h.text: h.type};
+        options['pin_comment'] = post.pinCommentOptions;
+        options['last_screen'] = post.endingOptions;
       } catch (_) {}
     }
+    _options = options;
+    _storyContext = storyContext;
 
     final posts = await PostLogStore.load();
     if (!mounted) return;
@@ -99,6 +127,36 @@ class _PostingKitState extends State<_PostingKit> {
 
   String _title = 'Reel';
   bool _posted = false;
+  Map<String, List<String>> _options = {};
+  Map<String, String> _hookTypes = {};
+  String _storyContext = '';
+
+  /// Makes one of the offered options the chosen one. Saved as an edit, which is what
+  /// the reel's cover, its closing card and this sheet all read — so choosing here is
+  /// choosing everywhere.
+  Future<void> _use(_Item item, String value) async {
+    setState(() => _edits[item.field] = value);
+    await _saveField(item.field, value);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 3),
+      content: Text(item.field == 'pin_comment'
+          ? 'Pinned comment chosen.'
+          : '${item.title} chosen. Rebuild the reel to see it on the video.')));
+  }
+
+  /// Saves one field, merged into the edits as they are on disk now. Writing this
+  /// sheet's whole copy back would undo a cover picked on the Script step meanwhile.
+  Future<void> _saveField(String field, String value) =>
+      ProjectStore.update(widget.projectId, (p) {
+        final edits = {...p.edits};
+        if (value.isEmpty) {
+          edits.remove(field);
+        } else {
+          edits[field] = value;
+        }
+        return p.copyWith(edits: edits);
+      });
 
   /// Logs that this reel went out now, so its numbers can be added in Plan later and
   /// the times that work start to show. The time is taken from the tap, which is why
@@ -150,30 +208,31 @@ class _PostingKitState extends State<_PostingKit> {
       }
     });
 
-    // Only this one field, merged into the edits as they are on disk now. Writing this
-    // sheet's whole copy back would undo a cover picked on the Script step meanwhile.
-    final value = result.trim();
-    await ProjectStore.update(widget.projectId, (p) {
-      final edits = {...p.edits};
-      if (value.isEmpty) {
-        edits.remove(item.field);
-      } else {
-        edits[item.field] = value;
-      }
-      return p.copyWith(edits: edits);
-    });
+    await _saveField(item.field, result.trim());
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: CircularProgressIndicator());
 
+    final replyButton = SizedBox(
+      width: double.infinity,
+      child: SecondaryButton(
+        label: 'Reply to a comment',
+        icon: Icons.chat_bubble_outline,
+        onPressed: () => showReplyAssistant(context, storyContext: _storyContext),
+      ),
+    );
+
     if (_items.isEmpty) {
-      return ListView(controller: widget.scroll, padding: const EdgeInsets.all(24), children: const [
-        Text('No caption yet', style: AppText.screenTitle),
+      return ListView(controller: widget.scroll, padding: const EdgeInsets.all(24), children: [
+        const Text('No caption yet', style: AppText.screenTitle),
         Gap.s,
-        Text('This story has no caption or comments written down. Open AI prompts from '
-            'the Pictures step once and they are saved from then on.', style: AppText.hint),
+        const Text('This story has no caption or comments written down. Open AI prompts '
+            'from the Pictures step once and they are saved from then on.',
+            style: AppText.hint),
+        Gap.l,
+        replyButton,
       ]);
     }
 
@@ -181,11 +240,14 @@ class _PostingKitState extends State<_PostingKit> {
       controller: widget.scroll,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
-        const Text('Caption & comments', style: AppText.screenTitle),
+        const Text('Posting kit', style: AppText.screenTitle),
         Gap.xs,
-        const Text('Tap the copy icon, paste into Instagram. Nothing here uses a request.',
+        const Text('Pick the hook, ending and pinned comment, then copy and paste into '
+            'Instagram. Nothing here uses a request, except Reply to a comment.',
           style: AppText.hint),
         Gap.m,
+        replyButton,
+        Gap.s,
         SizedBox(
           width: double.infinity,
           child: FilledButton.icon(
@@ -226,10 +288,58 @@ class _PostingKitState extends State<_PostingKit> {
               Gap.s,
               SelectableText(_text(item).isEmpty ? '—' : _text(item),
                 style: AppText.body),
+              // The alternatives, each one tap to choose. The chosen one is marked, so
+              // it is clear what the reel and the post will actually use.
+              if ((_options[item.field] ?? const []).isNotEmpty) ...[
+                Gap.s,
+                const Divider(height: 1, color: AppColors.border),
+                Gap.s,
+                Text(item.field == 'cover_hook' ? 'Hook options'
+                    : item.field == 'last_screen' ? 'Ending options' : 'Other options',
+                  style: AppText.section),
+                Gap.xs,
+                ..._options[item.field]!.map((option) {
+                  final chosen = option == _text(item);
+                  final type = item.field == 'cover_hook' ? _hookTypes[option] : null;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                      Icon(chosen ? Icons.check_circle : Icons.circle_outlined,
+                        size: 18, color: chosen ? AppColors.primary : AppColors.textFaint),
+                      Gap.wS,
+                      Expanded(child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(option, style: TextStyle(fontSize: 14, height: 1.35,
+                          fontWeight: chosen ? FontWeight.w700 : FontWeight.w400,
+                          color: AppColors.text)),
+                        if (type != null && type.isNotEmpty)
+                          Text(type, style: AppText.small),
+                      ])),
+                      if (!chosen)
+                        TextButton(
+                          onPressed: () => _use(item, option),
+                          child: const Text('Use this')),
+                    ]),
+                  );
+                }),
+              ],
             ]),
           ),
         )),
       ],
     );
   }
+}
+
+/// What the closing card says when no ending has been chosen.
+///
+/// The first offered ending when there are options. Stories written before endings
+/// were offered keep the question-and-save lines they always had, so their saved reels
+/// still match and are not rebuilt for no reason.
+String defaultEnding(PostDetails post) {
+  if (post.endingOptions.isNotEmpty) return post.endingOptions.first;
+  return [
+    if (post.endQuestion.isNotEmpty) post.endQuestion,
+    post.ctaLine.isNotEmpty ? post.ctaLine : kDefaultCtaLine,
+  ].join('\n\n');
 }

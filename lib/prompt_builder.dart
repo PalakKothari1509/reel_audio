@@ -141,6 +141,8 @@ Return ONLY valid JSON in exactly this shape:
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
   "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs. Something answerable in a few words, never yes or no",
+  "pin_comment_options": ["five DIFFERENT pinned first comments in natural Hinglish that start a genuine conversation between parents, e.g. Aapke little one ne bhi kabhi aisa kiya hai? ❤️ — never comment YES, type 1, tag friends, or follow"],
+  "ending_options": ["five DIFFERENT one-line endings for the closing card under Little Stories, Big Lessons ❤️, e.g. Would your little one do this too? ❤️ / Save this little lesson for later. / Know a parent who needs this reminder? Share it ❤️ / Which part felt familiar at your home? 🥹 — short, warm, no bait"],
   "reply_question": "what to reply to a comment with. Warm, Hinglish, and it ends in a question of its own so the conversation carries on — a reply that only says thank you ends it",
   "best_time": "a posting window for Indian parents of small children, e.g. Weekdays 8-9 pm IST",
   "scenes": [
@@ -158,6 +160,7 @@ Rules:
 - "at" is the second that line starts, counting from 0, roughly 4 seconds apart.
 - $scriptShape
 - "scenes" must have exactly $expectedLines entries, one per script line, in order.
+- "cover_hook_options", "pin_comment_options" and "ending_options" each have 5 entries that are genuinely different from each other, not rewordings of one idea.
 - Scene 1 is the hook and must be the most eye-catching picture of the set.
 - Describe pictures, not camera equipment. No text or writing inside the pictures.
 - Keep it all compact. Short sentences everywhere.
@@ -293,6 +296,8 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
   "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs. Something answerable in a few words, never yes or no",
+  "pin_comment_options": ["five DIFFERENT pinned first comments in natural Hinglish that start a genuine conversation between parents, e.g. Aapke little one ne bhi kabhi aisa kiya hai? ❤️ — never comment YES, type 1, tag friends, or follow"],
+  "ending_options": ["five DIFFERENT one-line endings for the closing card under Little Stories, Big Lessons ❤️, e.g. Would your little one do this too? ❤️ / Save this little lesson for later. / Know a parent who needs this reminder? Share it ❤️ / Which part felt familiar at your home? 🥹 — short, warm, no bait"],
   "reply_question": "what to reply to a comment with. Warm, Hinglish, and it ends in a question of its own so the conversation carries on — a reply that only says thank you ends it",
   "best_time": "a suggested posting window for Indian parents of small children, with the day part, e.g. Weekdays 8-9 pm IST",
   "scenes": [
@@ -307,6 +312,7 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
 
 Rules:
 - "scenes" must have exactly ${scriptLines.length} entries, one per script line, in order.
+- "cover_hook_options", "pin_comment_options" and "ending_options" each have 5 entries that are genuinely different from each other, not rewordings of one idea.
 - Each "scene" describes what is VISIBLE. Framing words go in "shot", not in "scene".
 - Vary "shot" across the scenes. All one framing makes a reel look static.
 - "beat" must run in order across the scenes: Hook first, Ending last, and every
@@ -426,8 +432,23 @@ PromptSet _toPromptSet(
                 (m['text'] as String?)?.trim() ?? ''))
           .where((c) => c.text.isNotEmpty)
           .toList(),
+      pinCommentOptions: _strings(json['pin_comment_options']),
+      endingOptions: _strings(json['ending_options']),
     ),
   );
+}
+
+/// A list of non-empty trimmed strings, whatever shape the reply gave it in. Missing or
+/// malformed means an empty list, and the screens simply show no choices for it.
+List<String> _strings(Object? value) {
+  if (value is! List) return const [];
+  final seen = <String>{};
+  return value
+      .whereType<String>()
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty && seen.add(s.toLowerCase()))
+      .take(5)
+      .toList();
 }
 
 /// Removes a ```json fence when one turns up despite responseMimeType.

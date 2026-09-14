@@ -165,6 +165,12 @@ class PostDetails {
   /// whichever one the model happened to prefer. It still suggests one as coverHook.
   final List<HookChoice> coverHookOptions;
 
+  /// Five different first comments to pin. You choose; the model only suggests.
+  final List<String> pinCommentOptions;
+
+  /// Three to five one-line endings for the closing card, under the brand line.
+  final List<String> endingOptions;
+
   const PostDetails({
     required this.coverTitle,
     required this.caption,
@@ -177,6 +183,8 @@ class PostDetails {
     this.ctaLine = '',
     this.endQuestion = '',
     this.coverHookOptions = const [],
+    this.pinCommentOptions = const [],
+    this.endingOptions = const [],
   });
 
   /// Caption and hashtags as one block, which is how they get pasted into Instagram.
@@ -203,10 +211,40 @@ const kBestTimeCaveat =
 /// with nobody able to say why.
 const kScriptShapeRules = '''
 EVERY STORY HAS THIS SHAPE, NO EXCEPTIONS:
-1. REAL PROBLEM — something a parent recognises from their own house at once.
-2. CURIOSITY — something happens that makes the watcher need to see the ending.
-3. EMOTIONAL TURN — the child realises something through what happens to THEM.
-4. SIMPLE LESSON — shown in what the child does next, not explained.
+1. REAL DAILY-LIFE PROBLEM — something a parent of a 2–6 year old recognises at once.
+2. CURIOSITY / HOOK — something that makes the watcher need to see what happens.
+3. THE PROBLEM DEVELOPS — shown happening, not described.
+4. ESCALATION OR AN UNEXPECTED EVENT — it gets worse, or something surprising happens.
+5. AN EMOTIONAL OR CREATIVE TURN — a felt moment, or a clever idea.
+6. THE CHILD REALISES SOMETHING — through what happened to THEM.
+7. A NATURAL LESSON — shown in what the child does next, never preached.
+8. A SAVE- OR SHARE-WORTHY ENDING — the kind a parent keeps or sends to another parent.
+
+WHAT KIND OF STORIES:
+Real moments from a small child's day: refusing to brush or bathe, refusing
+vegetables, too much tablet time, not cleaning up toys, not wanting shoes on, not
+wanting to sleep, not sharing, getting upset at losing a game, not wanting to leave
+the park, wanting a toy in a shop, interrupting, refusing a small task, being scared
+to try something new, losing something through carelessness, making a mess, not
+listening when called, fighting over toys, not wanting to wait, "main khud karungi".
+Not a generic "be kind" story. Never use the old "Ria's Little Heart" series label, or
+any series label.
+
+CHARACTERS — keep them consistent:
+- Ria: curious, expressive, sometimes stubborn.
+- Rio: playful, energetic, loves exploring.
+- Cuty: the playful bunny; comic relief and warmth, never the one who lectures.
+
+QUALITY RULES — every story must:
+- Suit preschool children and be understandable from the pictures alone, even with
+  the sound off, and be easy to show in 5 to 8 pictures.
+- Feel relatable to parents, with a clear beginning, middle and end.
+- Have curiosity, an emotional or creative moment, and a natural lesson.
+- Fit a 20 to 60 second reel.
+- Avoid preachy lectures, fear-heavy moments, unnecessary punishment, unrealistic
+  behaviour, and morals repeated from story to story.
+- Be ORIGINAL. Never retell a well-known viral story or a common fable. A story that
+  exists only for engagement, with no real progression, is not acceptable.
 
 THE CHILD LEARNS FROM WHAT HAPPENS, NEVER FROM BEING TOLD.
 Banned shape, however natural it feels: child does something wrong → an adult
@@ -288,9 +326,13 @@ the moment on their own, because a great many people watch with the sound off.
 SCREEN N-1 — THE LESSON. What the child in the story learned, in one warm line a
 parent would actually say out loud.
 
-SCREEN N — THE INVITATION. A reason to keep the reel — saving it for bedtime, showing
-it to a child later — and one question a parent can answer in four words. Warm, never
-demanding. No "LIKE COMMENT SHARE NOW".''';
+SCREEN N — THE ENDING. Under the brand line "Little Stories, Big Lessons ❤️", ONE short
+parent-focused line: a question, a thought, or a gentle reason to save or share it.
+Clean, never text-heavy, never demanding.
+
+NO ENGAGEMENT BAIT, anywhere — not in the ending, the caption or the comments:
+no "comment YES", "type 1", "tag 10 friends", "like this", "follow for more",
+"follow me and I'll follow you". Invite genuine conversation between parents instead.''';
 
 // ── The two templates ─────────────────────────────────────────────────────────
 

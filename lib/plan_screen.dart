@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'plan_data.dart';
+import 'reply_assistant.dart';
 import 'theme.dart';
 
 // ── Plan: hooks, schedule, results ────────────────────────────────────────────
@@ -19,7 +20,7 @@ class _PlanScreenState extends State<PlanScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Plan'),
@@ -27,10 +28,18 @@ class _PlanScreenState extends State<PlanScreen> {
             labelColor: AppColors.primary,
             indicatorColor: AppColors.primary,
             unselectedLabelColor: AppColors.textSoft,
-            tabs: [Tab(text: 'Hooks'), Tab(text: 'When to post'), Tab(text: 'Results')],
+            isScrollable: true,
+            tabs: [
+              Tab(text: 'Hooks'), Tab(text: 'When to post'),
+              Tab(text: 'Results'), Tab(text: 'Replies'),
+            ],
           ),
         ),
-        body: const TabBarView(children: [_HooksTab(), _ScheduleTab(), _ResultsTab()]),
+        // Replies sits here as well as in the posting kit, so answering a comment on an
+        // older reel does not mean finding its story first.
+        body: const TabBarView(children: [
+          _HooksTab(), _ScheduleTab(), _ResultsTab(), ReplyAssistant(),
+        ]),
       ),
     );
   }

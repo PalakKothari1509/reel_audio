@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'characters.dart';
+import 'posting_kit.dart';
 import 'prompt_builder.dart';
 import 'projects.dart';
 import 'prompts.dart';
@@ -441,6 +442,27 @@ class _PromptScreenState extends State<PromptScreen> {
       const Text('Posting it',
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
       const SizedBox(height: 8),
+      // All the choices — five hooks, five endings, five pinned comments, and replies to
+      // comments — live in the posting kit. The cards below stay for copying and editing.
+      if (widget.projectId.isNotEmpty) ...[
+        SizedBox(
+          width: double.infinity,
+          child: SecondaryButton(
+            label: 'Open posting kit — choose hook, ending, pinned comment',
+            icon: Icons.checklist,
+            colour: AppColors.accent,
+            onPressed: () async {
+              await showPostingKit(context, widget.projectId);
+              // Choices made there are edits; read them back so these cards match.
+              final project = await loadProject(widget.projectId);
+              if (mounted && project != null) {
+                setState(() => _edits = Map.of(project.edits));
+              }
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
       _promptCard(
         title: '1. Cover hook',
         subtitle: 'Drawn on picture 1 by the app — this is the thumbnail',
@@ -461,12 +483,9 @@ class _PromptScreenState extends State<PromptScreen> {
         title: '3. Last screen',
         // Both on one card because they are one screen, and reading them apart is
         // how you end up with a question that does not sit with the line above it.
-        subtitle: 'Drawn on the closing card by the app',
-        // Question first, then the reason to keep it — the same order it is drawn in,
-        // so what you read here is what ends up on the screen.
-        body: _shown('last_screen',
-            '${p.post.endQuestion.isEmpty ? '' : '${p.post.endQuestion}\n\n'}'
-            '${p.post.ctaLine.isEmpty ? kDefaultCtaLine : p.post.ctaLine}'),
+        subtitle: 'Drawn on the closing card — choose from 5 in the posting kit',
+        // The same default the reel and the posting kit use, so all three agree.
+        body: _shown('last_screen', defaultEnding(p.post)),
         copyLabel: 'Last screen',
         editField: 'last_screen',
       ),
