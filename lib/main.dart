@@ -1330,6 +1330,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// The closing brand card. On by default — it should be on every reel.
   bool _endCard = true;
 
+  /// The big cover words on picture 1. On by default, because that picture is the
+  /// thumbnail; switchable, and separate from Captions, for reels that want it clean.
+  bool _coverHook = true;
+
   /// The Moment look: every picture as a tilted printed photo over a blurred copy of
   /// itself. Off unless chosen — it changes how every reel looks, so it is a decision
   /// you make, not something that happens to you.
@@ -1900,9 +1904,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         musicPath: _music == null ? null : await unpackTrack(_music!, dir.path),
         // Drawn by Flutter, not FFmpeg's drawtext: drawtext does no complex-script
         // shaping, so Devanagari conjuncts and matras come out in the wrong places.
-        captionPngs: _captions
-            ? await _captionPngs(dir.path, post)
-            : const [],
+        captionPngs: await _captionPngs(dir.path, post),
         // The same closing shape on every reel, which is the point of it — a channel
         // gets recognised by what repeats, not by what varies.
         brandPng: _endCard
@@ -1911,8 +1913,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             : null,
         captionSpot: _captionSpot,
         motion: _motion,
-        // The first caption is swapped for the cover hook whenever captions are on.
-        coverOnFirst: _captions,
+        // Picture 1 carries the cover hook when it is switched on, captions or not.
+        coverOnFirst: _coverHook,
         moment: _moment ? await _momentFrames(dir.path, post) : null,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
       );
@@ -2487,6 +2489,14 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             ),
             const Divider(height: 1, color: AppColors.border),
             SettingRow(
+              icon: Icons.title,
+              label: 'Cover hook on picture 1',
+              value: _coverHook ? 'On' : 'Off',
+              valueColour: _coverHook ? AppColors.primary : AppColors.textFaint,
+              onTap: busy ? null : () => _setLook(() => _coverHook = !_coverHook),
+            ),
+            const Divider(height: 1, color: AppColors.border),
+            SettingRow(
               icon: Icons.subtitles_outlined,
               label: 'Captions',
               value: _captions ? 'On' : 'Off',
@@ -2734,32 +2744,35 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   ///
   /// Picture 1 is the thumbnail, and a thumbnail carrying an ordinary caption is a
   /// wasted thumbnail. The hook goes there instead, at nearly twice the size.
+  ///
+  /// The cover has its own switch rather than riding on Captions. It is not a caption
+  /// — it is the thumbnail in the profile grid — so turning captions off should not
+  /// quietly take it too, and a reel can want captions with a clean first picture.
   Future<List<String?>> _captionPngs(String workDir, _ReelText post) async {
-    final captions = await renderCaptions(
-      lines: _lines.map((l) => l.text).toList(), workDir: workDir);
-    if (captions.isEmpty) return captions;
+    if (_lines.isEmpty) return const [];
+    final captions = _captions
+        ? await renderCaptions(lines: _lines.map((l) => l.text).toList(), workDir: workDir)
+        : List<String?>.filled(_lines.length, null);
 
-    // Falls back to the first script line, which is the hook anyway — just longer
-    // than the two to four words a cover wants.
-    final hook = post.coverHook.trim().isNotEmpty
-        ? post.coverHook.trim()
-        : _lines.first.text;
-
-    final cover = await renderCoverHook(hook, '$workDir/cover_hook.png');
-    if (cover != null) captions[0] = cover;
+    if (_coverHook) {
+      final cover = await _renderCover(workDir, post);
+      if (cover != null) captions[0] = cover;
+    }
     return captions;
+  }
+
+  /// The cover hook image. Falls back to the first script line, which is the hook
+  /// anyway — just longer than the two to four words a cover wants.
+  Future<String?> _renderCover(String workDir, _ReelText post) {
+    final hook = post.coverHook.trim().isNotEmpty ? post.coverHook.trim() : _lines.first.text;
+    return renderCoverHook(hook, '$workDir/cover_hook.png');
   }
 
   /// Every picture drawn as a Moment frame, with its caption and the cover hook inside.
   Future<List<MomentFrame>> _momentFrames(String workDir, _ReelText post) async {
     final frames = <MomentFrame>[];
-    String? cover;
-    if (_captions && _lines.isNotEmpty) {
-      final hook = post.coverHook.trim().isNotEmpty
-          ? post.coverHook.trim()
-          : _lines.first.text;
-      cover = await renderCoverHook(hook, '$workDir/cover_hook.png');
-    }
+    // Its own switch, for the same reason as above.
+    final cover = (_lines.isEmpty || !_coverHook) ? null : await _renderCover(workDir, post);
 
     for (var i = 0; i < _lines.length; i++) {
       if (mounted) {
@@ -2813,6 +2826,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         'motion': _motion.name,
         'endCard': _endCard ? '1' : '0',
         'moment': _moment ? '1' : '0',
+        'cover': _coverHook ? '1' : '0',
       };
 
   /// What the voice depends on. The times only matter for the line-by-line engines,
@@ -2870,6 +2884,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       if (look['captions'] != null) _captions = look['captions'] == '1';
       if (look['endCard'] != null) _endCard = look['endCard'] == '1';
       if (look['moment'] != null) _moment = look['moment'] == '1';
+      if (look['cover'] != null) _coverHook = look['cover'] == '1';
       final spot = CaptionSpot.values.where((s) => s.name == look['captionSpot']);
       if (spot.isNotEmpty) _captionSpot = spot.first;
       final motion = ClipMotion.values.where((m) => m.name == look['motion']);
