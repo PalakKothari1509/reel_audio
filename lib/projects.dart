@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'plan_data.dart';
+
 // ── Saved stories ─────────────────────────────────────────────────────────────
 //
 // Nothing used to be saved anywhere. A story lived in one text field, the script in
@@ -368,9 +370,15 @@ class ProjectBackup {
     final all = await ProjectStore.load();
     final json = jsonEncode({
       'app': 'reel_audio',
-      'version': 1,
+      'version': 2,
       'savedAt': DateTime.now().toIso8601String(),
       'stories': all.map((p) => p.toJson()).toList(),
+      // The plan goes with the stories: a reinstall that brought back the stories but
+      // lost your hooks, your posting times and every result you logged would lose
+      // the part that takes weeks to build up.
+      'hooks': (await HookStore.load()).map((h) => h.toJson()).toList(),
+      'schedule': (await ScheduleStore.load()).map((s) => s.toJson()).toList(),
+      'posts': (await PostLogStore.load()).map((p) => p.toJson()).toList(),
     });
 
     final where = await _mediaChannel.invokeMethod<String>(
@@ -416,6 +424,44 @@ class ProjectBackup {
       await ProjectStore.save(project.copyWith(
         images: await ProjectStore.existingImages(project.images)));
       added++;
+    }
+
+    // Same rule as the stories: add what is missing, never overwrite what is here.
+    if (raw['hooks'] is List) {
+      final have = await HookStore.load();
+      final ids = have.map((h) => h.id).toSet();
+      final incoming = (raw['hooks'] as List).whereType<Map<String, dynamic>>()
+          .map(HookIdea.fromJson).where((h) => h.id.isNotEmpty);
+      String sig(HookIdea h) => jsonEncode(h.toJson());
+      final defaults = {for (final d in kDefaultHooks) d.id: sig(d)};
+      final merged = [
+        ...have.map((h) {
+          final match = incoming.where((i) => i.id == h.id);
+          if (match.isEmpty) return h;
+          // Untouched here, so the backup's version — with its edits and its "used"
+          // date — is the more informed one. Changed here, so this phone's wins.
+          return sig(h) == defaults[h.id] ? match.first : h;
+        }),
+        ...incoming.where((h) => !ids.contains(h.id)),
+      ];
+      await HookStore.save(merged);
+    }
+    if (raw['posts'] is List) {
+      final have = await PostLogStore.load();
+      final ids = have.map((p) => p.id).toSet();
+      final incoming = (raw['posts'] as List).whereType<Map<String, dynamic>>()
+          .map(PostRecord.fromJson).where((p) => p.id.isNotEmpty && !ids.contains(p.id));
+      await PostLogStore.save([...have, ...incoming]);
+    }
+    // The schedule is one small table, so a backup's copy replaces the default only
+    // when nothing here has been changed from the default.
+    if (raw['schedule'] is List) {
+      final here = await ScheduleStore.load();
+      final untouched = jsonEncode(here.map((s) => s.toJson()).toList()) ==
+          jsonEncode(kDefaultSchedule.map((s) => s.toJson()).toList());
+      final incoming = (raw['schedule'] as List).whereType<Map<String, dynamic>>()
+          .map(PostSlot.fromJson).toList();
+      if (untouched && incoming.length == 7) await ScheduleStore.save(incoming);
     }
     return added;
   }

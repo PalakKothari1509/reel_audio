@@ -14,6 +14,8 @@ import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'gemini_call.dart';
 import 'video_builder.dart';
 import 'voice.dart';
+import 'plan_data.dart';
+import 'plan_screen.dart';
 import 'posting_kit.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
@@ -510,6 +512,39 @@ class _StoryScreenState extends State<StoryScreen> {
     );
   }
 
+  /// Opens the plan. A hook chosen there comes back as a filled-in story form.
+  Future<void> _openPlan() async {
+    final hook = await Navigator.push<HookIdea>(context,
+      MaterialPageRoute(builder: (_) => const PlanScreen()));
+    if (hook == null || !mounted) return;
+
+    // A new story, not an edit of whatever was in the box — otherwise the chosen hook
+    // would be saved over a different story you were in the middle of.
+    if (_descCtrl.text.trim().isNotEmpty) {
+      final replace = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Start a new story?'),
+          content: const Text('The story in the box is saved already. This starts a new '
+              'one from the hook you picked.', style: AppText.hint),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Start new')),
+          ],
+        ),
+      );
+      if (replace != true || !mounted) return;
+    }
+
+    _saveTimer?.cancel();
+    setState(() {
+      _project = null;
+      _descCtrl.text = hook.asStoryText();
+      _status = '💡 ${hook.cover} — fill in anything you like, then write the script.';
+    });
+    await HookStore.markUsed(hook.id);
+  }
+
   /// Opens the saved stories, and puts the chosen one back in the box.
   Future<void> _openSaved() async {
     final chosen = await Navigator.push<Project>(context,
@@ -806,6 +841,11 @@ class _StoryScreenState extends State<StoryScreen> {
       appBar: AppBar(
         title: const Text('Story Reel Maker'),
         actions: [
+          IconButton(
+            tooltip: 'Plan: hooks, when to post, results',
+            icon: const Icon(Icons.calendar_month_outlined, size: 21),
+            onPressed: _isGenerating ? null : _openPlan,
+          ),
           IconButton(
             tooltip: 'Saved stories',
             icon: const Icon(Icons.folder_open, size: 21),

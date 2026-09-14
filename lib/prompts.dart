@@ -225,6 +225,14 @@ the thumbnail and for most people it is the only thing they ever see. Two to fou
 of Hinglish across it, taken from what actually happens — "Tractor Gayab?!",
 "Bath Se Darr?", "Zidd vs Mumma". Never bait: not "Wait for the end", not "You won't
 believe". A hook that is not true of the story wins one view and loses a follower.
+If the story has a "Cover hook:" line, use those exact words as the cover — it was
+chosen on purpose.
+
+The reels are told by a storyteller about Ria, Rio and Cuty. Never write as "I" or
+"my child", as if a parent were speaking about their own family.
+
+Hashtags: always #FunLearningWithPalak and #LittleStoriesBigLessons, plus three that
+name THIS story's problem — not the same generic tags on every post.
 
 SCREENS 2 to N-2 — THE STORY. The problem, worse, then the turn. Pictures that carry
 the moment on their own, because a great many people watch with the sound off.

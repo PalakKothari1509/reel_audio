@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'plan_data.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
 import 'theme.dart';
@@ -62,6 +63,10 @@ class _PostingKitState extends State<_PostingKit> {
     final project = await loadProject(widget.projectId);
     final items = <_Item>[];
 
+    // From your own schedule rather than the time Gemini makes up for each reel: one
+    // table you control and can check against results, instead of a new guess per post.
+    final nextSlot = nextPostingTime(await ScheduleStore.load());
+
     if (project != null && project.promptsJson.isNotEmpty) {
       try {
         final post = promptsFromSaved(project.promptsJson, project.promptsScript).post;
@@ -75,18 +80,40 @@ class _PostingKitState extends State<_PostingKit> {
             'conversation carries on', post.replyQuestion),
           _Item('cover_hook', 'Cover hook', 'Already drawn on the reel — here for the '
             'cover title', post.coverHook.isEmpty ? post.coverTitle : post.coverHook),
-          _Item('best_time', 'When to post', 'A starting point — your Insights know better',
-            post.bestTime),
+          _Item('best_time', 'When to post', 'Next slot from your schedule in Plan',
+            nextSlot.isEmpty ? post.bestTime : nextSlot),
         ]);
       } catch (_) {}
     }
 
+    final posts = await PostLogStore.load();
     if (!mounted) return;
     setState(() {
       _items = items;
       _edits = Map.of(project?.edits ?? const {});
+      _title = project?.title ?? 'Reel';
+      _posted = posts.any((p) => p.projectId == widget.projectId);
       _loading = false;
     });
+  }
+
+  String _title = 'Reel';
+  bool _posted = false;
+
+  /// Logs that this reel went out now, so its numbers can be added in Plan later and
+  /// the times that work start to show. The time is taken from the tap, which is why
+  /// the button is meant to be pressed right after posting.
+  Future<void> _markPosted() async {
+    await PostLogStore.add(PostRecord(
+      id: 'post${DateTime.now().millisecondsSinceEpoch}',
+      title: _title,
+      projectId: widget.projectId,
+      postedAt: DateTime.now(),
+    ));
+    if (!mounted) return;
+    setState(() => _posted = true);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Logged. Add its views and saves in Plan → Results in two days.')));
   }
 
   String _text(_Item item) =>
@@ -148,6 +175,18 @@ class _PostingKitState extends State<_PostingKit> {
         Gap.xs,
         const Text('Tap the copy icon, paste into Instagram. Nothing here uses a request.',
           style: AppText.hint),
+        Gap.m,
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: _posted ? null : _markPosted,
+            icon: Icon(_posted ? Icons.check : Icons.send, size: 18),
+            label: Text(_posted ? 'Logged as posted' : 'I posted it'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.accent,
+              padding: const EdgeInsets.symmetric(vertical: 14)),
+          ),
+        ),
         Gap.m,
         ..._items.map((item) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
