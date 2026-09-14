@@ -78,6 +78,14 @@ String captionSpotLabel(CaptionSpot spot) {
   }
 }
 
+/// One picture drawn in the Moment look: a blurred backdrop, and the tilted photo card
+/// that sits on it. Two files so FFmpeg can move the card and leave the backdrop still.
+class MomentFrame {
+  final String backgroundPng;
+  final String cardPng;
+  const MomentFrame(this.backgroundPng, this.cardPng);
+}
+
 /// How much the picture moves while it is on screen.
 ///
 /// No zoom in the list, and that is deliberate: zooming has to crop to have anywhere
@@ -344,6 +352,9 @@ class SlideshowBuilder {
     ClipMotion motion = ClipMotion.drift,
     /// True when the first caption is the cover hook, which is placed differently.
     bool coverOnFirst = false,
+    /// One frame per line in the Moment look, already drawn. When given, these are
+    /// used instead of the pictures and captions, which are inside the card already.
+    List<MomentFrame>? moment,
     void Function(String message)? onStatus,
   }) async {
     if (imagePaths.isEmpty) throw Exception('Add at least one image first.');
@@ -367,6 +378,19 @@ class SlideshowBuilder {
     for (int i = 0; i < durations.length; i++) {
       onStatus?.call('Rendering image ${i + 1} of ${durations.length}...');
       final clipPath = '$workDir/clip_$i.mp4';
+      if (moment != null && i < moment.length) {
+        await _renderMomentClip(
+          frame: moment[i],
+          outPath: clipPath,
+          seconds: durations[i],
+          index: i,
+          isFirst: i == 0,
+          isLast: brandPng == null && i == durations.length - 1,
+          motion: motion,
+        );
+        clipPaths.add(clipPath);
+        continue;
+      }
       await _renderClip(
         imagePath: imageForLine(imagePaths, i),
         outPath: clipPath,
@@ -519,6 +543,64 @@ class SlideshowBuilder {
     await _check(session, 'Rendering image ${index + 1} failed');
     if (!await File(outPath).exists()) {
       throw Exception('Image ${index + 1} produced no clip.');
+    }
+  }
+
+  /// One picture in the Moment look: the photo card laid over its blurred backdrop.
+  ///
+  /// All the drawing already happened in Flutter, so this is two still images and one
+  /// overlay — no blur, rotate or blend filters, and nothing a phone's FFmpeg can be
+  /// missing. The card moves with the Movement setting; the backdrop stays put, which
+  /// is what makes it read as a print held over a table rather than a zooming picture.
+  static Future<void> _renderMomentClip({
+    required MomentFrame frame,
+    required String outPath,
+    required double seconds,
+    required int index,
+    required bool isFirst,
+    required bool isLast,
+    ClipMotion motion = ClipMotion.drift,
+  }) async {
+    for (final f in [frame.backgroundPng, frame.cardPng]) {
+      if (!await File(f).exists()) {
+        throw Exception('Picture ${index + 1} was not framed: $f is missing.');
+      }
+    }
+    await _deleteIfExists(outPath);
+
+    final fades = <String>[];
+    if (isFirst) fades.add('fade=t=in:st=0:d=0.5');
+    if (isLast) {
+      final from = (seconds - 0.6) < 0 ? 0.0 : seconds - 0.6;
+      fades.add('fade=t=out:st=${from.toStringAsFixed(2)}:d=0.6');
+    }
+    final fadePart = fades.isEmpty ? '' : ',${fades.join(',')}';
+
+    final swing = index.isEven ? 1 : -1;
+    final filter =
+        '[0:v]scale=$kVideoWidth:$kVideoHeight,setsar=1[back];'
+        '[back][1:v]overlay=x=${_motionX(motion, swing)}:y=${_motionY(motion, swing)},'
+        'format=yuv420p$fadePart[v]';
+
+    final session = await FFmpegKit.executeWithArguments([
+      '-loop', '1', '-i', frame.backgroundPng,
+      '-loop', '1', '-i', frame.cardPng,
+      '-t', seconds.toStringAsFixed(3),
+      '-filter_complex', filter,
+      '-map', '[v]',
+      '-r', '$kFps',
+      // Identical to the plain clips, because the join is a stream copy and a clip
+      // encoded differently breaks it at the seam.
+      '-c:v', 'libx264',
+      '-preset', 'ultrafast',
+      '-crf', '26',
+      '-pix_fmt', 'yuv420p',
+      '-y', outPath,
+    ]);
+
+    await _check(session, 'Rendering picture ${index + 1} failed');
+    if (!await File(outPath).exists()) {
+      throw Exception('Picture ${index + 1} produced no clip.');
     }
   }
 

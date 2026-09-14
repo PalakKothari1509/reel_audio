@@ -1191,6 +1191,11 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// The closing brand card. On by default — it should be on every reel.
   bool _endCard = true;
 
+  /// The Moment look: every picture as a tilted printed photo over a blurred copy of
+  /// itself. Off unless chosen — it changes how every reel looks, so it is a decision
+  /// you make, not something that happens to you.
+  bool _moment = false;
+
   /// Which of Script, Pictures, Voice, Reel is showing. One screen, four views, so
   /// nothing about the state or the pipeline had to move to make it step by step.
   int _step = 0;
@@ -1733,6 +1738,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         motion: _motion,
         // The first caption is swapped for the cover hook whenever captions are on.
         coverOnFirst: _captions,
+        moment: _moment ? await _momentFrames(dir.path, post) : null,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
       );
       // Out of the cache folder and into the app's own storage, with a note of what it
@@ -2268,6 +2274,17 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         AppCard(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
           child: Column(children: [
+            // First in the list because it changes everything else on it: in the
+            // Moment look the caption sits inside the photo, so its position setting
+            // no longer applies.
+            SettingRow(
+              icon: Icons.photo_outlined,
+              label: 'Look',
+              value: _moment ? 'Moment' : 'Plain',
+              valueColour: _moment ? AppColors.accent : AppColors.textFaint,
+              onTap: busy ? null : () => _setLook(() => _moment = !_moment),
+            ),
+            const Divider(height: 1, color: AppColors.border),
             SettingRow(
               icon: Icons.subtitles_outlined,
               label: 'Captions',
@@ -2275,7 +2292,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               valueColour: _captions ? AppColors.primary : AppColors.textFaint,
               onTap: busy ? null : () => _setLook(() => _captions = !_captions),
             ),
-            if (_captions) ...[
+            // Hidden in the Moment look, where the caption always sits inside the photo.
+            if (_captions && !_moment) ...[
               const Divider(height: 1, color: AppColors.border),
               SettingRow(
                 icon: Icons.vertical_align_top,
@@ -2531,6 +2549,36 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     return captions;
   }
 
+  /// Every picture drawn as a Moment frame, with its caption and the cover hook inside.
+  Future<List<MomentFrame>> _momentFrames(String workDir, _ReelText post) async {
+    final frames = <MomentFrame>[];
+    String? cover;
+    if (_captions && _lines.isNotEmpty) {
+      final hook = post.coverHook.trim().isNotEmpty
+          ? post.coverHook.trim()
+          : _lines.first.text;
+      cover = await renderCoverHook(hook, '$workDir/cover_hook.png');
+    }
+
+    for (var i = 0; i < _lines.length; i++) {
+      if (mounted) {
+        setState(() => _status = 'Framing picture ${i + 1} of ${_lines.length}...');
+      }
+      final frame = await renderMomentFrame(
+        imagePath: SlideshowBuilder.imageForLine(_images, i),
+        index: i,
+        workDir: workDir,
+        caption: _captions ? _lines[i].text : '',
+        coverPng: i == 0 ? cover : null,
+      );
+      if (frame == null) {
+        throw Exception('Picture ${i + 1} could not be read to frame it.');
+      }
+      frames.add(frame);
+    }
+    return frames;
+  }
+
   /// Writes the script and pictures back onto the saved story.
   ///
   /// Reads the file first rather than keeping a copy in memory: the story text itself
@@ -2566,6 +2614,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         'captionSpot': _captionSpot.name,
         'motion': _motion.name,
         'endCard': _endCard ? '1' : '0',
+        'moment': _moment ? '1' : '0',
       };
 
   /// What the voice depends on. The times only matter for the line-by-line engines,
@@ -2621,6 +2670,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       final look = project.look;
       if (look['captions'] != null) _captions = look['captions'] == '1';
       if (look['endCard'] != null) _endCard = look['endCard'] == '1';
+      if (look['moment'] != null) _moment = look['moment'] == '1';
       final spot = CaptionSpot.values.where((s) => s.name == look['captionSpot']);
       if (spot.isNotEmpty) _captionSpot = spot.first;
       final motion = ClipMotion.values.where((m) => m.name == look['motion']);

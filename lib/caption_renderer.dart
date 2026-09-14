@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -194,6 +195,223 @@ Future<String?> renderBrandCard(
   tagline.paint(canvas, Offset((w - tagline.width) / 2, y + name.height + gapBeforeName));
 
   final image = await recorder.endRecording().toImage(kVideoWidth, kVideoHeight);
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  image.dispose();
+  if (bytes == null) return null;
+
+  final file = File(outPath);
+  if (await file.exists()) await file.delete();
+  await file.writeAsBytes(bytes.buffer.asUint8List());
+  return outPath;
+}
+
+// ── The Moment look ───────────────────────────────────────────────────────────
+//
+// Each picture becomes a printed photo: shrunk onto a cream card with a thin border,
+// tilted a few degrees with a soft shadow, laid over a blurred and washed-out copy of
+// the same picture. The caption is written inside the photo in a serif storybook
+// face, and the channel's name runs along the bottom of it.
+//
+// Drawn here rather than in FFmpeg because every part of it is still. Flutter already
+// blurs, rotates, shadows and shapes Devanagari properly; doing the same in a filter
+// graph would be slower on a phone and would break on any build missing one filter.
+
+/// Photo paper: warm white, not screen white, which looks clinical next to watercolour.
+const _paper = Color(0xFFFBF7EF);
+const _ink = Color(0xFF3B332B);
+
+/// Draws one picture in the Moment look. Returns null if the picture cannot be read.
+Future<MomentFrame?> renderMomentFrame({
+  required String imagePath,
+  required int index,
+  required String workDir,
+  /// The line for this picture, written inside the photo. Empty for none.
+  String caption = '',
+  /// The cover hook PNG for the first picture, drawn in place of the caption.
+  String? coverPng,
+}) async {
+  final picture = await _loadImage(imagePath, 1080);
+  if (picture == null) return null;
+
+  final w = kVideoWidth.toDouble();
+  final h = kVideoHeight.toDouble();
+
+  // ── The backdrop: the same picture, blurred and washed pale ──
+  final backRec = ui.PictureRecorder();
+  final back = Canvas(backRec);
+  back.drawRect(Rect.fromLTWH(0, 0, w, h), Paint()..color = _paper);
+  back.saveLayer(Rect.fromLTWH(0, 0, w, h),
+    Paint()..imageFilter = ui.ImageFilter.blur(sigmaX: 36, sigmaY: 36));
+  _drawCover(back, picture, Rect.fromLTWH(-40, -40, w + 80, h + 80));
+  back.restore();
+  // Washed out, so the card is the thing you look at and the backdrop is only mood.
+  back.drawRect(Rect.fromLTWH(0, 0, w, h), Paint()..color = _paper.withOpacity(0.5));
+
+  // ── The card ──
+  final cardRec = ui.PictureRecorder();
+  final card = Canvas(cardRec);
+
+  const photoW = 800.0;
+  const photoH = photoW * 16 / 9;
+  const side = 22.0;
+  // A slightly deeper bottom edge, like a real print, which also gives the name room.
+  const bottom = 58.0;
+  const cardW = photoW + side * 2;
+  const cardH = photoH + side + bottom;
+
+  // Alternating tilt, so a run of pictures looks like prints laid down by hand rather
+  // than the same frame stamped seven times.
+  final angle = (index.isEven ? -1 : 1) * 3.5 * math.pi / 180;
+
+  card.save();
+  card.translate(w / 2, h / 2);
+  card.rotate(angle);
+  card.translate(-cardW / 2, -cardH / 2);
+
+  final cardRect = RRect.fromRectAndRadius(
+    const Rect.fromLTWH(0, 0, cardW, cardH), const Radius.circular(6));
+
+  card.drawRRect(
+    cardRect.shift(const Offset(10, 20)),
+    Paint()
+      ..color = const Color(0x55000000)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 26),
+  );
+  card.drawRRect(cardRect, Paint()..color = _paper);
+
+  const photo = Rect.fromLTWH(side, side, photoW, photoH);
+  card.save();
+  card.clipRect(photo);
+  card.drawRect(photo, Paint()..color = const Color(0xFFF1EADF));
+  // The whole picture, never cropped: the complaint that started fit-not-fill was
+  // heads cut off at the edges, and a smaller frame makes that worse, not better.
+  _drawContain(card, picture, photo);
+  card.restore();
+
+  // A faint line where the print meets the paper.
+  card.drawRect(photo, Paint()
+    ..color = const Color(0x14000000)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.5);
+
+  // ── Words inside the photo ──
+  if (coverPng != null && await File(coverPng).exists()) {
+    final cover = await _loadImage(coverPng, null);
+    if (cover != null) {
+      final scale = (photoW * 0.9) / cover.width;
+      final cw = cover.width * scale;
+      final ch = cover.height * scale;
+      card.drawImageRect(cover,
+        Rect.fromLTWH(0, 0, cover.width.toDouble(), cover.height.toDouble()),
+        Rect.fromLTWH(side + (photoW - cw) / 2, side + 40, cw, ch),
+        Paint()..filterQuality = FilterQuality.high);
+      cover.dispose();
+    }
+  } else if (caption.trim().isNotEmpty) {
+    final text = _storybookText(caption.trim(), 46, FontWeight.w600, FontStyle.normal,
+      maxWidth: photoW * 0.84, maxLines: 4);
+    text.paint(card, Offset(side + (photoW - text.width) / 2, side + 44));
+  }
+
+  // The channel's name on every picture, where the screenshot has it: in italics along
+  // the bottom of the photo, between two small flowers.
+  final name = _storybookText(kBrandName, 36, FontWeight.w500, FontStyle.italic,
+    maxWidth: photoW * 0.8, maxLines: 1);
+  final nameY = side + photoH - name.height - 28;
+  name.paint(card, Offset(side + (photoW - name.width) / 2, nameY));
+  final flowerY = nameY + name.height / 2;
+  _flower(card, Offset(side + (photoW - name.width) / 2 - 30, flowerY));
+  _flower(card, Offset(side + (photoW + name.width) / 2 + 30, flowerY));
+
+  card.restore();
+
+  final bgPath = await _savePng(backRec, kVideoWidth, kVideoHeight,
+    '$workDir/moment_bg_$index.png');
+  final cardPath = await _savePng(cardRec, kVideoWidth, kVideoHeight,
+    '$workDir/moment_card_$index.png');
+  picture.dispose();
+
+  if (bgPath == null || cardPath == null) return null;
+  return MomentFrame(bgPath, cardPath);
+}
+
+/// Serif, dark, with a soft paper-coloured glow behind it so it reads over a busy
+/// patch of the picture without needing the white box the plain captions use.
+TextPainter _storybookText(String text, double size, FontWeight weight, FontStyle style,
+    {required double maxWidth, required int maxLines}) {
+  const glow = Color(0xF2FFFBF3);
+  return TextPainter(
+    text: TextSpan(text: text, style: TextStyle(
+      fontFamily: 'serif',
+      fontSize: size,
+      fontWeight: weight,
+      fontStyle: style,
+      color: _ink,
+      height: 1.3,
+      shadows: const [
+        Shadow(color: glow, blurRadius: 18),
+        Shadow(color: glow, blurRadius: 8),
+        Shadow(color: glow, blurRadius: 3),
+      ],
+    )),
+    textAlign: TextAlign.center,
+    textDirection: TextDirection.ltr,
+    maxLines: maxLines,
+    ellipsis: '…',
+  )..layout(maxWidth: maxWidth);
+}
+
+/// A small five-petal flower beside the name.
+void _flower(Canvas canvas, Offset centre) {
+  const petal = Color(0xFFE9A6A6);
+  const heart = Color(0xFFE8C26A);
+  for (var i = 0; i < 5; i++) {
+    final a = i * 2 * math.pi / 5;
+    canvas.drawCircle(
+      centre + Offset(7 * math.cos(a), 7 * math.sin(a)), 6, Paint()..color = petal);
+  }
+  canvas.drawCircle(centre, 4.5, Paint()..color = heart);
+}
+
+void _drawCover(Canvas canvas, ui.Image image, Rect target) {
+  final scale = [target.width / image.width, target.height / image.height]
+      .reduce((a, b) => a > b ? a : b);
+  _drawScaled(canvas, image, target, scale);
+}
+
+void _drawContain(Canvas canvas, ui.Image image, Rect target) {
+  final scale = [target.width / image.width, target.height / image.height]
+      .reduce((a, b) => a < b ? a : b);
+  _drawScaled(canvas, image, target, scale);
+}
+
+void _drawScaled(Canvas canvas, ui.Image image, Rect target, double scale) {
+  final dw = image.width * scale;
+  final dh = image.height * scale;
+  canvas.drawImageRect(
+    image,
+    Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+    Rect.fromLTWH(target.left + (target.width - dw) / 2,
+      target.top + (target.height - dh) / 2, dw, dh),
+    Paint()..filterQuality = FilterQuality.high,
+  );
+}
+
+/// Reads a picture off disk, shrunk to [width] when given so a 4000-pixel photo from a
+/// camera does not take a phone's memory with it.
+Future<ui.Image?> _loadImage(String path, int? width) async {
+  try {
+    final bytes = await File(path).readAsBytes();
+    final codec = await ui.instantiateImageCodec(bytes, targetWidth: width);
+    return (await codec.getNextFrame()).image;
+  } catch (_) {
+    return null;
+  }
+}
+
+Future<String?> _savePng(
+    ui.PictureRecorder recorder, int width, int height, String outPath) async {
+  final image = await recorder.endRecording().toImage(width, height);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
   image.dispose();
   if (bytes == null) return null;
