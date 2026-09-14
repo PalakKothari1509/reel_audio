@@ -182,7 +182,7 @@ Rules:
     // A busy or rate-limited Gemini is not a reason to try again immediately with a
     // second call, so this one is passed up as a real error rather than a fallback.
     throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode)
+        ? geminiBusyMessage(response.statusCode, response.body)
         : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 
@@ -341,7 +341,7 @@ different one.
 
   if (response.statusCode != 200) {
     throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode)
+        ? geminiBusyMessage(response.statusCode, response.body)
         : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 

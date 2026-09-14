@@ -209,7 +209,7 @@ Return ONLY valid JSON:
     // Still busy after every retry. Say that plainly — the raw JSON reads like the
     // app is broken when the only thing wrong is Google's load at this minute.
     throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode)
+        ? geminiBusyMessage(response.statusCode, response.body)
         : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 
@@ -312,7 +312,7 @@ The child should work it out or be shown, not told off. Keep every value under 2
     // Still busy after every retry. Say that plainly — the raw JSON reads like the
     // app is broken when the only thing wrong is Google's load at this minute.
     throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode)
+        ? geminiBusyMessage(response.statusCode, response.body)
         : 'Gemini error ${response.statusCode}: ${response.body}');
   }
 

@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 // ── One place that talks to Gemini ────────────────────────────────────────────
 //
@@ -41,10 +45,48 @@ Duration? _googlesOwnDelay(String body) {
   return Duration(seconds: seconds.clamp(1, 60) + 1);
 }
 
-/// Models this key has already answered 404 for, so a name Google has renamed or
-/// never offered is tried once and then left alone rather than wasting a request
-/// before every single call.
-final Set<String> _missingModels = {};
+/// True when a 429 is the DAILY free allowance running out, not the per-minute one.
+///
+/// Google says which in the error: the quota's name has "PerDay" or "PerMinute" in it.
+/// A per-minute limit is worth waiting out — a minute later it works. A per-day one is
+/// not, and every retry against it is another request thrown at a wall, spending the
+/// wait for nothing and telling you nothing new.
+bool isDailyLimit(String body) => body.contains('PerDay');
+
+/// Models this key has answered 404 for, kept on the phone with the day they failed.
+///
+/// Kept across launches: in memory only, the missing model was tried again — and
+/// failed again — every time the app opened. Forgotten after a week, because Google
+/// does add models to keys, and a name missing today may be there next month.
+final Map<String, DateTime> _missingModels = {};
+bool _missingLoaded = false;
+
+Future<File> _missingFile() async =>
+    File('${(await getApplicationDocumentsDirectory()).path}/missing_models.json');
+
+Future<void> _loadMissing() async {
+  if (_missingLoaded) return;
+  _missingLoaded = true;
+  try {
+    final f = await _missingFile();
+    if (!await f.exists()) return;
+    final raw = jsonDecode(await f.readAsString());
+    if (raw is! Map) return;
+    final cutoff = DateTime.now().subtract(const Duration(days: 7));
+    raw.forEach((name, when) {
+      final t = DateTime.tryParse('$when');
+      if (t != null && t.isAfter(cutoff)) _missingModels['$name'] = t;
+    });
+  } catch (_) {}
+}
+
+Future<void> _rememberMissing(String model) async {
+  _missingModels[model] = DateTime.now();
+  try {
+    await (await _missingFile()).writeAsString(jsonEncode(
+      _missingModels.map((k, v) => MapEntry(k, v.toIso8601String()))));
+  } catch (_) {}
+}
 
 /// Posts to a Gemini text model and hands back the response.
 ///
@@ -65,8 +107,9 @@ Future<http.Response> geminiPost({
   /// Called between tries, so a wait does not look like a hang.
   void Function(String message)? onWait,
 }) async {
+  await _loadMissing();
   var chosen = model;
-  if (_missingModels.contains(chosen) && fallbackModel != null) {
+  if (_missingModels.containsKey(chosen) && fallbackModel != null) {
     chosen = fallbackModel;
   }
 
@@ -82,7 +125,7 @@ Future<http.Response> geminiPost({
   ).timeout(timeout);
 
   if (response.statusCode == 404 && fallbackModel != null && chosen != fallbackModel) {
-    _missingModels.add(chosen);
+    await _rememberMissing(chosen);
     chosen = fallbackModel;
     url = urlFor(chosen);
     response = await http.post(
@@ -94,6 +137,8 @@ Future<http.Response> geminiPost({
 
   for (final fallback in _backoff) {
     if (!_retryable.contains(response.statusCode)) return response;
+    // Out for the day: stop here rather than spend four more requests learning it.
+    if (response.statusCode == 429 && isDailyLimit(response.body)) return response;
 
     // Google's own number wins when it gives one.
     final wait = _googlesOwnDelay(response.body) ?? fallback;
@@ -122,8 +167,18 @@ Future<http.Response> geminiPost({
 ///
 /// Separate from the code because the answer is "wait a bit", not "something is
 /// broken", and the raw JSON says the opposite to anyone reading it.
-String geminiBusyMessage(int statusCode) => statusCode == 503
-    ? 'Gemini is overloaded right now. This is at their end and usually passes in a '
-        'minute or two. Your story is saved — try again shortly.'
-    : 'Gemini has run out of free requests for the moment. Your story is saved, so '
-        'nothing is lost — wait a minute and tap it again.';
+String geminiBusyMessage(int statusCode, [String body = '']) {
+  if (statusCode == 503) {
+    return 'Gemini is overloaded right now. This is at their end and usually passes in '
+        'a minute or two. Your story is saved — try again shortly.';
+  }
+  // Said differently because the advice is different: waiting a minute will not help,
+  // and tapping again and again only fails again.
+  if (isDailyLimit(body)) {
+    return 'Today\'s free Gemini requests are used up. They reset tomorrow. Your story '
+        'is saved — nothing is lost. Reels you already made still open, and the '
+        'caption sheet still works.';
+  }
+  return 'Gemini has run out of free requests for the moment. Your story is saved, so '
+      'nothing is lost — wait a minute and tap it again.';
+}

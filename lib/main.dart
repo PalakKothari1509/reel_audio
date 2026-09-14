@@ -168,7 +168,7 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
   if (response.statusCode != 200) {
     // Still busy after the retries. Say so plainly rather than handing over the JSON.
     throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode)
+        ? geminiBusyMessage(response.statusCode, response.body)
         : 'Gemini API error ${response.statusCode}: ${response.body}');
   }
 
@@ -1516,7 +1516,6 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       final dir = await getTemporaryDirectory();
       final style = widget.style.replaceAll(RegExp(r'[^\w\s-]'), '').trim();
       final wav = await speakSample(
-        basePath: '${dir.path}/sample_voice',
         apiKey: _geminiKey,
         style: style,
         onWait: (message) { if (mounted) setState(() => _status = message); },

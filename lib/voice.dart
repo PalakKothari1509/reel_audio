@@ -4,6 +4,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+
+import 'gemini_call.dart';
 
 // ── Which voice speaks the script ─────────────────────────────────────────────
 //
@@ -128,18 +131,35 @@ String voiceDirection(String style) =>
 ///
 /// Worth a request: picking the voice by its description alone means finding out it
 /// was wrong after the script, the pictures and five minutes of rendering.
+///
+/// Kept after the first time, one file per voice and tone. The sample line never
+/// changes, so the second Play of the same voice would buy exactly the same audio — and
+/// comparing voices means pressing Play on each of them several times over.
 Future<String> speakSample({
-  required String basePath,
   required String apiKey,
   required String style,
   void Function(String message)? onWait,
-}) =>
-    _geminiSpeak(
-      text: '${voiceDirection(style)}\n\n$kVoiceSampleText',
-      outPath: '$basePath.wav',
-      apiKey: apiKey,
-      onWait: onWait,
-    );
+}) async {
+  final dir = Directory(
+    '${(await getApplicationDocumentsDirectory()).path}/voice_samples');
+  if (!await dir.exists()) await dir.create(recursive: true);
+
+  // The version goes in the name so that changing the sample line or the direction
+  // in an update is heard, instead of the old saved sample playing forever.
+  final tone = style.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+  final path = '${dir.path}/v$_sampleVersion-$geminiVoiceName-$tone.wav';
+  if (await File(path).exists()) return path;
+
+  return _geminiSpeak(
+    text: '${voiceDirection(style)}\n\n$kVoiceSampleText',
+    outPath: path,
+    apiKey: apiKey,
+    onWait: onWait,
+  );
+}
+
+/// Bump when kVoiceSampleText or voiceDirection changes, so saved samples are remade.
+const _sampleVersion = 1;
 
 // ── One call, whichever engine ────────────────────────────────────────────────
 
@@ -275,6 +295,12 @@ Future<String> _geminiSpeak({
   // not ours — another app on the same key, or a retry after an error, can still push
   // us over. Google says how long to wait, so wait that long and go again rather than
   // throwing away the whole script.
+  // Out of today's voice requests: waiting and trying again only spends another request
+  // to hear the same answer, so say so and stop.
+  if (response.statusCode == 429 && isDailyLimit(response.body)) {
+    throw Exception('Today\'s free Gemini voice requests are used up. They reset '
+        'tomorrow. Your story is saved. For a reel today, switch the voice to Phone.');
+  }
   if (response.statusCode == 429) {
     final seconds = _retryAfterSeconds(response.body);
     for (var left = seconds; left > 0; left--) {
