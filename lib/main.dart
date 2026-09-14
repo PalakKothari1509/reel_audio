@@ -587,7 +587,7 @@ class _StoryScreenState extends State<StoryScreen> {
       if (chosen.style.isNotEmpty) _style = chosen.style;
       if (chosen.language.isNotEmpty) _language = chosen.language;
       _seconds = chosen.seconds;
-      _status = 'Opened "${chosen.title}".';
+      _status = 'Opened "${chosen.displayName}".';
     });
   }
 
@@ -3307,9 +3307,18 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            child: Text(p.title, maxLines: 2, overflow: TextOverflow.ellipsis,
+            child: Text(p.displayName, maxLines: 2, overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.edit_outlined, color: AppColors.primary),
+            title: Text(p.name.trim().isEmpty ? 'Name this story' : 'Rename'),
+            subtitle: const Text('So you can find it at a glance'),
+            onTap: () {
+              Navigator.pop(ctx);
+              _rename(p);
+            },
           ),
           if (hasReel)
             ListTile(
@@ -3405,12 +3414,53 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
     setState(() { _projects = all; _loading = false; });
   }
 
+  /// Gives a story a heading of your own, so it can be found without opening it.
+  ///
+  /// Saving an empty box goes back to the automatic title from the story's first line.
+  Future<void> _rename(Project p) async {
+    final ctrl = TextEditingController(text: p.name.trim().isNotEmpty ? p.name : '');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Story name'),
+        content: Column(mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, children: [
+          TextField(
+            controller: ctrl,
+            autofocus: true,
+            maxLength: 60,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+              hintText: 'e.g. Ria brush nahi karegi — park wali'),
+            onSubmitted: (v) => Navigator.pop(ctx, v),
+          ),
+          const SizedBox(height: 4),
+          Text('Right now: ${p.title}', maxLines: 2, overflow: TextOverflow.ellipsis,
+            style: AppText.small),
+        ]),
+        actions: [
+          if (p.name.trim().isNotEmpty)
+            TextButton(onPressed: () => Navigator.pop(ctx, ''),
+              child: const Text('Use automatic')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Save')),
+        ],
+      ),
+    );
+    if (result == null) return;
+
+    final name = result.trim();
+    await ProjectStore.update(p.id, (x) => x.copyWith(name: name));
+    await _load();
+  }
+
   Future<void> _delete(Project p) async {
     final sure = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete this story?'),
-        content: Text('"${p.title}" will be gone for good.',
+        content: Text('"${p.displayName}" will be gone for good.',
           style: AppText.hint),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false),
@@ -3498,12 +3548,20 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                             Expanded(child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(p.title,
+                                Text(p.displayName,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.text, height: 1.3)),
+                                // With a name of your own, the story's first line still
+                                // shows underneath, so two stories named alike can be
+                                // told apart.
+                                if (p.name.trim().isNotEmpty) ...[
+                                  const SizedBox(height: 2),
+                                  Text(p.title, maxLines: 1,
+                                    overflow: TextOverflow.ellipsis, style: AppText.small),
+                                ],
                                 const SizedBox(height: 6),
                                 Row(children: [
                                   Text(_when(p.savedAt), style: AppText.small),
@@ -3527,6 +3585,12 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                                 child: Icon(Icons.movie, size: 20,
                                   color: AppColors.primary),
                               ),
+                            IconButton(
+                              tooltip: 'Name this story',
+                              icon: const Icon(Icons.edit_outlined, size: 20,
+                                color: AppColors.primary),
+                              onPressed: () => _rename(p),
+                            ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline, size: 20,
                                 color: AppColors.textFaint),

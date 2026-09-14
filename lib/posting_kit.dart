@@ -76,7 +76,7 @@ class _PostingKitState extends State<_PostingKit> {
       try {
         final post = promptsFromSaved(project.promptsJson, project.promptsScript).post;
         storyContext = [
-          project.title,
+          project.displayName,
           if (post.moralLine.isNotEmpty) 'Lesson: ${post.moralLine}',
         ].join('. ');
 
@@ -119,7 +119,7 @@ class _PostingKitState extends State<_PostingKit> {
     setState(() {
       _items = items;
       _edits = Map.of(project?.edits ?? const {});
-      _title = project?.title ?? 'Reel';
+      _title = project?.displayName ?? 'Reel';
       _posted = posts.any((p) => p.projectId == widget.projectId);
       _loading = false;
     });

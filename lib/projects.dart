@@ -94,6 +94,14 @@ class Project {
   /// instead of inviting a second copy.
   final bool inGallery;
 
+  /// A heading you gave the story yourself. Kept apart from [title], which is worked out
+  /// from the first line of the story and rewritten on every autosave — a name typed into
+  /// title would be overwritten the next time the story was touched. Empty means none.
+  final String name;
+
+  /// What the story is shown as: your name for it, or the automatic title.
+  String get displayName => name.trim().isNotEmpty ? name.trim() : title;
+
   const Project({
     required this.id,
     required this.title,
@@ -117,6 +125,7 @@ class Project {
     this.reelPath = '',
     this.reelKey = '',
     this.inGallery = false,
+    this.name = '',
   });
 
   /// First few words of the story, which is what you will recognise it by.
@@ -163,6 +172,7 @@ class Project {
         'reelPath': reelPath,
         'reelKey': reelKey,
         'inGallery': inGallery,
+        'name': name,
       };
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
@@ -191,6 +201,7 @@ class Project {
         reelPath: json['reelPath'] as String? ?? '',
         reelKey: json['reelKey'] as String? ?? '',
         inGallery: json['inGallery'] as bool? ?? false,
+        name: json['name'] as String? ?? '',
       );
 
   /// Every field has to be carried through here, including the ones nothing calls
@@ -217,6 +228,7 @@ class Project {
     String? reelPath,
     String? reelKey,
     bool? inGallery,
+    String? name,
   }) =>
       Project(
         id: id,
@@ -241,6 +253,7 @@ class Project {
         reelPath: reelPath ?? this.reelPath,
         reelKey: reelKey ?? this.reelKey,
         inGallery: inGallery ?? this.inGallery,
+        name: name ?? this.name,
       );
 }
 
