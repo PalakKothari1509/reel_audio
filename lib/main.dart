@@ -14,6 +14,7 @@ import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'gemini_call.dart';
 import 'video_builder.dart';
 import 'voice.dart';
+import 'posting_kit.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
 import 'prompts.dart';
@@ -475,25 +476,38 @@ class _StoryScreenState extends State<StoryScreen> {
   /// is long enough to stop that without being long enough to lose a sentence.
   void _autoSave() {
     _saveTimer?.cancel();
-    _saveTimer = Timer(const Duration(milliseconds: 1200), () {
+    _saveTimer = Timer(const Duration(milliseconds: 1200), () async {
+      // Refreshes the main button, which says "continue" or "write" depending on
+      // whether this exact text already has a script.
+      if (mounted) setState(() {});
+
       final story = _descCtrl.text.trim();
       if (story.length < 12) return;
 
-      _project = (_project ?? Project(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            title: '',
-            savedAt: DateTime.now(),
-            story: '',
-          ))
-          .copyWith(
-            title: Project.titleFrom(story),
-            story: story,
-            style: _style,
-            language: _language,
-            seconds: _seconds,
-          );
-      ProjectStore.save(_project!);
+      _project = (await _freshProject()).copyWith(
+        title: Project.titleFrom(story),
+        story: story,
+        style: _style,
+        language: _language,
+        seconds: _seconds,
+      );
+      await ProjectStore.save(_project!);
     });
+  }
+
+  /// This story as it is on disk now, not as this screen last saw it.
+  ///
+  /// The script, pictures, voice, reel and edits are all written by other screens.
+  /// Saving from the copy held here would put back whatever it held when you left —
+  /// one keystroke after coming back from a finished reel would have wiped the reel.
+  Future<Project> _freshProject() async {
+    if (_project != null) return await loadProject(_project!.id) ?? _project!;
+    return Project(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: '',
+      savedAt: DateTime.now(),
+      story: '',
+    );
   }
 
   /// Opens the saved stories, and puts the chosen one back in the box.
@@ -671,25 +685,29 @@ class _StoryScreenState extends State<StoryScreen> {
 
   /// [prompts] is set when the script and the prompts arrived in the same reply, so
   /// they can be written down now and the prompts screen never has to ask for them.
-  void _openScript(List<ScriptLine> lines, {PromptSet? prompts}) {
+  Future<void> _openScript(List<ScriptLine> lines, {PromptSet? prompts}) async {
     // Saved before leaving rather than after coming back: the whole point is that a
     // failure on the next screen cannot take the story with it.
     _saveTimer?.cancel();
     final story = _descCtrl.text.trim();
-    _project = (_project ?? Project(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          title: '', savedAt: DateTime.now(), story: ''))
+    _project = (await _freshProject())
         .copyWith(
           title: Project.titleFrom(story), story: story,
           style: _style, language: _language, seconds: _seconds,
-          script: lines.map(scriptLineToText).toList(),
+          // Null for "write it myself", which opens an empty editor. Saving that empty
+          // list would have wiped a script this story already had.
+          script: lines.isEmpty ? null : lines.map(scriptLineToText).toList(),
+          scriptStoryKey: lines.isEmpty ? null : fingerprint(story),
           promptsJson: prompts?.rawJson,
           // Matched against the on-screen text later, so it has to be that and not
           // the timestamped form, or the cache never recognises itself.
           promptsScript: prompts == null
               ? null : lines.map((l) => l.text).toList(),
         );
-    ProjectStore.save(_project!);
+    // Awaited: the next screen reads this story straight back off disk to restore the
+    // voice and reel, and would find the old version if it got there first.
+    await ProjectStore.save(_project!);
+    if (!mounted) return;
 
     Navigator.push(context, MaterialPageRoute(
       builder: (_) => TimedScriptScreen(
@@ -706,11 +724,30 @@ class _StoryScreenState extends State<StoryScreen> {
     ));
   }
 
-  Future<void> _generate() async {
+  /// True when this exact story already has a script written for it.
+  ///
+  /// Checked against a fingerprint of the story text rather than just "has a script",
+  /// because the story autosaves as you edit it — a script written for yesterday's
+  /// version is not a script for today's.
+  bool get _hasSavedScript =>
+      _project != null &&
+      _project!.script.isNotEmpty &&
+      _project!.scriptStoryKey == fingerprint(_descCtrl.text.trim());
+
+  /// Opens the script already written for this story. No request.
+  void _continueSaved() {
+    final lines = parseScript(_project!.script.join('\n'));
+    if (lines.isEmpty) { _generate(force: true); return; }
+    _openScript(lines);
+  }
+
+  /// [force] writes a new script even when this story already has one.
+  Future<void> _generate({bool force = false}) async {
     if (_descCtrl.text.trim().isEmpty) {
       setState(() => _status = 'Type what happens in the story first — without it Gemini makes one up.');
       return;
     }
+    if (!force && _hasSavedScript) { _continueSaved(); return; }
     setState(() { _isGenerating = true; _status = 'Writing the script with Gemini...'; });
     final story = _descCtrl.text.trim();
     final expectedLines = (_seconds / 4).floor().clamp(4, 20);
@@ -854,19 +891,33 @@ class _StoryScreenState extends State<StoryScreen> {
                 content: Text('Copied'), duration: Duration(seconds: 1)));
             }),
             PrimaryButton(
-              label: _isGenerating ? 'Writing the script...' : 'Write the script',
-              icon: Icons.auto_awesome,
+              // Says "continue" when the script already exists, because that is what
+              // it does — and a button that says "write" teaches you to expect a
+              // request and a new script every time you press it.
+              label: _isGenerating
+                  ? 'Writing the script...'
+                  : _hasSavedScript ? 'Continue with this story' : 'Write the script',
+              icon: _hasSavedScript ? Icons.arrow_forward : Icons.auto_awesome,
               loading: _isGenerating,
               onPressed: _generate,
             ),
             Gap.s,
-            TextButton.icon(
-              onPressed: _isGenerating ? null : () => _openScript(const []),
-              icon: const Icon(Icons.edit_outlined, size: 17),
-              label: const Text('Or write the script myself',
-                style: TextStyle(fontSize: 14)),
-              style: TextButton.styleFrom(foregroundColor: AppColors.textSoft),
-            ),
+            if (_hasSavedScript)
+              TextButton.icon(
+                onPressed: _isGenerating ? null : () => _generate(force: true),
+                icon: const Icon(Icons.refresh, size: 17),
+                label: const Text('Write a new script instead (uses a request)',
+                  style: TextStyle(fontSize: 13)),
+                style: TextButton.styleFrom(foregroundColor: AppColors.textSoft),
+              )
+            else
+              TextButton.icon(
+                onPressed: _isGenerating ? null : () => _openScript(const []),
+                icon: const Icon(Icons.edit_outlined, size: 17),
+                label: const Text('Or write the script myself',
+                  style: TextStyle(fontSize: 14)),
+                style: TextButton.styleFrom(foregroundColor: AppColors.textSoft),
+              ),
           ]),
         ),
       ]),
@@ -1158,6 +1209,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     _textCtrls = _lines.map((l) => TextEditingController(text: l.text)).toList();
     _timeCtrls = _lines.map((l) => TextEditingController(text: fmtDuration(l.time))).toList();
     _initTts();
+    // Brings back the pictures, voice and settings this story was left with, and finds
+    // the reel if one was already made — so coming back never means starting over.
+    _restoreFromProject();
   }
 
   VoiceProfile get _vp => kVoiceProfiles[widget.style] ?? const VoiceProfile(0.55, 1.1);
@@ -1218,6 +1272,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     // the audio depends on them. The phone and ElevenLabs are different: their track
     // is BUILT to those timestamps with silence between the lines, so there a time
     // change really does make the saved audio wrong.
+    // Any edit at all means the saved reel shows something different from the screen.
+    if (wordsChanged || timesChanged) _matchingReel = null;
+
     final voiceIsOneTake = _engine == VoiceEngine.gemini;
     final voiceStale = wordsChanged || (timesChanged && !voiceIsOneTake);
 
@@ -1424,13 +1481,17 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     );
 
     if (chosen == null || !mounted) return;
+    // Same voice picked again: keep what was recorded with it.
+    if (chosen == geminiVoiceName) return;
     setState(() {
       geminiVoiceName = chosen;
       // The saved voice was spoken by the old one, so it no longer matches the choice.
       _audioPath = null;
       _lineStarts = [];
+      _matchingReel = null;
       _status = 'Voice set to $chosen. Tap Hear it, or Save Voice to use it.';
     });
+    _saveProject();
   }
 
   /// Speaks every line to its own file, then lays them out on a timeline with FFmpeg.
@@ -1445,6 +1506,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     if (_engine == VoiceEngine.gemini) {
       try {
         await _saveGeminiInOnePass();
+        // Kept, so this is the last request this voice ever costs.
+        await _persistVoice();
         setState(() {
           _status = _storyMode
               ? '✅ Voice ready. Now tap Build Video.'
@@ -1549,6 +1612,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
       // This track was built to the script's own timestamps, so the pictures follow them.
       _lineStarts = _lines.map((l) => l.time.inMilliseconds / 1000.0).toList();
+      await _persistVoice();
 
       // Says which button to press next, and doesn't call the phone's voice "AI".
       setState(() {
@@ -1625,6 +1689,16 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       setState(() => _status = 'Tap Save Voice first.');
       return;
     }
+
+    // Already made from exactly this? Then open it. Rebuilding an identical reel costs
+    // minutes and gives you the same file you already had.
+    await _checkSavedReel();
+    if (_matchingReel != null) {
+      if (!mounted) return;
+      _openReel(_matchingReel!);
+      return;
+    }
+
     setState(() { _isMerging = true; _status = 'Building the video...'; });
     try {
       final dir = await getTemporaryDirectory();
@@ -1657,13 +1731,30 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             : null,
         captionSpot: _captionSpot,
         motion: _motion,
+        // The first caption is swapped for the cover hook whenever captions are on.
+        coverOnFirst: _captions,
         onStatus: (message) { if (mounted) setState(() => _status = message); },
       );
+      // Out of the cache folder and into the app's own storage, with a note of what it
+      // was made from. This is what lets you leave, come back, and find it waiting.
+      var reelPath = outPath;
+      if (widget.projectId.isNotEmpty) {
+        reelPath = await keepFile(outPath, 'reels', '${widget.projectId}.mp4');
+        final project = await loadProject(widget.projectId);
+        if (project != null) {
+          await ProjectStore.save(project.copyWith(
+            reelPath: reelPath,
+            reelKey: await _reelKey(),
+            // A new reel is a new file the gallery has not seen.
+            inGallery: false,
+            look: _lookMap(),
+          ));
+        }
+      }
+
       if (!mounted) return;
-      setState(() { _status = ''; _isMerging = false; });
-      Navigator.push(context, MaterialPageRoute(
-        builder: (_) => PreviewMergedScreen(mergedFile: File(outPath)),
-      ));
+      setState(() { _status = ''; _isMerging = false; _matchingReel = reelPath; });
+      _openReel(reelPath);
       return;
     } catch (e) {
       setState(() { _status = '❌ $e'; });
@@ -1765,6 +1856,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         onTap: (i) {
           if (i == 0) { Navigator.pop(context); return; }
           setState(() => _step = i - 1);
+          if (_step == 3) _checkSavedReel();
         },
       ),
       Expanded(child: _stepBody(busy)),
@@ -1796,8 +1888,33 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         if (_step < 3)
           PrimaryButton(
             label: 'Next: ${kSteps[_step + 2].toLowerCase()}',
-            onPressed: busy ? null : () => setState(() => _step += 1),
+            onPressed: busy ? null : () {
+              setState(() => _step += 1);
+              // Arriving at the last step is when "is it already made?" matters.
+              if (_step == 3) _checkSavedReel();
+            },
           )
+        // A reel already made from exactly this: the main button opens it, and making
+        // it again is still possible but no longer the thing you reach for by default.
+        else if (_matchingReel != null) ...[
+          PrimaryButton(
+            label: 'Open your reel',
+            icon: Icons.play_circle_outline,
+            onPressed: busy ? null : () => _openReel(_matchingReel!),
+          ),
+          TextButton(
+            onPressed: busy ? null : () async {
+              final project = await loadProject(widget.projectId);
+              if (project != null) {
+                await ProjectStore.save(project.copyWith(reelKey: ''));
+              }
+              setState(() => _matchingReel = null);
+              await _makeReel();
+            },
+            child: const Text('Build it again anyway',
+              style: TextStyle(fontSize: 13, color: AppColors.textSoft)),
+          ),
+        ]
         else ...[
           if (_notReadyReason.isNotEmpty)
             Padding(
@@ -2005,6 +2122,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               onTap: busy ? null : () => setState(() {
                 _images.removeAt(i);
                 _status = '';
+                _matchingReel = null;
+                // Remembered, or the removed picture comes back next time it opens.
+                _saveProject();
               }),
               child: Stack(children: [
                 ClipRRect(
@@ -2044,12 +2164,19 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         ...VoiceEngine.values.map((e) => Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: GestureDetector(
-            onTap: busy ? null : () => setState(() {
-              _engine = e;
-              _audioPath = null;
-              _lineStarts = [];
-              _status = '';
-            }),
+            onTap: busy ? null : () {
+              // Tapping the engine already chosen is not a change, and must not throw
+              // away a voice that took a request to make.
+              if (_engine == e) return;
+              setState(() {
+                _engine = e;
+                _audioPath = null;
+                _lineStarts = [];
+                _matchingReel = null;
+                _status = '';
+              });
+              _saveProject();
+            },
             child: AppCard(
               colour: _engine == e ? AppColors.primarySoft : AppColors.surface,
               borderColour: _engine == e ? AppColors.primary : AppColors.border,
@@ -2146,7 +2273,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               label: 'Captions',
               value: _captions ? 'On' : 'Off',
               valueColour: _captions ? AppColors.primary : AppColors.textFaint,
-              onTap: busy ? null : () => setState(() => _captions = !_captions),
+              onTap: busy ? null : () => _setLook(() => _captions = !_captions),
             ),
             if (_captions) ...[
               const Divider(height: 1, color: AppColors.border),
@@ -2154,7 +2281,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
                 icon: Icons.vertical_align_top,
                 label: 'Caption position',
                 value: captionSpotLabel(_captionSpot),
-                onTap: busy ? null : () => setState(() {
+                onTap: busy ? null : () => _setLook(() {
                   _captionSpot = CaptionSpot.values[
                       (_captionSpot.index + 1) % CaptionSpot.values.length];
                 }),
@@ -2165,7 +2292,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               icon: Icons.animation,
               label: 'Movement',
               value: clipMotionLabel(_motion),
-              onTap: busy ? null : () => setState(() {
+              onTap: busy ? null : () => _setLook(() {
                 _motion = ClipMotion.values[
                     (_motion.index + 1) % ClipMotion.values.length];
               }),
@@ -2176,7 +2303,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               label: 'End card',
               value: _endCard ? 'On' : 'Off',
               valueColour: _endCard ? AppColors.primary : AppColors.textFaint,
-              onTap: busy ? null : () => setState(() => _endCard = !_endCard),
+              onTap: busy ? null : () => _setLook(() => _endCard = !_endCard),
             ),
             if (hasMusic) ...[
               const Divider(height: 1, color: AppColors.border),
@@ -2323,7 +2450,23 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   Future<void> _pickImages() async {
     final picked = await ImagePicker().pickMultiImage();
     if (picked.isEmpty) return;
-    setState(() { _images.addAll(picked.map((x) => x.path)); _status = ''; });
+
+    // Copied out of the picker's cache, which Android clears without asking. A story
+    // whose pictures vanish next week cannot be rebuilt or adjusted.
+    final kept = <String>[];
+    final stamp = DateTime.now().millisecondsSinceEpoch;
+    for (var i = 0; i < picked.length; i++) {
+      final path = picked[i].path;
+      if (widget.projectId.isEmpty) { kept.add(path); continue; }
+      final ext = path.contains('.') ? path.split('.').last : 'jpg';
+      try {
+        kept.add(await keepFile(path, 'pictures/${widget.projectId}', '${stamp}_$i.$ext'));
+      } catch (_) {
+        kept.add(path);
+      }
+    }
+
+    setState(() { _images.addAll(kept); _status = ''; _matchingReel = null; });
     _saveProject();
   }
 
@@ -2402,16 +2545,169 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     await ProjectStore.save(matches.first.copyWith(
       script: _lines.map(scriptLineToText).toList(),
       images: List.of(_images),
+      engine: _engine.name,
+      voiceName: geminiVoiceName,
+      look: _lookMap(),
     ));
   }
 
+  // ── Not making the same thing twice ─────────────────────────────────────────
+  //
+  // A finished voice and a finished reel are both kept with a fingerprint of what
+  // they were made from. Opening this screen again, or coming back from the preview,
+  // finds them and uses them — the reel you already made is the reel you get.
+
+  /// Bump when rendering changes in a way an old reel would not have, so reels built
+  /// before an update are rebuilt once instead of being reused with the old look.
+  static const _renderVersion = 3;
+
+  Map<String, String> _lookMap() => {
+        'captions': _captions ? '1' : '0',
+        'captionSpot': _captionSpot.name,
+        'motion': _motion.name,
+        'endCard': _endCard ? '1' : '0',
+      };
+
+  /// What the voice depends on. The times only matter for the line-by-line engines,
+  /// whose track is built to them; a one-take read does not care where pictures change.
+  String _voiceKey() => fingerprint([
+        _engine.name,
+        geminiVoiceName,
+        widget.style,
+        widget.language,
+        ..._lines.map((l) => l.spoken),
+        if (_engine != VoiceEngine.gemini)
+          ..._lines.map((l) => '${l.time.inMilliseconds}'),
+      ].join(''));
+
+  /// What the reel depends on — every picture, word, timing and setting that changes
+  /// what ends up on screen.
+  Future<String> _reelKey() async {
+    final post = await _savedPost();
+    return fingerprint([
+      '$_renderVersion',
+      _voiceKey(),
+      ..._lineStarts.map((s) => (s * 1000).round().toString()),
+      ..._images,
+      ..._lines.map((l) => l.text),
+      ..._lookMap().values,
+      _music?.asset ?? '',
+      post.coverHook,
+      post.closing,
+    ].join(''));
+  }
+
+  /// Puts back the pictures, voice, settings and choices this story was left with.
+  Future<void> _restoreFromProject() async {
+    final project = await loadProject(widget.projectId);
+    if (project == null || !mounted) return;
+
+    final images = await ProjectStore.existingImages(project.images);
+
+    // A new story has no engine of its own yet, so it takes the one used last time
+    // rather than quietly falling back to the phone voice nobody picked.
+    var engineName = project.engine;
+    if (engineName.isEmpty) {
+      final recent = (await ProjectStore.load()).where((p) => p.engine.isNotEmpty);
+      if (recent.isNotEmpty) engineName = recent.first.engine;
+    }
+    final engine = VoiceEngine.values.where((e) => e.name == engineName);
+
+    setState(() {
+      if (_images.isEmpty) _images = images;
+      if (engine.isNotEmpty) _engine = engine.first;
+      if (project.voiceName.isNotEmpty) geminiVoiceName = project.voiceName;
+
+      final look = project.look;
+      if (look['captions'] != null) _captions = look['captions'] == '1';
+      if (look['endCard'] != null) _endCard = look['endCard'] == '1';
+      final spot = CaptionSpot.values.where((s) => s.name == look['captionSpot']);
+      if (spot.isNotEmpty) _captionSpot = spot.first;
+      final motion = ClipMotion.values.where((m) => m.name == look['motion']);
+      if (motion.isNotEmpty) _motion = motion.first;
+    });
+
+    // The voice is only reused when it was made from exactly these words with exactly
+    // this voice. Anything else would build a reel that says something the captions do not.
+    if (project.voicePath.isNotEmpty &&
+        await File(project.voicePath).exists() &&
+        project.voiceKey == _voiceKey()) {
+      if (!mounted) return;
+      setState(() {
+        _audioPath = project.voicePath;
+        _lineStarts = List.of(project.lineStarts);
+      });
+      await _checkSavedReel();
+    }
+  }
+
+  /// The saved reel, if it still matches everything on screen.
+  String? _matchingReel;
+
+  Future<void> _checkSavedReel() async {
+    final project = await loadProject(widget.projectId);
+    String? match;
+    if (project != null &&
+        project.reelPath.isNotEmpty &&
+        _audioPath != null &&
+        await File(project.reelPath).exists() &&
+        project.reelKey == await _reelKey()) {
+      match = project.reelPath;
+    }
+    if (!mounted) return;
+    setState(() {
+      _matchingReel = match;
+      if (match != null && _status.isEmpty) {
+        _status = '✅ This reel is already made. Open it — nothing needs redoing.';
+      }
+    });
+  }
+
+  /// Moves a just-recorded voice somewhere it will still be tomorrow, and notes what
+  /// it was made from.
+  Future<void> _persistVoice() async {
+    if (widget.projectId.isEmpty || _audioPath == null) return;
+    final ext = _audioPath!.split('.').last;
+    final kept = await keepFile(_audioPath!, 'voices', '${widget.projectId}.$ext');
+
+    final project = await loadProject(widget.projectId);
+    if (project == null) return;
+    _audioPath = kept;
+    await ProjectStore.save(project.copyWith(
+      voicePath: kept,
+      voiceKey: _voiceKey(),
+      lineStarts: List.of(_lineStarts),
+      engine: _engine.name,
+      voiceName: geminiVoiceName,
+    ));
+  }
+
+  void _openReel(String path) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) => PreviewMergedScreen(
+        mergedFile: File(path), projectId: widget.projectId),
+    ));
+  }
+
+  /// Changes a render setting and remembers it, and the saved reel no longer matches.
+  void _setLook(VoidCallback change) {
+    setState(() {
+      change();
+      _matchingReel = null;
+    });
+    _saveProject();
+    _checkSavedReel();
+  }
 }
 
 // ── Preview Merged Screen ─────────────────────────────────────────────────────
 
 class PreviewMergedScreen extends StatefulWidget {
   final File mergedFile;
-  const PreviewMergedScreen({super.key, required this.mergedFile});
+  /// The story this reel belongs to, so the caption and comments can be opened from
+  /// here and the gallery state remembered. Empty for the old add-voice-to-video path.
+  final String projectId;
+  const PreviewMergedScreen({super.key, required this.mergedFile, this.projectId = ''});
   @override
   State<PreviewMergedScreen> createState() => _PreviewMergedScreenState();
 }
@@ -2420,9 +2716,19 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
   VideoPlayerController? _ctrl;
   bool _isSaving = false;
   String _status = '';
+  bool _inGallery = false;
 
   @override
-  void initState() { super.initState(); _initVideo(); }
+  void initState() {
+    super.initState();
+    _initVideo();
+    _loadGalleryState();
+  }
+
+  Future<void> _loadGalleryState() async {
+    final project = await loadProject(widget.projectId);
+    if (mounted && project != null) setState(() => _inGallery = project.inGallery);
+  }
 
   Future<void> _initVideo() async {
     final c = VideoPlayerController.file(widget.mergedFile);
@@ -2446,8 +2752,13 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
         'path': widget.mergedFile.path,
         'name': 'reel_${DateTime.now().millisecondsSinceEpoch}.mp4',
       });
-      setState(() => _status = '🎉 Saved. Look in Gallery → Movies → Reels, '
-          'or pick it straight from Instagram.');
+      setState(() {
+        _inGallery = true;
+        _status = '🎉 Saved. Look in Gallery → Movies → Reels, or pick it straight '
+            'from Instagram.';
+      });
+      final project = await loadProject(widget.projectId);
+      if (project != null) await ProjectStore.save(project.copyWith(inGallery: true));
     } catch (e) { setState(() { _status = '❌ $e'; }); }
     setState(() => _isSaving = false);
   }
@@ -2496,24 +2807,32 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
           ),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             StatusBar(message: _status),
-            PrimaryButton(
-              label: _isSaving ? 'Saving...' : 'Save to gallery',
-              icon: Icons.download,
-              loading: _isSaving,
-              onPressed: _saveToGallery,
-            ),
-            Gap.s,
-            // Worth its own button rather than leaving people to find the back
-            // arrow: a timing nudge no longer costs a re-recording, so coming back
-            // to fix one is now the cheap thing to do.
-            SizedBox(
-              width: double.infinity,
-              child: SecondaryButton(
-                label: 'Go back and adjust',
-                icon: Icons.tune,
-                onPressed: () => Navigator.pop(context),
+            // Posting needs the caption more than it needs anything else, and it used
+            // to be several screens away. Now it is the first thing under the reel.
+            if (widget.projectId.isNotEmpty) ...[
+              PrimaryButton(
+                label: 'Caption & comments',
+                icon: Icons.content_copy,
+                onPressed: () => showPostingKit(context, widget.projectId),
               ),
-            ),
+              Gap.s,
+            ],
+            Row(children: [
+              Expanded(child: SecondaryButton(
+                label: _isSaving ? 'Saving...' : _inGallery ? 'In gallery ✓' : 'Save to gallery',
+                icon: Icons.download,
+                onPressed: _isSaving ? null : _saveToGallery,
+              )),
+              Gap.wS,
+              // Nothing is lost by going back any more: the reel and the voice are both
+              // kept, so adjusting and returning opens this same reel again.
+              Expanded(child: SecondaryButton(
+                label: 'Adjust',
+                icon: Icons.tune,
+                colour: AppColors.textSoft,
+                onPressed: () => Navigator.pop(context),
+              )),
+            ]),
           ]),
         ),
       ]),
@@ -2564,6 +2883,98 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
     } catch (e) {
       if (mounted) setState(() { _busy = false; _note = '❌ $e'; });
     }
+  }
+
+  /// What can be done with one story, depending on how far it got.
+  ///
+  /// Tapping a story used to drop it back into the story box, which meant writing the
+  /// script again, recording the voice again and building the reel again just to get
+  /// back to something already finished. Now each thing it already has is one tap.
+  Future<void> _openStory(Project p) async {
+    final hasReel = p.reelPath.isNotEmpty && await File(p.reelPath).exists();
+    final lines = parseScript(p.script.join('\n'));
+    if (!mounted) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+            child: Text(p.title, maxLines: 2, overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+          ),
+          if (hasReel)
+            ListTile(
+              leading: const Icon(Icons.play_circle, color: AppColors.primary),
+              title: const Text('Open the reel'),
+              subtitle: const Text('Already made — opens straight away'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => PreviewMergedScreen(
+                    mergedFile: File(p.reelPath), projectId: p.id)));
+              },
+            ),
+          if (p.promptsJson.isNotEmpty)
+            ListTile(
+              leading: const Icon(Icons.content_copy, color: AppColors.primary),
+              title: const Text('Caption & comments'),
+              subtitle: const Text('Copy for posting'),
+              onTap: () {
+                Navigator.pop(ctx);
+                showPostingKit(context, p.id);
+              },
+            ),
+          if (lines.isNotEmpty)
+            ListTile(
+              leading: const Icon(Icons.tune, color: AppColors.textSoft),
+              title: const Text('Continue working on it'),
+              subtitle: const Text('Script, pictures, voice — as you left them'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => TimedScriptScreen(
+                    style: p.style.isEmpty ? '❤️ Heartwarming' : p.style,
+                    language: p.language.isEmpty ? 'Hinglish' : p.language,
+                    videoFile: null,
+                    initialLines: lines,
+                    storyDescription: p.story,
+                    seconds: p.seconds,
+                    projectId: p.id,
+                  ))).then((_) => _load());
+              },
+            ),
+          if (lines.isNotEmpty)
+            ListTile(
+              leading: const Icon(Icons.auto_fix_high, color: AppColors.textSoft),
+              title: const Text('Picture prompts'),
+              subtitle: const Text('For Meta AI'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => PromptScreen(
+                    storyDescription: p.story,
+                    scriptLines: lines.map((l) => l.text).toList(),
+                    seconds: p.seconds,
+                    projectId: p.id,
+                  )));
+              },
+            ),
+          ListTile(
+            leading: const Icon(Icons.edit_note, color: AppColors.textSoft),
+            title: const Text('Edit the story text'),
+            onTap: () {
+              Navigator.pop(ctx);
+              Navigator.pop(context, p);
+            },
+          ),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    );
   }
 
   /// Writes the backup now, for when you want to be sure before uninstalling.
@@ -2676,7 +3087,7 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: GestureDetector(
-                        onTap: () => Navigator.pop(context, p),
+                        onTap: () => _openStory(p),
                         child: AppCard(
                           child: Row(children: [
                             Expanded(child: Column(
@@ -2703,22 +3114,13 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                                   ],
                                 ]),
                               ])),
-                            // Straight to the caption, hook and prompts without
-                            // rebuilding anything. They were written down when the
-                            // story was, so this costs nothing and needs no reel.
-                            if (p.script.isNotEmpty)
-                              IconButton(
-                                tooltip: 'Caption, hook and prompts',
-                                icon: const Icon(Icons.description_outlined, size: 20,
+                            // A finished reel is marked on the row itself, so the
+                            // stories that are ready to post stand out in a long list.
+                            if (p.reelPath.isNotEmpty)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 4),
+                                child: Icon(Icons.movie, size: 20,
                                   color: AppColors.primary),
-                                onPressed: () => Navigator.push(context,
-                                  MaterialPageRoute(builder: (_) => PromptScreen(
-                                    storyDescription: p.story,
-                                    scriptLines: parseScript(p.script.join('\n'))
-                                        .map((l) => l.text).toList(),
-                                    seconds: p.seconds,
-                                    projectId: p.id,
-                                  ))),
                               ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline, size: 20,

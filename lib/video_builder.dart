@@ -38,6 +38,13 @@ const double kEndCardSeconds = 2.0;
 const double kSafeTop = 0.13;
 const double kSafeBottom = 0.78;
 
+/// Pixels between the top edge of the frame and a caption placed high.
+const int kCaptionTopGap = 30;
+
+/// Where the top of the cover hook sits. Below the 240 pixels Instagram's 3:4 profile
+/// grid crops off the top of a reel, with a little room, so the hook survives the crop.
+const int kCoverTop = 280;
+
 /// Widest a caption may be before its right end slides under the button column.
 ///
 /// The old 0.86 put the last few characters of every caption directly beneath the
@@ -335,6 +342,8 @@ class SlideshowBuilder {
     String? brandPng,
     CaptionSpot captionSpot = CaptionSpot.high,
     ClipMotion motion = ClipMotion.drift,
+    /// True when the first caption is the cover hook, which is placed differently.
+    bool coverOnFirst = false,
     void Function(String message)? onStatus,
   }) async {
     if (imagePaths.isEmpty) throw Exception('Add at least one image first.');
@@ -370,6 +379,7 @@ class SlideshowBuilder {
         captionPng: i < captionPngs.length ? captionPngs[i] : null,
         captionSpot: captionSpot,
         motion: motion,
+        isCover: coverOnFirst && i == 0,
       );
       clipPaths.add(clipPath);
     }
@@ -419,6 +429,8 @@ class SlideshowBuilder {
     String? captionPng,
     CaptionSpot captionSpot = CaptionSpot.high,
     ClipMotion motion = ClipMotion.drift,
+    /// True when [captionPng] is the cover hook rather than an ordinary caption.
+    bool isCover = false,
   }) async {
     if (!await File(imagePath).exists()) {
       throw Exception('Image ${index + 1} is missing: $imagePath');
@@ -458,10 +470,27 @@ class SlideshowBuilder {
     // out to be: a three-line caption placed low would otherwise hang down into the
     // username and audio ticker and lose its bottom line.
     final spot = captionSpotFraction(captionSpot);
+    final String captionY;
+    if (isCover) {
+      // The cover sits lower than the captions on purpose. Instagram's profile grid
+      // shows a reel as a 3:4 crop from the middle, which cuts the top 240 pixels off —
+      // a hook placed where the captions go would be missing from the one view where
+      // the cover is the whole point.
+      captionY = "'$kCoverTop'";
+    } else if (captionSpot == CaptionSpot.high) {
+      // Right at the top, a fixed gap from the edge, as asked. A fixed number of
+      // pixels rather than a share of the frame so it lands in the same place on
+      // every reel whatever the caption's height.
+      captionY = "'$kCaptionTopGap'";
+    } else {
+      // min/max keep it inside the band Instagram leaves alone whatever height it
+      // turns out to be: a three-line caption placed low would otherwise hang down
+      // into the username and audio ticker and lose its bottom line.
+      captionY = "'max(H*$kSafeTop,min(H*$spot-h/2,H*$kSafeBottom-h))'";
+    }
     final captionPart = caption == null
         ? ''
-        : "[withpic];[withpic][1:v]overlay=x='(W-w)/2':"
-          "y='max(H*$kSafeTop,min(H*$spot-h/2,H*$kSafeBottom-h))'";
+        : "[withpic];[withpic][1:v]overlay=x='(W-w)/2':y=$captionY";
 
     final filter =
         '[0:v]split=2[bg][fg];'

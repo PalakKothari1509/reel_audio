@@ -61,6 +61,37 @@ class Project {
   /// worse. What you typed always wins over what was generated.
   final Map<String, String> edits;
 
+  /// Which story text the saved script was written from. Lets the story screen tell
+  /// "this story already has a script" apart from "this story was edited since", so it
+  /// can reopen the script instead of spending a request writing it again.
+  final String scriptStoryKey;
+
+  // ── What has already been made ──────────────────────────────────────────────
+  //
+  // Each finished thing is kept with a fingerprint of everything it was made from.
+  // Same fingerprint, same result — so it is opened, not made again. Change a word,
+  // a picture or a setting and the fingerprint changes, and only then is it redone.
+
+  /// The voice engine and voice last used, so reopening does not quietly fall back
+  /// to the phone voice and record something you never chose.
+  final String engine;
+  final String voiceName;
+
+  /// Captions, caption position, movement, end card — remembered per story.
+  final Map<String, String> look;
+
+  final String voicePath;
+  final String voiceKey;
+  /// Where each line starts in that voice, as measured from its pauses. Kept because
+  /// measuring again needs the voice file and a pass through FFmpeg for nothing.
+  final List<double> lineStarts;
+
+  final String reelPath;
+  final String reelKey;
+  /// Whether this reel has already been put in the gallery, so the button can say so
+  /// instead of inviting a second copy.
+  final bool inGallery;
+
   const Project({
     required this.id,
     required this.title,
@@ -74,6 +105,16 @@ class Project {
     this.promptsJson = '',
     this.promptsScript = const [],
     this.edits = const {},
+    this.scriptStoryKey = '',
+    this.engine = '',
+    this.voiceName = '',
+    this.look = const {},
+    this.voicePath = '',
+    this.voiceKey = '',
+    this.lineStarts = const [],
+    this.reelPath = '',
+    this.reelKey = '',
+    this.inGallery = false,
   });
 
   /// First few words of the story, which is what you will recognise it by.
@@ -110,6 +151,16 @@ class Project {
         'promptsJson': promptsJson,
         'promptsScript': promptsScript,
         'edits': edits,
+        'scriptStoryKey': scriptStoryKey,
+        'engine': engine,
+        'voiceName': voiceName,
+        'look': look,
+        'voicePath': voicePath,
+        'voiceKey': voiceKey,
+        'lineStarts': lineStarts,
+        'reelPath': reelPath,
+        'reelKey': reelKey,
+        'inGallery': inGallery,
       };
 
   factory Project.fromJson(Map<String, dynamic> json) => Project(
@@ -126,6 +177,18 @@ class Project {
         promptsScript: ((json['promptsScript'] as List?) ?? const []).whereType<String>().toList(),
         edits: ((json['edits'] as Map?) ?? const {})
             .map((k, v) => MapEntry('$k', '$v')),
+        scriptStoryKey: json['scriptStoryKey'] as String? ?? '',
+        engine: json['engine'] as String? ?? '',
+        voiceName: json['voiceName'] as String? ?? '',
+        look: ((json['look'] as Map?) ?? const {})
+            .map((k, v) => MapEntry('$k', '$v')),
+        voicePath: json['voicePath'] as String? ?? '',
+        voiceKey: json['voiceKey'] as String? ?? '',
+        lineStarts: ((json['lineStarts'] as List?) ?? const [])
+            .whereType<num>().map((n) => n.toDouble()).toList(),
+        reelPath: json['reelPath'] as String? ?? '',
+        reelKey: json['reelKey'] as String? ?? '',
+        inGallery: json['inGallery'] as bool? ?? false,
       );
 
   /// Every field has to be carried through here, including the ones nothing calls
@@ -142,6 +205,16 @@ class Project {
     String? promptsJson,
     List<String>? promptsScript,
     Map<String, String>? edits,
+    String? scriptStoryKey,
+    String? engine,
+    String? voiceName,
+    Map<String, String>? look,
+    String? voicePath,
+    String? voiceKey,
+    List<double>? lineStarts,
+    String? reelPath,
+    String? reelKey,
+    bool? inGallery,
   }) =>
       Project(
         id: id,
@@ -156,7 +229,55 @@ class Project {
         promptsJson: promptsJson ?? this.promptsJson,
         promptsScript: promptsScript ?? this.promptsScript,
         edits: edits ?? this.edits,
+        scriptStoryKey: scriptStoryKey ?? this.scriptStoryKey,
+        engine: engine ?? this.engine,
+        voiceName: voiceName ?? this.voiceName,
+        look: look ?? this.look,
+        voicePath: voicePath ?? this.voicePath,
+        voiceKey: voiceKey ?? this.voiceKey,
+        lineStarts: lineStarts ?? this.lineStarts,
+        reelPath: reelPath ?? this.reelPath,
+        reelKey: reelKey ?? this.reelKey,
+        inGallery: inGallery ?? this.inGallery,
       );
+}
+
+/// A short fingerprint of some text, the same every time for the same text.
+///
+/// FNV-1a rather than String.hashCode, because hashCode is not promised to stay the
+/// same between runs of the app, and a fingerprint that changes on restart would make
+/// every saved voice and reel look out of date the next morning.
+String fingerprint(String text) {
+  var hash = 0x811c9dc5;
+  for (final byte in utf8.encode(text)) {
+    hash ^= byte;
+    hash = (hash * 0x01000193) & 0xFFFFFFFF;
+  }
+  return hash.toRadixString(16).padLeft(8, '0');
+}
+
+/// Copies a file into the app's own storage and returns the new path.
+///
+/// Voices, reels and picked pictures all start life in cache folders that Android
+/// empties whenever it likes. A story that "has a reel" is only true while the reel
+/// is somewhere that does not get cleared behind your back.
+Future<String> keepFile(String sourcePath, String folder, String name) async {
+  final dir = Directory('${(await getApplicationDocumentsDirectory()).path}/$folder');
+  if (!await dir.exists()) await dir.create(recursive: true);
+  final target = '${dir.path}/$name';
+  if (sourcePath == target) return target;
+
+  final old = File(target);
+  if (await old.exists()) await old.delete();
+  await File(sourcePath).copy(target);
+  return target;
+}
+
+/// One story by id, or null.
+Future<Project?> loadProject(String id) async {
+  if (id.isEmpty) return null;
+  final matches = (await ProjectStore.load()).where((p) => p.id == id);
+  return matches.isEmpty ? null : matches.first;
 }
 
 class ProjectStore {
