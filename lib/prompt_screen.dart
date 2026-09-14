@@ -134,13 +134,12 @@ class _PromptScreenState extends State<PromptScreen> {
 
   Future<void> _savePrompts(PromptSet prompts) async {
     if (widget.projectId.isEmpty || prompts.rawJson.isEmpty) return;
-    final all = await ProjectStore.load();
-    final matches = all.where((p) => p.id == widget.projectId);
-    if (matches.isEmpty) return;
-
-    await ProjectStore.save(matches.first.copyWith(
+    final script = List.of(widget.scriptLines);
+    await ProjectStore.update(widget.projectId, (p) => p.copyWith(
       promptsJson: prompts.rawJson,
-      promptsScript: List.of(widget.scriptLines),
+      promptsScript: script,
+      // New prompts bring new cover options, so a pick from the old ones is let go.
+      edits: {...p.edits}..remove('cover_hook'),
     ));
   }
 
@@ -638,15 +637,22 @@ class _PromptScreenState extends State<PromptScreen> {
         _edits[field] = result.trim();
       }
     });
-    await _saveEdits();
+    await _saveEdit(field, result.trim());
   }
 
-  Future<void> _saveEdits() async {
+  /// Saves one field, merged into the edits as they are on disk now — writing this
+  /// screen's whole copy back would undo a change made on another screen meanwhile.
+  Future<void> _saveEdit(String field, String value) async {
     if (widget.projectId.isEmpty) return;
-    final all = await ProjectStore.load();
-    final matches = all.where((p) => p.id == widget.projectId);
-    if (matches.isEmpty) return;
-    await ProjectStore.save(matches.first.copyWith(edits: Map.of(_edits)));
+    await ProjectStore.update(widget.projectId, (p) {
+      final edits = {...p.edits};
+      if (value.isEmpty) {
+        edits.remove(field);
+      } else {
+        edits[field] = value;
+      }
+      return p.copyWith(edits: edits);
+    });
   }
 
   Widget _promptCard({

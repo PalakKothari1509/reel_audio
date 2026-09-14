@@ -311,7 +311,61 @@ class ProjectStore {
   /// Writes one story. Silent on failure by design — this is called on every edit,
   /// and an alert box about a failed autosave in the middle of typing would be worse
   /// than the thing it is warning about.
-  static Future<void> save(Project project) async {
+  static Future<void> save(Project project) => _inTurn(() => _write(project));
+
+  /// Changes one story as a single step: read it fresh, change it, write it.
+  ///
+  /// Every screen writes to the same file — the story screen, the editor, the voice,
+  /// the reel, the caption sheet — and several of them used to read the story, wait on
+  /// something, then write back what they had read. Two of those overlapping meant the
+  /// second quietly put back what the first had just changed: a cover pick or a saved
+  /// voice undone by an autosave that had read the file a moment earlier. Taking turns,
+  /// each change starts from whatever the one before it left.
+  ///
+  /// Returns null when the story is not on the phone.
+  static Future<Project?> update(String id, Project Function(Project current) change) =>
+      _inTurn(() async {
+        final current = await _read(id);
+        if (current == null) return null;
+        final next = change(current);
+        await _write(next);
+        return next;
+      });
+
+  /// The same, but creates the story from [seed] when it is not saved yet.
+  static Future<Project> upsert(Project seed, Project Function(Project current) change) =>
+      _inTurn(() async {
+        final next = change(await _read(seed.id) ?? seed);
+        await _write(next);
+        return next;
+      });
+
+  static Future<void> _queue = Future.value();
+
+  static Future<T> _inTurn<T>(Future<T> Function() job) {
+    final done = Completer<T>();
+    _queue = _queue.then((_) async {
+      try {
+        done.complete(await job());
+      } catch (e, s) {
+        done.completeError(e, s);
+      }
+    });
+    return done.future;
+  }
+
+  static Future<Project?> _read(String id) async {
+    try {
+      final file = File('${(await _dir()).path}/$id.json');
+      if (!await file.exists()) return null;
+      final raw = jsonDecode(await file.readAsString());
+      return raw is Map<String, dynamic> ? Project.fromJson(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _write(Project project) async {
     try {
       final dir = await _dir();
       if (!await dir.exists()) await dir.create(recursive: true);
@@ -320,10 +374,8 @@ class ProjectStore {
     } catch (_) {}
 
     // The copy in Downloads is the only one that survives an uninstall, so it is kept
-    // up to date automatically rather than waiting for anyone to remember a backup
-    // button. Not awaited: the story is already safe on the phone by this line, and
-    // the editor should not pause for a file write it does not depend on.
-    unawaited(ProjectBackup.writeQuietly());
+    // up to date automatically rather than waiting for anyone to remember a button.
+    ProjectBackup.schedule();
   }
 
   static Future<void> delete(String id) async {
@@ -366,7 +418,23 @@ const _mediaChannel = MethodChannel('com.example.reel_audio/media');
 
 class ProjectBackup {
   /// Writes every story to Downloads. Returns where it landed.
-  static Future<String> write() async {
+  /// "Back up now" and the automatic backup share this one door, so pressing the button
+  /// while an automatic one is mid-write waits for it instead of writing over it.
+  static Future<String> write() {
+    final done = Completer<String>();
+    _writeChain = _writeChain.then((_) async {
+      try {
+        done.complete(await _writeNow());
+      } catch (e, s) {
+        done.completeError(e, s);
+      }
+    });
+    return done.future;
+  }
+
+  static Future<void> _writeChain = Future.value();
+
+  static Future<String> _writeNow() async {
     final all = await ProjectStore.load();
     final json = jsonEncode({
       'app': 'reel_audio',
@@ -394,6 +462,30 @@ class ProjectBackup {
     try {
       await write();
     } catch (_) {}
+  }
+
+  /// Asks for a backup a few seconds from now, once things go quiet.
+  ///
+  /// It used to be written on every single save — every pause in typing, every setting
+  /// tapped — each one a delete and a fresh write in Downloads. Overlapping, two of
+  /// those could leave the folder with no backup at all, or with a "(1)" copy that is
+  /// the out-of-date one. Now a burst of saves becomes one backup, and a backup already
+  /// running is followed by one more rather than run on top of.
+  static void schedule() {
+    _pending?.cancel();
+    _pending = Timer(const Duration(seconds: 8), _runScheduled);
+  }
+
+  static Timer? _pending;
+  static bool _running = false;
+  static bool _wantedAgain = false;
+
+  static Future<void> _runScheduled() async {
+    if (_running) { _wantedAgain = true; return; }
+    _running = true;
+    await writeQuietly();
+    _running = false;
+    if (_wantedAgain) { _wantedAgain = false; schedule(); }
   }
 
   /// Reads a backup the user picks and puts the stories back.

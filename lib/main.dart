@@ -342,12 +342,16 @@ final List<Character> kCharacters = [
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
-void main() => runApp(MaterialApp(
-      title: 'Story Reel Maker',
-      debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
-      home: const StoryScreen(),
-    ));
+void main() {
+  // Hooks, posting times and results go into the Downloads backup with the stories.
+  onPlanSaved = ProjectBackup.schedule;
+  runApp(MaterialApp(
+    title: 'Story Reel Maker',
+    debugShowCheckedModeBanner: false,
+    theme: buildAppTheme(),
+    home: const StoryScreen(),
+  ));
+}
 
 /// What a reel is mainly for. Parent relatable first: for this page it is the one that
 /// earns saves and shares, rather than chasing "viral" on every post.
@@ -484,39 +488,61 @@ class _StoryScreenState extends State<StoryScreen> {
   /// Debounced because writing a file on every keystroke is wasteful, and 1.2 seconds
   /// is long enough to stop that without being long enough to lose a sentence.
   void _autoSave() {
-    _saveTimer?.cancel();
-    _saveTimer = Timer(const Duration(milliseconds: 1200), () async {
-      // Refreshes the main button, which says "continue" or "write" depending on
-      // whether this exact text already has a script.
+    // Cleared the box: whatever is typed next is a different story. Without this the
+    // next story was saved INTO the last one — its text replacing the old story's, the
+    // old reel and voice left attached to a story they were never made for.
+    if (_descCtrl.text.trim().length < 12 && _project != null) {
+      _saveTimer?.cancel();
+      _project = null;
       if (mounted) setState(() {});
+      return;
+    }
 
-      final story = _descCtrl.text.trim();
-      if (story.length < 12) return;
-
-      _project = (await _freshProject()).copyWith(
-        title: Project.titleFrom(story),
-        story: story,
-        style: _style,
-        language: _language,
-        seconds: _seconds,
-      );
-      await ProjectStore.save(_project!);
-    });
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 1200), _saveNow);
   }
 
-  /// This story as it is on disk now, not as this screen last saw it.
+  /// Writes the story in the box straight away.
+  Future<void> _saveNow() async {
+    _saveTimer?.cancel();
+    // Refreshes the main button, which says "continue" or "write" depending on
+    // whether this exact text already has a script.
+    if (mounted) setState(() {});
+
+    final story = _descCtrl.text.trim();
+    if (story.length < 12) return;
+
+    // Read fresh and written in one step: the script, voice, reel and edits are all
+    // written by other screens, and saving from a copy held here would put back
+    // whatever it held when you left.
+    _project = await ProjectStore.upsert(_project ?? _newProject(), (p) => p.copyWith(
+      title: Project.titleFrom(story),
+      story: story,
+      style: _style,
+      language: _language,
+      seconds: _seconds,
+    ));
+  }
+
+  Project _newProject() => Project(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: '',
+        savedAt: DateTime.now(),
+        story: '',
+      );
+
+  /// Saves what is in the box, then lets the next thing start a brand new story.
   ///
-  /// The script, pictures, voice, reel and edits are all written by other screens.
-  /// Saving from the copy held here would put back whatever it held when you left —
-  /// one keystroke after coming back from a finished reel would have wiped the reel.
-  Future<Project> _freshProject() async {
-    if (_project != null) return await loadProject(_project!.id) ?? _project!;
-    return Project(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: '',
-      savedAt: DateTime.now(),
-      story: '',
-    );
+  /// The save comes first because the last second of typing may not have been written
+  /// yet, and starting a new story on top of it would lose those words.
+  Future<void> _startNewStory({String text = '', String status = ''}) async {
+    if (_descCtrl.text.trim().length >= 12) await _saveNow();
+    if (!mounted) return;
+    setState(() {
+      _project = null;
+      _descCtrl.text = text;
+      _status = status;
+    });
   }
 
   /// Opens the plan. A hook chosen there comes back as a filled-in story form.
@@ -543,12 +569,9 @@ class _StoryScreenState extends State<StoryScreen> {
       if (replace != true || !mounted) return;
     }
 
-    _saveTimer?.cancel();
-    setState(() {
-      _project = null;
-      _descCtrl.text = hook.asStoryText();
-      _status = '💡 ${hook.cover} — fill in anything you like, then write the script.';
-    });
+    await _startNewStory(
+      text: hook.asStoryText(),
+      status: '💡 ${hook.cover} — fill in anything you like, then write the script.');
     await HookStore.markUsed(hook.id);
   }
 
@@ -731,11 +754,12 @@ class _StoryScreenState extends State<StoryScreen> {
         onWait: (message) { if (mounted) setState(() => _status = message); });
       if (!mounted) return;
       // Dropped straight into the box rather than shown for approval: it is a starting
-      // point to edit, and an extra "use this?" step helps nobody.
-      setState(() {
-        _descCtrl.text = idea.asStoryText;
-        _status = '💡 ${idea.title} — edit anything, then write the script.';
-      });
+      // point to edit, and an extra "use this?" step helps nobody. As a NEW story —
+      // written into the current one, it replaced a story you may already have made a
+      // reel from. The one that was in the box stays in Saved stories.
+      await _startNewStory(
+        text: idea.asStoryText,
+        status: '💡 ${idea.title} — edit anything, then write the script.');
     } catch (e) {
       if (mounted) setState(() => _status = '❌ $e');
     }
@@ -768,23 +792,23 @@ class _StoryScreenState extends State<StoryScreen> {
     // failure on the next screen cannot take the story with it.
     _saveTimer?.cancel();
     final story = _descCtrl.text.trim();
-    _project = (await _freshProject())
-        .copyWith(
-          title: Project.titleFrom(story), story: story,
-          style: _style, language: _language, seconds: _seconds,
-          // Null for "write it myself", which opens an empty editor. Saving that empty
-          // list would have wiped a script this story already had.
-          script: lines.isEmpty ? null : lines.map(scriptLineToText).toList(),
-          scriptStoryKey: lines.isEmpty ? null : fingerprint(story),
-          promptsJson: prompts?.rawJson,
-          // Matched against the on-screen text later, so it has to be that and not
-          // the timestamped form, or the cache never recognises itself.
-          promptsScript: prompts == null
-              ? null : lines.map((l) => l.text).toList(),
-        );
     // Awaited: the next screen reads this story straight back off disk to restore the
     // voice and reel, and would find the old version if it got there first.
-    await ProjectStore.save(_project!);
+    _project = await ProjectStore.upsert(_project ?? _newProject(), (p) => p.copyWith(
+      title: Project.titleFrom(story), story: story,
+      style: _style, language: _language, seconds: _seconds,
+      // Null for "write it myself", which opens an empty editor. Saving that empty
+      // list would have wiped a script this story already had.
+      script: lines.isEmpty ? null : lines.map(scriptLineToText).toList(),
+      scriptStoryKey: lines.isEmpty ? null : fingerprint(story),
+      promptsJson: prompts?.rawJson,
+      // Matched against the on-screen text later, so it has to be that and not the
+      // timestamped form, or the cache never recognises itself.
+      promptsScript: prompts == null ? null : lines.map((l) => l.text).toList(),
+      // A fresh script from the model brings fresh cover options, so an earlier pick
+      // from the old ones no longer applies.
+      edits: prompts == null ? null : ({...p.edits}..remove('cover_hook')),
+    ));
     if (!mounted) return;
 
     Navigator.push(context, MaterialPageRoute(
@@ -899,6 +923,14 @@ class _StoryScreenState extends State<StoryScreen> {
       appBar: AppBar(
         title: const Text('Story Reel Maker'),
         actions: [
+          // The dependable way to begin the next reel. Clearing the box works too, but
+          // pasting a new story over the old one cannot be told apart from editing it.
+          IconButton(
+            tooltip: 'New story',
+            icon: const Icon(Icons.note_add_outlined, size: 21),
+            onPressed: _isGenerating ? null : () => _startNewStory(
+              status: 'New story. The last one is in Saved stories.'),
+          ),
           IconButton(
             tooltip: 'Plan: hooks, when to post, results',
             icon: const Icon(Icons.calendar_month_outlined, size: 21),
@@ -1403,7 +1435,17 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
     // Times moved and the voice still stands: keep it, and just move the pictures.
     if (timesChanged) {
-      _lineStarts = _lines.map((l) => l.time.inMilliseconds / 1000.0).toList();
+      // Only the lines you actually moved take the new time. The rest keep the start
+      // measured from the voice's own pauses, to the millisecond. Rebuilding them all
+      // from the boxes rounded every picture change to a whole second, so nudging one
+      // line put every other picture up to half a second off the words.
+      final measured = _lineStarts;
+      _lineStarts = List.generate(_lines.length, (i) {
+        final shown = _lines[i].time.inMilliseconds / 1000.0;
+        final untouched = i < measured.length &&
+            measured[i].round() == _lines[i].time.inSeconds;
+        return untouched ? measured[i] : shown;
+      });
       _status = 'Picture times updated — tap Make Reel to build it again.';
     }
   }
@@ -1415,15 +1457,36 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       _lines.add(ScriptLine(lastTime, ''));
       _textCtrls.add(TextEditingController());
       _timeCtrls.add(TextEditingController(text: fmtDuration(lastTime)));
+      _scriptShapeChanged();
     });
+    _saveProject();
   }
 
   void _removeLine(int i) {
+    _syncLines();
     setState(() {
       _lines.removeAt(i);
       _textCtrls.removeAt(i).dispose();
       _timeCtrls.removeAt(i).dispose();
+      _scriptShapeChanged();
     });
+    // Saved, or the removed line comes back the next time this story is opened.
+    _saveProject();
+  }
+
+  /// A line added or removed after recording: the voice no longer matches.
+  ///
+  /// Editing a line is noticed by comparing each box with its line, but adding or
+  /// removing one moves the boxes and the lines together, so nothing looked changed.
+  /// The reel was then built from a voice still saying the deleted line, with every
+  /// picture after it a line out of step.
+  void _scriptShapeChanged() {
+    _matchingReel = null;
+    if (_audioPath != null) {
+      _audioPath = null;
+      _lineStarts = [];
+      _status = 'Lines changed — the voice will be recorded again for the new script.';
+    }
   }
 
   /// Preview always speaks with the phone, whatever engine is selected — it is instant
@@ -1788,7 +1851,13 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         // instead of being asked for again.
         projectId: widget.projectId,
       ),
-    ));
+    // Coming back, the prompts screen may have written the cover options for the first
+    // time — long reels and pasted scripts get them there, not with the script — or
+    // changed the cover. Read them again so the Script step shows what is saved.
+    )).then((_) {
+      _loadHookChoices();
+      _checkSavedReel();
+    });
   }
 
   /// Builds the reel from the chosen images instead of a source video.
@@ -1852,16 +1921,16 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       var reelPath = outPath;
       if (widget.projectId.isNotEmpty) {
         reelPath = await keepFile(outPath, 'reels', '${widget.projectId}.mp4');
-        final project = await loadProject(widget.projectId);
-        if (project != null) {
-          await ProjectStore.save(project.copyWith(
-            reelPath: reelPath,
-            reelKey: await _reelKey(),
-            // A new reel is a new file the gallery has not seen.
-            inGallery: false,
-            look: _lookMap(),
-          ));
-        }
+        final key = await _reelKey();
+        final look = _lookMap();
+        final kept = reelPath;
+        await ProjectStore.update(widget.projectId, (p) => p.copyWith(
+          reelPath: kept,
+          reelKey: key,
+          // A new reel is a new file the gallery has not seen.
+          inGallery: false,
+          look: look,
+        ));
       }
 
       if (!mounted) return;
@@ -2016,10 +2085,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           ),
           TextButton(
             onPressed: busy ? null : () async {
-              final project = await loadProject(widget.projectId);
-              if (project != null) {
-                await ProjectStore.save(project.copyWith(reelKey: ''));
-              }
+              await ProjectStore.update(widget.projectId, (p) => p.copyWith(reelKey: ''));
               setState(() => _matchingReel = null);
               await _makeReel();
             },
@@ -2721,17 +2787,14 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// would lose an edit made there.
   Future<void> _saveProject() async {
     if (widget.projectId.isEmpty) return;
-    final all = await ProjectStore.load();
-    final matches = all.where((p) => p.id == widget.projectId);
-    if (matches.isEmpty) return;
-
-    await ProjectStore.save(matches.first.copyWith(
-      script: _lines.map(scriptLineToText).toList(),
-      images: List.of(_images),
-      engine: _engine.name,
-      voiceName: geminiVoiceName,
-      look: _lookMap(),
-    ));
+    // Taken now, not inside the update: by the time it runs, the screen may have moved.
+    final script = _lines.map(scriptLineToText).toList();
+    final images = List.of(_images);
+    final engine = _engine.name;
+    final voice = geminiVoiceName;
+    final look = _lookMap();
+    await ProjectStore.update(widget.projectId, (p) => p.copyWith(
+      script: script, images: images, engine: engine, voiceName: voice, look: look));
   }
 
   // ── Not making the same thing twice ─────────────────────────────────────────
@@ -2852,10 +2915,10 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   /// reel and the caption sheet already read — so choosing here changes both.
   Future<void> _chooseCover(String text) async {
     setState(() { _coverChoice = text; _matchingReel = null; });
-    final project = await loadProject(widget.projectId);
-    if (project == null) return;
-    await ProjectStore.save(project.copyWith(
-      edits: {...project.edits, 'cover_hook': text}));
+    // Merged into the edits as they are on disk at that moment, so a caption edited on
+    // another screen is not undone by picking a cover here.
+    await ProjectStore.update(widget.projectId, (p) => p.copyWith(
+      edits: {...p.edits, 'cover_hook': text}));
   }
 
   Future<void> _checkSavedReel() async {
@@ -2884,16 +2947,14 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     final ext = _audioPath!.split('.').last;
     final kept = await keepFile(_audioPath!, 'voices', '${widget.projectId}.$ext');
 
-    final project = await loadProject(widget.projectId);
-    if (project == null) return;
     _audioPath = kept;
-    await ProjectStore.save(project.copyWith(
-      voicePath: kept,
-      voiceKey: _voiceKey(),
-      lineStarts: List.of(_lineStarts),
-      engine: _engine.name,
-      voiceName: geminiVoiceName,
-    ));
+    final key = _voiceKey();
+    final starts = List.of(_lineStarts);
+    final engine = _engine.name;
+    final voice = geminiVoiceName;
+    await ProjectStore.update(widget.projectId, (p) => p.copyWith(
+      voicePath: kept, voiceKey: key, lineStarts: starts,
+      engine: engine, voiceName: voice));
   }
 
   void _openReel(String path) {
@@ -2971,8 +3032,7 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
         _status = '🎉 Saved. Look in Gallery → Movies → Reels, or pick it straight '
             'from Instagram.';
       });
-      final project = await loadProject(widget.projectId);
-      if (project != null) await ProjectStore.save(project.copyWith(inGallery: true));
+      await ProjectStore.update(widget.projectId, (p) => p.copyWith(inGallery: true));
     } catch (e) { setState(() { _status = '❌ $e'; }); }
     setState(() => _isSaving = false);
   }

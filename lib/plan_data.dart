@@ -13,6 +13,11 @@ import 'package:path_provider/path_provider.dart';
 // turns them into one. Nobody outside Instagram knows when your followers are awake;
 // your own numbers after a few weeks will.
 
+/// Called after any hook, schedule or result is saved, so the Downloads backup picks
+/// it up. Set once at startup rather than imported, because the backup code already
+/// imports this file and the two importing each other would tie them in a knot.
+void Function()? onPlanSaved;
+
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
 class HookIdea {
@@ -248,6 +253,8 @@ class HookStore {
       final f = await _path(_file);
       await f.writeAsString(jsonEncode(hooks.map((h) => h.toJson()).toList()));
     } catch (_) {}
+    // Hooks, times and results belong in the backup too; see onPlanSaved.
+    onPlanSaved?.call();
   }
 
   static Future<void> markUsed(String id) async {
@@ -313,6 +320,8 @@ class ScheduleStore {
       await (await _path(_file))
           .writeAsString(jsonEncode(slots.map((s) => s.toJson()).toList()));
     } catch (_) {}
+    // Hooks, times and results belong in the backup too; see onPlanSaved.
+    onPlanSaved?.call();
   }
 }
 
@@ -423,6 +432,8 @@ class PostLogStore {
       await (await _path(_file))
           .writeAsString(jsonEncode(posts.map((p) => p.toJson()).toList()));
     } catch (_) {}
+    // Hooks, times and results belong in the backup too; see onPlanSaved.
+    onPlanSaved?.call();
   }
 
   static Future<void> add(PostRecord post) async {

@@ -150,8 +150,18 @@ class _PostingKitState extends State<_PostingKit> {
       }
     });
 
-    final project = await loadProject(widget.projectId);
-    if (project != null) await ProjectStore.save(project.copyWith(edits: Map.of(_edits)));
+    // Only this one field, merged into the edits as they are on disk now. Writing this
+    // sheet's whole copy back would undo a cover picked on the Script step meanwhile.
+    final value = result.trim();
+    await ProjectStore.update(widget.projectId, (p) {
+      final edits = {...p.edits};
+      if (value.isEmpty) {
+        edits.remove(item.field);
+      } else {
+        edits[item.field] = value;
+      }
+      return p.copyWith(edits: edits);
+    });
   }
 
   @override
