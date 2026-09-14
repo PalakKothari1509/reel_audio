@@ -108,7 +108,7 @@ $kScriptShapeRules
 
 $kReelShapeRules
 
-Keep every spoken line under 12 words so it takes about 4 seconds to say.
+Keep every line to 4-9 words: short on screen, still easy to say in about 4 seconds.
 Write how a person talks, not how a book reads.
 
 Return ONLY valid JSON in exactly this shape:
@@ -127,10 +127,16 @@ Return ONLY valid JSON in exactly this shape:
   "how_it_is_solved": "one sentence",
   "ending_line": "the moral, one short line in Hinglish",
   "closing_cta": "a short follow line in Hinglish",
-  "cover_hook": "2 to 4 Hinglish words for screen 1, taken from what happens, e.g. Tractor Gayab?!",
+  "cover_hook": "the best of the five options below, 2 to 4 Hinglish words",
+  "cover_hook_options": [
+    {"type": "Curiosity", "text": "makes them ask why, e.g. Ria ne aisa kyun kiya?!"},
+    {"type": "Parent relatable", "text": "the parent sees themselves, e.g. Har Mumma ki problem!"},
+    {"type": "Situation", "text": "the child in the moment, e.g. Brush nahi karungi!"},
+    {"type": "Mystery", "text": "something happened, e.g. Phir jo hua..."},
+    {"type": "Emotional", "text": "a quiet feeling, e.g. Mumma ne kuch nahi kaha..."}
+  ],
   "cover_title": "3 to 5 words for the reel cover, big and curious",
   "moral_line": "the lesson for the second-to-last screen, one warm line a parent would say out loud",
-  "cta_line": "the reason to keep this reel, on the last screen, e.g. Save this for tonight's bedtime story",
   "end_question": "one question on the last screen a parent can answer in four words, about their own child",
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
@@ -273,10 +279,16 @@ Return ONLY valid JSON, no markdown fence, in exactly this shape:
   "how_it_is_solved": "one sentence",
   "ending_line": "the moral, one short line in Hinglish",
   "closing_cta": "a short follow line in Hinglish",
-  "cover_hook": "2 to 4 Hinglish words for screen 1, taken from what happens, e.g. Tractor Gayab?!",
+  "cover_hook": "the best of the five options below, 2 to 4 Hinglish words",
+  "cover_hook_options": [
+    {"type": "Curiosity", "text": "makes them ask why, e.g. Ria ne aisa kyun kiya?!"},
+    {"type": "Parent relatable", "text": "the parent sees themselves, e.g. Har Mumma ki problem!"},
+    {"type": "Situation", "text": "the child in the moment, e.g. Brush nahi karungi!"},
+    {"type": "Mystery", "text": "something happened, e.g. Phir jo hua..."},
+    {"type": "Emotional", "text": "a quiet feeling, e.g. Mumma ne kuch nahi kaha..."}
+  ],
   "cover_title": "3 to 5 words for the reel cover, big and curious",
   "moral_line": "the lesson for the second-to-last screen, one warm line a parent would say out loud",
-  "cta_line": "the reason to keep this reel, on the last screen, e.g. Save this for tonight's bedtime story",
   "end_question": "one question on the last screen a parent can answer in four words, about their own child",
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
@@ -402,10 +414,18 @@ PromptSet _toPromptSet(
       moralLine: (json['moral_line'] as String?)?.trim() ?? '',
       // Falls back to the channel's own line rather than to nothing: a closing screen
       // with no reason to keep the reel is a wasted screen, and every reel has one.
-      ctaLine: (json['cta_line'] as String?)?.trim().isNotEmpty == true
-          ? (json['cta_line'] as String).trim()
-          : kDefaultCtaLine,
+      // The same save-and-share lines on every reel now, rather than a new invented line
+      // per reel: the closing card is part of the channel's shape, and its reasons to
+      // save and share are the same every time.
+      ctaLine: kDefaultCtaLine,
       endQuestion: (json['end_question'] as String?)?.trim() ?? '',
+      coverHookOptions: ((json['cover_hook_options'] as List?) ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map((m) => HookChoice(
+                (m['type'] as String?)?.trim() ?? '',
+                (m['text'] as String?)?.trim() ?? ''))
+          .where((c) => c.text.isNotEmpty)
+          .toList(),
     ),
   );
 }

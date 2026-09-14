@@ -149,33 +149,44 @@ Future<String?> renderBrandCard(
 
   // Split on the blank line between paragraphs, so an edited message keeps the same
   // shape as a generated one without anything here needing to know which it is.
+  // Line breaks inside a paragraph are kept: the save and share reasons are two lines
+  // on purpose, each with its own icon, and run together they read as one sentence.
   final parts = message
       .trim()
       .split(RegExp(r'\n\s*\n'))
-      .map((p) => p.trim().replaceAll('\n', ' '))
+      .map((p) => p.trim())
       .where((p) => p.isNotEmpty)
       .toList();
 
-  // The first line biggest. On a closing screen the channel's name is the least
-  // interesting thing present — it asks for nothing and gives nothing back.
-  final ask = parts.isEmpty ? null : line(parts.first, 58, FontWeight.w800, Colors.white);
+  // Top to bottom, the same on every reel:
+  //   ❤️ Little Stories, Big Lessons
+  //   the question for parents        (biggest — it is the thing that earns comments)
+  //   💾 Save this for later
+  //   ↗️ Share with a parent who needs it
+  //   Fun Learning With Palak
+  // An invitation with a reason in it, rather than a closing screen that only says
+  // "follow" and gives a parent nothing to do.
+  final header = line(kEndCardHeader, 34, FontWeight.w600, Colors.white70);
+  final ask = parts.isEmpty ? null : line(parts.first, 60, FontWeight.w800, Colors.white);
   final keep = parts.length < 2
       ? null
-      : line(parts.sublist(1).join('  '), 40, FontWeight.w600, Colors.tealAccent);
-  final name = line(kBrandName, 46, FontWeight.w800, Colors.white);
-  final tagline = line(kBrandTagline, 30, FontWeight.w500, Colors.white70);
+      : line(parts.sublist(1).join('\n'), 42, FontWeight.w600, Colors.tealAccent);
+  final name = line(kBrandName, 44, FontWeight.w800, Colors.white);
 
-  const gapAfterAsk = 40.0;
-  const gapAfterKeep = 46.0;
-  const gapBeforeName = 14.0;
+  const gapAfterHeader = 44.0;
+  const gapAfterAsk = 52.0;
+  const gapAfterKeep = 64.0;
 
-  var blockHeight = name.height + gapBeforeName + tagline.height;
+  var blockHeight = header.height + gapAfterHeader + name.height;
   if (keep != null) blockHeight += keep.height + gapAfterKeep;
   if (ask != null) blockHeight += ask.height + gapAfterAsk;
 
   // Sat a little above centre: the eye reads the top half of a frame first, and the
   // bottom of a reel is where Instagram puts its own username and caption.
   var y = h * 0.44 - blockHeight / 2;
+
+  header.paint(canvas, Offset((w - header.width) / 2, y));
+  y += header.height + gapAfterHeader;
 
   if (ask != null) {
     ask.paint(canvas, Offset((w - ask.width) / 2, y));
@@ -187,12 +198,11 @@ Future<String?> renderBrandCard(
   }
 
   canvas.drawRect(
-    Rect.fromLTWH(w / 2 - 70, y - 22, 140, 2),
+    Rect.fromLTWH(w / 2 - 70, y - 30, 140, 2),
     Paint()..color = Colors.tealAccent.withOpacity(0.7),
   );
 
   name.paint(canvas, Offset((w - name.width) / 2, y));
-  tagline.paint(canvas, Offset((w - tagline.width) / 2, y + name.height + gapBeforeName));
 
   final image = await recorder.endRecording().toImage(kVideoWidth, kVideoHeight);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);

@@ -118,7 +118,7 @@ The script must follow the story above. Do not invent a different story.
 Shape it like a reel that holds attention:
 $kScriptShapeRules
 
-Keep every line under 12 words so it can be spoken in about 4 seconds.
+Keep every line to 4-9 words: short on screen, still easy to say in about 4 seconds.
 Write how a person talks, not how a book reads.
 
 Output ONLY $expectedLines lines. $formatNote Nothing else. No explanations. No bullet points. No asterisks.
@@ -349,6 +349,13 @@ void main() => runApp(MaterialApp(
       home: const StoryScreen(),
     ));
 
+/// What a reel is mainly for. Parent relatable first: for this page it is the one that
+/// earns saves and shares, rather than chasing "viral" on every post.
+const kReelPurposes = [
+  'Parent relatable', 'Save-worthy', 'Share-worthy', 'Funny',
+  'Emotional', 'Life lesson', 'Curiosity',
+];
+
 /// The five steps, named once so the bar says the same thing on every screen.
 const kSteps = ['Story', 'Script', 'Pictures', 'Voice', 'Reel'];
 
@@ -574,34 +581,70 @@ class _StoryScreenState extends State<StoryScreen> {
       if (!mounted) return;
       setState(() => _isGenerating = false);
 
+      // Ready / Improve / Rewrite, coloured, because the one decision this check exists
+      // for is whether to spend the evening making pictures for this story.
+      final bandColour = check.band == 'Ready'
+          ? AppColors.primary
+          : check.band == 'Improve' ? AppColors.warning : AppColors.danger;
+      final bandNote = check.band == 'Ready'
+          ? 'Good to make today.'
+          : check.band == 'Improve'
+              ? 'Fix the points below before making pictures.'
+              : 'Not worth the pictures yet — rework the story first.';
+
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: AppColors.surface,
           title: Row(children: [
             Text('${check.score}/10',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                // Amber rather than red below 7: it is a nudge to improve, not a
-                // refusal, and the story is still yours to use.
-                color: check.score >= 8
-                    ? AppColors.primary
-                    : check.score >= 6 ? AppColors.warning : AppColors.accent,
-              )),
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: bandColour)),
             const SizedBox(width: 10),
-            const Expanded(child: Text('Story check', style: TextStyle(fontSize: 15))),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: bandColour.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(20)),
+              child: Text(check.band, style: TextStyle(
+                fontSize: 14, fontWeight: FontWeight.w800, color: bandColour)),
+            ),
           ]),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(bandNote, style: TextStyle(fontSize: 13, color: bandColour,
+                  fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
                 if (check.verdict.isNotEmpty) ...[
                   Text(check.verdict, style: const TextStyle(fontSize: 13)),
                   const SizedBox(height: 12),
                 ],
-                ...check.good.map((g) => Padding(
+                // The ten requirements, each passed or not, so a low score says exactly
+                // where it lost its points instead of only that it did.
+                ...check.rows.map((r) => Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Icon(r.pass ? Icons.check_circle : Icons.cancel,
+                          size: 16, color: r.pass ? AppColors.primary : AppColors.danger),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text.rich(TextSpan(children: [
+                          TextSpan(text: r.name, style: const TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w700)),
+                          if (r.note.isNotEmpty)
+                            TextSpan(text: ' — ${r.note}', style: const TextStyle(
+                              fontSize: 12, color: AppColors.textSoft)),
+                        ]))),
+                      ]),
+                    )),
+                if (check.rows.isNotEmpty && check.missing.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10, bottom: 6),
+                    child: Text('Fix first', style: TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w800)),
+                  ),
+                if (check.rows.isEmpty) ...check.good.map((g) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         const Icon(Icons.check, size: 14, color: AppColors.primary),
@@ -759,6 +802,21 @@ class _StoryScreenState extends State<StoryScreen> {
     ));
   }
 
+  static final _purposeLine = RegExp(r'^Purpose:\s*(.*)$', multiLine: true);
+
+  /// The purpose written in the story, or empty.
+  String get _purpose => _purposeLine.firstMatch(_descCtrl.text)?.group(1)?.trim() ?? '';
+
+  /// Sets the story's purpose line, adding it at the top if it is not there yet.
+  void _setPurpose(String purpose) {
+    final text = _descCtrl.text;
+    setState(() {
+      _descCtrl.text = _purposeLine.hasMatch(text)
+          ? text.replaceFirst(_purposeLine, 'Purpose: $purpose')
+          : 'Purpose: $purpose\n$text';
+    });
+  }
+
   /// True when this exact story already has a script written for it.
   ///
   /// Checked against a fingerprint of the story text rather than just "has a script",
@@ -904,6 +962,15 @@ class _StoryScreenState extends State<StoryScreen> {
                   label: 'Form', icon: Icons.list_alt,
                   onPressed: _isGenerating ? null : _useFormat)),
               ]),
+              Gap.l,
+
+              // Chosen before the script, because the purpose decides how the story is
+              // built — a funny reel and a save-worthy one turn in different places.
+              // Kept as a line in the story itself, so it is saved with it and seen by
+              // every prompt without anything else needing to carry it.
+              const SectionTitle('What is this reel for?'),
+              _chips(kReelPurposes.map((p) => _Choice(p, _purpose == p,
+                  () => _setPurpose(p)))),
               Gap.l,
 
               const SectionTitle('How long'),
@@ -2029,6 +2096,35 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           Gap.m,
         ],
 
+        // Five kinds of cover hook, written with the script. You pick; the model only
+        // suggests. The chosen one is drawn big on picture 1, which is the thumbnail.
+        if (_hookChoices.isNotEmpty) ...[
+          const SectionTitle('Cover words — pick one'),
+          ..._hookChoices.map((c) {
+            final chosen = c.text == _coverChoice;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: GestureDetector(
+                onTap: busy ? null : () => _chooseCover(c.text),
+                child: AppCard(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  colour: chosen ? AppColors.primarySoft : AppColors.surface,
+                  borderColour: chosen ? AppColors.primary : AppColors.border,
+                  child: Row(children: [
+                    Icon(chosen ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                      size: 18, color: chosen ? AppColors.primary : AppColors.textFaint),
+                    Gap.wS,
+                    Expanded(child: Text(c.text, style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.text))),
+                    Text(c.type, style: AppText.small),
+                  ]),
+                ),
+              ),
+            );
+          }),
+          Gap.m,
+        ],
+
         SectionTitle('The rest', trailing: '${_lines.length} lines'),
         ...List.generate(_lines.length, (i) => i == 0
             ? const SizedBox.shrink()
@@ -2690,6 +2786,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
   Future<void> _restoreFromProject() async {
     final project = await loadProject(widget.projectId);
     if (project == null || !mounted) return;
+    _loadHookChoices();
 
     final images = await ProjectStore.existingImages(project.images);
 
@@ -2733,6 +2830,34 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
 
   /// The saved reel, if it still matches everything on screen.
   String? _matchingReel;
+
+  /// The five cover hooks written with the script, and the one currently chosen.
+  List<HookChoice> _hookChoices = [];
+  String _coverChoice = '';
+
+  Future<void> _loadHookChoices() async {
+    final project = await loadProject(widget.projectId);
+    if (project == null || project.promptsJson.isEmpty) return;
+    try {
+      final post = promptsFromSaved(project.promptsJson, project.promptsScript).post;
+      if (!mounted) return;
+      setState(() {
+        _hookChoices = post.coverHookOptions;
+        final edited = project.edits['cover_hook']?.trim() ?? '';
+        _coverChoice = edited.isNotEmpty ? edited : post.coverHook;
+      });
+    } catch (_) {}
+  }
+
+  /// Makes one of the five the cover. Saved as an edit, which is what the cover on the
+  /// reel and the caption sheet already read — so choosing here changes both.
+  Future<void> _chooseCover(String text) async {
+    setState(() { _coverChoice = text; _matchingReel = null; });
+    final project = await loadProject(widget.projectId);
+    if (project == null) return;
+    await ProjectStore.save(project.copyWith(
+      edits: {...project.edits, 'cover_hook': text}));
+  }
 
   Future<void> _checkSavedReel() async {
     final project = await loadProject(widget.projectId);

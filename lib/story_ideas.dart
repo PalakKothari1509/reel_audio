@@ -91,6 +91,32 @@ class StoryIdea {
 
 // ── Checking a story before it costs anything ─────────────────────────────────
 
+/// One of the ten things a story is judged on.
+class CheckRow {
+  final String name;
+  final bool pass;
+  /// Why, in a few words — mostly useful when it did not pass.
+  final String note;
+  const CheckRow(this.name, this.pass, this.note);
+}
+
+/// The ten requirements, in the order they matter to a parent scrolling past.
+///
+/// Fixed here rather than left to the model, so every story is held to the same
+/// standard and two checks of two stories can actually be compared.
+const kStoryChecks = [
+  'Real-life problem',
+  'Hook',
+  'Curiosity',
+  'Emotion',
+  'Child learns naturally',
+  'Satisfying ending',
+  'Save value',
+  'Share value',
+  'Originality',
+  'Character fit',
+];
+
 class StoryCheck {
   final int score;
   /// What the story already does, so the check is not only a list of complaints.
@@ -98,13 +124,19 @@ class StoryCheck {
   /// What is weak, in the order worth fixing.
   final List<String> missing;
   final String verdict;
+  final List<CheckRow> rows;
 
   const StoryCheck({
     required this.score,
     required this.good,
     required this.missing,
     required this.verdict,
+    this.rows = const [],
   });
+
+  /// Worked out here from the score rather than trusted from the model, so a 7 always
+  /// means the same thing. Below 7 is not worth an evening of making pictures for.
+  String get band => score >= 9 ? 'Ready' : score >= 7 ? 'Improve' : 'Rewrite';
 }
 
 /// Reads a story and says whether it will make a reel worth watching.
@@ -124,22 +156,35 @@ Judge this story for a 30 second Instagram reel for Indian parents of preschoole
 $story
 
 Be honest and specific. A story that is merely pleasant scores low — the test is
-whether a parent stops scrolling and recognises their own house.
+whether a parent stops scrolling, watches to the end, and saves or shares it.
+
+Judge it on exactly these ten, one entry each, in this order:
+1. Real-life problem — a parent recognises it from their own house.
+2. Hook — the opening makes you want to keep watching.
+3. Curiosity — something stays unresolved long enough to hold attention.
+4. Emotion — a genuine feeling, not a forced one.
+5. Child learns naturally — through what happens, NOT an adult explaining, NOT a
+   "say sorry" scene. A story where an adult explains the lesson FAILS this.
+6. Satisfying ending — it lands; it does not just stop.
+7. Save value — a parent would want to keep it to show their child later.
+8. Share value — a parent would send it to another parent.
+9. Originality — not the obvious version every page already posted.
+10. Character fit — Ria, Rio and Cuty belong in it and act like themselves.
 
 Return ONLY valid JSON:
 
 {
   "score": 7,
+  "checks": [
+    {"name": "Real-life problem", "pass": true, "note": "few words why"}
+  ],
   "good": ["what already works, short phrases"],
-  "missing": ["what is weak, most important first, short phrases"],
-  "verdict": "one sentence saying whether to use it or rework it"
+  "missing": ["the most useful fixes, most important first, short and concrete"],
+  "verdict": "one sentence saying whether to use it or how to rework it"
 }
 
-Check for: a real everyday problem, a clear start, the problem actually shown, a moment
-of feeling, a turn where it changes, a solution the child reaches, a warm ending,
-age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 minutes.
-
-"score" is 1 to 10.
+"score" is 1 to 10 and should roughly equal the number of checks passed. Be strict:
+9 or 10 means ready to make today.
 ''';
 
   final response = await geminiPost(
@@ -185,11 +230,24 @@ age-appropriate, nothing frightening, and enough to fill 30 seconds but not 3 mi
       .where((s) => s.isNotEmpty)
       .toList();
 
+  // Matched to the fixed list by position, and named from it, so a check the model
+  // renamed or skipped still lands on the right row instead of shifting every row after.
+  final rawChecks = ((json['checks'] as List?) ?? const [])
+      .whereType<Map<String, dynamic>>().toList();
+  final rows = <CheckRow>[
+    for (var i = 0; i < kStoryChecks.length && i < rawChecks.length; i++)
+      CheckRow(
+        kStoryChecks[i],
+        rawChecks[i]['pass'] == true,
+        (rawChecks[i]['note'] as String?)?.trim() ?? ''),
+  ];
+
   return StoryCheck(
     score: (json['score'] is num) ? (json['score'] as num).round().clamp(1, 10) : 5,
     good: list('good'),
     missing: list('missing'),
     verdict: (json['verdict'] as String?)?.trim() ?? '',
+    rows: rows,
   );
 }
 

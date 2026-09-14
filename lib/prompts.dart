@@ -117,7 +117,17 @@ const kBrandTagline = 'Little Stories • Big Lessons';
 /// A reason to keep the reel rather than an instruction to follow. Saving is the
 /// thing Instagram counts hardest, and a parent will save a bedtime story long
 /// before they will follow a stranger who told them to.
-const kDefaultCtaLine = 'Save this for tonight\'s bedtime story';
+const kDefaultCtaLine = '💾 Save this for later\n↗️ Share with a parent who needs it';
+
+/// The small line at the top of the closing card, same on every reel.
+const kEndCardHeader = '❤️ Little Stories, Big Lessons';
+
+/// One cover hook to choose from, and what kind of hook it is.
+class HookChoice {
+  final String type;
+  final String text;
+  const HookChoice(this.type, this.text);
+}
 
 /// Everything needed to actually post the reel.
 class PostDetails {
@@ -151,6 +161,10 @@ class PostDetails {
   /// an opinion.
   final String endQuestion;
 
+  /// Five cover hooks of different kinds, so you pick the hook rather than taking
+  /// whichever one the model happened to prefer. It still suggests one as coverHook.
+  final List<HookChoice> coverHookOptions;
+
   const PostDetails({
     required this.coverTitle,
     required this.caption,
@@ -162,6 +176,7 @@ class PostDetails {
     this.moralLine = '',
     this.ctaLine = '',
     this.endQuestion = '',
+    this.coverHookOptions = const [],
   });
 
   /// Caption and hashtags as one block, which is how they get pasted into Instagram.
@@ -187,6 +202,30 @@ const kBestTimeCaveat =
 /// within a week, and the half that drifted would be the half producing weak hooks
 /// with nobody able to say why.
 const kScriptShapeRules = '''
+EVERY STORY HAS THIS SHAPE, NO EXCEPTIONS:
+1. REAL PROBLEM — something a parent recognises from their own house at once.
+2. CURIOSITY — something happens that makes the watcher need to see the ending.
+3. EMOTIONAL TURN — the child realises something through what happens to THEM.
+4. SIMPLE LESSON — shown in what the child does next, not explained.
+
+THE CHILD LEARNS FROM WHAT HAPPENS, NEVER FROM BEING TOLD.
+Banned shape, however natural it feels: child does something wrong → an adult
+explains why it matters → child says sorry → moral. That story has been told a
+thousand times and every parent scrolls past it by the second line.
+- No adult explaining. No lecture. No "sorry" scene. No moral said by a grown-up.
+- If Mumma or Papa appear, they notice, wait, or help — they do not teach.
+- Let the world do the teaching. Not "Mumma says brushing matters" but: Ria skips
+  brushing, they reach the park, she laughs with her friends — and notices something
+  that makes her want to brush. That is a story, not a lesson dressed up as one.
+- Before writing, think of the obvious version of this story, then do not write it.
+
+TIMING, for a 30 second reel (stretch evenly for longer ones):
+0–2s hook · 2–8s the problem · 8–20s it gets worse · 20–27s the turn · 27–35s the lesson.
+
+ON-SCREEN LINES ARE SHORT: 4 to 9 words. The picture carries the rest. Not
+"Ria didn't want to clean her room because she wanted to keep playing" but
+"Ria ne kamra saaf nahi kiya..." — then the next picture: "Arey! Cuty kahan hai?"
+
 LINE 1 IS THE HOOK AND IT DECIDES EVERYTHING.
 It is heard in the first three seconds. If it does not stop a parent's thumb, nothing
 after it is ever seen, so treat it as the hardest line in the script.
@@ -200,11 +239,20 @@ after it is ever seen, so treat it as the hardest line in the script.
   the", anything that begins at the beginning, any greeting, any introduction.
 
 MIDDLE LINES: show the problem and make it worse. Show it happening, do not explain it.
-Somewhere in here the turn: what the child works out, or is shown. No adult lecturing.
+Somewhere in here the turn: what the child works out for themselves.
 
-THE LAST LINE IS THE MORAL.
+THE LAST LINE IS THE MORAL, said by the storyteller, never by a character.
 One short warm Hinglish line saying what the child watching should take away. It is a
 lesson, not a summary — "Sharing se dosti badhti hai", not "Aur phir woh khush ho gaye".
+
+IF THE STORY HAS A "Purpose:" LINE, build the whole reel around that goal:
+- Parent relatable: the problem is the exact thing a parent dealt with this week.
+- Save-worthy: the lesson is something a parent would want to show their child later.
+- Share-worthy: the kind of moment a parent sends to another parent saying "same!"
+- Funny: the escalation is comic; the turn is a laugh, not a scolding.
+- Emotional: the turn is a quiet, felt moment between the characters.
+- Life lesson: the lesson is clear and specific, still learned by doing.
+- Curiosity: hold the answer back until the turn; every line adds to the question.
 If the story has a "Moral:" line, the last line says that moral in your own words.
 If the story has a "Hook:" line, line 1 is built from it.
 

@@ -21,9 +21,9 @@ const double kTailSeconds = 1.5;
 
 /// How long the closing brand card stays up.
 ///
-/// Long enough to read two lines, short enough that nobody scrolls away during it —
-/// an end card people skip teaches Instagram the reel was not finished.
-const double kEndCardSeconds = 2.0;
+/// Long enough to read a question and two reasons, short enough that nobody scrolls
+/// away during it — an end card people skip teaches Instagram the reel was not finished.
+const double kEndCardSeconds = 3.5;
 
 // ── Staying out of Instagram's way ────────────────────────────────────────────
 //
