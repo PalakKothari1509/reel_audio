@@ -25,6 +25,7 @@ import 'caption_renderer.dart';
 import 'story_ideas.dart';
 import 'theme.dart';
 import 'music.dart';
+import 'quick_content.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -997,6 +998,12 @@ class _StoryScreenState extends State<StoryScreen> {
             tooltip: 'Saved stories',
             icon: const Icon(Icons.folder_open, size: 21),
             onPressed: _isGenerating ? null : _openSaved,
+          ),
+          IconButton(
+            tooltip: 'Quick Content Studio',
+            icon: const Icon(Icons.article_outlined, size: 21),
+            onPressed: _isGenerating ? null : () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const QuickContentScreen())),
           ),
           // The old-path entry lives up here now. It still works, but it is not what
           // the app is for, and as a full-width button it read like a main choice.
