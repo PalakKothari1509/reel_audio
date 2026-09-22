@@ -329,7 +329,61 @@ The article icon on the main screen opens Quick Content Studio. It supports:
 - content goal, mood, audience, hook, idea, problem, lesson, visual style, and CTA
 - generated image prompts, captions, hashtags, scripts, and comment packs
 - saved post ideas with reopen and copy actions
-- reusable profile-promotion comments with save, copy, and delete actions
 
 ### Gallery importing
 The Android app now declares image-library access for importing images from the device gallery. The story image picker uses the device gallery multi-image picker, while video selection remains separate.
+
+### Current creator dashboard
+The app now opens on a creator dashboard with four clear entry points:
+- Make a reel: the existing story, script, image, voice, and render workflow
+- Create a quick post: carousel, static-image, story, or reel copy packs
+- Browse ideas: complete built-in hooks with filled story beats, not blank placeholders
+- Profile promotion comments: open the full reusable comment vault
+
+The dashboard shows the first three ready comments with one-tap copy. The `Profile promotion comments` button opens every saved comment, supports copying, and lets you add another reusable comment. Saved story history remains available through the existing folder/file-manager icon in the dashboard app bar.
+
+Selecting an idea from `Browse ideas` now returns it directly to the story editor with its complete story scaffold filled in. The generated structure includes the setting, starting problem, escalation, solution, ending line, and moral, so there are no blank story sections to complete before writing the script.
+
+### Quick-post history
+Generated quick-post packs are also stored automatically in a separate history list. Carousel and static-image posts can be reopened or copied from the history icon in Quick Content Studio, even when they were not saved as a reusable idea.
+
+### Profile-promotion comment vault
+The dashboard owns the persistent library of reusable comments for engaging with other creators' posts. The library contains the Ria, Rio, Cuty, combined-character, curiosity, and community comment groups. Each comment can be copied, and new comments can be saved directly from the dashboard button.
+
+### Real AI video generation
+Gemini's current Veo video models can create short 4, 6, or 8-second clips with native audio and optional reference images. This is different from the app's current image-to-reel renderer. Veo access is asynchronous and depends on the API key, billing, region, and model entitlement, so it should be integrated as a separate video-shot workflow and then combined with the existing script, voice, caption, and posting tools. The current app still uses its reliable local image-to-video assembly path until Veo access is configured and tested with the project's key.
+
+The recommended implementation for a longer Hinglish reel is three independent portrait shots, each generated from the same character references, followed by local FFmpeg concatenation. Because Veo's supported duration is 4, 6, or 8 seconds rather than 10 seconds, each requested 10-second segment must be implemented as an 8-second generation plus a 2-second extension or local hold/transition. Hinglish dialogue can be included in the prompt, but English is the only fully evaluated Veo language, so the existing Flutter TTS/Hinglish voice pipeline remains the reliable voice layer until Veo audio quality is tested for the account.
+
+### Shot Planner implementation
+The first Veo-ready layer is now implemented in `lib/shot_planner.dart` and is opened from the Story screen with `Plan cinematic shots`.
+
+It:
+- calculates a valid combination of 4, 6, and 8-second shots for the selected reel length
+- tells the user when an exact total is impossible, such as 45 seconds becoming 44 seconds
+- asks Gemini for structured cinematic beats: purpose, characters, location, action, emotion, camera, movement, Hinglish dialogue, and ending
+- loads the saved cast descriptions and embeds a non-editable character-consistency contract in each Veo prompt
+- shows each shot as a review card with its generated Veo prompt
+- supports regenerating an individual shot plan without changing the rest of the app
+
+This is intentionally P0. Veo generation, remote video download, FFmpeg joining, and shot thumbnails should be added only after the planner output is tested on real stories and the API key is confirmed to have Veo access.
+
+### AI Idea Lab backend
+The secure provider boundary is scaffolded in the `backend/` folder:
+- `backend/server.js` exposes `POST /v1/ideas`
+- the active provider is `openai` only; Claude is intentionally deferred
+- the backend sends the Fun Learning With Palak brand context automatically
+- responses are normalized into ideas with hooks, concepts, characters, reasons, and quality scores
+- the OpenAI credential is read only from the backend environment variables
+- `lib/idea_lab_api.dart` is the Flutter client and receives only the public backend URL
+
+The backend must be deployed to an HTTPS host and protected with authentication and rate limiting before the Flutter app calls it. Node.js is not available on the current development machine, so the backend still needs to be installed and smoke-tested in the deployment environment. Any credentials previously present in `lib/secrets.dart` should be revoked and rotated before production use.
+
+### 100th Instagram post ideas
+The 100th milestone concepts are now available in the built-in `Page & milestone` Ideas category:
+- `100 Posts. One World.`: the primary combined milestone, brand introduction, character introduction, and Trial Reel concept
+- `100 Posts Ago...`: the emotional page-journey version
+- `Who Made Post 100?`: the funny Ria/Rio/Cuty version
+- `Meet Our Little World`: the pinned character and brand introduction
+
+Each idea now carries its recommended format, strategy, ready caption, and pinned comment. Selecting one from Browse ideas sends the full kit into the story editor, so it is usable rather than only a title or hook.

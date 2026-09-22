@@ -26,6 +26,8 @@ import 'story_ideas.dart';
 import 'theme.dart';
 import 'music.dart';
 import 'quick_content.dart';
+import 'creator_home.dart';
+import 'shot_planner.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -343,14 +345,40 @@ final List<Character> kCharacters = [
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+final _appNavigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   // Hooks, posting times and results go into the Downloads backup with the stories.
   onPlanSaved = ProjectBackup.schedule;
   runApp(MaterialApp(
     title: 'Story Reel Maker',
+    navigatorKey: _appNavigatorKey,
     debugShowCheckedModeBanner: false,
     theme: buildAppTheme(),
-    home: const StoryScreen(),
+    home: CreatorHomeScreen(
+      onMakeReel: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const StoryScreen()),
+      ),
+      onQuickPost: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const QuickContentScreen()),
+      ),
+      onIdeas: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const PlanScreen()),
+      ).then((hook) {
+        if (hook is! HookIdea || _appNavigatorKey.currentContext == null) return;
+        Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => StoryScreen(initialText: hook.asStoryText())),
+        );
+      }),
+      onSavedStories: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const SavedStoriesScreen()),
+      ),
+    ),
   ));
 }
 
@@ -446,7 +474,9 @@ class _HomeScreenState extends State<HomeScreen> {
 // how many lines there are to fill.
 
 class StoryScreen extends StatefulWidget {
-  const StoryScreen({super.key});
+  final String initialText;
+
+  const StoryScreen({super.key, this.initialText = ''});
   @override
   State<StoryScreen> createState() => _StoryScreenState();
 }
@@ -469,6 +499,7 @@ class _StoryScreenState extends State<StoryScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialText.isNotEmpty) _descCtrl.text = widget.initialText;
     _descCtrl.addListener(_autoSave);
   }
 
@@ -916,6 +947,17 @@ class _StoryScreenState extends State<StoryScreen> {
     _openScript(lines);
   }
 
+  Future<void> _openShotPlanner() async {
+    final story = _descCtrl.text.trim();
+    if (story.isEmpty) {
+      setState(() => _status = 'Write the story first, then plan its cinematic shots.');
+      return;
+    }
+    await Navigator.push(context, MaterialPageRoute(
+      builder: (_) => ShotPlannerScreen(story: story, targetSeconds: _seconds),
+    ));
+  }
+
   /// [force] writes a new script even when this story already has one.
   Future<void> _generate({bool force = false}) async {
     if (_descCtrl.text.trim().isEmpty) {
@@ -999,12 +1041,6 @@ class _StoryScreenState extends State<StoryScreen> {
             icon: const Icon(Icons.folder_open, size: 21),
             onPressed: _isGenerating ? null : _openSaved,
           ),
-          IconButton(
-            tooltip: 'Quick Content Studio',
-            icon: const Icon(Icons.article_outlined, size: 21),
-            onPressed: _isGenerating ? null : () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const QuickContentScreen())),
-          ),
           // The old-path entry lives up here now. It still works, but it is not what
           // the app is for, and as a full-width button it read like a main choice.
           IconButton(
@@ -1058,6 +1094,15 @@ class _StoryScreenState extends State<StoryScreen> {
                   label: 'Form', icon: Icons.list_alt,
                   onPressed: _isGenerating ? null : _useFormat)),
               ]),
+              Gap.s,
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isGenerating ? null : _openShotPlanner,
+                  icon: const Icon(Icons.movie_filter_outlined),
+                  label: const Text('Plan cinematic shots'),
+                ),
+              ),
               Gap.l,
 
               // Chosen before the script, because the purpose decides how the story is

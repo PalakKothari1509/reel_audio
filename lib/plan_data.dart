@@ -31,6 +31,10 @@ class HookIdea {
   /// The real preschool problem the story is built on.
   final String problem;
   final String lesson;
+  final String postFormat;
+  final String strategy;
+  final String caption;
+  final String pinnedComment;
   /// False for posts the app cannot make — milestones and behind-the-scenes need your
   /// own screen recordings, not an illustrated story.
   final bool forApp;
@@ -47,6 +51,10 @@ class HookIdea {
     required this.opening,
     required this.problem,
     required this.lesson,
+    this.postFormat = 'Reel',
+    this.strategy = '',
+    this.caption = '',
+    this.pinnedComment = '',
     this.forApp = true,
     this.usedOn = '',
     this.custom = false,
@@ -61,6 +69,10 @@ class HookIdea {
         opening: opening ?? this.opening,
         problem: problem ?? this.problem,
         lesson: lesson ?? this.lesson,
+        postFormat: postFormat,
+        strategy: strategy,
+        caption: caption,
+        pinnedComment: pinnedComment,
         forApp: forApp,
         usedOn: usedOn ?? this.usedOn,
         custom: custom,
@@ -69,7 +81,8 @@ class HookIdea {
   Map<String, dynamic> toJson() => {
         'id': id, 'category': category, 'cover': cover, 'opening': opening,
         'problem': problem, 'lesson': lesson, 'forApp': forApp,
-        'usedOn': usedOn, 'custom': custom,
+        'usedOn': usedOn, 'custom': custom, 'postFormat': postFormat,
+        'strategy': strategy, 'caption': caption, 'pinnedComment': pinnedComment,
       };
 
   factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
@@ -79,6 +92,10 @@ class HookIdea {
         opening: j['opening'] as String? ?? '',
         problem: j['problem'] as String? ?? '',
         lesson: j['lesson'] as String? ?? '',
+        postFormat: j['postFormat'] as String? ?? 'Reel',
+        strategy: j['strategy'] as String? ?? '',
+        caption: j['caption'] as String? ?? '',
+        pinnedComment: j['pinnedComment'] as String? ?? '',
         forApp: j['forApp'] as bool? ?? true,
         usedOn: j['usedOn'] as String? ?? '',
         custom: j['custom'] as bool? ?? false,
@@ -88,13 +105,17 @@ class HookIdea {
   String asStoryText() => 'Cover hook: $cover\n'
       'Hook: $opening\n'
       'Who: Ria, Rio, Cuty\n'
-      'Where:\n'
+      'Where: A warm, familiar family home\n'
       'What starts it: $problem\n'
-      'What goes wrong:\n'
-      'How it gets worse:\n'
-      'How it is solved:\n'
-      'Ending line:\n'
-      'Moral: $lesson';
+      'What goes wrong: The small problem turns into funny family chaos\n'
+      'How it gets worse: Each character reacts in their own way\n'
+      'How it is solved: They listen, help one another, and try again\n'
+      'Ending line: That is how one little moment becomes a big family memory\n'
+      'Moral: $lesson\n'
+      'Post format: $postFormat\n'
+      'Strategy: $strategy\n'
+      'Caption: $caption\n'
+      'Pinned comment: $pinnedComment';
 }
 
 const kHookCategories = [
@@ -280,6 +301,44 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Aaj Ria ne Mumma ko ek baat sikha di...',
     problem: 'A small child says something that makes the adult rethink',
     lesson: 'Bachche humse zyada samajhte hain'),
+
+  // Milestone posts: complete concepts for the 100th Instagram post.
+  HookIdea(id: 'p05', category: 'Page & milestone',
+    cover: '100 Posts. One World.',
+    opening: '100 posts. ❤️ But who are we? Ria jumps in, Rio says NO, and Cuty is sleeping.',
+    problem: 'A new visitor should understand Fun Learning With Palak, the three characters, and the page world in one reel',
+    lesson: 'Little stories, learning, masti and everyday childhood can grow into one warm little world',
+    postFormat: 'Reel / Trial Reel',
+    strategy: 'Milestone + brand introduction + character introduction + discovery. Use a 25-35 second reel with Ria, Rio and Cuty, then test two hooks as Trial Reels: 100 POSTS ❤️ and Meet Our Little World 👀.',
+    caption: '100 posts. ❤️\n\nWhat started as little ideas slowly became our little world — Ria, Rio, Cuty and so many tiny stories, laughs and lessons. 🌸💙🐰\n\nThank you for being here.\n\nLittle Stories. Big Lessons. 🌱\n\nAre you Team Ria, Team Rio or Team Cuty? 👇',
+    pinnedComment: 'Okay, important question 😂👇\n🌸 Ria = Tofani\n💙 Rio = Ziddi\n🐰 Cuty = Sleep Lover\nWhich one is most like your little one?'),
+  HookIdea(id: 'p06', category: 'Page & milestone',
+    cover: '100 Posts Ago...',
+    opening: '100 posts ago, there was no big world — just one little idea and one little character.',
+    problem: 'The page journey and its characters need an emotional introduction for new visitors',
+    lesson: 'One small idea can grow into a little family and a community that learns together',
+    postFormat: 'Reel / Emotional milestone',
+    strategy: 'Open with 100 posts ago, introduce Ria, then Rio, then Cuty, and end with 100 POSTS ❤️ and We are just getting started.',
+    caption: '100 posts ago, there was only one little idea. Today, Ria, Rio and Cuty have their own little world. ❤️\n\nThank you for growing with us. Little Stories. Big Lessons. 🌱',
+    pinnedComment: 'Which character did you meet first — Ria, Rio or Cuty? ❤️'),
+  HookIdea(id: 'p07', category: 'Page & milestone',
+    cover: 'Who Made Post 100?',
+    opening: 'Ria says she made Post 100. Rio says NO. Cuty says wake me up at Post 200.',
+    problem: 'A milestone announcement can feel too formal unless the characters make it funny and memorable',
+    lesson: 'Ria\'s masti, Rio\'s zidd and Cuty\'s neend are what make this little world special',
+    postFormat: 'Funny Reel / Trial Reel',
+    strategy: 'Use the funniest version for discovery. Ria claims credit, Rio argues, Cuty keeps sleeping, and the final card reveals POST #100 🎉.',
+    caption: 'Who made it to Post #100? 😂\n\nRia says it was her. Rio says NO. Cuty is sleeping through the celebration.\n\nStill causing trouble, one little story at a time. ❤️',
+    pinnedComment: 'Who is most like your little one: Tofani Ria, Ziddi Rio or sleepy Cuty? 😂'),
+  HookIdea(id: 'p08', category: 'Page & milestone',
+    cover: 'Meet Our Little World',
+    opening: 'Meet Ria, Rio and Cuty — one is Tofani, one is Ziddi, and one just wants to sleep.',
+    problem: 'New followers need a simple pinned introduction to the characters and the page promise',
+    lesson: 'Together they make Fun Learning With Palak: cute preschool stories, learning, laughter and little lessons',
+    postFormat: 'Reel / Pinned brand introduction',
+    strategy: 'Pin this after Post 100. Introduce each character in one quick beat, then show learning, masti, family and everyday childhood.',
+    caption: 'Welcome to our little world. 🌸💙🐰\n\nRia is Tofani, Rio is Ziddi, and Cuty is our sleep lover. Together they bring little stories, little lessons and lots of masti.\n\nFun Learning With Palak ❤️',
+    pinnedComment: 'Which one are you: Team Ria, Team Rio or Team Cuty? 👇'),
 
   // Page posts: need your own footage, so the app lists them but cannot build them.
   HookIdea(id: 'p01', category: 'Page & milestone', forApp: false,

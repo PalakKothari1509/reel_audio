@@ -125,6 +125,36 @@ class QuickIdeaStore {
   }
 }
 
+class QuickHistoryStore {
+  static const _fileName = 'quick_post_history.json';
+
+  static Future<File> _path() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/$_fileName');
+  }
+
+  static Future<List<QuickIdea>> load() async {
+    try {
+      final file = await _path();
+      if (!await file.exists()) return const [];
+      final raw = jsonDecode(await file.readAsString());
+      if (raw is! List) return const [];
+      return raw.whereType<Map<String, dynamic>>().map(QuickIdea.fromJson).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static Future<void> add(QuickIdea idea) async {
+    final existing = await load();
+    final updated = [idea, ...existing].take(50).toList();
+    try {
+      final file = await _path();
+      await file.writeAsString(jsonEncode(updated.map((item) => item.toJson()).toList()));
+    } catch (_) {}
+  }
+}
+
 class PromoCommentStore {
   static const _fileName = 'promo_comments.json';
   static const starterComments = [
@@ -132,6 +162,56 @@ class PromoCommentStore {
     'Meri Profile pe Ria, Rio & Cuty ki full masti chal rahi hai - miss mat karna! ❤️',
     'Cuty ki masti + Ria Rio ki stories = perfect little-kids content 🐰💕',
     'Ria ne aaj phir kya kaand kar diya dekho meri Profile pe 🤣😂',
+    'Ria ne aaj phir kya kaand kiya hai 😂🌸 Profile pe dekho!',
+    'Meri Ria ko ek jagah shaant rehna aata hi nahi 😂❤️',
+    'Ria ki Tofani duniya mein welcome 😂🌸',
+    'Ria ke naye kaand dekhne hain? 😂❤️',
+    'Ria = full masti, zero silence 😂🌸',
+    'Meri profile pe Ria ki full Tofani masti chal rahi hai 😂❤️',
+    'Ria ko dekhke har Mumma bolegi — “ye toh meri beti hai!” 😂',
+    'Ria phir se kuch karne wali hai… mujhe already pata hai 😂🌸',
+    'Rio ka favourite word? “Nahi!” 😂💙',
+    'Rio ki zidd aur Ria ki masti… ghar mein shanti impossible 😂',
+    'Mera Rio har baat pe negotiation karta hai 😂💙',
+    'Rio ki zidd dekhke parents ko apna ghar yaad aa jayega 😂💙',
+    'Rio ne phir “Nahi!” bol diya 😤😂',
+    'Rio ki little adventures meri profile pe chal rahi hain 💙',
+    'Rio ko samjhana = full-time job 😂💙',
+    'Jahan Rio hai, wahan “Nahi!” toh hoga hi 😂',
+    'Cuty ka solution? Pehle nap… phir problem solve 😴🐰😂',
+    'Cuty peacefully sabki masti dekh raha hai 😂🐰',
+    'Ria-Rio lad rahe hain, Cuty so raha hai… perfect balance 😂🐰',
+    'Cuty ko duniya ki sabse important cheez pata hai — NAP 😴🐰❤️',
+    'Meri profile ka sabse peaceful member = Cuty 🐰💤',
+    'Cuty enters… aur pura drama suddenly cute ho jata hai 🐰❤️',
+    'Cuty ko bas sone do, baaki Ria-Rio sambhal lenge 😂🐰',
+    'Cuty ki sleepy masti miss mat karna 😴🐰',
+    'Ria ki masti + Rio ki zidd + Cuty ki neend = meri daily story 😂❤️',
+    'Ek Tofani, ek Ziddi, ek sleepy… aur ek ghar 😂🌸💙🐰',
+    'Ria chaos create karti hai, Rio problem badhata hai, Cuty peace lata hai 😂❤️',
+    'Meri profile pe teen personalities ki full masti chal rahi hai 🌸💙🐰',
+    'Ria + Rio + Cuty = ghar mein kabhi boring nahi hota 😂❤️',
+    'Teen little characters, har din ek nayi story 🌸💙🐰',
+    'In teenon ko ek saath chhod do… story khud ban jaati hai 😂',
+    'Ria aur Rio ka drama, Cuty ka nap — perfect combo 😂🐰',
+    'Little characters, big masti ❤️ Ria, Rio & Cuty!',
+    'Meri profile pe chhoti-chhoti stories aur full-on masti ❤️😂',
+    'Aaj Ria ne jo kiya na… 😂 Profile pe story dekho!',
+    'Rio ko aaj bhi “Nahi” bolna tha 😭😂',
+    'Cuty ne aaj phir sabse unexpected kaam kiya 🐰😂',
+    'In teenon ke saath normal day bhi adventure ban jata hai 😂',
+    'Aaj ka Ria-Rio drama dekhke Mumma log relate karenge 😂❤️',
+    'Bas ek baar Ria, Rio & Cuty se mil lo… phir yaad rahenge ❤️🐰',
+    'Agar ghar mein toddler hai, Ria-Rio ki stories definitely relatable hongi 😂',
+    'Parents ke liye ye little stories too relatable hain 😂❤️',
+    'Meri profile pe abhi ek aisi story hai jo har parent relate karega 👀❤️',
+    'Ria-Rio-Cuty ki little world mein roz kuch na kuch hota rehta hai 😂',
+    'Our little world is growing one story at a time 🌱❤️',
+    'Ria, Rio & Cuty ki little world mein aapka welcome hai 🥹❤️',
+    'Little stories, little lessons, lots of masti 🌸🐰',
+    'Humari little world mein har din ek nayi story hoti hai ❤️',
+    'Ria-Rio-Cuty ke saath childhood ko thoda aur fun bana rahe hain 🌸❤️',
+    'Chhoti stories, big little lessons ❤️🌱',
   ];
 
   static Future<File> _path() async {
@@ -356,11 +436,11 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
   final _scriptCtrl = TextEditingController();
   final _hashtagsCtrl = TextEditingController();
   final _pinCommentCtrl = TextEditingController();
-  final _promoCommentCtrl = TextEditingController();
 
   List<String> _comments = [];
   List<String> _promoComments = [];
   List<QuickIdea> _savedIdeas = [];
+  List<QuickIdea> _history = [];
   bool _loading = true;
 
   String _postType = 'Carousel';
@@ -374,40 +454,17 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
   Future<void> _loadSaved() async {
     final results = await Future.wait([
       QuickIdeaStore.load(),
-      PromoCommentStore.load(),
+      QuickHistoryStore.load(),
     ]);
     if (!mounted) return;
     setState(() {
       _savedIdeas = results[0] as List<QuickIdea>;
-      _promoComments = results[1] as List<String>;
+      _history = results[1] as List<QuickIdea>;
       _loading = false;
     });
   }
 
-  Future<void> _addPromoComment() async {
-    final text = _promoCommentCtrl.text.trim();
-    if (text.isEmpty) return;
-    if (_promoComments.contains(text)) {
-      _promoCommentCtrl.clear();
-      return;
-    }
-    final updated = [text, ..._promoComments];
-    await PromoCommentStore.save(updated);
-    if (!mounted) return;
-    setState(() {
-      _promoComments = updated;
-      _promoCommentCtrl.clear();
-    });
-  }
-
-  Future<void> _deletePromoComment(String comment) async {
-    final updated = _promoComments.where((item) => item != comment).toList();
-    await PromoCommentStore.save(updated);
-    if (!mounted) return;
-    setState(() => _promoComments = updated);
-  }
-
-  void _generatePack() {
+  Future<void> _generatePack() async {
     final idea = buildQuickIdea(
       title: _titleCtrl.text,
       postType: _postType,
@@ -428,6 +485,9 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     _hashtagsCtrl.text = idea.hashtags;
     _pinCommentCtrl.text = idea.comments.first;
     _comments = idea.comments;
+
+    await QuickHistoryStore.add(idea);
+    _history = [idea, ..._history].take(50).toList();
 
     setState(() {});
   }
@@ -502,7 +562,6 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     _scriptCtrl.dispose();
     _hashtagsCtrl.dispose();
     _pinCommentCtrl.dispose();
-    _promoCommentCtrl.dispose();
     super.dispose();
   }
 
@@ -517,6 +576,12 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
               tooltip: 'Saved ideas',
               icon: const Icon(Icons.bookmark_outline),
               onPressed: () => _showSavedIdeas(),
+            ),
+          if (_history.isNotEmpty)
+            IconButton(
+              tooltip: 'Post history',
+              icon: const Icon(Icons.history),
+              onPressed: () => _showHistory(),
             ),
         ],
       ),
@@ -620,57 +685,6 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                         ),
                       );
                     }),
-
-                  Gap.m,
-                  const Text('PROFILE PROMOTION COMMENTS', style: AppText.section),
-                  Gap.s,
-                  const Text('Save friendly comments you can use when replying on other people\'s posts.', style: AppText.hint),
-                  Gap.s,
-                  TextField(
-                    controller: _promoCommentCtrl,
-                    minLines: 2,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      hintText: 'Write a reusable profile comment...',
-                    ),
-                  ),
-                  Gap.s,
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _addPromoComment,
-                      icon: const Icon(Icons.bookmark_add_outlined),
-                      label: const Text('Save comment'),
-                    ),
-                  ),
-                  if (_promoComments.isNotEmpty) ...[
-                    Gap.s,
-                    ..._promoComments.map((comment) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: Text(comment, style: AppText.body)),
-                              IconButton(
-                                tooltip: 'Copy comment',
-                                onPressed: () => _copy(comment, 'Promotion comment'),
-                                icon: const Icon(Icons.copy_all_outlined, size: 18),
-                              ),
-                              IconButton(
-                                tooltip: 'Delete comment',
-                                onPressed: () => _deletePromoComment(comment),
-                                icon: const Icon(Icons.delete_outline, size: 18),
-                              ),
-                            ],
-                          ),
-                        )),
-                  ],
 
                   Gap.m,
                   Row(
@@ -812,6 +826,66 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                       _styleCtrl.text = idea.visualStyle;
                       _goalCtrl.text = idea.contentGoal;
                       _moodCtrl.text = idea.mood;
+                      _ctaCtrl.text = idea.cta;
+                      _imagePromptCtrl.text = idea.imagePrompt;
+                      _captionCtrl.text = idea.caption;
+                      _scriptCtrl.text = idea.script;
+                      _hashtagsCtrl.text = idea.hashtags;
+                      _pinCommentCtrl.text = idea.comments.isNotEmpty ? idea.comments.first : '';
+                      _comments = idea.comments;
+                      setState(() {});
+                      Navigator.pop(sheetContext);
+                    },
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showHistory() async {
+    if (_history.isEmpty) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        builder: (sheetContext, scrollController) => ListView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(16),
+          children: [
+            const Text('Post history', style: AppText.screenTitle),
+            Gap.s,
+            const Text('Generated carousel, static-image, story, and reel packs stay here automatically.', style: AppText.hint),
+            Gap.m,
+            ..._history.map((idea) => Card(
+                  child: ListTile(
+                    leading: Icon(idea.postType == 'Carousel' ? Icons.view_carousel_outlined : Icons.image_outlined),
+                    title: Text(idea.title),
+                    subtitle: Text('${idea.postType} • ${idea.createdAt.toLocal()}'),
+                    trailing: IconButton(
+                      tooltip: 'Copy history item',
+                      icon: const Icon(Icons.copy_all_outlined),
+                      onPressed: () => _copy(
+                        'Title: ${idea.title}\n\nCaption: ${idea.caption}\n\nPrompt: ${idea.imagePrompt}\n\nScript: ${idea.script}',
+                        'History item',
+                      ),
+                    ),
+                    onTap: () {
+                      _titleCtrl.text = idea.title;
+                      _postType = idea.postType;
+                      _audienceCtrl.text = idea.audience;
+                      _goalCtrl.text = idea.contentGoal;
+                      _moodCtrl.text = idea.mood;
+                      _hookCtrl.text = idea.hook;
+                      _ideaCtrl.text = idea.mainIdea;
+                      _problemCtrl.text = idea.problem;
+                      _lessonCtrl.text = idea.lesson;
+                      _styleCtrl.text = idea.visualStyle;
                       _ctaCtrl.text = idea.cta;
                       _imagePromptCtrl.text = idea.imagePrompt;
                       _captionCtrl.text = idea.caption;
