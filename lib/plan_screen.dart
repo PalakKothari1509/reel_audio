@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'day14_posts.dart';
 import 'plan_data.dart';
 import 'reply_assistant.dart';
 import 'theme.dart';
@@ -327,6 +328,7 @@ class _ResultsTabState extends State<_ResultsTab> {
   }
 
   Future<void> _enter(PostRecord post) async {
+    String bucketValue = post.bucket;
     final fields = {
       'Views': TextEditingController(text: post.views == 0 ? '' : '${post.views}'),
       'Likes': TextEditingController(text: post.likes == 0 ? '' : '${post.likes}'),
@@ -346,8 +348,26 @@ class _ResultsTabState extends State<_ResultsTab> {
           ...fields.entries.map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: TextField(controller: e.value, keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: e.key, isDense: true)),
+             decoration: InputDecoration(labelText: e.key, isDense: true)),
           )),
+          Gap.s,
+          DropdownButtonFormField<String>(
+            value: bucketValue.isEmpty ? null : bucketValue,
+            hint: const Text('Content bucket (optional)'),
+            items: [
+              const DropdownMenuItem(value: '', child: Text('None')),
+              ...kContentBuckets.map((b) => DropdownMenuItem(
+                  value: b.id,
+                  child: Row(children: [
+                    Container(width: 12, height: 12,
+                      decoration: BoxDecoration(color: b.color, shape: BoxShape.circle)),
+                    const SizedBox(width: 8),
+                    Text(b.shortLabel),
+                  ]),
+              )),
+            ],
+            onChanged: (v) => bucketValue = v ?? '',
+          ),
         ])),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -358,7 +378,8 @@ class _ResultsTabState extends State<_ResultsTab> {
     if (ok != true) return;
     int n(String k) => int.tryParse(fields[k]!.text.trim()) ?? 0;
     final updated = post.copyWith(views: n('Views'), likes: n('Likes'),
-      comments: n('Comments'), saves: n('Saves'), shares: n('Shares'));
+      comments: n('Comments'), saves: n('Saves'), shares: n('Shares'),
+      bucket: bucketValue);
     await PostLogStore.save(_posts.map((p) => p.id == post.id ? updated : p).toList());
     await _load();
   }
@@ -367,6 +388,7 @@ class _ResultsTabState extends State<_ResultsTab> {
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: CircularProgressIndicator());
     final byTime = resultsByTime(_posts);
+    final byBucket = resultsByBucket(_posts);
     final withResults = _posts.where((p) => p.hasResults).length;
 
     return ListView(
@@ -400,6 +422,31 @@ class _ResultsTabState extends State<_ResultsTab> {
                 ]),
               ),
           ])),
+        if (byBucket.isNotEmpty) ...[
+          Gap.l,
+          const SectionTitle('Best content bucket'),
+          AppCard(child: Column(children: [
+            for (final b in byBucket)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(children: [
+                  CircleAvatar(radius: 8, backgroundColor: bucketById(b.bucket)?.color ?? AppColors.textFaint),
+                  const SizedBox(width: 8),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(bucketLabel(b.bucket), style: const TextStyle(
+                      fontWeight: FontWeight.w700)),
+                    Text('${b.posts} posts', style: AppText.small),
+                  ])),
+                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Text('${b.avgViews.round()} views', style: const TextStyle(
+                      fontWeight: FontWeight.w700, color: AppColors.primary)),
+                    Text('${b.totalSaves} saves · ${b.totalComments} comments',
+                      style: AppText.small),
+                  ]),
+                ]),
+              ),
+          ])),
+        ],
         Gap.l,
         SectionTitle('Posted', trailing: '${_posts.length}'),
         if (_posts.isEmpty)
@@ -409,6 +456,19 @@ class _ResultsTabState extends State<_ResultsTab> {
           child: GestureDetector(
             onTap: () => _enter(p),
             child: AppCard(child: Row(children: [
+              if (p.bucket.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: CircleAvatar(
+                    radius: 10,
+                    backgroundColor: bucketById(p.bucket)?.color ?? AppColors.textFaint,
+                    child: Text(bucketLabel(p.bucket)[0],
+                        style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                  ),
+                ),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.w700)),

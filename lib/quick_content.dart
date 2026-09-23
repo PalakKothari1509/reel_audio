@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'day14_posts.dart';
+import 'slide_prompt_list.dart';
+import 'slide_prompts.dart';
 import 'theme.dart';
 
 class QuickIdea {
@@ -25,7 +28,13 @@ class QuickIdea {
   final String hashtags;
   final List<String> comments;
   final String script;
+  /// One image prompt per slide, in slide order.
+  ///
+  /// Empty for a post whose script is not written slide by slide, because then
+  /// there is nothing per slide to make one from.
+  final List<String> slidePrompts;
   final DateTime createdAt;
+  final String bucket;
 
   const QuickIdea({
     required this.id,
@@ -45,7 +54,9 @@ class QuickIdea {
     required this.hashtags,
     required this.comments,
     required this.script,
+    this.slidePrompts = const [],
     required this.createdAt,
+    this.bucket = '',
   });
 
   Map<String, dynamic> toJson() => {
@@ -66,7 +77,9 @@ class QuickIdea {
         'hashtags': hashtags,
         'comments': comments,
         'script': script,
+        'slidePrompts': slidePrompts,
         'createdAt': createdAt.toIso8601String(),
+        'bucket': bucket,
       };
 
   factory QuickIdea.fromJson(Map<String, dynamic> json) => QuickIdea(
@@ -87,7 +100,10 @@ class QuickIdea {
         hashtags: json['hashtags'] as String? ?? '',
         comments: ((json['comments'] as List?) ?? const []).whereType<String>().toList(),
         script: json['script'] as String? ?? '',
+        slidePrompts:
+            ((json['slidePrompts'] as List?) ?? const []).whereType<String>().toList(),
         createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+        bucket: json['bucket'] as String? ?? '',
       );
 }
 
@@ -155,6 +171,29 @@ class QuickHistoryStore {
   }
 }
 
+// A reusable comment in the promo comment vault, optionally tagged with a content bucket.
+class PromoComment {
+  final String text;
+  final String bucket;
+
+  const PromoComment({required this.text, this.bucket = ''});
+
+  /// The text in a normalized form for duplicate detection.
+  String get normalizedText => text.trim();
+
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'bucket': bucket,
+      };
+
+  factory PromoComment.fromJson(Map<String, dynamic> json) => PromoComment(
+        text: (json['text'] as String?)?.trim() ?? '',
+        bucket: (json['bucket'] as String?)?.trim() ?? '',
+      );
+
+  factory PromoComment.fromString(String text) => PromoComment(text: text);
+}
+
 class PromoCommentStore {
   static const _fileName = 'promo_comments.json';
   static const starterComments = [
@@ -219,19 +258,40 @@ class PromoCommentStore {
     return File('${dir.path}/$_fileName');
   }
 
-  static Future<List<String>> load() async {
+  /// Load comments as PromoComment objects with bucket tags.
+  static Future<List<PromoComment>> loadWithBuckets() async {
     try {
       final file = await _path();
-      if (!await file.exists()) return starterComments;
+      if (!await file.exists()) {
+        return starterComments.map((s) => PromoComment.fromString(s)).toList();
+      }
       final raw = jsonDecode(await file.readAsString());
-      if (raw is! List) return starterComments;
-      return raw.whereType<String>().where((text) => text.trim().isNotEmpty).toList();
+      if (raw is! List) return starterComments.map((s) => PromoComment.fromString(s)).toList();
+      return raw.whereType<Map<String, dynamic>>().map((j) {
+        final c = PromoComment.fromJson(j);
+        if (c.text.isEmpty) {
+          final s = (j['text'] as String?) ?? (j as String? ?? '');
+          if (s.trim().isNotEmpty) return PromoComment.fromString(s);
+        }
+        return c;
+      }).where((c) => c.text.trim().isNotEmpty).toList();
     } catch (_) {
-      return starterComments;
+      return starterComments.map((s) => PromoComment.fromString(s)).toList();
     }
   }
 
-  static Future<void> save(List<String> comments) async {
+  /// Backward-compatible: load as plain strings.
+  static Future<List<String>> load() async {
+    return (await loadWithBuckets()).map((c) => c.text).toList();
+  }
+
+  static Future<void> add(PromoComment comment) async {
+    final list = await loadWithBuckets();
+    list.insert(0, comment);
+    await save(list.map((c) => c.toJson()).toList());
+  }
+
+  static Future<void> save(List<dynamic> comments) async {
     try {
       final file = await _path();
       await file.writeAsString(jsonEncode(comments));
@@ -259,6 +319,7 @@ List<String> makeCommentPack({
   required String hook,
   required String audience,
   required String message,
+  String bucket = '',
 }) {
   final base = message.trim();
   final result = <String>[];
@@ -288,6 +349,45 @@ List<String> makeCommentPack({
 
   if (audience.toLowerCase().contains('dad') || audience.toLowerCase().contains('non')) {
     result[2] = 'This is relatable even outside mom life — real family chaos looks the same for everyone.';
+  }
+
+  // Bucket-specific comment styles — avoids repeating the same wording across every post
+  if (bucket == 'puzzle') {
+    result[0] = 'My child spotted it right away! 🧩';
+    result[1] = 'These observation games are so good for focus — saving this!';
+    result[2] = 'Took me longer than my 4-year-old 😂 good one!';
+    result[3] = 'More puzzles please, this was fun! 👀';
+    result[4] = 'We found it! How fast did you spot it? ⏱️';
+  } else if (bucket == 'humor') {
+    result[0] = '😂😂😂 this is EXACTLY my house every day';
+    result[1] = 'I need to print this and tape it to my forehead 😭';
+    result[2] = 'My partner and I say this to each other on loop';
+    result[3] = 'Tag a parent who needs to see this right now';
+    result[4] = 'Be honest — what number are you on today? 👇';
+  } else if (bucket == 'activity') {
+    result[0] = 'Trying this tonight while dinner cooks — perfect timing!';
+    result[1] = 'Love that this uses stuff already in my kitchen!';
+    result[2] = 'My little one turned this into their own version 😂';
+    result[3] = 'Simple enough that I can actually do it too';
+    result[4] = 'Going straight into my saved activities — thank you!';
+  } else if (bucket == 'talk') {
+    result[0] = 'Trying this at bedtime tonight — can\'t wait to hear the answer!';
+    result[1] = 'These questions open up the best conversations 💛';
+    result[2] = 'Finally, actual questions instead of "how was your day?"';
+    result[3] = 'My child said the most unexpected thing...';
+    result[4] = 'More of these please, this is gold ✨';
+  } else if (bucket == 'skill') {
+    result[0] = 'Bookmarking this for when my little one hits this milestone';
+    result[1] = 'So reassuring — not a race, just a guide ❤️';
+    result[2] = 'My 3-year-old can do most of these already!';
+    result[3] = 'Saving this to track progress over the next few months';
+    result[4] = 'Such a helpful, non-stressful way to check in ✨';
+  } else if (bucket == 'wrap') {
+    result[0] = 'Loved the puzzles the most this week — more please!';
+    result[1] = 'Honestly all of them were great, such a fun week!';
+    result[2] = 'The humor reels made me laugh out loud 😂';
+    result[3] = 'The skill checklists were genuinely useful for me';
+    result[4] = 'Can we get more activities like the sock hunt?';
   }
 
   return result.take(5).toList();
@@ -332,20 +432,126 @@ String makeCaption({
   return text.join('\n');
 }
 
+/// A script and the image prompts that go with its beats.
+///
+/// Written together on purpose: the slides and the prompts come from one list, so a
+/// seven-slide carousel cannot come back with five prompts, and no prompt can ever
+/// describe a slide the script does not have.
+class ScriptAndPrompts {
+  final String script;
+  final List<String> slidePrompts;
+
+  const ScriptAndPrompts({required this.script, required this.slidePrompts});
+}
+
+/// How many frames a story is written in. A story is a short sequence rather than a
+/// swipeable deck, so it does not follow the carousel's slide picker.
+const kStoryFrames = kMinCarouselSlides;
+
+ScriptAndPrompts buildScriptAndPrompts({
+  required String title,
+  required String postType,
+  required String audience,
+  required String hook,
+  required String mainIdea,
+  required String problem,
+  required String lesson,
+  required String visualStyle,
+  required String cta,
+  required String contentGoal,
+  required String mood,
+  int slideCount = kDefaultCarouselSlides,
+}) {
+  final type = postType.trim().toLowerCase();
+
+  if (type == 'carousel' || type == 'story') {
+    final isStory = type == 'story';
+    final plan = planCarousel(
+      title: title,
+      hook: hook,
+      mainIdea: mainIdea,
+      problem: problem,
+      lesson: lesson,
+      cta: cta,
+      slideCount: isStory ? kStoryFrames : slideCount,
+      beatLabel: isStory ? 'Frame' : 'Slide',
+      visualStyle: visualStyle,
+      audience: audience,
+      contentGoal: contentGoal,
+      mood: mood,
+    );
+    return ScriptAndPrompts(script: plan.script, slidePrompts: plan.prompts);
+  }
+
+  if (type == 'reel') {
+    final script = makeReelScript(hook: hook, mainIdea: mainIdea, lesson: lesson);
+    return ScriptAndPrompts(
+      script: script,
+      // One prompt per timeline moment, so the footage has a prompt of its own.
+      slidePrompts: promptsForScript(
+        script: script,
+        title: title,
+        visualStyle: visualStyle,
+        audience: audience,
+        contentGoal: contentGoal,
+        mood: mood,
+        postType: postType,
+        beatLabel: 'Shot',
+      ),
+    );
+  }
+
+  // A static image is one picture, so there is nothing per slide to write and the
+  // single prompt above it is the whole set.
+  final single = hook.trim().isEmpty ? title.trim() : hook.trim();
+  return ScriptAndPrompts(
+    script: single.isEmpty ? '' : 'Single image: $single',
+    slidePrompts: const [],
+  );
+}
+
+/// The reel timeline: five moments, four seconds apart.
+String makeReelScript({
+  required String hook,
+  required String mainIdea,
+  required String lesson,
+}) {
+  final title = hook.isEmpty ? 'Daily Family Drama' : hook;
+  final base = mainIdea.isEmpty
+      ? 'A normal morning turns into a small family challenge.'
+      : mainIdea;
+  final message = lesson.isEmpty ? 'Little moments teach big lessons.' : lesson;
+  return '0:00 $title\n0:04 $base\n0:08 Everyone reacts differently\n'
+      '0:12 Then the tiny lesson appears\n0:16 $message';
+}
+
+/// The script on its own, for a caller that does not need the prompts.
+///
+/// Delegates rather than writing its own slides, so there is exactly one writer and
+/// the script and the prompt list can never drift apart.
 String makeScript({
   required String hook,
   required String mainIdea,
   required String lesson,
   required String postType,
-}) {
-  final title = hook.isEmpty ? 'Daily Family Drama' : hook;
-  final base = mainIdea.isEmpty ? 'A normal morning turns into a small family challenge.' : mainIdea;
-  final message = lesson.isEmpty ? 'Little moments teach big lessons.' : lesson;
-  if (postType.toLowerCase() == 'reel') {
-    return '0:00 $title\n0:04 $base\n0:08 Everyone reacts differently\n0:12 Then the tiny lesson appears\n0:16 $message';
-  }
-  return 'Slide 1: $title\nSlide 2: The moment it starts\nSlide 3: What children do\nSlide 4: What parents learn\nSlide 5: $message';
-}
+  String problem = '',
+  String cta = '',
+  int slideCount = kDefaultCarouselSlides,
+}) =>
+    buildScriptAndPrompts(
+      title: hook,
+      postType: postType,
+      audience: '',
+      hook: hook,
+      mainIdea: mainIdea,
+      problem: problem,
+      lesson: lesson,
+      visualStyle: '',
+      cta: cta,
+      contentGoal: '',
+      mood: '',
+      slideCount: slideCount,
+    ).script;
 
 QuickIdea buildQuickIdea({
   required String title,
@@ -359,16 +565,37 @@ QuickIdea buildQuickIdea({
   required String cta,
   required String contentGoal,
   required String mood,
+  int slideCount = kDefaultCarouselSlides,
+  String bucket = '',
 }) {
-  final imagePrompt = makeImagePrompt(
+  final pack = buildScriptAndPrompts(
     title: title,
-    hook: hook,
-    idea: mainIdea.isEmpty ? problem : mainIdea,
-    visualStyle: visualStyle,
+    postType: postType,
     audience: audience,
+    hook: hook,
+    mainIdea: mainIdea,
+    problem: problem,
+    lesson: lesson,
+    visualStyle: visualStyle,
+    cta: cta,
     contentGoal: contentGoal,
     mood: mood,
+    slideCount: slideCount,
   );
+
+  // The single Image prompt box shows the cover, so what sits beside the slide list
+  // is the first entry of that same list rather than a second, vaguer description.
+  final imagePrompt = pack.slidePrompts.isNotEmpty
+      ? pack.slidePrompts.first
+      : makeImagePrompt(
+          title: title,
+          hook: hook,
+          idea: mainIdea.isEmpty ? problem : mainIdea,
+          visualStyle: visualStyle,
+          audience: audience,
+          contentGoal: contentGoal,
+          mood: mood,
+        );
   final hashtags = makeHashtags(audience);
   final caption = makeCaption(
     title: title,
@@ -383,13 +610,9 @@ QuickIdea buildQuickIdea({
     hook: hook,
     audience: audience,
     message: mainIdea,
+    bucket: bucket,
   );
-  final script = makeScript(
-    hook: hook,
-    mainIdea: mainIdea.isEmpty ? problem : mainIdea,
-    lesson: lesson,
-    postType: postType,
-  );
+  final script = pack.script;
 
   return QuickIdea(
     id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -407,9 +630,11 @@ QuickIdea buildQuickIdea({
     caption: caption,
     cta: cta,
     hashtags: hashtags,
-    comments: comments,
-    script: script,
-    createdAt: DateTime.now(),
+        comments: comments,
+        script: script,
+        slidePrompts: pack.slidePrompts,
+        createdAt: DateTime.now(),
+    bucket: bucket,
   );
 }
 
@@ -438,12 +663,17 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
   final _pinCommentCtrl = TextEditingController();
 
   List<String> _comments = [];
-  List<String> _promoComments = [];
   List<QuickIdea> _savedIdeas = [];
   List<QuickIdea> _history = [];
   bool _loading = true;
 
   String _postType = 'Carousel';
+  String _bucketValue = '';
+
+  /// The slide count the next Generate writes, picked from the dropdown. Kept apart
+  /// from a loaded post's own slide count, so this is never a value the dropdown
+  /// does not offer.
+  int _slideCount = kDefaultCarouselSlides;
 
   @override
   void initState() {
@@ -464,6 +694,32 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     });
   }
 
+  /// The per-slide prompts for whatever is on screen right now.
+  ///
+  /// Derived from the script rather than stored, so the prompts always describe the
+  /// slides actually being looked at. A carousel just generated, one opened from the
+  /// saved library and one pasted in as text all come through here, which is why none
+  /// of them can end up with a prompt list that does not match its script.
+  List<String> get _slidePrompts => promptsForScript(
+        script: _scriptCtrl.text,
+        title: _titleCtrl.text,
+        visualStyle: _styleCtrl.text,
+        audience: _audienceCtrl.text,
+        contentGoal: _goalCtrl.text,
+        mood: _moodCtrl.text,
+        postType: _postType,
+        beatLabel: _beatLabelFor(_postType),
+      );
+
+  /// What one beat is called in a format: a carousel has slides, a story has frames
+  /// and a reel has shots.
+  String _beatLabelFor(String postType) {
+    final type = postType.trim().toLowerCase();
+    if (type == 'story') return 'Frame';
+    if (type == 'reel') return 'Shot';
+    return 'Slide';
+  }
+
   Future<void> _generatePack() async {
     final idea = buildQuickIdea(
       title: _titleCtrl.text,
@@ -477,6 +733,8 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
       lesson: _lessonCtrl.text,
       visualStyle: _styleCtrl.text,
       cta: _ctaCtrl.text,
+      slideCount: _slideCount,
+      bucket: _bucketValue,
     );
 
     _imagePromptCtrl.text = idea.imagePrompt;
@@ -492,6 +750,139 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     setState(() {});
   }
 
+  void _loadFrom14DayPost(QuickIdea post) {
+    _titleCtrl.text = post.title;
+    _postType = post.postType;
+    _audienceCtrl.text = post.audience;
+    _goalCtrl.text = post.contentGoal.isEmpty ? 'Build connection' : post.contentGoal;
+    _moodCtrl.text = post.mood;
+    _hookCtrl.text = post.hook;
+    _ideaCtrl.text = post.mainIdea;
+    _problemCtrl.text = post.problem;
+    _lessonCtrl.text = post.lesson;
+    _styleCtrl.text = post.visualStyle;
+    _ctaCtrl.text = post.cta;
+    _imagePromptCtrl.text = post.imagePrompt;
+    _captionCtrl.text = post.caption;
+    _scriptCtrl.text = post.script;
+    _hashtagsCtrl.text = post.hashtags;
+    _pinCommentCtrl.text = post.comments.isNotEmpty ? post.comments.first : '';
+    _comments = post.comments;
+    _bucketValue = post.bucket;
+    setState(() {});
+  }
+
+  Future<void> _pick14DayPost() async {
+    final chosen = await showModalBottomSheet<QuickIdea>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.75,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        builder: (sheetCtx, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.all(16),
+          children: [
+            const Text('14-Day Test', style: AppText.screenTitle),
+            Gap.s,
+            const Text('Pre-built post packages. Tap one to load into Quick Content Studio.',
+                style: AppText.hint),
+            Gap.m,
+            ...kDay14Posts.map((post) => Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: bucketById(post.bucket)?.color ?? AppColors.accent,
+                      child: Text(post.id.substring(4).substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white)),
+                    ),
+                    title: Text(post.title,
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                    subtitle: Text(
+                        '${post.postType} • ${bucketLabel(post.bucket)}\n${post.hook}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.hint),
+                    isThreeLine: true,
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pop(sheetCtx, post),
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+    if (chosen != null) _loadFrom14DayPost(chosen);
+  }
+
+  Future<void> _bulkPaste() async {
+    final ctrl = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Paste full post package'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text(
+                'Paste your complete post package text below. It will be split into the '
+                'fields automatically.',
+                style: AppText.hint),
+            Gap.s,
+            TextField(
+              controller: ctrl,
+              minLines: 8,
+              maxLines: 20,
+              style: AppText.body,
+              decoration: const InputDecoration(
+                hintText: 'Title: ...\nPost Type: ...\n--- Image Prompt ---\n...',
+              ),
+            ),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Paste')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    final parsed = parseBulkPaste(ctrl.text);
+    if (!parsed.hasAnyContent) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('No fields found in the pasted text')));
+      return;
+    }
+
+    _titleCtrl.text = parsed.title;
+    _postType = parsed.postType;
+    _audienceCtrl.text = parsed.audience;
+    _goalCtrl.text = parsed.contentGoal;
+    _moodCtrl.text = parsed.mood;
+    _hookCtrl.text = parsed.hook;
+    _ideaCtrl.text = parsed.mainIdea;
+    _problemCtrl.text = parsed.problem;
+    _lessonCtrl.text = parsed.lesson;
+    _styleCtrl.text = parsed.visualStyle;
+    _ctaCtrl.text = parsed.cta;
+    _imagePromptCtrl.text = parsed.imagePrompt;
+    _captionCtrl.text = parsed.caption;
+    _scriptCtrl.text = parsed.script;
+    _hashtagsCtrl.text = parsed.hashtags;
+    _pinCommentCtrl.text = parsed.pinnedComment;
+    _comments = parsed.replyComments;
+    _bucketValue = parsed.bucket;
+    setState(() {});
+
+  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Post package parsed and filled.'), duration: Duration(seconds: 1)));
+  }
+
   Future<void> _saveIdea() async {
     final idea = buildQuickIdea(
       title: _titleCtrl.text,
@@ -505,6 +896,10 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
       lesson: _lessonCtrl.text,
       visualStyle: _styleCtrl.text,
       cta: _ctaCtrl.text,
+      // The slide count that is on screen wins, so saving never rebuilds a different
+      // number of slides than the one being looked at.
+      slideCount: _slidePrompts.isEmpty ? _slideCount : _slidePrompts.length,
+      bucket: _bucketValue,
     );
 
     final fullIdea = QuickIdea(
@@ -525,7 +920,9 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
       hashtags: _hashtagsCtrl.text.isEmpty ? idea.hashtags : _hashtagsCtrl.text,
       comments: _comments.isEmpty ? idea.comments : _comments,
       script: _scriptCtrl.text.isEmpty ? idea.script : _scriptCtrl.text,
+      slidePrompts: _slidePrompts.isEmpty ? idea.slidePrompts : _slidePrompts,
       createdAt: DateTime.now(),
+      bucket: _bucketValue,
     );
 
     await QuickIdeaStore.add(fullIdea);
@@ -583,6 +980,16 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
               icon: const Icon(Icons.history),
               onPressed: () => _showHistory(),
             ),
+          IconButton(
+            tooltip: 'Load 14-Day Test',
+            icon: const Icon(Icons.calendar_today_outlined),
+            onPressed: _pick14DayPost,
+          ),
+          IconButton(
+            tooltip: 'Bulk paste',
+            icon: const Icon(Icons.paste_rounded),
+            onPressed: _bulkPaste,
+          ),
         ],
       ),
       body: _loading
@@ -630,7 +1037,31 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                   _field('Problem', _problemCtrl),
                   _field('Lesson / takeaway', _lessonCtrl),
                   _field('Visual style', _styleCtrl),
-                  _field('CTA', _ctaCtrl),
+                   _field('CTA', _ctaCtrl),
+                   Gap.s,
+                   const Text('Content bucket', style: AppText.section),
+                   Gap.s,
+                   DropdownButtonFormField<String>(
+                     value: _bucketValue.isEmpty ? null : _bucketValue,
+                     hint: const Text('Choose a bucket (optional)'),
+                     items: [
+                       const DropdownMenuItem(value: '', child: Text('None')),
+                       ...kContentBuckets.map((b) => DropdownMenuItem(
+                           value: b.id,
+                           child: Row(children: [
+                             Container(
+                               width: 12, height: 12,
+                               decoration: BoxDecoration(
+                                 color: b.color,
+                                 shape: BoxShape.circle),
+                             ),
+                             const SizedBox(width: 8),
+                             Text(b.shortLabel),
+                           ]),
+                         )),
+                     ],
+                     onChanged: (v) => setState(() => _bucketValue = v ?? ''),
+                   ),
 
                   Gap.m,
                   SizedBox(
@@ -798,9 +1229,34 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
           children: [
             const Text('Saved ideas', style: AppText.screenTitle),
             Gap.s,
-            ..._savedIdeas.map((idea) => Card(
-                  child: ListTile(
-                    title: Text(idea.title),
+              ..._savedIdeas.map((idea) => Card(
+                child: ListTile(
+                    leading: (idea.bucket.isNotEmpty)
+                        ? CircleAvatar(
+                            radius: 14,
+                            backgroundColor: bucketById(idea.bucket)?.color ?? AppColors.accent,
+                            child: Text(bucketLabel(idea.bucket)[0],
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white)),
+                          )
+                        : CircleAvatar(
+                            radius: 14,
+                            backgroundColor: AppColors.primarySoft,
+                            child: const Icon(Icons.lightbulb, size: 14, color: AppColors.primary)),
+                    title: Row(children: [
+                      Expanded(child: Text(idea.title)),
+                      if (idea.bucket.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Text(bucketLabel(idea.bucket),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: bucketById(idea.bucket)?.color ?? AppColors.textSoft)),
+                        ),
+                    ]),
                     subtitle: Text('${idea.postType} • ${idea.audience}'),
                     trailing: IconButton(
                       icon: const Icon(Icons.content_copy),
@@ -833,6 +1289,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                       _hashtagsCtrl.text = idea.hashtags;
                       _pinCommentCtrl.text = idea.comments.isNotEmpty ? idea.comments.first : '';
                       _comments = idea.comments;
+                      _bucketValue = idea.bucket;
                       setState(() {});
                       Navigator.pop(sheetContext);
                     },
@@ -864,8 +1321,23 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
             Gap.m,
             ..._history.map((idea) => Card(
                   child: ListTile(
-                    leading: Icon(idea.postType == 'Carousel' ? Icons.view_carousel_outlined : Icons.image_outlined),
-                    title: Text(idea.title),
+                    leading: Icon(idea.postType == 'Carousel'
+                        ? Icons.view_carousel_outlined
+                        : idea.postType == 'Reel'
+                            ? Icons.play_arrow_outlined
+                            : Icons.image_outlined),
+                    title: Row(children: [
+                      Expanded(child: Text(idea.title)),
+                      if (idea.bucket.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: Text(bucketLabel(idea.bucket),
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: bucketById(idea.bucket)?.color ?? AppColors.textSoft)),
+                        ),
+                    ]),
                     subtitle: Text('${idea.postType} • ${idea.createdAt.toLocal()}'),
                     trailing: IconButton(
                       tooltip: 'Copy history item',
@@ -893,6 +1365,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                       _hashtagsCtrl.text = idea.hashtags;
                       _pinCommentCtrl.text = idea.comments.isNotEmpty ? idea.comments.first : '';
                       _comments = idea.comments;
+                      _bucketValue = idea.bucket;
                       setState(() {});
                       Navigator.pop(sheetContext);
                     },

@@ -504,6 +504,7 @@ class PostRecord {
   final String title;
   final String projectId;
   final String hookId;
+  final String bucket;
   final DateTime postedAt;
   /// Filled in by hand from Instagram a day or two after posting. Zero means not yet.
   final int views, likes, comments, saves, shares;
@@ -514,13 +515,15 @@ class PostRecord {
     required this.postedAt,
     this.projectId = '',
     this.hookId = '',
+    this.bucket = '',
     this.views = 0, this.likes = 0, this.comments = 0, this.saves = 0, this.shares = 0,
   });
 
   PostRecord copyWith({DateTime? postedAt, int? views, int? likes, int? comments,
-      int? saves, int? shares}) =>
+      int? saves, int? shares, String? bucket}) =>
       PostRecord(
         id: id, title: title, projectId: projectId, hookId: hookId,
+        bucket: bucket ?? this.bucket,
         postedAt: postedAt ?? this.postedAt,
         views: views ?? this.views, likes: likes ?? this.likes,
         comments: comments ?? this.comments, saves: saves ?? this.saves,
@@ -531,7 +534,7 @@ class PostRecord {
 
   Map<String, dynamic> toJson() => {
         'id': id, 'title': title, 'projectId': projectId, 'hookId': hookId,
-        'postedAt': postedAt.toIso8601String(),
+        'bucket': bucket, 'postedAt': postedAt.toIso8601String(),
         'views': views, 'likes': likes, 'comments': comments,
         'saves': saves, 'shares': shares,
       };
@@ -541,6 +544,7 @@ class PostRecord {
         title: j['title'] as String? ?? '',
         projectId: j['projectId'] as String? ?? '',
         hookId: j['hookId'] as String? ?? '',
+        bucket: j['bucket'] as String? ?? '',
         postedAt: DateTime.tryParse(j['postedAt'] as String? ?? '') ?? DateTime.now(),
         views: (j['views'] as num?)?.toInt() ?? 0,
         likes: (j['likes'] as num?)?.toInt() ?? 0,
@@ -594,16 +598,16 @@ String timeBucket(DateTime t) {
   return 'Night (8 PM–12 AM)';
 }
 
-class BucketResult {
+class TimeBucketResult {
   final String bucket;
   final int posts;
   final double avgViews, avgSaves, avgComments, avgShares;
-  const BucketResult(this.bucket, this.posts, this.avgViews, this.avgSaves,
+  const TimeBucketResult(this.bucket, this.posts, this.avgViews, this.avgSaves,
       this.avgComments, this.avgShares);
 }
 
 /// Average results per time of day, best first, from posts with numbers filled in.
-List<BucketResult> resultsByTime(List<PostRecord> posts) {
+List<TimeBucketResult> resultsByTime(List<PostRecord> posts) {
   final groups = <String, List<PostRecord>>{};
   for (final p in posts.where((p) => p.hasResults)) {
     groups.putIfAbsent(timeBucket(p.postedAt), () => []).add(p);
@@ -612,9 +616,57 @@ List<BucketResult> resultsByTime(List<PostRecord> posts) {
       g.map(f).fold<int>(0, (a, b) => a + b) / g.length;
 
   return groups.entries
-      .map((e) => BucketResult(e.key, e.value.length,
+      .map((e) => TimeBucketResult(e.key, e.value.length,
           avg(e.value, (p) => p.views), avg(e.value, (p) => p.saves),
           avg(e.value, (p) => p.comments), avg(e.value, (p) => p.shares)))
+      .toList()
+    ..sort((a, b) => b.avgViews.compareTo(a.avgViews));
+}
+
+// ── Content Bucket Results ────────────────────────────────────────────────────
+
+class ContentBucketResult {
+  final String bucket;
+  final int posts;
+  final double avgViews, avgSaves, avgComments, avgShares;
+  final int totalSaves;
+  final int totalComments;
+  final int totalShares;
+
+  const ContentBucketResult({
+    required this.bucket,
+    required this.posts,
+    required this.avgViews,
+    required this.avgSaves,
+    required this.avgComments,
+    required this.avgShares,
+    required this.totalSaves,
+    required this.totalComments,
+    required this.totalShares,
+  });
+}
+
+/// Average results per content bucket, best first, from posts with numbers filled in.
+List<ContentBucketResult> resultsByBucket(List<PostRecord> posts) {
+  final groups = <String, List<PostRecord>>{};
+  for (final p in posts.where((p) => p.hasResults && p.bucket.isNotEmpty)) {
+    groups.putIfAbsent(p.bucket, () => []).add(p);
+  }
+  double avg(List<PostRecord> g, int Function(PostRecord) f) =>
+      g.map(f).fold<int>(0, (a, b) => a + b) / g.length;
+
+  return groups.entries
+      .map((e) => ContentBucketResult(
+          bucket: e.key,
+          posts: e.value.length,
+          avgViews: avg(e.value, (p) => p.views),
+          avgSaves: avg(e.value, (p) => p.saves),
+          avgComments: avg(e.value, (p) => p.comments),
+          avgShares: avg(e.value, (p) => p.shares),
+          totalSaves: e.value.fold(0, (sum, p) => sum + p.saves),
+          totalComments: e.value.fold(0, (sum, p) => sum + p.comments),
+          totalShares: e.value.fold(0, (sum, p) => sum + p.shares),
+        ))
       .toList()
     ..sort((a, b) => b.avgViews.compareTo(a.avgViews));
 }

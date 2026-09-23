@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'day14_posts.dart';
 import 'quick_content.dart';
 import 'theme.dart';
 
@@ -23,7 +24,8 @@ class CreatorHomeScreen extends StatefulWidget {
 }
 
 class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
-  List<String> _comments = [];
+  List<PromoComment> _comments = [];
+  String _filterBucket = '';
 
   @override
   void initState() {
@@ -32,7 +34,7 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
   }
 
   Future<void> _loadComments() async {
-    final comments = await PromoCommentStore.load();
+    final comments = await PromoCommentStore.loadWithBuckets();
     if (mounted) setState(() => _comments = comments);
   }
 
@@ -45,8 +47,8 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
   }
 
   Future<void> _showPromotionComments() async {
-    final comments = await PromoCommentStore.load();
     final input = TextEditingController();
+    String selectedBucket = '';
     if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
@@ -69,7 +71,26 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
               controller: input,
               minLines: 2,
               maxLines: 4,
-              decoration: const InputDecoration(hintText: 'Add your own reusable comment...'),
+              decoration: InputDecoration(
+                hintText: 'Add your own reusable comment...',
+                suffix: DropdownButton<String>(
+                  value: selectedBucket.isEmpty ? null : selectedBucket,
+                  hint: const Text('Bucket'),
+                  items: [
+                    const DropdownMenuItem(value: '', child: Text('None')),
+                    ...kContentBuckets.map((b) => DropdownMenuItem(
+                      value: b.id,
+                      child: Row(children: [
+                        Container(width: 10, height: 10,
+                          decoration: BoxDecoration(color: b.color, shape: BoxShape.circle)),
+                        const SizedBox(width: 6),
+                        Text(b.shortLabel),
+                      ]),
+                    )),
+                  ],
+                  onChanged: (v) => setSheetState(() => selectedBucket = v ?? ''),
+                ),
+              ),
             ),
             Gap.s,
             SizedBox(
@@ -79,19 +100,31 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
                 label: const Text('Save comment'),
                 onPressed: () async {
                   final text = input.text.trim();
-                  if (text.isEmpty || comments.contains(text)) return;
-                  comments.insert(0, text);
-                  await PromoCommentStore.save(comments);
+                  if (text.isEmpty || _comments.any((c) => c.normalizedText == text)) return;
+                  final comment = PromoComment(text: text, bucket: selectedBucket);
+                  await PromoCommentStore.add(comment);
                   input.clear();
                   setSheetState(() {});
-                  if (mounted) setState(() => _comments = List.of(comments));
+                  if (mounted) setState(() => _loadComments());
                 },
               ),
             ),
             Gap.m,
-            ...comments.map((comment) => _CommentRow(
-                  text: comment,
-                  onCopy: () => _copyComment(comment),
+            if (_filterBucket.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('Showing: ${bucketLabel(_filterBucket)} bucket only',
+                    style: AppText.hint),
+              ),
+            ..._filteredComments.map((comment) => _CommentRow(
+                  text: comment.text,
+                  bucket: comment.bucket,
+                  onCopy: () => _copyComment(comment.text),
+                  onBucketFilter: (bucketId) {
+                    setState(() {
+                      _filterBucket = bucketId;
+                    });
+                  },
                 )),
           ],
         ),
@@ -101,12 +134,24 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
     input.dispose();
   }
 
+  List<PromoComment> get _filteredComments {
+    if (_filterBucket.isEmpty) return _comments;
+    return _comments.where((c) => c.bucket == _filterBucket).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fun Learning With Palak'),
         actions: [
+          if (_filterBucket.isNotEmpty)
+            TextButton(
+              onPressed: () => setState(() {
+                _filterBucket = '';
+              }),
+              child: const Text('Clear', style: TextStyle(color: AppColors.textSoft)),
+            ),
           IconButton(
             tooltip: 'Saved stories',
             icon: const Icon(Icons.folder_open),
@@ -152,6 +197,43 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
             subtitle: 'Open all saved comments and copy one for another post',
             onTap: _showPromotionComments,
           ),
+          if (_comments.isNotEmpty) ...[
+            Gap.l,
+            const SectionTitle('Your promotion comments'),
+            Gap.s,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                FilterChip(
+                  label: const Text('All'),
+                  selected: _filterBucket.isEmpty,
+                  onSelected: (v) => setState(() {
+                    _filterBucket = '';
+                  }),
+                ),
+                ...kContentBuckets.map((b) => FilterChip(
+                  label: Text(b.shortLabel),
+                  selected: _filterBucket == b.id,
+                  onSelected: (v) => setState(() {
+                    _filterBucket = v ? b.id : '';
+                  }),
+                  backgroundColor: b.softColor,
+                  selectedColor: b.color.withOpacity(0.3),
+                  checkmarkColor: b.color,
+                )),
+              ],
+            ),
+            Gap.m,
+            ..._filteredComments.map((comment) => _CommentRow(
+                  text: comment.text,
+                  bucket: comment.bucket,
+                  onCopy: () => _copyComment(comment.text),
+                  onBucketFilter: (bucketId) {
+                    setState(() => _filterBucket = bucketId);
+                  },
+                )),
+          ],
         ],
       ),
     );
@@ -160,9 +242,18 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
 
 class _CommentRow extends StatelessWidget {
   final String text;
+  final String bucket;
   final VoidCallback onCopy;
+  final void Function(String bucketId)? onBucketFilter;
+  final String? filterBucket;
 
-  const _CommentRow({required this.text, required this.onCopy});
+  const _CommentRow({
+    required this.text,
+    this.bucket = '',
+    required this.onCopy,
+    this.onBucketFilter,
+    this.filterBucket,
+  });
 
   @override
   Widget build(BuildContext context) => Container(
@@ -175,6 +266,24 @@ class _CommentRow extends StatelessWidget {
         ),
         child: Row(
           children: [
+            if (bucket.isNotEmpty && onBucketFilter != null)
+              GestureDetector(
+                onTap: () => onBucketFilter!(bucket),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: bucketById(bucket)?.softColor ?? AppColors.surfaceAlt,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: bucketById(bucket)?.color ?? AppColors.border),
+                  ),
+                  child: Text(bucketLabel(bucket),
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: bucketById(bucket)?.color ?? AppColors.textSoft)),
+                ),
+              ),
             Expanded(child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppText.hint)),
             IconButton(tooltip: 'Copy comment', onPressed: onCopy, icon: const Icon(Icons.copy_outlined, size: 18)),
           ],
@@ -231,8 +340,7 @@ class _ActionCard extends StatelessWidget {
                     Gap.xs,
                     Text(subtitle, style: AppText.hint),
                   ],
-                ),
-              ),
+                )),
               const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textFaint),
             ],
           ),
