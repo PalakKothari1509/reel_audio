@@ -387,3 +387,422 @@ The 100th milestone concepts are now available in the built-in `Page & milestone
 - `Meet Our Little World`: the pinned character and brand introduction
 
 Each idea now carries its recommended format, strategy, ready caption, and pinned comment. Selecting one from Browse ideas sends the full kit into the story editor, so it is usable rather than only a title or hook.
+
+### 14-Day Post Package Library
+The app now includes a structured 14-day content plan in `lib/day14_posts.dart`. This library provides ready-to-use post packages that creators can load individually or import in bulk:
+
+- **Content Buckets**: Six strategy buckets — `puzzle`, `humor`, `activity`, `talk`, `skill`, and `wrap` — each with its own color. Posts are categorized by the engagement type they target.
+- **13 Post Packages (Days 2–14)**: Every `QuickIdea` includes a title, hook, main idea, problem, lesson, mood, visual style, character-consistent image prompt, caption, CTA, hashtags, comment pack, and script. Day 1 ("100 Posts. One World.") remains a built-in hook in `plan_data.dart`.
+- **Character Bible**: Image prompts consistently feature Ria (brown eyes, warm skin tone, no glasses, pastel watercolor style) and Rio (same), plus Cuty the white bunny with a pink bow. All prompts specify cream background and soft pastel watercolor storybook aesthetics.
+
+#### Bulk-Paste Import
+A new `_bulkPaste()` method in `QuickContentScreen` (`lib/quick_content.dart`) lets creators import multiple post packages at once:
+- Paste multi-line text structured with key-value pairs (e.g., `Title: ...`, `Hook: ...`, `Bucket: puzzle`)
+- The `parseBulkPaste()` parser in `day14_posts.dart` converts pasted text into `QuickIdea` objects
+- Parsed ideas can be saved or edited immediately
+
+#### Bucket-Based Performance Tracking
+`lib/plan_data.dart` now supports per-bucket analytics:
+- `PostRecord.bucket` field tracks which content bucket each posted idea belongs to
+- `resultsByBucket()` aggregates posts, engagement metrics, and completion rate per bucket
+- `ContentBucketResult` class represents per-bucket performance summary
+- The Results tab shows a "Best content bucket" section with color-coded avatars sorted by engagement rate
+
+#### Calendar View with Buckets
+- `QuickContentScreen` includes a bucket dropdown for assigning content buckets when drafting ideas
+- `PlanScreen` (`lib/plan_screen.dart`) has a bucket dropdown when recording post results
+- Posted list items show bucket badges with bucket-specific colors
+- Selecting a 14-day post loads it directly into the Quick Content Studio form
+
+#### Carousel Slide Prompts
+When you generate a carousel post in the Quick Content Studio, the app shows and lets you copy **all slide image prompts at once**:
+- Tap **Generate post pack** with post type set to **Carousel**
+- A "Slide image prompts (7)" section appears with each slide's full image prompt
+- Each prompt has its own **copy button**, plus a **Copy all slide prompts** button at the top
+- The **Copy all** button also bundles all slide prompts into the combined clipboard
+- Prompts are generated per slide by `planCarousel()` and `buildSlidePrompts()` in `lib/slide_prompts.dart`, displayed via `_buildSlidePromptsSection()` in `lib/quick_content.dart`
+
+You can choose the number of slides: a **Slide count** dropdown (5, 6, 7, 8, or 10) appears when post type is set to **Carousel**. When loading a saved idea, the dropdown auto-adjusts to match the post's script beat count.
+
+#### Comment Vault Filter by Bucket
+`lib/creator_home.dart` now supports bucket-tagged comments:
+- `PromoComment` model includes an optional `bucket` field
+- Bucket filter chips let creators view comments for specific content types (e.g., only "humor" comments)
+- Comment rows display bucket badges; tapping a badge filters the vault to that bucket
+- Saved comments are backward-compatible: old comments load without a bucket, new comments can opt-in to bucket tagging
+
+---
+
+## 17. Brand System & Content Generation Engine (P0 Complete)
+
+The app now includes a **complete brand-aware content generation engine** that eliminates manual entry of character descriptions, hashtags, CTAs, and visual style. Everything is defined once in `lib/brand_system.dart` and automatically injected into every generated prompt.
+
+### Brand Defaults (`lib/brand_system.dart`)
+- **Brand**: Fun Learning With Palak (`@funlearningwithpalak`)
+- **Audience**: Parents of preschoolers (1.5-5 years)
+- **Tone**: Warm, playful, parent-relatable, simple
+- **Visual Style**: Soft pastel watercolor storybook, cream background
+- **Default CTAs**: 5 rotating options (Save, Share, Comment, Follow, Try)
+- **Hashtag Pool**: 11 curated tags, exactly 5 used per post
+- **Character Bible** (immutable, auto-injected):
+  - **Ria** 🌸 — Indian preschool girl, dark brown hair in two ponytails with pink bows, brown eyes, pink dress, **no glasses**
+  - **Rio** 💙 — Indian preschool boy, dark brown hair, blue outfit, brown eyes, **no glasses**
+  - **Cuty** 🐰 — Small white bunny, pink bow, unchanged always
+
+### Content Buckets (5 Strategies)
+Every post belongs to exactly one bucket, which drives the generation structure, visual approach, and success metric:
+
+| Bucket | Emoji | Description | Example Hooks | Slide Template |
+|--------|-------|-------------|---------------|----------------|
+| **Challenge** | 🔎 | Observation games, pattern challenges, spot-the-hidden | "WHICH ONE DOESN'T BELONG? 👀" | Cover → Challenge → Options → Think → Reveal → Why → CTA |
+| **Conversation** | 🗣️ | Bedtime questions, dinner talks, imagination starters | "ASK YOUR CHILD THIS TONIGHT 🗣️" | Cover → Q1 → Q2 → Q3 → Why → Variation → CTA |
+| **Activity** | 🏠 | Try This at Home — practical play using household items | "5-MINUTE KITCHEN CHALLENGE 🥄" | Cover → What You Need → Step 1 → Step 2 → Step 3 → Learn → CTA |
+| **Humor** | 😂 | Parent-relatable moments, toddler logic, daily chaos | "MUMMA SAYS THIS 100× A DAY 😂" | Cover → Scene 1 → Scene 2 → Scene 3 → Punchline → Tagline → CTA |
+| **Age Practice** | 📚 | Gentle milestone checklists for specific ages | "CAN YOUR 3-YEAR-OLD DO THESE? ✅" | Cover → Skill 1 → Skill 2 → Skill 3 → Skill 4 → Skill 5 → CTA |
+
+Each bucket defines: generation prompt, color, slide template, example hooks.
+
+### Content Formats (4 Output Types)
+Separate from buckets — defines **how** the content is published:
+
+| Format | Emoji | Description | Default Slides/Shots |
+|--------|-------|-------------|---------------------|
+| **Carousel** | 📚 | Swipeable multi-slide post | 7 (5-10) |
+| **Reel** | 🎬 | 15-20 sec vertical video | 5 (4-8) |
+| **Trial Reel** | 🧪 | 60-sec fast-cut for non-follower reach | 8 (7-10) |
+| **Single Image** | 🖼️ | One image + full caption pack | 1 |
+
+### Complete Content Package Generator (`lib/content_generator.dart`)
+**One call generates everything:**
+
+```dart
+final package = await ContentGenerator.generate(
+  idea: 'Find the hidden Cuty',
+  bucket: BucketLibrary.challenge,
+  format: ContentFormat.carousel,
+);
+```
+
+**Output includes:**
+- ✅ Hook (bucket-specific)
+- ✅ Slides/Shots (per bucket template × format slide count)
+- ✅ Visual Prompts (per slide, with Character Lock + Brand Context)
+- ✅ Caption (hook + idea + CTA + 5 hashtags)
+- ✅ CTA (bucket-specific)
+- ✅ Hashtags (exactly 5 from brand pool + bucket tags)
+- ✅ Pinned Comment (bucket-specific question)
+- ✅ 5 Reply Comments (5 distinct styles: Relatable Parent, Non-Parent, Emoji, Validation, CTA)
+
+### Regeneration System (`lib/regenerator.dart`)
+Regenerate **individual sections** with style variations — no need to re-generate the whole package:
+
+| Target | Style Variations (8) |
+|--------|---------------------|
+| Hook | More Playful, More Curiosity, Simpler, Funnier, More Parent-Relatable, More Educational, More Visual |
+| All Slides | Same 8 styles |
+| Single Slide | Same 8 styles |
+| Visual Prompts | Same 8 styles |
+| Caption | Same 8 styles |
+| CTA | Rotating options |
+| Hashtags | Fresh shuffle |
+| Pinned Comment | Same 8 styles |
+| Reply Comments | Same 8 styles |
+
+```dart
+final result = await Regenerator.regenerate(RegenerationRequest(
+  originalPackage: package,
+  target: RegenerateTarget.caption,
+  style: RegenerateStyle.funnier,
+));
+```
+
+### Brand Context Auto-Injection
+Every AI prompt automatically receives:
+
+```
+BRAND CONTEXT (auto-injected):
+Brand: Fun Learning With Palak
+Audience: Parents of preschoolers
+Tone: Warm, playful, parent-relatable, simple
+Visual Style: Soft pastel watercolor storybook, cream background
+
+CHARACTER LOCK:
+Ria: dark brown hair, two ponytails, pink bows, brown eyes, pink dress, NO GLASSES
+Rio: dark brown hair, blue outfit, brown eyes, NO GLASSES
+Cuty: small white bunny, pink bow, unchanged always
+
+FORMAT: Carousel (7 slides)
+BUCKET: Challenge 🔎
+SLIDE TEMPLATE: Cover → Challenge → Options → Think → Reveal → Why → CTA
+```
+
+---
+
+## 18. Redesigned Dashboard (5 Options)
+
+The main dashboard now shows exactly **5 focused options** — no clutter:
+
+| # | Option | Navigates To | Purpose |
+|---|--------|--------------|---------|
+| 1 | 🎬 **Reel** | `StoryScreen` | Full workflow: story → script → images → voice → video |
+| 2 | 🧪 **Trial Reel** | `TrialReelScreen` | 60-sec compilation generator (hook, 7 fast cuts, celebration, follow CTA) |
+| 3 | 📚 **Carousel** | `CarouselMakerScreen` | Enter idea → get slide prompts for all carousel pages |
+| 4 | 🖼️ **Image** | `SingleImageScreen` | Enter idea → get 7 different image prompts for Meta AI |
+| 5 | 💬 **Promotion Comments** | Bottom Sheet | Section-wise comment vault with bucket filter chips |
+
+**Design**: Clean cards with color-coded icons, descriptive subtitles, chevron indicators. Comments vault shows at bottom with bucket filter chips.
+
+---
+
+## 19. 14-Day + Extended Post Library (24 Posts)
+
+`lib/day14_posts.dart` now contains **24 ready-to-use posts** (Days 2-25):
+
+### Days 2-14 (Original Plan)
+| Day | ID | Type | Bucket | Hook |
+|-----|-----|------|--------|------|
+| 2 | which-doesnt-belong | Static Image | puzzle | Which One Doesn't Belong? 🧩 |
+| 3 | mumma-says | Reel | humor | MUMMA SAYS THIS 100× A DAY 😂 |
+| 4 | kitchen-challenge | Carousel | activity | 5-MINUTE KITCHEN CHALLENGE 🥄 |
+| 5 | ask-tonight | Static Image | talk | ASK YOUR CHILD THIS TONIGHT 🗣️ |
+| 6 | 3year-skills | Carousel | skill | CAN YOUR 3-YEAR-OLD DO THESE? ✅ |
+| 7 | toddler-math | Reel | humor | TODDLER MATHEMATICS 😂 |
+| 8 | find-cuty | Static Image | puzzle | FIND THE HIDDEN CUTY! 👀 |
+| 9 | sock-hunt | Reel | activity | THE SOCK HUNT 🧦 |
+| 10 | 3-questions | Carousel | talk | 3 QUESTIONS TO ASK YOUR CHILD THIS WEEK ❤️ |
+| 11 | 4year-skills | Carousel | skill | CAN YOUR 4-YEAR-OLD DO THESE? ✅ |
+| 12 | dinner-types | Static Image | humor | THREE TYPES OF KIDS AT DINNER 🍽️ |
+| 13 | pattern-game | Reel | puzzle | WHAT COMES NEXT? 🟡🔵🟡🔵❓ |
+| 14 | favorite-format | Carousel | wrap | WHICH NEW FORMAT WAS YOUR FAVORITE? 🗳️ |
+
+### Days 15-25 (Mission Series — Post-100 Strategy)
+| Day | ID | Type | Bucket | Hook |
+|-----|-----|------|--------|------|
+| **15** | household-swaps | Carousel | activity | **NO SPECIAL TOYS NEEDED — HERE'S WHAT TO USE! 🏠** ⭐ |
+| 16 | voted-mission-won | Single Image | wrap | THE VOTES ARE IN! 🏆 |
+| 17 | mission1-race-track | Reel | activity | MISSION 2: ON YOUR MARK! 🏁 |
+| 18 | mission2-concert | Reel | activity | MISSION 3: LIVING ROOM CONCERT! 🎤 |
+| 19 | mission3-art-studio | Reel | activity | MISSION 4: ART CORNER TIME! 🎨 |
+| 20 | mission4-detective | Reel | puzzle | MISSION 5: CASE OPEN! 🕵️ |
+| 21 | mission5-rescue | Reel | activity | MISSION 6: RESCUE TIME! 🧸 |
+| 22 | mission6-treasure | Reel | skill | MISSION 7: TREASURE HUNT! 🎁 |
+| 23 | mission7-daily-care | Reel | skill | MISSION 8: SELF-CARE SQUAD! 🍎 |
+| 24 | trial-reel-7-missions | Reel | activity | 7 SCREEN-FREE MISSIONS IN 60 SECONDS 🏠✨ |
+| 25 | week-wrap-up | Carousel | wrap | WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉 |
+
+**All posts include:** Complete fields (title, hook, main idea, problem, lesson, visual style, image prompt, caption, CTA, hashtags, 5 varied comments, script, bucket, character-consistent prompts).
+
+---
+
+## 20. Asset Idea Files (32 Additional Ideas)
+
+`assets/ideas/` contains 4 markdown files with 32 ready-to-import ideas:
+
+| File | Ideas | Formats |
+|------|-------|---------|
+| `Carousel_Post_Ideas.md` | 8 | Carousel (5-9 slides each) |
+| `Reel_Post_Ideas.md` | 8 | Reel (10-20 sec each) |
+| `Static_Image_Post_Ideas.md` | 8 | Static Image |
+| `Trial_Reel_Post_Ideas.md` | 8 | Trial Reel (10-60 sec) |
+
+---
+
+## 21. Data Storage (Local JSON Files)
+
+All data persists locally in app documents directory:
+
+| Data | File | Structure |
+|------|------|-----------|
+| Reel Projects | `stories/{id}.json` | Individual project files |
+| Saved Ideas | `quick_ideas.json` | Array of QuickIdea |
+| Post History | `quick_post_history.json` | Last 50 generated (auto-saved) |
+| Promotion Comments | `promo_comments.json` | Array with bucket tags |
+| Plan Results | `plan_data.json` | PostRecord with bucket field |
+
+Access via `adb shell run-as com.example.reel_audio` on debug builds.
+
+---
+
+## 22. Next Development Phase — Updated Roadmap
+
+### 🔴 P0 — **DONE**
+1. ✅ Content Bucket system (5 buckets)
+2. ✅ Brand + Character Lock (Ria/Rio/Cuty)
+3. ✅ Complete Content Package Generator
+4. ✅ Regeneration System (9 targets × 8 styles)
+5. ✅ 5-Option Dashboard
+
+### 🔴 P1 — **Immediate Priority (Next Sprint)**
+
+| Priority | Feature | Why |
+|----------|---------|-----|
+| 🔴 P1 | **One Idea → Multiple Formats** | Biggest workflow improvement: generate Carousel + Reel + Trial Reel + Image from single idea |
+| 🔴 P1 | **Idea Inbox** | Capture raw ideas quickly without filling full form (Title, Raw idea, Bucket, Notes, Status) |
+| 🔴 P1 | **Posting Pack Screen** | Single screen to copy Hook, Caption, Hashtags, Pinned Comment, Reply Comments, Image Prompts, Script, plus "Copy Everything" |
+| 🟠 P1 | **Content Quality Check** | Actionable pre-export checks: Hook length, slide text density, character visibility, CTA presence, hashtag count, character lock |
+| 🟠 P1 | **Trial Reel → Shot Planner Integration** | Replace `makeImagePrompt` with proper Veo-style shot prompts; keep local pipeline as fallback |
+
+### 🟠 P1 — **Workflow Redesign (After Above)**
+
+1. **Proper "Create" Flow** — Idea → Bucket → Format → Generate → Review/Edit → Export
+2. **Content Quality Check UI** — Actionable flags (⚠ Hook too long, ⚠ Slide 4 too dense, ✅ Ria visible, ✅ 5 hashtags) + "Fix Issues" button
+3. **Trial Reel Consolidation** — Hook → Shot Planner → Video Shot Prompts → Optional Veo → Local FFmpeg assembly (Veo optional)
+
+### 🟡 P2 — **Content Management (After P1)**
+
+| Feature | Purpose |
+|---------|---------|
+| **Content Library** | Searchable, filterable by bucket/format/status; Favorite, Duplicate, "Create Another Format" |
+| **Idea/Draft/Ready/Posted/Reuse Statuses** | Separate raw Ideas from generated Posts; clear lifecycle |
+| **Settings Screen** | API keys, defaults, brand settings (convenience) |
+
+### 🟢 P3 — **Not Needed Yet**
+
+| Feature | Reason |
+|---------|--------|
+| Scheduling / Publishing automation | Content creation is the value, not publishing |
+| Onboarding | Personal app — not needed |
+| Multi-platform publishing | Single-platform focus |
+| Complicated analytics | Overkill for current stage |
+| Another AI provider | OpenAI backend already scaffolded |
+
+---
+
+## 23. Explicit Content Hierarchy (New Architecture)
+
+The app now follows this explicit hierarchy — every piece of content flows through these layers:
+
+```
+IDEA
+  ↓
+BUCKET (Challenge 🔎 / Conversation 🗣️ / Activity 🏠 / Humor 😂 / Age Practice 📚)
+  ↓
+FORMAT (Carousel 📚 / Reel 🎬 / Trial Reel 🧪 / Single Image 🖼️)
+  ↓
+CONTENT PACKAGE
+  ├── Hook
+  ├── Slides/Shots (per bucket template × format count)
+  ├── Visual Prompts (per slide, with Character Lock + Brand Context)
+  ├── Caption (hook + idea + CTA + 5 hashtags)
+  ├── CTA (bucket-specific)
+  ├── Hashtags (exactly 5 from brand pool + bucket tags)
+  ├── Pinned Comment (bucket-specific question)
+  └── 5 Reply Comments (Relatable Parent, Non-Parent, Emoji, Validation, CTA)
+  ↓
+QUALITY CHECK (actionable flags, not arbitrary scores)
+  ↓
+POSTING PACK (single screen: Copy Hook, Caption, Hashtags, Pinned, Replies, Prompts, Script, "Copy Everything")
+  ↓
+STATUS (Idea 💡 → Developing 📝 → Ready ✅ → Posted 📤 → Reuse ♻️)
+```
+
+**Example: "Find the Hidden Cuty"**
+
+```
+Find Hidden Cuty
+        ↓
+Challenge 🔎
+        ↓
+┌─────────────────────────────────────────┐
+│  Carousel 📚    Reel 🎬    Trial Reel 🧪  Single Image 🖼️
+│  7 slides       5 shots      8 shots         1 image
+│  ↓              ↓             ↓              ↓
+│  Package        Package       Package        Package
+│  (each with     (each with    (each with     (each with
+│   full output)  full output)  full output)   full output)
+└─────────────────────────────────────────┘
+        ↓
+   Quality Check
+        ↓
+   Posting Pack (per format)
+        ↓
+   Status: Ready → Posted → Reuse
+```
+
+This architecture means **one idea becomes four related packages** — not four unrelated ideas. Bucket, characters, brand style, and core idea stay identical; only the format-specific structure changes.
+
+---
+
+## 24. Ideal Dashboard (Target State)
+
+```
+🌸 FUN LEARNING WITH PALAK
+
+What are we creating today?
+
+┌─────────────────────────────────────┐
+│ 💡 CREATE CONTENT                   │
+│ Turn an idea into a post            │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ 🎬 REEL MAKER                       │
+│ Full story → video                  │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ 🧪 TRIAL REEL                       │
+│ Fast experimental reel              │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ 📚 CAROUSEL / IMAGE                 │
+│ Quick visual content                │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ 💡 IDEA VAULT                       │
+│ Ideas, drafts & posts               │
+└─────────────────────────────────────┘
+
+💬 Promotion Comments  (persistent bottom button)
+```
+
+**Changes from current:**
+- "Create Content" becomes the primary entry (opens Idea Inbox → Bucket → Format)
+- "Idea Vault" replaces "Browse Ideas" + "Saved Stories" — unified library with status filters
+- "Promotion Comments" becomes persistent bottom button (not a primary creation slot)
+
+---
+
+## 25. What We Will NOT Build (Explicit)
+
+| Feature | Reason |
+|---------|--------|
+| ❌ Scheduling / Auto-publishing | Content creation is the core value; publishing is manual |
+| ❌ Onboarding flow | Personal use app — you know how it works |
+| ❌ Multi-platform publishing (TikTok, YouTube, etc.) | Instagram-first; cross-posting is manual |
+| ❌ Complex analytics dashboard | Content quality > post analytics |
+| ❌ Additional AI providers (Claude, etc.) | OpenAI backend already scaffolded; stick to one |
+| ❌ Elaborate Settings UI | Hardcoded defaults work; settings = convenience only |
+| ❌ Team collaboration / Multi-user | Solo creator workflow |
+
+---
+
+## 26. Development Priority Summary
+
+| Priority | Feature | Effort | Impact |
+|----------|---------|--------|--------|
+| 🔴 P1 | One Idea → Multiple Formats | Medium | **Highest** — eliminates duplicate work |
+| 🔴 P1 | Idea Inbox | Low | **High** — captures fleeting ideas |
+| 🔴 P1 | Posting Pack Screen | Low | **High** — daily time saver |
+| 🟠 P1 | Content Quality Check | Medium | **High** — prevents bad posts |
+| 🟠 P1 | Trial Reel → Shot Planner | Medium | **High** — fixes architectural gap |
+| 🟠 P1 | Proper Create Flow | Medium | **Medium** — polish |
+| 🟡 P2 | Content Library + Statuses | Medium | **Medium** — scales with volume |
+| 🟡 P2 | Settings | Low | **Low** — convenience |
+| 🟢 P3 | Scheduling | High | **Low** — not core value |
+| 🟢 P3 | Onboarding | Low | **None** — personal app |
+
+---
+
+The app has evolved from "Quick Content Studio" → **"Fun Learning Content Studio"** — a **brand-aware, bucket-driven, format-flexible content production pipeline** with:
+
+- **Capture**: Idea Inbox
+- **Generate**: One Idea → Multiple Formats (Carousel/Reel/Trial Reel/Image)
+- **Check**: Content Quality Check (actionable, not scores)
+- **Export**: Posting Pack (single screen, "Copy Everything")
+- **Manage**: Content Library with Idea/Draft/Ready/Posted/Reuse statuses
+- **Reuse**: Duplicate → Create Another Format
+
+All powered by immutable Brand + Character Lock, 5 Content Buckets, 4 Formats, and per-section Regeneration with 8 style variations.

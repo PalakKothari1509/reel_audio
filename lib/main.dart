@@ -356,24 +356,30 @@ void main() {
     debugShowCheckedModeBanner: false,
     theme: buildAppTheme(),
     home: CreatorHomeScreen(
-      onMakeReel: () => Navigator.push(
+      onReel: () => Navigator.push(
         _appNavigatorKey.currentContext!,
         MaterialPageRoute(builder: (_) => const StoryScreen()),
       ),
-      onQuickPost: () => Navigator.push(
+      onTrialReel: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const QuickContentScreen()),
+        MaterialPageRoute(builder: (_) => const TrialReelScreen()),
       ),
-      onIdeas: () => Navigator.push(
+      onCarousel: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const PlanScreen()),
-      ).then((hook) {
-        if (hook is! HookIdea || _appNavigatorKey.currentContext == null) return;
-        Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => StoryScreen(initialText: hook.asStoryText())),
-        );
-      }),
+        MaterialPageRoute(builder: (_) => const CarouselMakerScreen()),
+      ),
+      onSingleImage: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const SingleImageScreen()),
+      ),
+      onMultiFormat: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const MultiFormatScreen()),
+      ),
+      onIdeaVault: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => const IdeaInboxScreen()),
+      ),
       onSavedStories: () => Navigator.push(
         _appNavigatorKey.currentContext!,
         MaterialPageRoute(builder: (_) => const SavedStoriesScreen()),
