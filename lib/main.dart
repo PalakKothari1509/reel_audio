@@ -25,9 +25,12 @@ import 'caption_renderer.dart';
 import 'story_ideas.dart';
 import 'theme.dart';
 import 'music.dart';
-import 'quick_content.dart';
+import 'quick_content.dart' as qc;
 import 'creator_home.dart';
 import 'shot_planner.dart';
+import 'ai_provider.dart';
+import 'gemini_client.dart';
+import 'settings_screen.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -350,6 +353,10 @@ final _appNavigatorKey = GlobalKey<NavigatorState>();
 void main() {
   // Hooks, posting times and results go into the Downloads backup with the stories.
   onPlanSaved = ProjectBackup.schedule;
+  
+  // Initialize AI provider from settings
+  AIProvider? aiProvider;
+  
   runApp(MaterialApp(
     title: 'Story Reel Maker',
     navigatorKey: _appNavigatorKey,
@@ -362,27 +369,34 @@ void main() {
       ),
       onTrialReel: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const TrialReelScreen()),
+        MaterialPageRoute(builder: (_) => const qc.TrialReelScreen()),
       ),
       onCarousel: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const CarouselMakerScreen()),
+        MaterialPageRoute(builder: (_) => const qc.CarouselMakerScreen()),
       ),
       onSingleImage: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const SingleImageScreen()),
+        MaterialPageRoute(builder: (_) => const qc.SingleImageScreen()),
       ),
       onMultiFormat: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const MultiFormatScreen()),
+        MaterialPageRoute(builder: (_) => qc.QuickContentScreen(aiProvider: aiProvider)),
       ),
       onIdeaVault: () => Navigator.push(
         _appNavigatorKey.currentContext!,
-        MaterialPageRoute(builder: (_) => const IdeaInboxScreen()),
+        MaterialPageRoute(builder: (_) => const qc.IdeaInboxScreen()),
       ),
       onSavedStories: () => Navigator.push(
         _appNavigatorKey.currentContext!,
         MaterialPageRoute(builder: (_) => const SavedStoriesScreen()),
+      ),
+      onSettings: () => Navigator.push(
+        _appNavigatorKey.currentContext!,
+        MaterialPageRoute(builder: (_) => SettingsScreen(
+          initialProvider: aiProvider,
+          onProviderChanged: (provider) => aiProvider = provider,
+        )),
       ),
     ),
   ));
@@ -959,9 +973,11 @@ class _StoryScreenState extends State<StoryScreen> {
       setState(() => _status = 'Write the story first, then plan its cinematic shots.');
       return;
     }
-    await Navigator.push(context, MaterialPageRoute(
-      builder: (_) => ShotPlannerScreen(story: story, targetSeconds: _seconds),
-    ));
+    // ShotPlannerScreen now requires ContentPackage + formats from Quick Content Studio
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Use Quick Content Studio → Generate All Formats → Shot Planner for shot planning')),
+    );
   }
 
   /// [force] writes a new script even when this story already has one.

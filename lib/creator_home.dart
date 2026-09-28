@@ -13,6 +13,7 @@ class CreatorHomeScreen extends StatefulWidget {
   final VoidCallback onMultiFormat;
   final VoidCallback onIdeaVault;
   final VoidCallback onSavedStories;
+  final VoidCallback onSettings;
 
   const CreatorHomeScreen({
     super.key,
@@ -23,6 +24,7 @@ class CreatorHomeScreen extends StatefulWidget {
     required this.onMultiFormat,
     required this.onIdeaVault,
     required this.onSavedStories,
+    required this.onSettings,
   });
 
   @override
@@ -241,6 +243,14 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
                   onBucketFilter: (bucketId) => setState(() => _filterBucket = bucketId),
                 )),
           ],
+          Gap.l,
+          _ActionCard(
+            icon: Icons.settings_outlined,
+            colour: Colors.grey.shade600,
+            title: 'Settings',
+            subtitle: 'AI provider, API keys, defaults, export/import data',
+            onTap: widget.onSettings,
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(

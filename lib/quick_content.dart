@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_generator.dart';
 import 'day14_posts.dart' as day14;
+import 'format_adapter.dart';
+import 'posting_pack.dart';
+import 'quality_check.dart';
 import 'regenerator.dart';
 import 'slide_prompts.dart';
 import 'theme.dart';
@@ -641,7 +645,9 @@ QuickIdea buildQuickIdea({
 }
 
 class QuickContentScreen extends StatefulWidget {
-  const QuickContentScreen({super.key});
+  final AIProvider? aiProvider;
+
+  const QuickContentScreen({super.key, this.aiProvider});
 
   @override
   State<QuickContentScreen> createState() => _QuickContentScreenState();
@@ -677,9 +683,14 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
   /// does not offer.
   int _slideCount = kDefaultCarouselSlides;
 
+  // AI Provider for content generation
+  AIProvider? _aiProvider;
+  bool _generatingAllFormats = false;
+
   @override
   void initState() {
     super.initState();
+    _aiProvider = widget.aiProvider;
     _loadSaved();
   }
 
@@ -750,6 +761,97 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     _history = [idea, ..._history].take(50).toList();
 
     setState(() {});
+  }
+
+  Future<void> _generateAllFormats() async {
+    if (_ideaCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an idea first')),
+      );
+      return;
+    }
+
+    if (_aiProvider == null || !_aiProvider!.isAvailable) {
+      // Fallback to template generation
+      final bucket = _bucketValue.isNotEmpty 
+          ? BucketLibrary.byId(_bucketValue) ?? BucketLibrary.challenge 
+          : BucketLibrary.challenge;
+      
+      final pkg = await ContentGenerator.generate(
+        idea: _ideaCtrl.text,
+        bucket: bucket,
+        format: ContentFormat.carousel,
+        characters: CharacterLibrary.all,
+        slideCount: _slideCount,
+      );
+      
+      final formats = FormatAdapter.adaptAll(pkg);
+      if (!mounted) return;
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PostingPackScreen(
+          formats: formats,
+          originalPackage: pkg,
+        )),
+      );
+      return;
+    }
+
+    setState(() => _generatingAllFormats = true);
+
+    try {
+      final bucket = _bucketValue.isNotEmpty 
+          ? BucketLibrary.byId(_bucketValue) ?? BucketLibrary.challenge 
+          : BucketLibrary.challenge;
+
+      final input = IdeaInput(
+        topic: _ideaCtrl.text,
+        bucket: bucket,
+        targetFormats: ContentFormat.values,
+        brand: BrandContext.defaultContext(),
+        characters: CharacterLibrary.all,
+        slideCount: _slideCount,
+      );
+
+      final pkg = await _aiProvider!.generate(input);
+      final formats = FormatAdapter.adaptAll(pkg);
+
+      if (!mounted) return;
+      
+      // Run quality check
+      final report = QualityChecker.check(pkg, formats);
+      
+      if (!report.isReadyToPost && mounted) {
+        final proceed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Quality Check: Issues Found'),
+            content: Text('${report.failCount} critical issues, ${report.warnCount} warnings. Continue anyway?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Review First')),
+              FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Continue')),
+            ],
+          ),
+        );
+        if (proceed != true) return;
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => PostingPackScreen(
+          formats: formats,
+          originalPackage: pkg,
+        )),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Generation failed: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _generatingAllFormats = false);
+    }
   }
 
   void _loadFrom14DayPost(QuickIdea post) {
@@ -1086,6 +1188,20 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                       onPressed: _generatePack,
                       icon: const Icon(Icons.auto_awesome),
                       label: const Text('Generate post pack'),
+                    ),
+                  ),
+                  Gap.s,
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _generatingAllFormats ? null : _generateAllFormats,
+                      icon: _generatingAllFormats
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.auto_awesome_mosaic),
+                      label: Text(_generatingAllFormats ? 'Generating All Formats...' : 'Generate All Formats (AI)'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                      ),
                     ),
                   ),
                   Gap.m,
@@ -1621,235 +1737,6 @@ Future<void> _copy(String text, String label) async {
 }
 
 // ============================================================================
-// Posting Pack Screen — Single screen to copy all post content
-// ============================================================================
-
-class PostingPackScreen extends StatefulWidget {
-  final ContentPackage package;
-
-  const PostingPackScreen({super.key, required this.package});
-  @override
-  State<PostingPackScreen> createState() => _PostingPackScreenState();
-}
-
-class _PostingPackScreenState extends State<PostingPackScreen> {
-  late ContentPackage _package;
-
-  @override
-  void initState() {
-    super.initState();
-    _package = widget.package;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Posting Pack: ${_package.format.emoji} ${_package.format.label}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.verified),
-            tooltip: 'Quality Check',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => QualityCheckScreen(
-                package: _package,
-                onRegenerate: (target, style) {
-                  // Show snackbar that regenerate happened
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Regenerated ${target.label} with ${style.label} style')),
-                  );
-                },
-              )),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.content_copy),
-            tooltip: 'Copy Everything',
-            onPressed: _copyEverything,
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Format badge + bucket
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _package.bucket.softColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Text(_package.bucket.emoji, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 6),
-                    Text(_package.bucket.shortLabel, style: TextStyle(color: _package.bucket.color, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(_package.format.label, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
-              ),
-            ],
-          ),
-          Gap.l,
-
-          // Hook
-          _PostingSection(
-            title: 'Hook',
-            content: _package.hook,
-            onCopy: () => _copy(_package.hook, 'Hook'),
-            icon: Icons.bolt,
-          ),
-          Gap.s,
-
-          // Slides/Shots
-          _PostingSection(
-            title: 'Slides/Shots (${_package.slides.length})',
-            content: _package.slides.map((s) => '${s.index + 1}. ${s.title}\n${s.body}').join('\n\n'),
-            onCopy: () => _copy(_package.slides.map((s) => '${s.title}\n${s.body}').join('\n\n'), 'Slides'),
-            icon: Icons.view_carousel,
-          ),
-          Gap.s,
-
-          // Visual Prompts
-          _PostingSection(
-            title: 'Visual Prompts (${_package.visualPrompts.length})',
-            content: _package.visualPrompts.join('\n\n'),
-            onCopy: () => _copy(_package.visualPrompts.join('\n\n'), 'Visual Prompts'),
-            icon: Icons.image,
-          ),
-          Gap.s,
-
-          // Caption
-          _PostingSection(
-            title: 'Caption',
-            content: _package.caption,
-            onCopy: () => _copy(_package.caption, 'Caption'),
-            icon: Icons.text_fields,
-          ),
-          Gap.s,
-
-          // CTA + Hashtags
-          Row(
-            children: [
-              Expanded(child: _PostingSection(
-                title: 'CTA',
-                content: _package.cta,
-                onCopy: () => _copy(_package.cta, 'CTA'),
-                icon: Icons.flag,
-              )),
-              const SizedBox(width: 12),
-              Expanded(child: _PostingSection(
-                title: 'Hashtags (${_package.hashtags.length})',
-                content: _package.hashtags.join(' '),
-                onCopy: () => _copy(_package.hashtags.join(' '), 'Hashtags'),
-                icon: Icons.tag,
-              )),
-            ],
-          ),
-          Gap.s,
-
-          // Pinned Comment
-          _PostingSection(
-            title: 'Pinned Comment',
-            content: _package.pinnedComment,
-            onCopy: () => _copy(_package.pinnedComment, 'Pinned Comment'),
-            icon: Icons.push_pin,
-          ),
-          Gap.s,
-
-          // Reply Comments
-          _PostingSection(
-            title: 'Reply Comments (${_package.replyComments.length})',
-            content: _package.replyComments.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n\n'),
-            onCopy: () => _copy(_package.replyComments.join('\n\n'), 'Reply Comments'),
-            icon: Icons.comment,
-          ),
-          Gap.l,
-
-          // Copy Everything Button
-          FilledButton.icon(
-            onPressed: _copyEverything,
-            icon: const Icon(Icons.copy_all),
-            label: const Text('COPY EVERYTHING'),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: AppColors.primary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _copyEverything() async {
-    final buffer = StringBuffer();
-    buffer.writeln('═══════════════════════════════════');
-    buffer.writeln('POSTING PACK: ${_package.format.label}');
-    buffer.writeln('Bucket: ${_package.bucket.name}');
-    buffer.writeln('═══════════════════════════════════');
-    buffer.writeln();
-    buffer.writeln('HOOK');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.hook);
-    buffer.writeln();
-    buffer.writeln('SLIDES/SHOTS');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.slides.map((s) => '${s.index + 1}. ${s.title}\n${s.body}').join('\n\n'));
-    buffer.writeln();
-    buffer.writeln('VISUAL PROMPTS');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.visualPrompts.join('\n\n'));
-    buffer.writeln();
-    buffer.writeln('CAPTION');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.caption);
-    buffer.writeln();
-    buffer.writeln('CTA');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.cta);
-    buffer.writeln();
-    buffer.writeln('HASHTAGS');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.hashtags.join(' '));
-    buffer.writeln();
-    buffer.writeln('PINNED COMMENT');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.pinnedComment);
-    buffer.writeln();
-    buffer.writeln('REPLY COMMENTS');
-    buffer.writeln('────────────────────────────────────');
-    buffer.writeln(_package.replyComments.join('\n\n'));
-    buffer.writeln();
-    buffer.writeln('═══════════════════════════════════');
-
-    await Clipboard.setData(ClipboardData(text: buffer.toString()));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Everything copied to clipboard!'), duration: Duration(seconds: 2)),
-    );
-  }
-
-Future<void> _copy(String text, String label) async {
-    await Clipboard.setData(ClipboardData(text: text));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label copied'), duration: const Duration(seconds: 1)),
-    );
-  }
-}
-
-// ============================================================================
 // Content Quality Check — Actionable pre-export validation
 // ============================================================================
 
@@ -1862,8 +1749,12 @@ enum QualitySeverity {
   final String label;
   final Color color;
 
-  const QualitySeverity(this.icon, this.label, this.color);
+const QualitySeverity(this.icon, this.label, this.color);
 }
+
+// ============================================================================
+// Content Quality Check — Actionable pre-export validation
+// ============================================================================
 
 class QualityCheck {
   final String id;
@@ -2139,7 +2030,7 @@ class _QualityCheckScreenState extends State<QualityCheckScreen> {
             ],
           ),
           Gap.l,
-          const Text('Actionable Checks', style: AppText.screenTitle),
+const Text('Actionable Checks', style: AppText.screenTitle),
           Gap.s,
           ..._checks.map((check) => Card(
             margin: const EdgeInsets.only(bottom: 12),
@@ -2207,7 +2098,7 @@ class _QualityCheckScreenState extends State<QualityCheckScreen> {
                             _FixButton(label: 'Curious Pinned', onTap: () => widget.onRegenerate!(RegenerateTarget.pinnedComment, RegenerateStyle.moreCuriosity)),
                           ],
                           if (check.id.contains('reply')) ...[
-_FixButton(label: 'Fresh Replies', onTap: () => widget.onRegenerate!(RegenerateTarget.replyComments, RegenerateStyle.original)),
+                            _FixButton(label: 'Fresh Replies', onTap: () => widget.onRegenerate!(RegenerateTarget.replyComments, RegenerateStyle.original)),
                           ],
                           if (check.id.contains('cta')) ...[
                             _FixButton(label: 'Fix CTA', onTap: () => widget.onRegenerate!(RegenerateTarget.cta, RegenerateStyle.original)),
@@ -2216,16 +2107,14 @@ _FixButton(label: 'Fresh Replies', onTap: () => widget.onRegenerate!(RegenerateT
                       ),
                     ],
                   ],
-],
-                ),
+                ],
               ),
             ),
-          ]))
+          )).toList(),
         ],
       ),
-    );
+);
   }
-}
 }
 
 class _SummaryCard extends StatelessWidget {
@@ -2965,10 +2854,19 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
                       ? TextButton.icon(
                           icon: const Icon(Icons.content_copy, size: 18),
                           label: const Text('Posting Pack'),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => PostingPackScreen(package: pkg)),
-                          ),
+                          onPressed: () {
+                            final formats = <ContentFormat, FormatOutput>{};
+                            for (final entry in _results.entries) {
+                              formats[entry.key] = FormatAdapter.adapt(entry.value, entry.key);
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => PostingPackScreen(
+                                formats: formats,
+                                originalPackage: pkg,
+                              )),
+                            );
+                          },
                         )
                       : null,
                   children: [
