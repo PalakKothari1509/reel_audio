@@ -367,17 +367,34 @@ Visual: Clean checklist style, consistent icons per skill, warm not clinical.'''
 // ============================================================================
 
 enum ContentFormat {
-  carousel('Carousel', '📚', 'Swipeable multi-slide post', 7),
-  reel('Reel', '🎬', '15-20 sec vertical video', 5),
-  trialReel('Trial Reel', '🧪', '60-sec fast-cut for reach', 8),
-  singleImage('Single Image', '🖼️', 'One image + full caption pack', 1);
+  carousel('Carousel', '📚', 'Swipeable multi-slide post', 7,
+    canvasWidth: 1080, canvasHeight: 1440,
+    topMargin: 180, bottomMargin: 180, leftMargin: 50, rightMargin: 50),
+  reel('Reel', '🎬', '15-20 sec vertical video', 5,
+    canvasWidth: 1080, canvasHeight: 1920,
+    topMargin: 250, bottomMargin: 450, leftMargin: 35, rightMargin: 35),
+  trialReel('Trial Reel', '🧪', '60-sec fast-cut for reach', 8,
+    canvasWidth: 1080, canvasHeight: 1920,
+    topMargin: 250, bottomMargin: 450, leftMargin: 35, rightMargin: 35),
+  singleImage('Single Image', '🖼️', 'One image + full caption pack', 1,
+    canvasWidth: 1080, canvasHeight: 1080,
+    topMargin: 100, bottomMargin: 100, leftMargin: 50, rightMargin: 50);
 
   final String label;
   final String emoji;
   final String description;
   final int defaultSlideCount;
+  final int canvasWidth;
+  final int canvasHeight;
+  final int topMargin;
+  final int bottomMargin;
+  final int leftMargin;
+  final int rightMargin;
 
-  const ContentFormat(this.label, this.emoji, this.description, this.defaultSlideCount);
+  const ContentFormat(this.label, this.emoji, this.description, this.defaultSlideCount,
+    {required this.canvasWidth, required this.canvasHeight,
+     required this.topMargin, required this.bottomMargin,
+     required this.leftMargin, required this.rightMargin});
 }
 
 extension FormatExt on ContentFormat {
@@ -394,6 +411,33 @@ extension FormatExt on ContentFormat {
     ContentFormat.trialReel => 10,
     ContentFormat.singleImage => 1,
   };
+
+  String get safeZoneSpec => '''
+Safe Zone (content must stay within these margins):
+  Canvas: ${canvasWidth}x${canvasHeight}px
+  Top Margin: ${topMargin}px
+  Bottom Margin: ${bottomMargin}px
+  Left Margin: ${leftMargin}px
+  Right Margin: ${rightMargin}px
+  Safe Area: ${canvasWidth - leftMargin - rightMargin}x${canvasHeight - topMargin - bottomMargin}px
+  (All key text, characters, and visual elements MUST remain inside this safe area)''';
+
+  String get visualPromptSpec => '''
+Visual Prompt Spec (for AI image/video generation):
+  Format: ${label} (${description})
+  Canvas: ${canvasWidth}x${canvasHeight}px (${aspectRatio})
+  Safe Zone: Top ${topMargin}px, Bottom ${bottomMargin}px, Left ${leftMargin}px, Right ${rightMargin}px
+  Style: ${BrandDefaults.visualStyle}
+  Characters: Ria (brown eyes, warm skin, pink dress, two ponytails), Rio (brown eyes, warm skin, blue t-shirt), Cuty (white bunny, pink bow)''';
+
+  String get aspectRatio {
+    final w = canvasWidth;
+    final h = canvasHeight;
+    final gcd = _gcd(w, h);
+    return '${w ~/ gcd}:${h ~/ gcd}';
+  }
+
+  int _gcd(int a, int b) => b == 0 ? a : _gcd(b, a % b);
 }
 
 // ============================================================================
@@ -423,6 +467,8 @@ ${CharacterLibrary.characterLockBlock}
 
 FORMAT: ${format.label} (${format.description})
 Default slides/shots: ${format.defaultSlideCount} (range: ${format.minSlides}-${format.maxSlides})
+${format.safeZoneSpec}
+${format.visualPromptSpec}
 
 BUCKET: ${bucket.name} ${bucket.emoji}
 ${bucket.description}

@@ -130,6 +130,7 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
                     onCopy: () => _copyComment(comment.text),
                     onBucketFilter: (bucketId) {
                       setState(() => _filterBucket = bucketId);
+                      Navigator.pop(context);
                     },
                   )),
             ],
@@ -145,7 +146,7 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
     return _comments.where((c) => c.bucket == _filterBucket).toList();
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -212,37 +213,6 @@ class _CreatorHomeScreenState extends State<CreatorHomeScreen> {
             subtitle: 'Capture, organize & develop ideas (💡📝✅📤♻️)',
             onTap: widget.onIdeaVault,
           ),
-          if (_comments.isNotEmpty) ...[
-            Gap.l,
-            const SectionTitle('Your promotion comments'),
-            Gap.s,
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilterChip(
-                  label: const Text('All'),
-                  selected: _filterBucket.isEmpty,
-                  onSelected: (v) => setState(() => _filterBucket = ''),
-                ),
-                ...kContentBuckets.map((b) => FilterChip(
-                  label: Text(b.shortLabel),
-                  selected: _filterBucket == b.id,
-                  onSelected: (v) => setState(() => _filterBucket = v ? b.id : ''),
-                  backgroundColor: b.softColor,
-                  selectedColor: b.color.withOpacity(0.3),
-                  checkmarkColor: b.color,
-                )),
-              ],
-            ),
-            Gap.m,
-            ..._filteredComments.map((comment) => _CommentRow(
-                  text: comment.text,
-                  bucket: comment.bucket,
-                  onCopy: () => _copyComment(comment.text),
-                  onBucketFilter: (bucketId) => setState(() => _filterBucket = bucketId),
-                )),
-          ],
           Gap.l,
           _ActionCard(
             icon: Icons.settings_outlined,

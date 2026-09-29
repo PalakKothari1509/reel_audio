@@ -51,6 +51,8 @@ class AppText {
       TextStyle(fontSize: 13, color: AppColors.textSoft, height: 1.4);
   static const small =
       TextStyle(fontSize: 12, color: AppColors.textFaint, height: 1.35);
+  static const subtitle =
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.text, height: 1.4);
 }
 
 /// Spacing steps. Everything is a multiple of these so nothing is nearly-aligned.

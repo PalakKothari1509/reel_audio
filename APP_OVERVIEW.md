@@ -334,13 +334,17 @@ The article icon on the main screen opens Quick Content Studio. It supports:
 The Android app now declares image-library access for importing images from the device gallery. The story image picker uses the device gallery multi-image picker, while video selection remains separate.
 
 ### Current creator dashboard
-The app now opens on a creator dashboard with four clear entry points:
-- Make a reel: the existing story, script, image, voice, and render workflow
-- Create a quick post: carousel, static-image, story, or reel copy packs
-- Browse ideas: complete built-in hooks with filled story beats, not blank placeholders
-- Profile promotion comments: open the full reusable comment vault
+The app now opens on a creator dashboard with **7 clear entry points** plus a persistent bottom bar:
+- ✨ **Create Content**: One idea → Carousel, Reel, Trial Reel, Image (all at once)
+- 🎬 **Make a reel**: the existing story, script, image, voice, and render workflow
+- 🧪 **Trial Reel**: 60-sec fast-cut compilation for non-follower reach
+- 📚 **Carousel**: Enter idea → get slide prompts for all carousel pages
+- 🖼️ **Image**: Enter idea → get 7 different image prompts for Meta AI
+- 💡 **Idea Vault**: Capture, organize & develop ideas (💡📝✅📤♻️)
+- ⚙️ **Settings**: AI provider, API keys, defaults, export/import data
+- 💬 **Promotion Comments** (bottom bar): opens full reusable comment vault with bucket filter chips
 
-The dashboard shows the first three ready comments with one-tap copy. The `Profile promotion comments` button opens every saved comment, supports copying, and lets you add another reusable comment. Saved story history remains available through the existing folder/file-manager icon in the dashboard app bar.
+Saved story history remains available through the existing folder/file-manager icon in the dashboard app bar.
 
 Selecting an idea from `Browse ideas` now returns it directly to the story editor with its complete story scaffold filled in. The generated structure includes the setting, starting problem, escalation, solution, ending line, and moral, so there are no blank story sections to complete before writing the script.
 
@@ -538,19 +542,23 @@ SLIDE TEMPLATE: Cover → Challenge → Options → Think → Reveal → Why →
 
 ---
 
-## 18. Redesigned Dashboard (5 Options)
+## 18. Redesigned Dashboard (7 Options + Bottom Bar)
 
-The main dashboard now shows exactly **5 focused options** — no clutter:
+The main dashboard now shows exactly **7 focused options** — no clutter:
 
 | # | Option | Navigates To | Purpose |
 |---|--------|--------------|---------|
-| 1 | 🎬 **Reel** | `StoryScreen` | Full workflow: story → script → images → voice → video |
-| 2 | 🧪 **Trial Reel** | `TrialReelScreen` | 60-sec compilation generator (hook, 7 fast cuts, celebration, follow CTA) |
-| 3 | 📚 **Carousel** | `CarouselMakerScreen` | Enter idea → get slide prompts for all carousel pages |
-| 4 | 🖼️ **Image** | `SingleImageScreen` | Enter idea → get 7 different image prompts for Meta AI |
-| 5 | 💬 **Promotion Comments** | Bottom Sheet | Section-wise comment vault with bucket filter chips |
+| 1 | ✨ **Create Content** | `QuickContentScreen` | One idea → Carousel + Reel + Trial Reel + Image (all at once) |
+| 2 | 🎬 **Reel** | `StoryScreen` | Full workflow: story → script → images → voice → video |
+| 3 | 🧪 **Trial Reel** | `TrialReelScreen` | 60-sec compilation generator (hook, 7 fast cuts, celebration, follow CTA) |
+| 4 | 📚 **Carousel** | `CarouselMakerScreen` | Enter idea → get slide prompts for all carousel pages |
+| 5 | 🖼️ **Image** | `SingleImageScreen` | Enter idea → get 7 different image prompts for Meta AI |
+| 6 | 💡 **Idea Vault** | `IdeaInboxScreen` | Capture, organize & develop ideas (💡📝✅📤♻️) |
+| 7 | ⚙️ **Settings** | `SettingsScreen` | AI provider, API keys, defaults, export/import data |
 
-**Design**: Clean cards with color-coded icons, descriptive subtitles, chevron indicators. Comments vault shows at bottom with bucket filter chips.
+**Bottom Bar**: 💬 **Promotion Comments** — persistent bottom button opens modal sheet with bucket filter chips, saved comments, and "Add comment" form.
+
+**Design**: Clean cards with color-coded icons, descriptive subtitles, chevron indicators. Comments vault accessible only via bottom bar (not cluttering main scroll area).
 
 ---
 
@@ -723,7 +731,7 @@ This architecture means **one idea becomes four related packages** — not four 
 
 ---
 
-## 24. Ideal Dashboard (Target State)
+## 24. Ideal Dashboard (Current State)
 
 ```
 🌸 FUN LEARNING WITH PALAK
@@ -731,7 +739,7 @@ This architecture means **one idea becomes four related packages** — not four 
 What are we creating today?
 
 ┌─────────────────────────────────────┐
-│ 💡 CREATE CONTENT                   │
+│ ✨ CREATE CONTENT                   │
 │ Turn an idea into a post            │
 └─────────────────────────────────────┘
 
@@ -746,8 +754,13 @@ What are we creating today?
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
-│ 📚 CAROUSEL / IMAGE                 │
+│ 📚 CAROUSEL                         │
 │ Quick visual content                │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│ 🖼️ IMAGE                            │
+│ 7 prompts for Meta AI               │
 └─────────────────────────────────────┘
 
 ┌─────────────────────────────────────┐
@@ -755,13 +768,15 @@ What are we creating today?
 │ Ideas, drafts & posts               │
 └─────────────────────────────────────┘
 
+┌─────────────────────────────────────┐
+│ ⚙️ SETTINGS                         │
+│ AI, API keys, defaults              │
+└─────────────────────────────────────┘
+
 💬 Promotion Comments  (persistent bottom button)
 ```
 
-**Changes from current:**
-- "Create Content" becomes the primary entry (opens Idea Inbox → Bucket → Format)
-- "Idea Vault" replaces "Browse Ideas" + "Saved Stories" — unified library with status filters
-- "Promotion Comments" becomes persistent bottom button (not a primary creation slot)
+**Current implementation matches target** — all 7 options + bottom bar are live. No clutter, no comments in main scroll area.
 
 ---
 

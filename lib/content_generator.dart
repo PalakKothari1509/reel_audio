@@ -147,11 +147,11 @@ class ContentGenerator {
     final count = slideCount ?? format.defaultSlideCount.clamp(format.minSlides, format.maxSlides);
 
     // In production, call Gemini here. For now, use local template generation.
-    return _generateFromTemplate(idea, bucket, format, characters, count);
+    return generateFromTemplate(idea, bucket, format, characters, count);
   }
 
   /// Local template-based generation (no API call needed)
-  static ContentPackage _generateFromTemplate(
+  static ContentPackage generateFromTemplate(
     String idea,
     ContentBucket bucket,
     ContentFormat format,
