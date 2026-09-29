@@ -272,18 +272,21 @@ class PromoCommentStore {
         return starterComments.map((s) => PromoComment.fromString(s)).toList();
       }
       final raw = jsonDecode(await file.readAsString());
-      if (raw is! List) return starterComments.map((s) => PromoComment.fromString(s)).toList();
-      return raw.whereType<Map<String, dynamic>>().map((j) {
-        final c = PromoComment.fromJson(j);
-        if (c.text.isEmpty) {
-          final s = (j['text'] as String?) ?? (j as String? ?? '');
-          if (s.trim().isNotEmpty) return PromoComment.fromString(s);
-        }
-        return c;
-      }).where((c) => c.text.trim().isNotEmpty).toList();
+      return decode(raw);
     } catch (_) {
       return starterComments.map((s) => PromoComment.fromString(s)).toList();
     }
+  }
+
+  static List<PromoComment> decode(dynamic raw) {
+    if (raw is! List) {
+      return starterComments.map((s) => PromoComment.fromString(s)).toList();
+    }
+    return raw.map((item) {
+      if (item is String) return PromoComment.fromString(item);
+      if (item is Map<String, dynamic>) return PromoComment.fromJson(item);
+      return null;
+    }).whereType<PromoComment>().where((comment) => comment.text.isNotEmpty).toList();
   }
 
   /// Backward-compatible: load as plain strings.

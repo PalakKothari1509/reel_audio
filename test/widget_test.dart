@@ -3,9 +3,43 @@
 // most likely to break, since Gemini's output is never quite the same twice.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:reel_audio/creator_home.dart';
 import 'package:reel_audio/main.dart';
+import 'package:reel_audio/quick_content.dart';
 
 void main() {
+  testWidgets('home screen does not show promotion comments', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: CreatorHomeScreen(
+        onReel: () {},
+        onTrialReel: () {},
+        onCarousel: () {},
+        onSingleImage: () {},
+        onMultiFormat: () {},
+        onIdeaVault: () {},
+        onSavedStories: () {},
+        onSettings: () {},
+      ),
+    ));
+
+    expect(find.text('Create Content'), findsOneWidget);
+    expect(find.text('Promotion Comments'), findsNothing);
+  });
+
+  test('loads promotion comments saved in the legacy string format', () {
+    final comments = PromoCommentStore.decode([
+      'A legacy comment',
+      {'text': 'A bucketed comment', 'bucket': 'reels'},
+      '',
+      42,
+    ]);
+
+    expect(comments, hasLength(2));
+    expect(comments.first.text, 'A legacy comment');
+    expect(comments.last.text, 'A bucketed comment');
+    expect(comments.last.bucket, 'reels');
+  });
+
   test('reads timestamped lines and puts them in order', () {
     final lines = parseScript('0:08 Rio bhi aa gaya\n0:00 Ek baar ki baat hai');
 
