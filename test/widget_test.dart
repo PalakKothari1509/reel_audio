@@ -8,22 +8,36 @@ import 'package:reel_audio/main.dart';
 import 'package:reel_audio/quick_content.dart';
 
 void main() {
-  testWidgets('home screen does not show promotion comments', (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: CreatorHomeScreen(
-        onReel: () {},
-        onTrialReel: () {},
-        onCarousel: () {},
-        onSingleImage: () {},
-        onMultiFormat: () {},
-        onIdeaVault: () {},
-        onSavedStories: () {},
-        onSettings: () {},
+  testWidgets('home screen opens the promotion comments vault', (tester) async {
+    var openedComments = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreatorHomeScreen(
+          onReel: () {},
+          onTrialReel: () {},
+          onCarousel: () {},
+          onSingleImage: () {},
+          onMultiFormat: () {},
+          onIdeaVault: () {},
+          onSavedStories: () {},
+          onSettings: () {},
+          onPromoComments: () => openedComments = true,
+        ),
       ),
-    ));
+    );
 
     expect(find.text('Create Content'), findsOneWidget);
-    expect(find.text('Promotion Comments'), findsNothing);
+    await tester.scrollUntilVisible(
+      find.text('Promotion Comments'),
+      250,
+      scrollable: find.descendant(
+        of: find.byType(CreatorHomeScreen),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    expect(find.text('Promotion Comments'), findsOneWidget);
+    await tester.tap(find.text('Promotion Comments'));
+    expect(openedComments, isTrue);
   });
 
   test('loads promotion comments saved in the legacy string format', () {
@@ -40,6 +54,27 @@ void main() {
     expect(comments.last.bucket, 'reels');
   });
 
+  testWidgets('promotion vault renders comments as wrapping rows', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: PromoCommentVaultScreen()));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Cuty ki masti'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Idea Vault opens the add idea form', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: IdeaInboxScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Add idea'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add New Idea'), findsOneWidget);
+    expect(find.text('Save Idea'), findsOneWidget);
+  });
+
   test('reads timestamped lines and puts them in order', () {
     final lines = parseScript('0:08 Rio bhi aa gaya\n0:00 Ek baar ki baat hai');
 
@@ -49,7 +84,9 @@ void main() {
   });
 
   test('ignores bullets and numbering that Gemini sometimes adds', () {
-    final lines = parseScript('* 0:04 Ria ne dekha ek titli\nsome stray explanation');
+    final lines = parseScript(
+      '* 0:04 Ria ne dekha ek titli\nsome stray explanation',
+    );
 
     expect(lines.length, 1);
     expect(lines.first.text, 'Ria ne dekha ek titli');

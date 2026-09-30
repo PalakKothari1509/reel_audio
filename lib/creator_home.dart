@@ -11,6 +11,7 @@ class CreatorHomeScreen extends StatelessWidget {
   final VoidCallback onIdeaVault;
   final VoidCallback onSavedStories;
   final VoidCallback onSettings;
+  final VoidCallback onPromoComments;
 
   const CreatorHomeScreen({
     super.key,
@@ -22,6 +23,7 @@ class CreatorHomeScreen extends StatelessWidget {
     required this.onIdeaVault,
     required this.onSavedStories,
     required this.onSettings,
+    required this.onPromoComments,
   });
 
   @override
@@ -40,15 +42,22 @@ class CreatorHomeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          const Text('What are you creating today?', style: AppText.screenTitle),
+          const Text(
+            'What are you creating today?',
+            style: AppText.screenTitle,
+          ),
           Gap.s,
-          const Text('Choose a starting point. Your work stays saved in the app.', style: AppText.hint),
+          const Text(
+            'Choose a starting point. Your work stays saved in the app.',
+            style: AppText.hint,
+          ),
           Gap.l,
           _ActionCard(
             icon: Icons.auto_awesome,
             colour: AppColors.primary,
             title: 'Create Content',
-            subtitle: 'One idea → Carousel, Reel, Trial Reel, Image (all at once)',
+            subtitle:
+                'One idea → Carousel, Reel, Trial Reel, Image (all at once)',
             onTap: onMultiFormat,
           ),
           Gap.m,
@@ -56,7 +65,8 @@ class CreatorHomeScreen extends StatelessWidget {
             icon: Icons.movie_creation_outlined,
             colour: AppColors.accent,
             title: 'Reel',
-            subtitle: 'Full reel workflow: story → script → images → voice → video',
+            subtitle:
+                'Full reel workflow: story → script → images → voice → video',
             onTap: onReel,
           ),
           Gap.m,
@@ -98,6 +108,14 @@ class CreatorHomeScreen extends StatelessWidget {
             title: 'Settings',
             subtitle: 'AI provider, API keys, defaults, export/import data',
             onTap: onSettings,
+          ),
+          Gap.m,
+          _ActionCard(
+            icon: Icons.forum_outlined,
+            colour: AppColors.primary,
+            title: 'Promotion Comments',
+            subtitle: 'Copy and organize reusable profile replies',
+            onTap: onPromoComments,
           ),
         ],
       ),
@@ -150,7 +168,10 @@ class _ActionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: AppText.screenTitle.copyWith(fontSize: 18)),
+                    Text(
+                      title,
+                      style: AppText.screenTitle.copyWith(fontSize: 18),
+                    ),
                     const SizedBox(height: 4),
                     Text(subtitle, style: AppText.hint),
                   ],

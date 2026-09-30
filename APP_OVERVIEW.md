@@ -1,823 +1,168 @@
-# Quick Content Studio - Application Overview
-
-## 1. Project summary
-This app is a Flutter application for creating AI-assisted short-form content for parenting and kids-focused social media posts. The current build is centered around generating reels from stories, writing scripts, adding voiceover, designing scenes, and preparing posting copy.
-
-The app is useful for creators who want to:
-- write a story idea
-- generate a timed script with AI
-- choose a voice style and language
-- generate image prompts for each scene
-- build a final reel with captions and music
-- save the project and prepare Instagram-ready post content
-
----
-
-## 2. Current app direction
-The existing app already includes:
-- story input screen
-- script generation using Gemini
-- voice engine switching
-- AI prompt generation for scenes
-- project saving
-- hook and content planning
-- posting kit for captions and comments
-- saved project drafts
-
-This means the app already works as a reel-making assistant.
-
----
-
-## 3. What is missing for your workflow
-Your real need is not only reel creation. You also want to:
-- save many content ideas in one place
-- create posts without going through the full reel pipeline
-- generate prompts for static image posts and carousel posts
-- create captions quickly
-- create multiple different comments for one post
-- build copy-and-paste content for AI tools outside this app
-
-This means the app needs a second workflow: a fast content drafting module.
-
----
-
-## 4. Best product structure
-### A. Reel Maker
-For full video reels with:
-- story writing
-- script generation
-- narration
-- prompt generation
-- captions and reel output
-
-### B. Quick Content Studio
-For faster posts, such as:
-- static image posts
-- carousel posts
-- text-based posts
-- prompt-only generation
-- caption-only generation
-- comment pack generation
-
-### C. Saved Ideas Library
-A place where all ideas are stored and can be reopened later.
-
----
-
-## 5. Recommended app name
-Recommended name:
-- Quick Content Studio
-
-Alternative options:
-- PostPilot
-- StoryPack
-- ContentFlow
-
-The best fit for your business is: Quick Content Studio
-
----
-
-## 6. Core feature to build next
-### Quick Post Studio
-This should be one single page that lets a creator generate everything for a post without entering the full reel flow.
-
-Required fields:
-- Post type: Reel / Carousel / Static Image / Story
-- Post title or idea name
-- Target audience
-- Content goal
-- Hook / cover text
-- Main idea
-- Problem
-- Solution / lesson
-- Visual style
-- AI image prompt
-- Caption
-- CTA
-- Hashtags
-- Pin comment
-- 5 reply comments
-- Reel script or carousel slide text
-
-This page should also include buttons such as:
-- Copy all
-- Copy caption
-- Copy image prompt
-- Copy script
-- Copy comments
-- Save idea
+# Fun Learning With Palak App Overview
 
----
+## Product Summary
 
-## 7. Best one-page content form
-This is the recommended single-page structure:
+This is a Flutter content-planning and production app for the Fun Learning With Palak Instagram brand. It supports the full creator workflow: capture an idea, develop content for one or more Instagram formats, prepare copy and visual prompts, build a narrated reel, and keep drafts on the device.
 
-Post Type
-[ Reel / Carousel / Static Image / Story ]
+The brand focuses on playful learning, screen-free activities, everyday parenting situations, and the characters Ria, Rio, and Cuty. Brand defaults target parents of preschoolers; individual briefs can narrow the age range or audience.
 
-Post Title
-[ Example: School Morning Battle ]
+The app is local-first. It does not publish to Instagram, sync a creator account, or guarantee reach or view counts.
 
-Target Audience
-[ Parents of 3-6 year olds / non-mom audience / general parents ]
+## Dashboard
 
-Hook / Cover Text
-[ 2 to 5 words ]
+The dashboard is the entry point. It provides:
 
-Main Idea
-[ What is happening in this post? ]
+| Entry | Purpose |
+| --- | --- |
+| Create Content | Prepare a post and create outputs for selected formats, including carousel, Reel, Trial Reel, and single image. Gemini can generate structured content when configured; local templates are available as a fallback. |
+| Reel | Create a story-based reel through the script, scene, voice, and video workflow. |
+| Trial Reel | Prepare a short, fast-cut compilation aimed at testing content with new viewers. Reach is not guaranteed. |
+| Carousel | Create carousel copy and image prompts. |
+| Image | Prepare a single-image post and its visual prompt and caption. |
+| Idea Vault | Capture, edit, organize, develop, and delete raw ideas. |
+| Settings | Configure the Gemini provider and selected content defaults. |
+| Promotion Comments | Open the reusable comment vault. |
 
-Problem
-[ What is the child struggling with? ]
+Saved stories are available from the folder action in the dashboard app bar.
 
-Lesson / Solution
-[ What should the parent learn? ]
+## Main Workflows
 
-Mood / Emotion
-[ Relatable / Funny / Warm / Educational / Surprising ]
+### Create Content and Quick Content Studio
 
-Visual Style
-[ Bright / Clean / Real-life / Cartoon / Minimal ]
+Quick Content Studio is for preparing post packages without going through the full video-rendering workflow. The form supports a title, post type, audience, goal, mood, hook, main idea, problem, lesson, visual style, CTA, and generated or editable copy.
 
-Image Prompt
-[ Full prompt for image generation ]
+Depending on the chosen action and provider configuration, the app can use Gemini or local templates. A multi-format package adapts one core idea into format-specific content rather than starting with unrelated ideas. Outputs can include hooks, scripts or slide text, image prompts, captions, hashtags, pinned comments, and reply comments.
 
-Caption
-[ Final caption text ]
+Quick Content Studio also includes:
 
-CTA
-[ Save / Share / Comment / Follow ]
+- Saved post ideas: save a completed idea, reopen it in the form, copy its contents, or delete it with confirmation.
+- Recent post history: generated packages are kept locally, with history limited to the most recent 50 entries.
+- Built-in post packages and bulk paste for importing structured post text.
+- Carousel slide-count selection and prompts that follow the current slide content.
+- A posting pack view for reviewing and copying or sharing format-specific outputs.
 
-Hashtags
-[ #ParentingTips #KidsLife #ToddlerMom ]
+### Idea Vault
 
-Pinned Comment
-[ Single main comment ]
+The dashboard Idea Vault is implemented in `lib/quick_content.dart`. It is separate from the saved post-idea list in Quick Content Studio.
 
-Reply Comments
-[ 5 varied comments ]
-
-Script / Carousel Text
-[ For reel or carousel ]
-
----
-
-## 8. Comment strategy
-This is very important for Instagram safety and engagement.
-
-Do not reuse the same reply on multiple comments. That can look spammy and may trigger restrictions.
-
-A better approach is to generate a comment pack with 5 different styles for every post.
-
-### Recommended comment types
-1. Relatable mom comment
-2. Relatable non-mom comment
-3. Emoji reaction comment
-4. Validation / truth comment
-5. CTA or conversation comment
-
-### Example comment pack
-- Mom-focused: “This is my life right now 😭 and honestly, the struggle is so real.”
-- Non-mom comment: “This is honestly so relatable even for non-moms. It feels like family life in one moment.”
-- Emoji reaction: “😅😅😅 this is us every single day.”
-- Validation: “This is so true. We all need this reminder sometimes.”
-- CTA: “Which part of this feels most like your home? Tell me below 👇”
+Each raw idea can have a title, a short description, notes, a content bucket, and a status. The vault supports adding, editing, filtering, and confirmed deletion. An idea can be sent into the multi-format workflow for development.
 
-This creates organic conversation without repeating the same wording.
+The Idea Vault's local records use `idea_inbox.json`. The saved post-idea list uses `quick_ideas.json`; these are separate collections with different purposes.
 
----
+### Reel Maker
 
-## 9. CTA strategy for last slide or final image
-This is a strong idea and should be built into the content generator.
+The Reel workflow starts with a story brief. It supports story suggestions for common preschool situations and a story check that evaluates qualities such as real-life relevance, hook, curiosity, emotion, originality, character fit, and potential save/share value. The check is editorial guidance, not a prediction of Instagram performance.
 
-Suggested CTAs for end slide:
-- “Save this for the next time your child says no.”
-- “Share this with another parent who needs it.”
-- “Comment ‘save’ if this feels like your home too.”
-- “Tell me which part feels most relatable.”
-- “Tag someone who needs this reminder today.”
+The production flow is:
 
-This gives the final slide a clear engagement purpose.
+1. Write or select a story and set duration, language, and style.
+2. Generate a timed script and scene/image prompts with Gemini. Short scripts can be generated with prompts in one request; longer scripts can use the fallback multi-request path.
+3. Review and edit script lines, cover text, scene descriptions, and image prompts.
+4. Import or select images and choose narration settings.
+5. Render the portrait video locally, review it, and save it to the device gallery.
 
----
+A story project autosaves locally. Existing script and prompt results are reused when their source story has not changed, avoiding unnecessary repeat requests.
 
-## 10. Output model for different post types
-### Static image post output
-- image prompt
-- caption
-- pin comment
-- 5 reply comments
-- hashtags
-- CTA
+### Voice and Video
 
-### Carousel post output
-- slide-by-slide text
-- prompt per slide
-- caption
-- pin comment
-- 5 reply comments
-- CTA block
+Voice options include the device's text-to-speech engine, Gemini text-to-speech, and ElevenLabs. Phone speech works offline when the required language is installed; the network-based engines require their respective credentials and connectivity.
 
-### Reel post output
-- hook
-- script
-- caption
-- pin comment
-- 5 reply comments
-- CTA
+The local reel renderer uses FFmpeg to assemble a portrait video, images, voice audio, captions, motion, optional music, and closing elements. The renderer is designed around a 1080 x 1920, 30 fps output and includes Instagram-safe placement for captions and cover text.
 
----
+The Shot Planner asks Gemini to write shot-by-shot prompts in a Veo-friendly structure. It is a prompt-planning feature; it does not itself call Veo to generate remote video clips. Image-to-video assembly remains a separate local workflow.
 
-## 11. Saving ideas
-The app should support a draft idea system where each saved idea includes:
-- title
-- post type
-- audience
-- hook
-- story
-- lesson
-- visual direction
-- caption
-- prompt
-- script
-- comments
-- status: draft / approved / posted
+### Planning and Content Library
 
-This makes it easy to revisit older content and reuse ideas later.
+The planning tools contain built-in hooks, posting-time suggestions, and a manual post-results log. Results can be grouped by content bucket. Suggested posting times are starting assumptions; use the app's results log and real account data to adjust them.
 
----
+The content library and built-in post files provide reusable examples and packages. Character reference images are stored under `assets/characters/`; additional content ideas are in `assets/ideas/`. Music assets are documented under `assets/music/` and must be included in the Flutter asset configuration before use.
 
-## 12. Best first implementation phase
-### Phase 1: Quick Content Studio
-- new screen for idea saving
-- post type selector
-- prompt generation
-- caption generation
-- comment pack generation
-- copy buttons
-- save drafts
+### Promotion Comment Vault
 
-### Phase 2: Saved Ideas Library
-- list all ideas
-- filter by post type
-- mark as posted or approved
-- reopen and edit
+The Promotion Comments dashboard entry opens a dedicated, scrollable vault. It shows one wrapping comment per row, supports copying a comment, adding a new comment, and filtering comments by bucket. Starter comments are built in, and custom comments are stored on the device.
 
-### Phase 3: Full Post Planner
-- scheduling
-- content calendar
-- posting bundle for different platforms
+The store reads both the current object format (comment text plus optional bucket) and older plain-string entries, so existing saved comments remain compatible. The local file is `promo_comments.json`.
 
----
+## Brand and Content Model
 
-## 13. Key product principle
-The app should never force every idea into the full reel workflow.
+`lib/brand_system.dart` contains the core brand defaults, character descriptions, content buckets, and supported formats. Generated visual prompts can use the character-lock descriptions for:
 
-Instead, it should support two modes:
-1. Fast post mode for quick content generation
-2. Full reel mode for story-based video content
+- Ria: curious, playful, energetic, and a little mischievous.
+- Rio: sweet, determined, and often quick to say no.
+- Cuty: a small white bunny with a pink bow; calm and observant.
 
-This is the cleanest and most useful direction for your creator workflow.
+Content buckets describe the kind of post (for example, challenge, conversation, activity, humor, or age practice). Formats describe how the content is presented (for example, carousel, Reel, Trial Reel, or single image). A bucket and a format are separate choices.
 
----
+The content package model can hold a hook, slides or shots, visual prompts, caption, CTA, hashtags, pinned comment, and varied reply comments. Some parts use local templates; Gemini-backed paths can generate structured content and regenerate selected sections.
 
-## 14. Recommended next step
-The next step is to build the Quick Content Studio and the Saved Ideas page first.
+## AI and Credentials
 
-After that, we can connect it to AI prompt generation and caption/comment generation.
+Gemini is the app's only text/content AI provider. There is no OpenAI client, OpenAI API-key field, or OpenAI Idea Lab backend in the app. If Gemini is unavailable or not configured, supported Quick Content flows can fall back to local templates; direct Gemini-backed story, prompt, and voice workflows still require a working Gemini credential.
 
-At that point, the app will be much more aligned with your actual posting workflow.
-
----
-
-## 15. Final recommendation
-The correct product direction for this app is:
-
-Quick Content Studio + Reel Maker + Saved Idea Vault
-
-This gives you:
-- faster content generation
-- ready-to-copy prompt packs
-- ready-to-copy captions
-- ready-to-copy scripts
-- ready-to-copy comments
-- better content reuse
-- less friction in daily posting
-
-This is the best fit for your use case.
-
----
-
-## 16. Current implementation status
-The planned Quick Content Studio and saved idea workflow are now implemented.
-
-### Where to find the built-in marketing ideas
-The ideas from `Ideas from chat gpt for marketing posts.md` were added as built-in hooks in `lib/plan_data.dart`.
-
-In the app:
-1. Open the main Story Reel Maker screen.
-2. Tap the calendar icon in the top bar.
-3. Open the `Hooks` tab.
-4. Browse the Palak ideas, including `Which Kid Is Yours?`, `7 Things Every Toddler Does`, `When Mumma Says No`, and `Mumma's Little Detective`.
-5. Tap a hook to edit or reuse it in the story workflow.
-
-The markdown file remains the full source/reference document. It is not displayed as a document page inside the app; its selected ideas are represented in the app as editable hook entries.
-
-### Quick Content Studio
-The article icon on the main screen opens Quick Content Studio. It supports:
-- Reel, carousel, static image, and story briefs
-- content goal, mood, audience, hook, idea, problem, lesson, visual style, and CTA
-- generated image prompts, captions, hashtags, scripts, and comment packs
-- saved post ideas with reopen and copy actions
-
-### Gallery importing
-The Android app now declares image-library access for importing images from the device gallery. The story image picker uses the device gallery multi-image picker, while video selection remains separate.
-
-### Current creator dashboard
-The app now opens on a creator dashboard with **7 clear entry points** plus a persistent bottom bar:
-- ✨ **Create Content**: One idea → Carousel, Reel, Trial Reel, Image (all at once)
-- 🎬 **Make a reel**: the existing story, script, image, voice, and render workflow
-- 🧪 **Trial Reel**: 60-sec fast-cut compilation for non-follower reach
-- 📚 **Carousel**: Enter idea → get slide prompts for all carousel pages
-- 🖼️ **Image**: Enter idea → get 7 different image prompts for Meta AI
-- 💡 **Idea Vault**: Capture, organize & develop ideas (💡📝✅📤♻️)
-- ⚙️ **Settings**: AI provider, API keys, defaults, export/import data
-- 💬 **Promotion Comments** (bottom bar): opens full reusable comment vault with bucket filter chips
-
-Saved story history remains available through the existing folder/file-manager icon in the dashboard app bar.
-
-Selecting an idea from `Browse ideas` now returns it directly to the story editor with its complete story scaffold filled in. The generated structure includes the setting, starting problem, escalation, solution, ending line, and moral, so there are no blank story sections to complete before writing the script.
-
-### Quick-post history
-Generated quick-post packs are also stored automatically in a separate history list. Carousel and static-image posts can be reopened or copied from the history icon in Quick Content Studio, even when they were not saved as a reusable idea.
-
-### Profile-promotion comment vault
-The dashboard owns the persistent library of reusable comments for engaging with other creators' posts. The library contains the Ria, Rio, Cuty, combined-character, curiosity, and community comment groups. Each comment can be copied, and new comments can be saved directly from the dashboard button.
-
-### Real AI video generation
-Gemini's current Veo video models can create short 4, 6, or 8-second clips with native audio and optional reference images. This is different from the app's current image-to-reel renderer. Veo access is asynchronous and depends on the API key, billing, region, and model entitlement, so it should be integrated as a separate video-shot workflow and then combined with the existing script, voice, caption, and posting tools. The current app still uses its reliable local image-to-video assembly path until Veo access is configured and tested with the project's key.
-
-The recommended implementation for a longer Hinglish reel is three independent portrait shots, each generated from the same character references, followed by local FFmpeg concatenation. Because Veo's supported duration is 4, 6, or 8 seconds rather than 10 seconds, each requested 10-second segment must be implemented as an 8-second generation plus a 2-second extension or local hold/transition. Hinglish dialogue can be included in the prompt, but English is the only fully evaluated Veo language, so the existing Flutter TTS/Hinglish voice pipeline remains the reliable voice layer until Veo audio quality is tested for the account.
-
-### Shot Planner implementation
-The first Veo-ready layer is now implemented in `lib/shot_planner.dart` and is opened from the Story screen with `Plan cinematic shots`.
-
-It:
-- calculates a valid combination of 4, 6, and 8-second shots for the selected reel length
-- tells the user when an exact total is impossible, such as 45 seconds becoming 44 seconds
-- asks Gemini for structured cinematic beats: purpose, characters, location, action, emotion, camera, movement, Hinglish dialogue, and ending
-- loads the saved cast descriptions and embeds a non-editable character-consistency contract in each Veo prompt
-- shows each shot as a review card with its generated Veo prompt
-- supports regenerating an individual shot plan without changing the rest of the app
-
-This is intentionally P0. Veo generation, remote video download, FFmpeg joining, and shot thumbnails should be added only after the planner output is tested on real stories and the API key is confirmed to have Veo access.
-
-### AI Idea Lab backend
-The secure provider boundary is scaffolded in the `backend/` folder:
-- `backend/server.js` exposes `POST /v1/ideas`
-- the active provider is `openai` only; Claude is intentionally deferred
-- the backend sends the Fun Learning With Palak brand context automatically
-- responses are normalized into ideas with hooks, concepts, characters, reasons, and quality scores
-- the OpenAI credential is read only from the backend environment variables
-- `lib/idea_lab_api.dart` is the Flutter client and receives only the public backend URL
-
-The backend must be deployed to an HTTPS host and protected with authentication and rate limiting before the Flutter app calls it. Node.js is not available on the current development machine, so the backend still needs to be installed and smoke-tested in the deployment environment. Any credentials previously present in `lib/secrets.dart` should be revoked and rotated before production use.
-
-### 100th Instagram post ideas
-The 100th milestone concepts are now available in the built-in `Page & milestone` Ideas category:
-- `100 Posts. One World.`: the primary combined milestone, brand introduction, character introduction, and Trial Reel concept
-- `100 Posts Ago...`: the emotional page-journey version
-- `Who Made Post 100?`: the funny Ria/Rio/Cuty version
-- `Meet Our Little World`: the pinned character and brand introduction
-
-Each idea now carries its recommended format, strategy, ready caption, and pinned comment. Selecting one from Browse ideas sends the full kit into the story editor, so it is usable rather than only a title or hook.
-
-### 14-Day Post Package Library
-The app now includes a structured 14-day content plan in `lib/day14_posts.dart`. This library provides ready-to-use post packages that creators can load individually or import in bulk:
-
-- **Content Buckets**: Six strategy buckets — `puzzle`, `humor`, `activity`, `talk`, `skill`, and `wrap` — each with its own color. Posts are categorized by the engagement type they target.
-- **13 Post Packages (Days 2–14)**: Every `QuickIdea` includes a title, hook, main idea, problem, lesson, mood, visual style, character-consistent image prompt, caption, CTA, hashtags, comment pack, and script. Day 1 ("100 Posts. One World.") remains a built-in hook in `plan_data.dart`.
-- **Character Bible**: Image prompts consistently feature Ria (brown eyes, warm skin tone, no glasses, pastel watercolor style) and Rio (same), plus Cuty the white bunny with a pink bow. All prompts specify cream background and soft pastel watercolor storybook aesthetics.
-
-#### Bulk-Paste Import
-A new `_bulkPaste()` method in `QuickContentScreen` (`lib/quick_content.dart`) lets creators import multiple post packages at once:
-- Paste multi-line text structured with key-value pairs (e.g., `Title: ...`, `Hook: ...`, `Bucket: puzzle`)
-- The `parseBulkPaste()` parser in `day14_posts.dart` converts pasted text into `QuickIdea` objects
-- Parsed ideas can be saved or edited immediately
-
-#### Bucket-Based Performance Tracking
-`lib/plan_data.dart` now supports per-bucket analytics:
-- `PostRecord.bucket` field tracks which content bucket each posted idea belongs to
-- `resultsByBucket()` aggregates posts, engagement metrics, and completion rate per bucket
-- `ContentBucketResult` class represents per-bucket performance summary
-- The Results tab shows a "Best content bucket" section with color-coded avatars sorted by engagement rate
-
-#### Calendar View with Buckets
-- `QuickContentScreen` includes a bucket dropdown for assigning content buckets when drafting ideas
-- `PlanScreen` (`lib/plan_screen.dart`) has a bucket dropdown when recording post results
-- Posted list items show bucket badges with bucket-specific colors
-- Selecting a 14-day post loads it directly into the Quick Content Studio form
-
-#### Carousel Slide Prompts
-When you generate a carousel post in the Quick Content Studio, the app shows and lets you copy **all slide image prompts at once**:
-- Tap **Generate post pack** with post type set to **Carousel**
-- A "Slide image prompts (7)" section appears with each slide's full image prompt
-- Each prompt has its own **copy button**, plus a **Copy all slide prompts** button at the top
-- The **Copy all** button also bundles all slide prompts into the combined clipboard
-- Prompts are generated per slide by `planCarousel()` and `buildSlidePrompts()` in `lib/slide_prompts.dart`, displayed via `_buildSlidePromptsSection()` in `lib/quick_content.dart`
-
-You can choose the number of slides: a **Slide count** dropdown (5, 6, 7, 8, or 10) appears when post type is set to **Carousel**. When loading a saved idea, the dropdown auto-adjusts to match the post's script beat count.
-
-#### Comment Vault Filter by Bucket
-`lib/creator_home.dart` now supports bucket-tagged comments:
-- `PromoComment` model includes an optional `bucket` field
-- Bucket filter chips let creators view comments for specific content types (e.g., only "humor" comments)
-- Comment rows display bucket badges; tapping a badge filters the vault to that bucket
-- Saved comments are backward-compatible: old comments load without a bucket, new comments can opt-in to bucket tagging
-
----
-
-## 17. Brand System & Content Generation Engine (P0 Complete)
-
-The app now includes a **complete brand-aware content generation engine** that eliminates manual entry of character descriptions, hashtags, CTAs, and visual style. Everything is defined once in `lib/brand_system.dart` and automatically injected into every generated prompt.
-
-### Brand Defaults (`lib/brand_system.dart`)
-- **Brand**: Fun Learning With Palak (`@funlearningwithpalak`)
-- **Audience**: Parents of preschoolers (1.5-5 years)
-- **Tone**: Warm, playful, parent-relatable, simple
-- **Visual Style**: Soft pastel watercolor storybook, cream background
-- **Default CTAs**: 5 rotating options (Save, Share, Comment, Follow, Try)
-- **Hashtag Pool**: 11 curated tags, exactly 5 used per post
-- **Character Bible** (immutable, auto-injected):
-  - **Ria** 🌸 — Indian preschool girl, dark brown hair in two ponytails with pink bows, brown eyes, pink dress, **no glasses**
-  - **Rio** 💙 — Indian preschool boy, dark brown hair, blue outfit, brown eyes, **no glasses**
-  - **Cuty** 🐰 — Small white bunny, pink bow, unchanged always
-
-### Content Buckets (5 Strategies)
-Every post belongs to exactly one bucket, which drives the generation structure, visual approach, and success metric:
-
-| Bucket | Emoji | Description | Example Hooks | Slide Template |
-|--------|-------|-------------|---------------|----------------|
-| **Challenge** | 🔎 | Observation games, pattern challenges, spot-the-hidden | "WHICH ONE DOESN'T BELONG? 👀" | Cover → Challenge → Options → Think → Reveal → Why → CTA |
-| **Conversation** | 🗣️ | Bedtime questions, dinner talks, imagination starters | "ASK YOUR CHILD THIS TONIGHT 🗣️" | Cover → Q1 → Q2 → Q3 → Why → Variation → CTA |
-| **Activity** | 🏠 | Try This at Home — practical play using household items | "5-MINUTE KITCHEN CHALLENGE 🥄" | Cover → What You Need → Step 1 → Step 2 → Step 3 → Learn → CTA |
-| **Humor** | 😂 | Parent-relatable moments, toddler logic, daily chaos | "MUMMA SAYS THIS 100× A DAY 😂" | Cover → Scene 1 → Scene 2 → Scene 3 → Punchline → Tagline → CTA |
-| **Age Practice** | 📚 | Gentle milestone checklists for specific ages | "CAN YOUR 3-YEAR-OLD DO THESE? ✅" | Cover → Skill 1 → Skill 2 → Skill 3 → Skill 4 → Skill 5 → CTA |
-
-Each bucket defines: generation prompt, color, slide template, example hooks.
-
-### Content Formats (4 Output Types)
-Separate from buckets — defines **how** the content is published:
-
-| Format | Emoji | Description | Default Slides/Shots |
-|--------|-------|-------------|---------------------|
-| **Carousel** | 📚 | Swipeable multi-slide post | 7 (5-10) |
-| **Reel** | 🎬 | 15-20 sec vertical video | 5 (4-8) |
-| **Trial Reel** | 🧪 | 60-sec fast-cut for non-follower reach | 8 (7-10) |
-| **Single Image** | 🖼️ | One image + full caption pack | 1 |
-
-### Complete Content Package Generator (`lib/content_generator.dart`)
-**One call generates everything:**
-
-```dart
-final package = await ContentGenerator.generate(
-  idea: 'Find the hidden Cuty',
-  bucket: BucketLibrary.challenge,
-  format: ContentFormat.carousel,
-);
+The Gemini key used by Quick Content can be configured in Settings. Other direct Gemini services use the app's local secret configuration. Keep real credentials out of Git, screenshots, exported files, and distributed builds. A key embedded in a mobile app should be treated as extractable; a server-side proxy with authentication and rate limits is preferable before distributing the app broadly.
+
+ElevenLabs is an optional voice service, not a second text/content provider. Its voice credential is separate from the Gemini content workflow.
+
+## Local Data and Backups
+
+Most working data is stored as JSON in the app's documents directory. Important stores include:
+
+| Data | Local store |
+| --- | --- |
+| Story projects, scripts, edits, prompts, voice and render state | One JSON file per story under `stories/` |
+| Raw Idea Vault records | `idea_inbox.json` |
+| Saved Quick Content ideas | `quick_ideas.json` |
+| Recent generated post history | `quick_post_history.json` |
+| Promotion comments | `promo_comments.json` |
+| Content library | `content_library.json` |
+| Character configuration | `characters.json` |
+| Planning hooks and schedule | `hooks.json` and `schedule.json` |
+| Gemini Quick Content key and selected defaults | SharedPreferences |
+
+Story changes also schedule a backup through the project backup helper; the destination and behavior depend on the platform. Other local JSON data is not cloud-synced. Uninstalling the app can remove its local documents, so keep any required exports or backups separately.
+
+The Settings screen currently labels data export/import actions, but those handlers are placeholders and do not yet perform an export or import.
+
+## Important Source Files
+
+| File | Responsibility |
+| --- | --- |
+| `lib/main.dart` | App startup, dashboard routing, story/reel workflow, and Gemini-backed story operations. |
+| `lib/creator_home.dart` | Creator dashboard and entry points. |
+| `lib/quick_content.dart` | Quick Content Studio, multi-format tools, Idea Vault, saved ideas/history, Trial Reel, and Promotion Comments vault. |
+| `lib/brand_system.dart` | Brand defaults, characters, buckets, and content formats. |
+| `lib/ai_provider.dart`, `lib/gemini_client.dart` | Content-provider contract, Gemini implementation, and local fallback behavior. |
+| `lib/story_ideas.dart` | Story idea generation and story quality checks. |
+| `lib/prompt_builder.dart`, `lib/prompt_screen.dart` | Timed script and visual-prompt generation and review. |
+| `lib/projects.dart` | Story project persistence, autosave, and backup coordination. |
+| `lib/voice.dart` | Phone, Gemini, and ElevenLabs speech generation. |
+| `lib/video_builder.dart`, `lib/music.dart`, `lib/caption_renderer.dart` | Local video assembly, music selection, and on-video captions. |
+| `lib/format_adapter.dart`, `lib/posting_pack.dart` | Format conversion and copy/share-ready posting packs. |
+| `lib/plan_data.dart`, `lib/plan_screen.dart` | Hooks, posting schedule, and manual results tracking. |
+| `lib/settings_screen.dart` | Gemini configuration, defaults, app behavior, and data controls. |
+| `test/widget_test.dart` | Focused widget and script-parsing tests. |
+
+The dashboard currently routes to the Idea Vault implemented in `quick_content.dart`. `lib/idea_inbox.dart` is a separate model/store implementation and is not the dashboard route.
+
+## Run and Validate
+
+From the project root:
+
+```powershell
+flutter pub get
+flutter analyze
+flutter test
+flutter run
 ```
 
-**Output includes:**
-- ✅ Hook (bucket-specific)
-- ✅ Slides/Shots (per bucket template × format slide count)
-- ✅ Visual Prompts (per slide, with Character Lock + Brand Context)
-- ✅ Caption (hook + idea + CTA + 5 hashtags)
-- ✅ CTA (bucket-specific)
-- ✅ Hashtags (exactly 5 from brand pool + bucket tags)
-- ✅ Pinned Comment (bucket-specific question)
-- ✅ 5 Reply Comments (5 distinct styles: Relatable Parent, Non-Parent, Emoji, Validation, CTA)
-
-### Regeneration System (`lib/regenerator.dart`)
-Regenerate **individual sections** with style variations — no need to re-generate the whole package:
-
-| Target | Style Variations (8) |
-|--------|---------------------|
-| Hook | More Playful, More Curiosity, Simpler, Funnier, More Parent-Relatable, More Educational, More Visual |
-| All Slides | Same 8 styles |
-| Single Slide | Same 8 styles |
-| Visual Prompts | Same 8 styles |
-| Caption | Same 8 styles |
-| CTA | Rotating options |
-| Hashtags | Fresh shuffle |
-| Pinned Comment | Same 8 styles |
-| Reply Comments | Same 8 styles |
-
-```dart
-final result = await Regenerator.regenerate(RegenerationRequest(
-  originalPackage: package,
-  target: RegenerateTarget.caption,
-  style: RegenerateStyle.funnier,
-));
-```
-
-### Brand Context Auto-Injection
-Every AI prompt automatically receives:
-
-```
-BRAND CONTEXT (auto-injected):
-Brand: Fun Learning With Palak
-Audience: Parents of preschoolers
-Tone: Warm, playful, parent-relatable, simple
-Visual Style: Soft pastel watercolor storybook, cream background
-
-CHARACTER LOCK:
-Ria: dark brown hair, two ponytails, pink bows, brown eyes, pink dress, NO GLASSES
-Rio: dark brown hair, blue outfit, brown eyes, NO GLASSES
-Cuty: small white bunny, pink bow, unchanged always
-
-FORMAT: Carousel (7 slides)
-BUCKET: Challenge 🔎
-SLIDE TEMPLATE: Cover → Challenge → Options → Think → Reveal → Why → CTA
-```
-
----
-
-## 18. Redesigned Dashboard (7 Options + Bottom Bar)
-
-The main dashboard now shows exactly **7 focused options** — no clutter:
-
-| # | Option | Navigates To | Purpose |
-|---|--------|--------------|---------|
-| 1 | ✨ **Create Content** | `QuickContentScreen` | One idea → Carousel + Reel + Trial Reel + Image (all at once) |
-| 2 | 🎬 **Reel** | `StoryScreen` | Full workflow: story → script → images → voice → video |
-| 3 | 🧪 **Trial Reel** | `TrialReelScreen` | 60-sec compilation generator (hook, 7 fast cuts, celebration, follow CTA) |
-| 4 | 📚 **Carousel** | `CarouselMakerScreen` | Enter idea → get slide prompts for all carousel pages |
-| 5 | 🖼️ **Image** | `SingleImageScreen` | Enter idea → get 7 different image prompts for Meta AI |
-| 6 | 💡 **Idea Vault** | `IdeaInboxScreen` | Capture, organize & develop ideas (💡📝✅📤♻️) |
-| 7 | ⚙️ **Settings** | `SettingsScreen` | AI provider, API keys, defaults, export/import data |
-
-**Bottom Bar**: 💬 **Promotion Comments** — persistent bottom button opens modal sheet with bucket filter chips, saved comments, and "Add comment" form.
-
-**Design**: Clean cards with color-coded icons, descriptive subtitles, chevron indicators. Comments vault accessible only via bottom bar (not cluttering main scroll area).
-
----
-
-## 19. 14-Day + Extended Post Library (24 Posts)
-
-`lib/day14_posts.dart` now contains **24 ready-to-use posts** (Days 2-25):
-
-### Days 2-14 (Original Plan)
-| Day | ID | Type | Bucket | Hook |
-|-----|-----|------|--------|------|
-| 2 | which-doesnt-belong | Static Image | puzzle | Which One Doesn't Belong? 🧩 |
-| 3 | mumma-says | Reel | humor | MUMMA SAYS THIS 100× A DAY 😂 |
-| 4 | kitchen-challenge | Carousel | activity | 5-MINUTE KITCHEN CHALLENGE 🥄 |
-| 5 | ask-tonight | Static Image | talk | ASK YOUR CHILD THIS TONIGHT 🗣️ |
-| 6 | 3year-skills | Carousel | skill | CAN YOUR 3-YEAR-OLD DO THESE? ✅ |
-| 7 | toddler-math | Reel | humor | TODDLER MATHEMATICS 😂 |
-| 8 | find-cuty | Static Image | puzzle | FIND THE HIDDEN CUTY! 👀 |
-| 9 | sock-hunt | Reel | activity | THE SOCK HUNT 🧦 |
-| 10 | 3-questions | Carousel | talk | 3 QUESTIONS TO ASK YOUR CHILD THIS WEEK ❤️ |
-| 11 | 4year-skills | Carousel | skill | CAN YOUR 4-YEAR-OLD DO THESE? ✅ |
-| 12 | dinner-types | Static Image | humor | THREE TYPES OF KIDS AT DINNER 🍽️ |
-| 13 | pattern-game | Reel | puzzle | WHAT COMES NEXT? 🟡🔵🟡🔵❓ |
-| 14 | favorite-format | Carousel | wrap | WHICH NEW FORMAT WAS YOUR FAVORITE? 🗳️ |
-
-### Days 15-25 (Mission Series — Post-100 Strategy)
-| Day | ID | Type | Bucket | Hook |
-|-----|-----|------|--------|------|
-| **15** | household-swaps | Carousel | activity | **NO SPECIAL TOYS NEEDED — HERE'S WHAT TO USE! 🏠** ⭐ |
-| 16 | voted-mission-won | Single Image | wrap | THE VOTES ARE IN! 🏆 |
-| 17 | mission1-race-track | Reel | activity | MISSION 2: ON YOUR MARK! 🏁 |
-| 18 | mission2-concert | Reel | activity | MISSION 3: LIVING ROOM CONCERT! 🎤 |
-| 19 | mission3-art-studio | Reel | activity | MISSION 4: ART CORNER TIME! 🎨 |
-| 20 | mission4-detective | Reel | puzzle | MISSION 5: CASE OPEN! 🕵️ |
-| 21 | mission5-rescue | Reel | activity | MISSION 6: RESCUE TIME! 🧸 |
-| 22 | mission6-treasure | Reel | skill | MISSION 7: TREASURE HUNT! 🎁 |
-| 23 | mission7-daily-care | Reel | skill | MISSION 8: SELF-CARE SQUAD! 🍎 |
-| 24 | trial-reel-7-missions | Reel | activity | 7 SCREEN-FREE MISSIONS IN 60 SECONDS 🏠✨ |
-| 25 | week-wrap-up | Carousel | wrap | WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉 |
-
-**All posts include:** Complete fields (title, hook, main idea, problem, lesson, visual style, image prompt, caption, CTA, hashtags, 5 varied comments, script, bucket, character-consistent prompts).
-
----
-
-## 20. Asset Idea Files (32 Additional Ideas)
-
-`assets/ideas/` contains 4 markdown files with 32 ready-to-import ideas:
-
-| File | Ideas | Formats |
-|------|-------|---------|
-| `Carousel_Post_Ideas.md` | 8 | Carousel (5-9 slides each) |
-| `Reel_Post_Ideas.md` | 8 | Reel (10-20 sec each) |
-| `Static_Image_Post_Ideas.md` | 8 | Static Image |
-| `Trial_Reel_Post_Ideas.md` | 8 | Trial Reel (10-60 sec) |
-
----
-
-## 21. Data Storage (Local JSON Files)
-
-All data persists locally in app documents directory:
-
-| Data | File | Structure |
-|------|------|-----------|
-| Reel Projects | `stories/{id}.json` | Individual project files |
-| Saved Ideas | `quick_ideas.json` | Array of QuickIdea |
-| Post History | `quick_post_history.json` | Last 50 generated (auto-saved) |
-| Promotion Comments | `promo_comments.json` | Array with bucket tags |
-| Plan Results | `plan_data.json` | PostRecord with bucket field |
-
-Access via `adb shell run-as com.example.reel_audio` on debug builds.
-
----
-
-## 22. Next Development Phase — Updated Roadmap
-
-### 🔴 P0 — **DONE**
-1. ✅ Content Bucket system (5 buckets)
-2. ✅ Brand + Character Lock (Ria/Rio/Cuty)
-3. ✅ Complete Content Package Generator
-4. ✅ Regeneration System (9 targets × 8 styles)
-5. ✅ 5-Option Dashboard
-
-### 🔴 P1 — **Immediate Priority (Next Sprint)**
-
-| Priority | Feature | Why |
-|----------|---------|-----|
-| 🔴 P1 | **One Idea → Multiple Formats** | Biggest workflow improvement: generate Carousel + Reel + Trial Reel + Image from single idea |
-| 🔴 P1 | **Idea Inbox** | Capture raw ideas quickly without filling full form (Title, Raw idea, Bucket, Notes, Status) |
-| 🔴 P1 | **Posting Pack Screen** | Single screen to copy Hook, Caption, Hashtags, Pinned Comment, Reply Comments, Image Prompts, Script, plus "Copy Everything" |
-| 🟠 P1 | **Content Quality Check** | Actionable pre-export checks: Hook length, slide text density, character visibility, CTA presence, hashtag count, character lock |
-| 🟠 P1 | **Trial Reel → Shot Planner Integration** | Replace `makeImagePrompt` with proper Veo-style shot prompts; keep local pipeline as fallback |
-
-### 🟠 P1 — **Workflow Redesign (After Above)**
-
-1. **Proper "Create" Flow** — Idea → Bucket → Format → Generate → Review/Edit → Export
-2. **Content Quality Check UI** — Actionable flags (⚠ Hook too long, ⚠ Slide 4 too dense, ✅ Ria visible, ✅ 5 hashtags) + "Fix Issues" button
-3. **Trial Reel Consolidation** — Hook → Shot Planner → Video Shot Prompts → Optional Veo → Local FFmpeg assembly (Veo optional)
-
-### 🟡 P2 — **Content Management (After P1)**
-
-| Feature | Purpose |
-|---------|---------|
-| **Content Library** | Searchable, filterable by bucket/format/status; Favorite, Duplicate, "Create Another Format" |
-| **Idea/Draft/Ready/Posted/Reuse Statuses** | Separate raw Ideas from generated Posts; clear lifecycle |
-| **Settings Screen** | API keys, defaults, brand settings (convenience) |
-
-### 🟢 P3 — **Not Needed Yet**
-
-| Feature | Reason |
-|---------|--------|
-| Scheduling / Publishing automation | Content creation is the value, not publishing |
-| Onboarding | Personal app — not needed |
-| Multi-platform publishing | Single-platform focus |
-| Complicated analytics | Overkill for current stage |
-| Another AI provider | OpenAI backend already scaffolded |
-
----
-
-## 23. Explicit Content Hierarchy (New Architecture)
-
-The app now follows this explicit hierarchy — every piece of content flows through these layers:
-
-```
-IDEA
-  ↓
-BUCKET (Challenge 🔎 / Conversation 🗣️ / Activity 🏠 / Humor 😂 / Age Practice 📚)
-  ↓
-FORMAT (Carousel 📚 / Reel 🎬 / Trial Reel 🧪 / Single Image 🖼️)
-  ↓
-CONTENT PACKAGE
-  ├── Hook
-  ├── Slides/Shots (per bucket template × format count)
-  ├── Visual Prompts (per slide, with Character Lock + Brand Context)
-  ├── Caption (hook + idea + CTA + 5 hashtags)
-  ├── CTA (bucket-specific)
-  ├── Hashtags (exactly 5 from brand pool + bucket tags)
-  ├── Pinned Comment (bucket-specific question)
-  └── 5 Reply Comments (Relatable Parent, Non-Parent, Emoji, Validation, CTA)
-  ↓
-QUALITY CHECK (actionable flags, not arbitrary scores)
-  ↓
-POSTING PACK (single screen: Copy Hook, Caption, Hashtags, Pinned, Replies, Prompts, Script, "Copy Everything")
-  ↓
-STATUS (Idea 💡 → Developing 📝 → Ready ✅ → Posted 📤 → Reuse ♻️)
-```
-
-**Example: "Find the Hidden Cuty"**
-
-```
-Find Hidden Cuty
-        ↓
-Challenge 🔎
-        ↓
-┌─────────────────────────────────────────┐
-│  Carousel 📚    Reel 🎬    Trial Reel 🧪  Single Image 🖼️
-│  7 slides       5 shots      8 shots         1 image
-│  ↓              ↓             ↓              ↓
-│  Package        Package       Package        Package
-│  (each with     (each with    (each with     (each with
-│   full output)  full output)  full output)   full output)
-└─────────────────────────────────────────┘
-        ↓
-   Quality Check
-        ↓
-   Posting Pack (per format)
-        ↓
-   Status: Ready → Posted → Reuse
-```
-
-This architecture means **one idea becomes four related packages** — not four unrelated ideas. Bucket, characters, brand style, and core idea stay identical; only the format-specific structure changes.
-
----
-
-## 24. Ideal Dashboard (Current State)
-
-```
-🌸 FUN LEARNING WITH PALAK
-
-What are we creating today?
-
-┌─────────────────────────────────────┐
-│ ✨ CREATE CONTENT                   │
-│ Turn an idea into a post            │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 🎬 REEL MAKER                       │
-│ Full story → video                  │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 🧪 TRIAL REEL                       │
-│ Fast experimental reel              │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 📚 CAROUSEL                         │
-│ Quick visual content                │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 🖼️ IMAGE                            │
-│ 7 prompts for Meta AI               │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 💡 IDEA VAULT                       │
-│ Ideas, drafts & posts               │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ ⚙️ SETTINGS                         │
-│ AI, API keys, defaults              │
-└─────────────────────────────────────┘
-
-💬 Promotion Comments  (persistent bottom button)
-```
-
-**Current implementation matches target** — all 7 options + bottom bar are live. No clutter, no comments in main scroll area.
-
----
-
-## 25. What We Will NOT Build (Explicit)
-
-| Feature | Reason |
-|---------|--------|
-| ❌ Scheduling / Auto-publishing | Content creation is the core value; publishing is manual |
-| ❌ Onboarding flow | Personal use app — you know how it works |
-| ❌ Multi-platform publishing (TikTok, YouTube, etc.) | Instagram-first; cross-posting is manual |
-| ❌ Complex analytics dashboard | Content quality > post analytics |
-| ❌ Additional AI providers (Claude, etc.) | OpenAI backend already scaffolded; stick to one |
-| ❌ Elaborate Settings UI | Hardcoded defaults work; settings = convenience only |
-| ❌ Team collaboration / Multi-user | Solo creator workflow |
-
----
-
-## 26. Development Priority Summary
-
-| Priority | Feature | Effort | Impact |
-|----------|---------|--------|--------|
-| 🔴 P1 | One Idea → Multiple Formats | Medium | **Highest** — eliminates duplicate work |
-| 🔴 P1 | Idea Inbox | Low | **High** — captures fleeting ideas |
-| 🔴 P1 | Posting Pack Screen | Low | **High** — daily time saver |
-| 🟠 P1 | Content Quality Check | Medium | **High** — prevents bad posts |
-| 🟠 P1 | Trial Reel → Shot Planner | Medium | **High** — fixes architectural gap |
-| 🟠 P1 | Proper Create Flow | Medium | **Medium** — polish |
-| 🟡 P2 | Content Library + Statuses | Medium | **Medium** — scales with volume |
-| 🟡 P2 | Settings | Low | **Low** — convenience |
-| 🟢 P3 | Scheduling | High | **Low** — not core value |
-| 🟢 P3 | Onboarding | Low | **None** — personal app |
-
----
-
-The app has evolved from "Quick Content Studio" → **"Fun Learning Content Studio"** — a **brand-aware, bucket-driven, format-flexible content production pipeline** with:
-
-- **Capture**: Idea Inbox
-- **Generate**: One Idea → Multiple Formats (Carousel/Reel/Trial Reel/Image)
-- **Check**: Content Quality Check (actionable, not scores)
-- **Export**: Posting Pack (single screen, "Copy Everything")
-- **Manage**: Content Library with Idea/Draft/Ready/Posted/Reuse statuses
-- **Reuse**: Duplicate → Create Another Format
-
-All powered by immutable Brand + Character Lock, 5 Content Buckets, 4 Formats, and per-section Regeneration with 8 style variations.
+Choose the connected phone or emulator when Flutter prompts for a device. Image selection, text-to-speech, FFmpeg rendering, and saving to the gallery depend on platform permissions and native plugin support; validate those workflows on the target device.
+
+## Current Limitations
+
+- The app prepares content; Instagram publishing and scheduling are manual.
+- Reach and view counts cannot be predicted or guaranteed by a prompt, score, or posting-time suggestion.
+- Veo video generation is not connected; the Shot Planner currently generates prompts only.
+- Data is primarily local, with no account-based cloud sync.
+- Settings export/import controls are not implemented yet.
+- Voice engines other than the device TTS require separate credentials and network access.
+- Gemini model access, rate limits, supported regions, and quotas depend on the user's Google AI account.
