@@ -144,18 +144,40 @@ The Settings screen currently labels data export/import actions, but those handl
 
 The dashboard currently routes to the Idea Vault implemented in `quick_content.dart`. `lib/idea_inbox.dart` is a separate model/store implementation and is not the dashboard route.
 
-## Run and Validate
+## Fast Android Wireless Development
 
-From the project root:
+Use `run_phone.ps1` from the project root to add Android platform-tools to the current PowerShell session, connect the phone, list Flutter devices, and launch the app.
+
+Pair only if the phone has not already been paired with this computer:
 
 ```powershell
-flutter pub get
-flutter analyze
-flutter test
-flutter run
+.\run_phone.ps1 -Pair
 ```
 
-Choose the connected phone or emulator when Flutter prompts for a device. Image selection, text-to-speech, FFmpeg rendering, and saving to the gallery depend on platform permissions and native plugin support; validate those workflows on the target device.
+Enter the pairing IP and port from Android's "Pair device with pairing code" screen, then enter the code when ADB prompts. The script next asks for the current IP and port on the main Wireless debugging screen and starts the app.
+
+For later sessions, pairing is normally unnecessary. Run:
+
+```powershell
+.\run_phone.ps1
+```
+
+Enter the current IP and port from the main Wireless debugging screen. To skip that prompt:
+
+```powershell
+.\run_phone.ps1 -DeviceAddress "192.168.1.10:37639"
+```
+
+Keep the `flutter run` terminal open while editing. Press `r` there to hot reload a small Dart/UI change, `R` to hot restart the Dart app, and `q` to stop it. If launching from the VS Code Flutter debugger, use its Hot Reload action or save-triggered reload instead.
+
+Do not run `flutter clean`, `flutter pub get`, analysis, and tests after every small edit:
+
+- Run `flutter pub get` after changing dependencies in `pubspec.yaml`.
+- Use `flutter clean` only to recover from stale/corrupt build output or when native build configuration requires a clean rebuild.
+- Run `flutter analyze` and `flutter test` at meaningful checkpoints, before sharing changes, or when investigating a relevant issue.
+- Changes to Android permissions, Gradle files, or native plugins need a full stop/rebuild; Dart hot reload cannot apply native changes.
+
+Image selection, text-to-speech, FFmpeg rendering, and saving to the gallery depend on platform permissions and native plugin support, so validate those workflows on the target phone.
 
 ## Current Limitations
 

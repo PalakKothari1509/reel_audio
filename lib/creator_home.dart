@@ -12,6 +12,7 @@ class CreatorHomeScreen extends StatelessWidget {
   final VoidCallback onSavedStories;
   final VoidCallback onSettings;
   final VoidCallback onPromoComments;
+  final VoidCallback onCaptionGenerator;
 
   const CreatorHomeScreen({
     super.key,
@@ -24,6 +25,7 @@ class CreatorHomeScreen extends StatelessWidget {
     required this.onSavedStories,
     required this.onSettings,
     required this.onPromoComments,
+    required this.onCaptionGenerator,
   });
 
   @override
@@ -116,6 +118,15 @@ class CreatorHomeScreen extends StatelessWidget {
             title: 'Promotion Comments',
             subtitle: 'Copy and organize reusable profile replies',
             onTap: onPromoComments,
+          ),
+          Gap.m,
+          _ActionCard(
+            icon: Icons.edit_note_outlined,
+            colour: AppColors.accent,
+            title: 'Caption Generator',
+            subtitle:
+                'One topic in, ready to post caption out (hook, body, CTA, 5 tags)',
+            onTap: onCaptionGenerator,
           ),
         ],
       ),

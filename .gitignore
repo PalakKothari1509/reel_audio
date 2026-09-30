@@ -49,6 +49,7 @@ app.*.map.json
 .widget_preview/
 
 run_app.bat
+.adb_wireless_cache
 
 *.hprof
 *.log

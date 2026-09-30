@@ -36,6 +36,7 @@ import 'shot_planner.dart';
 import 'ai_provider.dart';
 import 'gemini_client.dart';
 import 'settings_screen.dart';
+import 'caption_generator.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -459,6 +460,12 @@ Future<void> main() async {
         onPromoComments: () => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const qc.PromoCommentVaultScreen()),
+        ),
+        onCaptionGenerator: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => const CaptionGeneratorScreen(),
+          ),
         ),
       ),
     ),
