@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_generator.dart';
-import 'day14_posts.dart' as day14;
+import 'content_ideas.dart' as ideas;
 import 'format_adapter.dart';
 import 'posting_pack.dart';
 import 'quality_check.dart';
@@ -611,7 +611,7 @@ List<String> makeCommentPack({
   }
 
   // Bucket-specific comment styles — avoids repeating the same wording across every post
-  if (bucket == 'puzzle') {
+  if (bucket == 'challenge') {
     result[0] = 'My child spotted it right away! 🧩';
     result[1] = 'These observation games are so good for focus — saving this!';
     result[2] = 'Took me longer than my 4-year-old 😂 good one!';
@@ -629,20 +629,20 @@ List<String> makeCommentPack({
     result[2] = 'My little one turned this into their own version 😂';
     result[3] = 'Simple enough that I can actually do it too';
     result[4] = 'Going straight into my saved activities — thank you!';
-  } else if (bucket == 'talk') {
+  } else if (bucket == 'conversation') {
     result[0] =
         'Trying this at bedtime tonight — can\'t wait to hear the answer!';
     result[1] = 'These questions open up the best conversations 💛';
     result[2] = 'Finally, actual questions instead of "how was your day?"';
     result[3] = 'My child said the most unexpected thing...';
     result[4] = 'More of these please, this is gold ✨';
-  } else if (bucket == 'skill') {
+  } else if (bucket == 'age_practice') {
     result[0] = 'Bookmarking this for when my little one hits this milestone';
     result[1] = 'So reassuring — not a race, just a guide ❤️';
     result[2] = 'My 3-year-old can do most of these already!';
     result[3] = 'Saving this to track progress over the next few months';
     result[4] = 'Such a helpful, non-stressful way to check in ✨';
-  } else if (bucket == 'wrap') {
+  } else if (bucket == 'community') {
     result[0] = 'Loved the puzzles the most this week — more please!';
     result[1] = 'Honestly all of them were great, such a fun week!';
     result[2] = 'The humor reels made me laugh out loud 😂';
@@ -1168,12 +1168,12 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
               style: AppText.hint,
             ),
             Gap.m,
-            ...day14.kDay14Posts.map(
+            ...ideas.kDay14Posts.map(
               (post) => Card(
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor:
-                        day14.bucketById(post.bucket)?.color ??
+                        ideas.bucketById(post.bucket)?.color ??
                         AppColors.accent,
                     child: Text(
                       post.id.substring(4).substring(0, 1).toUpperCase(),
@@ -1189,7 +1189,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   subtitle: Text(
-                    '${post.postType} • ${day14.bucketLabel(post.bucket)}\n${post.hook}',
+                    '${post.postType} • ${ideas.bucketLabel(post.bucket)}\n${post.hook}',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppText.hint,
@@ -1251,7 +1251,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     );
     if (ok != true || !mounted) return;
 
-    final parsed = day14.parseBulkPaste(ctrl.text);
+    final parsed = ideas.parseBulkPaste(ctrl.text);
     if (!parsed.hasAnyContent) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No fields found in the pasted text')),
@@ -1529,7 +1529,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                     hint: const Text('Choose a bucket (optional)'),
                     items: [
                       const DropdownMenuItem(value: '', child: Text('None')),
-                      ...day14.kContentBuckets.map(
+                      ...ideas.kContentBuckets.map(
                         (b) => DropdownMenuItem(
                           value: b.id,
                           child: Row(
@@ -1861,10 +1861,10 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                       ? CircleAvatar(
                           radius: 14,
                           backgroundColor:
-                              day14.bucketById(idea.bucket)?.color ??
+                              ideas.bucketById(idea.bucket)?.color ??
                               AppColors.accent,
                           child: Text(
-                            day14.bucketLabel(idea.bucket)[0],
+                            ideas.bucketLabel(idea.bucket)[0],
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
@@ -1888,12 +1888,12 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 6),
                           child: Text(
-                            day14.bucketLabel(idea.bucket),
+                            ideas.bucketLabel(idea.bucket),
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color:
-                                  day14.bucketById(idea.bucket)?.color ??
+                                  ideas.bucketById(idea.bucket)?.color ??
                                   AppColors.textSoft,
                             ),
                           ),
@@ -2023,12 +2023,12 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 6),
                           child: Text(
-                            day14.bucketLabel(idea.bucket),
+                            ideas.bucketLabel(idea.bucket),
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color:
-                                  day14.bucketById(idea.bucket)?.color ??
+                                  ideas.bucketById(idea.bucket)?.color ??
                                   AppColors.textSoft,
                             ),
                           ),

@@ -113,26 +113,27 @@ Future<http.Response> geminiPost({
     chosen = fallbackModel;
   }
 
-  Uri urlFor(String m) =>
-      Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/'
-          '$m:generateContent?key=$apiKey');
+  // The key goes in a header, not the query string. In the URL it lands in every
+  // proxy log, every crash report that captures the request, and anything that
+  // prints the request line. Same request, same response, one less copy of the key
+  // lying around in log files nobody reads.
+  final headers = {
+    'Content-Type': 'application/json',
+    'x-goog-api-key': apiKey,
+  };
+
+  Uri urlFor(String m) => Uri.parse(
+      'https://generativelanguage.googleapis.com/v1beta/models/$m:generateContent');
 
   var url = urlFor(chosen);
-  http.Response response = await http.post(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: body,
-  ).timeout(timeout);
+  http.Response response =
+      await http.post(url, headers: headers, body: body).timeout(timeout);
 
   if (response.statusCode == 404 && fallbackModel != null && chosen != fallbackModel) {
     await _rememberMissing(chosen);
     chosen = fallbackModel;
     url = urlFor(chosen);
-    response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    ).timeout(timeout);
+    response = await http.post(url, headers: headers, body: body).timeout(timeout);
   }
 
   for (final fallback in _backoff) {
@@ -153,11 +154,7 @@ Future<http.Response> geminiPost({
       await Future<void>.delayed(const Duration(seconds: 1));
     }
 
-    response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    ).timeout(timeout);
+    response = await http.post(url, headers: headers, body: body).timeout(timeout);
   }
 
   return response;

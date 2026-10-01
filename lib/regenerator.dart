@@ -258,6 +258,7 @@ class Regenerator {
       'activity': 'Tried this yet? Tell us how your little one did!',
       'humor': 'Be honest — how many times today? 😂',
       'age_practice': 'How many can your child already do? Tell us below! 💛',
+      'community': 'Which one did you pick? Comment your vote below 👇',
     };
     final base = comments[pkg.bucket.id] ?? 'What did you think? Comment below!';
 

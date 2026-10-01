@@ -62,24 +62,49 @@ class ContentPackage {
       };
 
   factory ContentPackage.fromJson(Map<String, dynamic> json) {
-    final bucket = BucketLibrary.byId(json['bucket'] as String) ?? BucketLibrary.challenge;
-    final format = ContentFormat.values.byName(json['format'] as String);
-    final chars = (json['characters'] as List).map((id) => CharacterLibrary.byId(id)!).toList();
+    // Every field here used to be a hard cast, so one missing or renamed key took
+    // the whole load down with it. Reading saved content should never be the thing
+    // that crashes the app, so each field falls back instead.
+    String text(String key) => json[key] as String? ?? '';
+    List<String> strings(String key) =>
+        ((json[key] as List?) ?? const []).map((e) => '$e').toList();
+
+    final bucket = BucketLibrary.byId(json['bucket'] as String? ?? '') ??
+        BucketLibrary.challenge;
+
+    // byName throws on anything it does not recognise, including a missing key.
+    ContentFormat format;
+    try {
+      format = ContentFormat.values.byName(json['format'] as String? ?? '');
+    } on ArgumentError {
+      format = ContentFormat.values.first;
+    }
+
+    // byId is nullable, so a character id from an older save must not be forced.
+    final chars = ((json['characters'] as List?) ?? const [])
+        .map((id) => CharacterLibrary.byId('$id'))
+        .whereType<Character>()
+        .toList();
+
     return ContentPackage(
-      id: json['id'] as String,
-      idea: json['idea'] as String,
+      id: text('id'),
+      idea: text('idea'),
       bucket: bucket,
       format: format,
-      characters: chars,
-      hook: json['hook'] as String,
-      slides: (json['slides'] as List).map((s) => SlideContent.fromJson(s)).toList(),
-      visualPrompts: (json['visualPrompts'] as List).cast<String>(),
-      caption: json['caption'] as String,
-      cta: json['cta'] as String,
-      hashtags: (json['hashtags'] as List).cast<String>(),
-      pinnedComment: json['pinnedComment'] as String,
-      replyComments: (json['replyComments'] as List).cast<String>(),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      characters: chars.isEmpty ? CharacterLibrary.all : chars,
+      hook: text('hook'),
+      slides: ((json['slides'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((s) => SlideContent.fromJson(s.cast<String, dynamic>()))
+          .toList(),
+      visualPrompts: strings('visualPrompts'),
+      caption: text('caption'),
+      cta: text('cta'),
+      hashtags: strings('hashtags'),
+      pinnedComment: text('pinnedComment'),
+      replyComments: strings('replyComments'),
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 }
@@ -383,6 +408,7 @@ Bucket context: ${bucket.generationPrompt}
       'activity': 'Save this for your next play moment! 📌',
       'humor': 'Tag a parent who needs this 😂',
       'age_practice': 'Bookmark for your next milestone check 📌',
+      'community': 'Vote in the comments and we will make it next 🗳️',
     };
     return ctas[bucket.id] ?? 'Save this for later!';
   }
@@ -394,6 +420,7 @@ Bucket context: ${bucket.generationPrompt}
       'activity': ['#toddleractivities', '#playbasedlearning', '#momhacks'],
       'humor': ['#parentingmemes', '#toddlerlife', '#relatablemom'],
       'age_practice': ['#preschoolmilestones', '#toddlerdevelopment', '#earlylearning'],
+      'community': ['#momcommunity', '#parentingcommunity', '#indianmoms'],
     };
     final base = BrandDefaults.hashtagPool;
     final extra = bucketTags[bucket.id] ?? [];
@@ -411,6 +438,7 @@ Bucket context: ${bucket.generationPrompt}
       'activity': 'Tried this yet? Tell us how your little one did!',
       'humor': 'Be honest — how many times today? 😂',
       'age_practice': 'How many can your child already do? Tell us below! 💛',
+      'community': 'Which one did you pick? Comment your vote below 👇',
     };
     return comments[bucket.id] ?? 'What did you think? Comment below!';
   }
@@ -452,6 +480,13 @@ Bucket context: ${bucket.generationPrompt}
         'Saving this to track over the next few months.',
         'She\'s still working on counting to 10 but getting there!',
         'Love that this isn\'t presented as a race — so refreshing.',
+      ],
+      'community': [
+        'Voted for the sock hunt one, please make it! 🧦',
+        'The detective mission was my favourite this week!',
+        'This is exactly what I needed to see today, thank you 💛',
+        'My daughter picked the first one without even thinking 😂',
+        'More of these please, I vote every single time!',
       ],
     };
     return styles[bucket.id] ?? [

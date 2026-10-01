@@ -193,6 +193,13 @@ Future<GeneratedCaption> generateCaption({
         // same every time is not a caption, it is a form letter.
         'temperature': 0.9,
         'maxOutputTokens': 1024,
+        // Measured, not guessed: this model thinks before it answers, and the
+        // thinking is counted against maxOutputTokens. On a 1024 budget it spent
+        // 981 tokens thinking and cut the reply off mid-JSON with
+        // finishReason MAX_TOKENS, which failed to parse. Writing a caption does
+        // not need deliberation, so the thinking is turned off and the whole
+        // budget goes to the caption.
+        'thinkingConfig': {'thinkingBudget': 0},
         'responseMimeType': 'application/json',
       },
     }),

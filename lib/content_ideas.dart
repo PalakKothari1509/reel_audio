@@ -1,107 +1,379 @@
-import 'package:flutter/material.dart';
+// -- Every Content Idea, In One Place --------------------------------------------
+//
+// The hook library, the ready-made post packages, and the bulk paste parser all
+// live here now. They used to sit in two files (plan_data.dart and
+// day14_posts.dart) and between them they had drifted apart: the posts carried
+// their own ContentBucket class and their own bucket ids, four of which did not
+// exist in the library the rest of the app reads. Ideas and the buckets they
+// belong to now sit together, and BucketLibrary in brand_system.dart is the only
+// list of buckets in the app.
+//
+// A bucket id is one thing everywhere now. puzzle became challenge, talk became
+// conversation, skill became age_practice, and wrap became the new community
+// bucket. That last one is new because the three posts that used it ask the
+// followers a question, which none of the other five buckets describes, and
+// folding them into 'conversation' would have quietly changed what they were about.
+
+import 'brand_system.dart';
 import 'quick_content.dart';
 
-// ── Content Buckets ────────────────────────────────────────────────────────────
+// -- Buckets ---------------------------------------------------------------------
 //
-// The six content strategies for the 14-day test. Every post belongs to exactly one
-// bucket, and the bucket drives which comment style, which visual approach and which
-// success metric matters most.
-//
-// Character bible reminder for every image prompt:
-//   Ria (brown eyes, warm skin tone, consistent face — outfit/hair rotates per post)
-//   Rio (brown eyes, warm skin tone, consistent face — outfit/hair rotates per post)
-//   Cuty (small white bunny, pink bow, unchanged always)
-//   No glasses on Ria or Rio, ever.
-//   Soft pastel watercolor storybook style, cream background,
-//   vertical 9:16 for reels, square or 4:5 for carousel/static.
+// Thin names over BucketLibrary rather than a second list. quick_content.dart and
+// plan_screen.dart call these, so they stay put and stop being a second truth.
 
-class ContentBucket {
+const List<ContentBucket> kContentBuckets = BucketLibrary.all;
+
+ContentBucket? bucketById(String id) => BucketLibrary.byId(id);
+
+ContentBucket? bucketByName(String name) => BucketLibrary.byName(name);
+
+String bucketLabel(String id) => bucketById(id)?.shortLabel ?? id;
+
+// ── Hooks ─────────────────────────────────────────────────────────────────────
+
+class HookIdea {
   final String id;
-  final String name;
-  final String shortLabel;
-  final String description;
-  final Color color;
-  final Color softColor;
+  final String category;
+  /// Two to four words for the cover. Short on purpose: longer stops being a hook
+  /// and starts being a sentence nobody reads at thumbnail size.
+  final String cover;
+  /// The first line said out loud, in the first three seconds.
+  final String opening;
+  /// The real preschool problem the story is built on.
+  final String problem;
+  final String lesson;
+  final String postFormat;
+  final String strategy;
+  final String caption;
+  final String pinnedComment;
+  /// False for posts the app cannot make — milestones and behind-the-scenes need your
+  /// own screen recordings, not an illustrated story.
+  final bool forApp;
+  /// When it was last used, so the same hook does not go out twice in a month.
+  final String usedOn;
+  /// True for one you added yourself. Built-in ones can be edited but not deleted,
+  /// so an update that adds new ones never fights with your changes.
+  final bool custom;
 
-  const ContentBucket({
+  const HookIdea({
     required this.id,
-    required this.name,
-    required this.shortLabel,
-    required this.description,
-    required this.color,
-    required this.softColor,
+    required this.category,
+    required this.cover,
+    required this.opening,
+    required this.problem,
+    required this.lesson,
+    this.postFormat = 'Reel',
+    this.strategy = '',
+    this.caption = '',
+    this.pinnedComment = '',
+    this.forApp = true,
+    this.usedOn = '',
+    this.custom = false,
   });
+
+  HookIdea copyWith({String? cover, String? opening, String? problem, String? lesson,
+      String? category, String? usedOn}) =>
+      HookIdea(
+        id: id,
+        category: category ?? this.category,
+        cover: cover ?? this.cover,
+        opening: opening ?? this.opening,
+        problem: problem ?? this.problem,
+        lesson: lesson ?? this.lesson,
+        postFormat: postFormat,
+        strategy: strategy,
+        caption: caption,
+        pinnedComment: pinnedComment,
+        forApp: forApp,
+        usedOn: usedOn ?? this.usedOn,
+        custom: custom,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id, 'category': category, 'cover': cover, 'opening': opening,
+        'problem': problem, 'lesson': lesson, 'forApp': forApp,
+        'usedOn': usedOn, 'custom': custom, 'postFormat': postFormat,
+        'strategy': strategy, 'caption': caption, 'pinnedComment': pinnedComment,
+      };
+
+  factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
+        id: j['id'] as String? ?? '',
+        category: j['category'] as String? ?? 'Relatable',
+        cover: j['cover'] as String? ?? '',
+        opening: j['opening'] as String? ?? '',
+        problem: j['problem'] as String? ?? '',
+        lesson: j['lesson'] as String? ?? '',
+        postFormat: j['postFormat'] as String? ?? 'Reel',
+        strategy: j['strategy'] as String? ?? '',
+        caption: j['caption'] as String? ?? '',
+        pinnedComment: j['pinnedComment'] as String? ?? '',
+        forApp: j['forApp'] as bool? ?? true,
+        usedOn: j['usedOn'] as String? ?? '',
+        custom: j['custom'] as bool? ?? false,
+      );
+
+  /// Laid out as the story form, ready for Write the script.
+  String asStoryText() => 'Cover hook: $cover\n'
+      'Hook: $opening\n'
+      'Who: Ria, Rio, Cuty\n'
+      'Where: A warm, familiar family home\n'
+      'What starts it: $problem\n'
+      'What goes wrong: The small problem turns into funny family chaos\n'
+      'How it gets worse: Each character reacts in their own way\n'
+      'How it is solved: They listen, help one another, and try again\n'
+      'Ending line: That is how one little moment becomes a big family memory\n'
+      'Moral: $lesson\n'
+      'Post format: $postFormat\n'
+      'Strategy: $strategy\n'
+      'Caption: $caption\n'
+      'Pinned comment: $pinnedComment';
 }
 
-const kContentBuckets = [
-  ContentBucket(
-    id: 'puzzle',
-    name: 'Can Your Child Figure It Out',
-    shortLabel: 'Puzzle',
-    description: 'Observation games, pattern challenges, spot-the-hidden',
-    color: Color(0xFFE8A87C),
-    softColor: Color(0xFFFDF0EB),
-  ),
-  ContentBucket(
-    id: 'humor',
-    name: 'Parent-Relatable Humor',
-    shortLabel: 'Humor',
-    description: 'Funny relatable parenting moments',
-    color: Color(0xFFF4C2C2),
-    softColor: Color(0xFFFFF0F3),
-  ),
-  ContentBucket(
-    id: 'activity',
-    name: 'Try This at Home',
-    shortLabel: 'Activity',
-    description: 'Hands-on activities using household items',
-    color: Color(0xFFA8D8EA),
-    softColor: Color(0xFFEDF7FC),
-  ),
-  ContentBucket(
-    id: 'talk',
-    name: 'Talk With Your Child',
-    shortLabel: 'Talk',
-    description: 'Conversation starters and bonding questions',
-    color: Color(0xFFB5E2A9),
-    softColor: Color(0xFFF0F7ED),
-  ),
-  ContentBucket(
-    id: 'skill',
-    name: 'Age-Based Skill Reference',
-    shortLabel: 'Skill',
-    description: 'Development milestone checklists',
-    color: Color(0xFFD4A5E8),
-    softColor: Color(0xFFF7EDFA),
-  ),
-  ContentBucket(
-    id: 'wrap',
-    name: 'Wrap-Up / Interactive',
-    shortLabel: 'Wrap-Up',
-    description: 'Community engagement and feedback posts',
-    color: Color(0xFFF0E68C),
-    softColor: Color(0xFFFFFAEC),
-  ),
+const kHookCategories = [
+  'Relatable', 'Struggle first', 'Surprising', 'Warm lesson', 'Page & milestone',
 ];
 
-ContentBucket? bucketById(String id) {
-  for (final b in kContentBuckets) {
-    if (b.id == id) return b;
-  }
-  return null;
-}
+/// The starting list. Merged from several AI suggestions and cut down hard: the same
+/// three problems (screen time, shoes, toy fights) appeared four or five times each,
+/// and several were written as "I" — a parent speaking — when the reels are told by a
+/// storyteller about Ria and Rio.
+const kDefaultHooks = <HookIdea>[
+  // Relatable: the child's own words, the thing every parent has heard this week.
+  HookIdea(id: 'h01', category: 'Relatable', cover: 'Main Khud Karungi!',
+    opening: 'Ria ne Mumma ka haath jhatak diya... joote khud pehnenge!',
+    problem: 'Ria insists on putting her shoes on herself and pushes Mumma away',
+    lesson: 'Thoda intezaar, aur bachcha khud seekh jaata hai'),
+  HookIdea(id: 'h02', category: 'Relatable', cover: 'Bas 5 Minute Aur?!',
+    opening: 'Phone band hua... aur Ria ka rona shuru!',
+    problem: 'Ria melts down when screen time ends suddenly',
+    lesson: 'Achanak nahi, pehle se bataakar band karo'),
+  HookIdea(id: 'h03', category: 'Relatable', cover: 'Mujhe Nahi Aata!',
+    opening: 'Rio ka tower teesri baar gira... aur usne haar maan li.',
+    problem: 'Rio gives up when his block tower keeps falling',
+    lesson: 'Galti se hi seekhte hain, phir se try karo'),
+  HookIdea(id: 'h04', category: 'Relatable', cover: 'Cuty Kahan Gaya?!',
+    opening: 'Poore kamre mein khilone... aur Cuty gayab!',
+    problem: 'Cuty is lost in the messy room; tidying turns into a treasure hunt',
+    lesson: 'Saaf kamra, sab kuch saamne'),
+  HookIdea(id: 'h05', category: 'Relatable', cover: 'Ek Aur Paani!',
+    opening: 'Lights band... aur Ria ko phir se paani chahiye.',
+    problem: 'Bedtime stretches on with one more water, one more story, one more hug',
+    lesson: 'Roz ek jaisa routine, neend jaldi aati hai'),
+  HookIdea(id: 'h06', category: 'Relatable', cover: 'Meri Car Hai!',
+    opening: 'Ria aur Rio ne car do taraf se kheenchi...',
+    problem: 'Ria and Rio fight over one toy car',
+    lesson: 'Baari baari khelne mein sabka mazaa'),
+  HookIdea(id: 'h07', category: 'Relatable', cover: 'Brush Nahi Karungi!',
+    opening: 'Ria kambal ke andar chhup gayi... brush ke dar se!',
+    problem: 'Ria hides under the blanket to avoid brushing her teeth',
+    lesson: 'Khel banao, zidd khud chali jaati hai'),
+  HookIdea(id: 'h08', category: 'Relatable', cover: 'Broccoli? Bilkul Nahi!',
+    opening: 'Plate aage aayi... aur Ria ne haath baandh liye.',
+    problem: 'Ria refuses vegetables at the table',
+    lesson: 'Khud banaya khaana, khud khaane ka mann'),
+  HookIdea(id: 'h09', category: 'Relatable', cover: 'Apne Kapde Khud!',
+    opening: 'Garmi mein bhi Ria ko winter boots hi pehenne hain!',
+    problem: 'Ria wants to choose her own mismatched outfit',
+    lesson: 'Chhote faisle, bada confidence'),
 
-ContentBucket? bucketByName(String name) {
-  for (final b in kContentBuckets) {
-    if (b.name == name) return b;
-  }
-  return null;
-}
+  // New built-in content ideas from Palak's marketing and character plan.
+  HookIdea(id: 'pal01', category: 'Relatable', cover: 'Which Kid Is Yours?',
+    opening: 'Ria = tofani, Rio = ziddi, Cuty = sleep lover.',
+    problem: 'Parents want to recognise their child in a playful character style',
+    lesson: 'Every child has a personality and every family sees themselves in it'),
+  HookIdea(id: 'pal02', category: 'Relatable', cover: '7 Things Every Toddler Does',
+    opening: 'Says no, wants the same spoon, and suddenly needs Mumma.',
+    problem: 'Parents need a humorous way to see their own daily chaos reflected back',
+    lesson: 'The tiny behaviours are the funny little signs of childhood'),
+  HookIdea(id: 'pal03', category: 'Relatable', cover: 'When Mumma Says No',
+    opening: 'Ria protests, Rio refuses, Cuty quietly quietly gives in.',
+    problem: 'The same parent boundary can trigger three very different reactions',
+    lesson: 'Kids react differently, but all of them need patience and clarity'),
+  HookIdea(id: 'pal04', category: 'Relatable', cover: '5 Minute Warning!',
+    opening: 'Five minutes left and suddenly every child hears a different story.',
+    problem: 'Screen time transitions create a dramatic meltdown in most homes',
+    lesson: 'Warning helps, but a gentle transition still matters most'),
+  HookIdea(id: 'pal05', category: 'Relatable', cover: 'Things Kids Say',
+    opening: 'Mumma, I am not sleepy and then five seconds later, snores.',
+    problem: 'Kids say the funniest things right before bedtime and during chaos',
+    lesson: 'A little laughter makes the hard moments easier to handle'),
+  HookIdea(id: 'pal06', category: 'Relatable', cover: 'Morning Personalities',
+    opening: 'Ria wakes up ready to play, Rio wants five more minutes, and Cuty is still sleeping.',
+    problem: 'Morning energy can look very different across siblings and personalities',
+    lesson: 'The family routine works better when personalities are respected'),
+  HookIdea(id: 'pal07', category: 'Relatable', cover: 'Ready to Go?',
+    opening: 'One child is ready, one is searching for a toy, and one is still half asleep.',
+    problem: 'Leaving the house is a daily family-level circus',
+    lesson: 'A little planning makes the morning calmer for everyone'),
+  HookIdea(id: 'pal08', category: 'Relatable', cover: 'Mumma\'s Little Detective',
+    opening: 'Who did it? Toys everywhere, crumbs on the floor, and one very innocent rabbit.',
+    problem: 'Kids create chaos and then deny it with talent',
+    lesson: 'The grown-up always knows, even when they try to act innocent'),
+  HookIdea(id: 'pal09', category: 'Warm lesson', cover: 'Main Khud Karungi',
+    opening: 'Let me do it myself and I will do it my way.',
+    problem: 'Kids want independence even when the task is small',
+    lesson: 'Support effort and trust them to learn through trying'),
+  HookIdea(id: 'pal10', category: 'Warm lesson', cover: 'Little Things Kids Remember',
+    opening: 'The bedtime story, the silly dance, the hug after a bad day.',
+    problem: 'Parents often forget that tiny everyday moments become the memories children hold',
+    lesson: 'Love is built in the little, repeated moments of the day'),
+  HookIdea(id: 'pal11', category: 'Relatable', cover: 'At The Supermarket',
+    opening: 'Ria wants everything, Rio wants the toy, Cuty is already ready to go home.',
+    problem: 'Shopping turns into a mini-lesson in patience, negotiation and excitement',
+    lesson: 'Every child brings a different energy into the same space'),
+  HookIdea(id: 'pal12', category: 'Relatable', cover: 'Bedtime Personalities',
+    opening: 'One child wants one more story, one wants one more screen, one is already asleep.',
+    problem: 'Bedtime is always different inside the same house',
+    lesson: 'Night routines work best when they match the child who is in them'),
+  HookIdea(id: 'pal13', category: 'Struggle first', cover: 'Toy Broke!',
+    opening: 'The toy breaks, everyone reacts differently, and then they learn together.',
+    problem: 'Small losses feel huge when a child is attached to a favourite thing',
+    lesson: 'A bad moment can become a calm lesson if we slow down and help'),
+  HookIdea(id: 'pal14', category: 'Warm lesson', cover: 'Big Feelings, Little Problems',
+    opening: 'To a child, a broken biscuit or a missing sock feels enormous.',
+    problem: 'Little problems can feel huge when your child is overwhelmed',
+    lesson: 'What seems small to us is often a big emotion to them'),
+  HookIdea(id: 'pal15', category: 'Surprising', cover: 'Ria\'s House Rules',
+    opening: 'Ria\'s five rules for fun, chaos and completely valid family drama.',
+    problem: 'Kids often create their own rules and logic in the middle of daily life',
+    lesson: 'Playful routines and family humour keep the home feeling lighter'),
+  HookIdea(id: 'pal16', category: 'Surprising', cover: 'Rio\'s Vocabulary',
+    opening: 'Rio\'s top words are no, mine, why, and one more time.',
+    problem: 'The toddler vocabulary is often very short but very intense',
+    lesson: 'A little repetition and a lot of parenting grace go a long way'),
+  HookIdea(id: 'pal17', category: 'Warm lesson', cover: 'Cuty Knows Best',
+    opening: 'Cuty believes in naps, calm, and never rushing through life.',
+    problem: 'Some children are highly sensitive to noise, pressure and movement',
+    lesson: 'Rest and calm are not lazy; they are part of healthy growth'),
+  HookIdea(id: 'pal18', category: 'Relatable', cover: 'One House, Three Kids',
+    opening: 'Same house, different universes: Ria, Rio and Cuty all live in their own rhythm.',
+    problem: 'Each child has a different personality, energy level and way of reacting',
+    lesson: 'Family life works when we learn to love the differences, not fight them'),
+  HookIdea(id: 'pal19', category: 'Relatable', cover: 'Mumma Says This Daily',
+    opening: 'Put your shoes on, stop running, where is your bottle, and come here.',
+    problem: 'Parents repeat the same phrases each day because the day repeats itself',
+    lesson: 'Even the hard repeated words are part of the family rhythm'),
+  HookIdea(id: 'pal20', category: 'Warm lesson', cover: 'Parent Memory',
+    opening: 'One day they won\'t ask you to carry them, and they won\'t need the same little routines.',
+    problem: 'Parents need a reminder to value the current chaos before it changes',
+    lesson: 'Enjoy the little moments while they are still happening'),
 
-String bucketLabel(String id) {
-  final b = bucketById(id);
-  return b?.shortLabel ?? id;
-}
+  // Struggle first: open on the moment it goes wrong. Struggle stops the scroll; the
+  // warm ending is what earns the save.
+  HookIdea(id: 'h10', category: 'Struggle first', cover: '1 Galti, Bada Mess!',
+    opening: 'Rio ke haath se saare rang gir gaye...',
+    problem: 'Rio spills paint everywhere by accident',
+    lesson: 'Galti pe gussa nahi, saath mein saaf karo'),
+  HookIdea(id: 'h11', category: 'Struggle first', cover: 'Tower Gir Gaya!',
+    opening: 'Rio zameen pe lot gaya... sirf blocks ke liye?',
+    problem: 'Rio has a big tantrum when his tower breaks',
+    lesson: 'Pehle gale lagao, phir samjhao'),
+  HookIdea(id: 'h12', category: 'Struggle first', cover: 'Subah Ka Drama',
+    opening: 'School ka time... aur Ria abhi tak bistar mein!',
+    problem: 'Morning school prep turns into a battle',
+    lesson: 'Jaldbaazi kam, zidd bhi kam'),
+  HookIdea(id: 'h13', category: 'Struggle first', cover: 'Suno Na, Ria!',
+    opening: 'Mumma teesri baar bulaa rahi hain... Ria sun hi nahi rahi.',
+    problem: 'Ria ignores instructions called from across the room',
+    lesson: 'Paas jaakar, aankhon mein dekhkar bolo'),
+  HookIdea(id: 'h14', category: 'Struggle first', cover: 'Tod Diya!',
+    opening: 'Car ke do tukde... aur dono ek doosre ko blame kar rahe hain.',
+    problem: 'The shared toy breaks and both children blame each other',
+    lesson: 'Kaun jeeta nahi, saath mein kaise theek karein'),
+
+  // Surprising: says the opposite of what a parent expects, then shows it.
+  HookIdea(id: 'h15', category: 'Surprising', cover: 'Phone Asli Problem Nahi',
+    opening: 'Ria ko phone se nahi, phone chhinne se gussa aata hai.',
+    problem: 'The upset is about the sudden stop, not the screen itself',
+    lesson: 'Timer lagao, badlaav aasaan ho jaata hai'),
+  HookIdea(id: 'h16', category: 'Surprising', cover: 'Dabba Ban Gaya Rocket!',
+    opening: 'Itne saare khilone... aur Rio ko chahiye khaali dabba?',
+    problem: 'Expensive toys are ignored; an empty box becomes a spaceship',
+    lesson: 'Kam khilone, zyada kalpana'),
+  HookIdea(id: 'h17', category: 'Surprising', cover: 'Mumma Ne NO Kyun Bola?',
+    opening: 'Baarish mein bahar jaana tha... Mumma ne mana kar diya!',
+    problem: 'Ria thinks Mumma is mean for saying no to playing in the rain',
+    lesson: 'NO ka matlab kabhi nahi — kabhi kabhi bas ruko'),
+  HookIdea(id: 'h18', category: 'Surprising', cover: 'Tumne Khud Kiya!',
+    opening: 'Ria ko "good girl" nahi... kuch aur sunna tha.',
+    problem: 'Praising the effort instead of calling the child good',
+    lesson: 'Mehnat ki taareef, himmat badhaati hai'),
+  HookIdea(id: 'h19', category: 'Surprising', cover: 'Bhaago Mat? Dheere Chalo!',
+    opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
+    problem: 'A child ignores "don\'t" but follows a clear "do"',
+    lesson: 'Kya nahi karna, nahi — kya karna hai, woh batao'),
+
+  // Warm lesson: gentle stories that end on something a parent wants to keep.
+  HookIdea(id: 'h20', category: 'Warm lesson', cover: 'Pyaar Bhi, Rule Bhi',
+    opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
+    problem: 'Holding a boundary kindly instead of giving in or shouting',
+    lesson: 'Pyaar ke saath rule, bachcha safe mehsoos karta hai'),
+  HookIdea(id: 'h21', category: 'Warm lesson', cover: 'Ria Ne Samjhaaya',
+    opening: 'Aaj Ria ne Mumma ko ek baat sikha di...',
+    problem: 'A small child says something that makes the adult rethink',
+    lesson: 'Bachche humse zyada samajhte hain'),
+
+  // Milestone posts: complete concepts for the 100th Instagram post.
+  HookIdea(id: 'p05', category: 'Page & milestone',
+    cover: '100 Posts. One World.',
+    opening: '100 posts. ❤️ But who are we? Ria jumps in, Rio says NO, and Cuty is sleeping.',
+    problem: 'A new visitor should understand Fun Learning With Palak, the three characters, and the page world in one reel',
+    lesson: 'Little stories, learning, masti and everyday childhood can grow into one warm little world',
+    postFormat: 'Reel / Trial Reel',
+    strategy: 'Milestone + brand introduction + character introduction + discovery. Use a 25-35 second reel with Ria, Rio and Cuty, then test two hooks as Trial Reels: 100 POSTS ❤️ and Meet Our Little World 👀.',
+    caption: '100 posts. ❤️\n\nWhat started as little ideas slowly became our little world — Ria, Rio, Cuty and so many tiny stories, laughs and lessons. 🌸💙🐰\n\nThank you for being here.\n\nLittle Stories. Big Lessons. 🌱\n\nAre you Team Ria, Team Rio or Team Cuty? 👇',
+    pinnedComment: 'Okay, important question 😂👇\n🌸 Ria = Tofani\n💙 Rio = Ziddi\n🐰 Cuty = Sleep Lover\nWhich one is most like your little one?'),
+  HookIdea(id: 'p06', category: 'Page & milestone',
+    cover: '100 Posts Ago...',
+    opening: '100 posts ago, there was no big world — just one little idea and one little character.',
+    problem: 'The page journey and its characters need an emotional introduction for new visitors',
+    lesson: 'One small idea can grow into a little family and a community that learns together',
+    postFormat: 'Reel / Emotional milestone',
+    strategy: 'Open with 100 posts ago, introduce Ria, then Rio, then Cuty, and end with 100 POSTS ❤️ and We are just getting started.',
+    caption: '100 posts ago, there was only one little idea. Today, Ria, Rio and Cuty have their own little world. ❤️\n\nThank you for growing with us. Little Stories. Big Lessons. 🌱',
+    pinnedComment: 'Which character did you meet first — Ria, Rio or Cuty? ❤️'),
+  HookIdea(id: 'p07', category: 'Page & milestone',
+    cover: 'Who Made Post 100?',
+    opening: 'Ria says she made Post 100. Rio says NO. Cuty says wake me up at Post 200.',
+    problem: 'A milestone announcement can feel too formal unless the characters make it funny and memorable',
+    lesson: 'Ria\'s masti, Rio\'s zidd and Cuty\'s neend are what make this little world special',
+    postFormat: 'Funny Reel / Trial Reel',
+    strategy: 'Use the funniest version for discovery. Ria claims credit, Rio argues, Cuty keeps sleeping, and the final card reveals POST #100 🎉.',
+    caption: 'Who made it to Post #100? 😂\n\nRia says it was her. Rio says NO. Cuty is sleeping through the celebration.\n\nStill causing trouble, one little story at a time. ❤️',
+    pinnedComment: 'Who is most like your little one: Tofani Ria, Ziddi Rio or sleepy Cuty? 😂'),
+  HookIdea(id: 'p08', category: 'Page & milestone',
+    cover: 'Meet Our Little World',
+    opening: 'Meet Ria, Rio and Cuty — one is Tofani, one is Ziddi, and one just wants to sleep.',
+    problem: 'New followers need a simple pinned introduction to the characters and the page promise',
+    lesson: 'Together they make Fun Learning With Palak: cute preschool stories, learning, laughter and little lessons',
+    postFormat: 'Reel / Pinned brand introduction',
+    strategy: 'Pin this after Post 100. Introduce each character in one quick beat, then show learning, masti, family and everyday childhood.',
+    caption: 'Welcome to our little world. 🌸💙🐰\n\nRia is Tofani, Rio is Ziddi, and Cuty is our sleep lover. Together they bring little stories, little lessons and lots of masti.\n\nFun Learning With Palak ❤️',
+    pinnedComment: 'Which one are you: Team Ria, Team Rio or Team Cuty? 👇'),
+
+  // Page posts: need your own footage, so the app lists them but cannot build them.
+  HookIdea(id: 'p01', category: 'Page & milestone', forApp: false,
+    cover: '1,000 Ke Paas!',
+    opening: 'Ruko... hum 1,000 dost hone wale hain?!',
+    problem: 'Milestone reel as you approach 1,000 followers',
+    lesson: 'Thank the parents who came first'),
+  HookIdea(id: 'p02', category: 'Page & milestone', forApp: false,
+    cover: '1,000 Dost!',
+    opening: 'Aaj Ria, Rio aur Cuty ke 1,000 dost ho gaye.',
+    problem: 'Thank-you reel on reaching 1,000',
+    lesson: 'A place in your feed means a lot'),
+  HookIdea(id: 'p03', category: 'Page & milestone', forApp: false,
+    cover: 'Ek Reel Kaise Banti Hai',
+    opening: '30 second ki ek kahani ke peeche kitna kaam hai...',
+    problem: 'Behind the scenes of making one story',
+    lesson: 'Shows the care that goes into every story'),
+  HookIdea(id: 'p04', category: 'Page & milestone', forApp: false,
+    cover: 'Jab Humne Shuru Kiya',
+    opening: 'Pehli kahani post ki thi... pata nahi tha koi dekhega bhi.',
+    problem: 'How the page started',
+    lesson: 'Honest start builds trust'),
+];
 
 // ── The 14-Day Post Packages ───────────────────────────────────────────────────
 //
@@ -135,7 +407,7 @@ final kDay14Posts = <QuickIdea>[
       'Love how easy this is to do with things we already have at home.',
     ],
     script: '',
-    bucket: 'puzzle',
+    bucket: 'challenge',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -222,7 +494,7 @@ final kDay14Posts = <QuickIdea>[
       'Trying this tonight, such a lovely idea.',
     ],
     script: '',
-    bucket: 'talk',
+    bucket: 'conversation',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -251,7 +523,7 @@ final kDay14Posts = <QuickIdea>[
       'She\'s still working on counting to 10 but getting there!',
     ],
     script: 'Slide 1: "CAN YOUR 3-YEAR-OLD DO THESE? ✅"\nSlide 2: "🎨 Identify basic colours"\nSlide 3: "🍎 Name 5 fruits"\nSlide 4: "📛 Recognise their own name"\nSlide 5: "🔢 Count 1–10"\nSlide 6: "👀 Identify body parts"\nSlide 7: "Save this to check off with your little one this week! 📌"',
-    bucket: 'skill',
+    bucket: 'age_practice',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -309,7 +581,7 @@ final kDay14Posts = <QuickIdea>[
       'My son said "there he is!" so excited 😍',
     ],
     script: '',
-    bucket: 'puzzle',
+    bucket: 'challenge',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -367,7 +639,7 @@ final kDay14Posts = <QuickIdea>[
       'This is going into our nightly routine now.',
     ],
     script: 'Slide 1: "3 QUESTIONS TO ASK YOUR CHILD THIS WEEK ❤️"\nSlide 2: "\'What made you happy today?\'"\nSlide 3: "\'What would you build with 100 blocks?\'"\nSlide 4: "\'Which animal would you want as a friend?\'"\nSlide 5: "Save this — ask one each night this week 💛"',
-    bucket: 'talk',
+    bucket: 'conversation',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -396,7 +668,7 @@ final kDay14Posts = <QuickIdea>[
       'Would love a 5-year-old version too!',
     ],
     script: 'Slide 1: "CAN YOUR 4-YEAR-OLD DO THESE? ✅"\nSlide 2: "🔢 Count 1–20"\nSlide 3: "🔤 Recognise A–Z"\nSlide 4: "📅 Name the days of the week"\nSlide 5: "🗂️ Sort objects by category"\nSlide 6: "👂 Follow 2–3 step instructions"\nSlide 7: "Bookmark this for your 4-year-old\'s next milestone check 📌"',
-    bucket: 'skill',
+    bucket: 'age_practice',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -454,7 +726,7 @@ final kDay14Posts = <QuickIdea>[
       'This is a great one to do out loud with my son.',
     ],
     script: 'Scene 1: Pattern builds on screen one shape at a time — 🟡🔵🟡🔵\nScene 2: Hold on a large "❓" where the next shape should go.\nScene 3: Ria taps her chin, thinking.\nScene 4: Reveal — 🟡 slides into place, Ria claps, Cuty hops happily.',
-    bucket: 'puzzle',
+    bucket: 'challenge',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -483,7 +755,7 @@ final kDay14Posts = <QuickIdea>[
       'Honestly loved all of them, such a fun week of content!',
     ],
     script: 'Slide 1: "WHICH NEW FORMAT WAS YOUR FAVORITE? 🗳️"\nSlide 2: "🔎 Puzzles & Challenges"\nSlide 3: "🗣️ Talk With Your Child"\nSlide 4: "🏠 Try This at Home"\nSlide 5: "😂 Parent-Relatable Humor"\nSlide 6: "📚 Age-Based Skill Checks"\nSlide 7: "Vote in our Story poll or comment your favorite below! 💛"',
-    bucket: 'wrap',
+    bucket: 'community',
     createdAt: DateTime(2026, 9, 24),
   ),
 
@@ -543,7 +815,7 @@ final kDay14Posts = <QuickIdea>[
       'More voting posts like this please, so fun!',
     ],
     script: '',
-    bucket: 'wrap',
+    bucket: 'community',
     createdAt: DateTime(2026, 9, 26),
   ),
 
@@ -663,7 +935,7 @@ final kDay14Posts = <QuickIdea>[
       'Cuty with magnifying glass 🐰🔍',
     ],
     script: 'Scene 1: "Mission 5: Case Open! 🕵️"\nScene 2: Ria with cardboard binoculars — "I see something!"\nScene 3: Rio cupped hands around eyes — "Looking closely"\nScene 4: Rio closes eyes to listen — "Shhh, I hear it!"\nScene 5: Found the clue! 🎉\nScene 6: "Did your detective solve it? 🕵️"',
-    bucket: 'puzzle',
+    bucket: 'challenge',
     createdAt: DateTime(2026, 9, 30),
   ),
 
@@ -723,7 +995,7 @@ final kDay14Posts = <QuickIdea>[
       'The bedtime transition at the end is so smooth!',
     ],
     script: 'Scene 1: "Mission 7: Treasure Hunt! 🎁"\nScene 2: Ria opens tiffin — "What\'s inside?"\nScene 3: Finds toy — "Treasure!"\nScene 4: Rio closes box carefully — "Safe now"\nScene 5: Tucking Cuty in — "Night night bunny" 🐰\nScene 6: "What treasure did you hide? 🎁"',
-    bucket: 'skill',
+    bucket: 'age_practice',
     createdAt: DateTime(2026, 10, 2),
   ),
 
@@ -753,7 +1025,7 @@ final kDay14Posts = <QuickIdea>[
       'Cuty watching them brush is too cute 🐰',
     ],
     script: 'Scene 1: "Mission 8: Self-Care Squad! 🍎"\nScene 2: Ria eats apple from tiffin — "Crunch!"\nScene 3: Rio drinks water — "Glug glug"\nScene 4: Both brush teeth together — "Scrub scrub"\nScene 5: Cuty watches from counter 🐰\nScene 6: "Hardest routine at your house? 🍎"',
-    bucket: 'skill',
+    bucket: 'age_practice',
     createdAt: DateTime(2026, 10, 3),
   ),
 
@@ -813,47 +1085,10 @@ final kDay14Posts = <QuickIdea>[
       'Can\'t wait to see what\'s next!',
     ],
     script: 'Slide 1: "WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉"\nSlide 2: "Race Track → Movement builds confidence 🏁"\nSlide 3: "Concert → Music is self-expression 🎤"\nSlide 4: "Art Studio → Creativity needs no fancy tools 🎨"\nSlide 5: "Detective → Observation is a superpower 🕵️"\nSlide 6: "Rescue Team → Teamwork makes the dream work 🧸"\nSlide 6: "Treasure Box → Small things bring big joy 🎁"\nSlide 7: "Daily Care → Routines build independence 🍎"\nSlide 8: "What\'s next? Tell us below! 🚀"',
-    bucket: 'wrap',
+    bucket: 'community',
     createdAt: DateTime(2026, 10, 5),
   ),
 ];
-
-// ── Bulk Paste Parser ──────────────────────────────────────────────────────────
-//
-// A single text box where you paste a full post package, and it splits into fields.
-// Format:
-//   Title: ...
-//   Post Type: ...
-//   Audience: ...
-//   Content Goal: ...
-//   Mood: ...
-//   Hook: ...
-//   Main Idea: ...
-//   Problem: ...
-//   Lesson: ...
-//   Visual Style: ...
-//   Bucket: <bucket name>
-//   CTA: ...
-//
-//   --- Image Prompt ---
-//   <multi-line prompt>
-//
-//   --- Caption ---
-//   <multi-line caption>
-//
-//   --- Hashtags ---
-//   <hashtags>
-//
-//   --- Pinned Comment ---
-//   <comment>
-//
-//   --- Reply Comments ---
-//   1. <comment 1>
-//   2. <comment 2>
-//   ...
-//
-//   --- Script ---
-//   <script text>
 
 class ParsedPostPackage {
   final String title;
@@ -1061,11 +1296,11 @@ String _resolveBucket(String name) {
   final b = bucketByName(name);
   if (b != null) return b.id;
   final lower = name.toLowerCase();
-  if (lower.contains('puzzle') || lower.contains('figure') || lower.contains('hidden') || lower.contains('pattern')) return 'puzzle';
+  if (lower.contains('puzzle') || lower.contains('figure') || lower.contains('hidden') || lower.contains('pattern')) return 'challenge';
   if (lower.contains('humor') || lower.contains('funny') || lower.contains('mumma')) return 'humor';
   if (lower.contains('activity') || lower.contains('challenge') || lower.contains('hunt')) return 'activity';
-  if (lower.contains('talk') || lower.contains('question') || lower.contains('ask')) return 'talk';
-  if (lower.contains('skill') || lower.contains('year-old') || lower.contains('checklist')) return 'skill';
-  if (lower.contains('wrap') || lower.contains('favorite') || lower.contains('feedback')) return 'wrap';
+  if (lower.contains('talk') || lower.contains('question') || lower.contains('ask')) return 'conversation';
+  if (lower.contains('skill') || lower.contains('year-old') || lower.contains('checklist')) return 'age_practice';
+  if (lower.contains('wrap') || lower.contains('favorite') || lower.contains('feedback')) return 'community';
   return '';
 }

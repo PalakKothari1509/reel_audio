@@ -339,12 +339,47 @@ Visual: Clean checklist style, consistent icons per skill, warm not clinical.'''
     ],
   );
 
+  // Added when the 14-day posts were folded in. Their 'wrap' bucket held three
+  // real posts (favourite format, voted mission, week wrap up) and none of the
+  // five buckets above described them: 'conversation' is talking with the child
+  // at bedtime, not talking to the page's followers. Folding them into an
+  // existing bucket would have quietly changed what those three posts are about.
+  static const ContentBucket community = ContentBucket(
+    id: 'community',
+    name: 'Community',
+    emoji: '💬',
+    shortLabel: 'Community',
+    description: 'Polls, votes, favourites, week wrap ups, feedback',
+    generationPrompt: '''
+This is a COMMUNITY post. The goal is to make followers answer, vote, or reply.
+Structure: Hook → The Question or Vote → Options → Why it matters → CTA.
+Tone: Warm, inviting, like a parent asking other parents.
+Visual: Characters holding or pointing at choices, friendly and open.''',
+    color: Color(0xFFF0E68C),
+    softColor: Color(0xFFFFFAEC),
+    exampleHooks: [
+      'WHICH ONE SHOULD WE DO NEXT? 🗳️',
+      'VOTE FOR RIA\'S NEXT MISSION 🐰',
+      'TELL US YOUR FAVOURITE FORMAT 💛',
+      'THIS WEEK ON THE PAGE: HERE IS EVERYTHING 🌈',
+      'WHICH MISSION WON? CAST YOUR VOTE 🏆',
+    ],
+    slideTemplates: [
+      'Cover: Hook + question or vote',
+      'Options: Show 2 to 4 choices',
+      'Each option: Character with one choice',
+      'Why: One line on what you will make next',
+      'CTA: Comment or vote',
+    ],
+  );
+
   static const List<ContentBucket> all = [
     challenge,
     conversation,
     activity,
     humor,
     agePractice,
+    community,
   ];
 
   static ContentBucket? byId(String id) {

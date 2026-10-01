@@ -268,8 +268,10 @@ Future<String> _geminiSpeak({
   _geminiCallTimes.add(DateTime.now());
   await _deleteIfExists(outPath);
 
+  // Key in a header, same as gemini_call.dart. In the URL it ends up in proxy and
+  // crash logs, and voice is the call that happens most often.
   final url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-      '$geminiTtsModel:generateContent?key=$apiKey';
+      '$geminiTtsModel:generateContent';
 
   final body = jsonEncode({
     'contents': [
@@ -287,7 +289,10 @@ Future<String> _geminiSpeak({
 
   var response = await http.post(
     Uri.parse(url),
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': apiKey,
+    },
     body: body,
   ).timeout(_timeout);
 

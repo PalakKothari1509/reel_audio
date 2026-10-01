@@ -539,6 +539,8 @@ class QualityChecker {
         return cta.contains('tag') || cta.contains('comment') || cta.contains('share');
       case 'age_practice':
         return cta.contains('save') || cta.contains('bookmark') || cta.contains('later');
+      case 'community':
+        return cta.contains('comment') || cta.contains('vote') || cta.contains('tell');
       default:
         return true;
     }
@@ -551,6 +553,7 @@ class QualityChecker {
       case 'activity': return '"Save for later" or "Try today"';
       case 'humor': return '"Tag a parent" or "Comment your version"';
       case 'age_practice': return '"Bookmark for milestone check" or "Save for later"';
+      case 'community': return '"Vote in the comments" or "Tell us your pick"';
       default: return 'Any clear CTA';
     }
   }

@@ -225,9 +225,14 @@ rewordings of one line. The examples show the style only; write new ones for thi
       'generationConfig': {
         // Low: a critique should be the same twice for the same story, or it is
         // not a judgement, it is a mood.
-        'temperature': 0.3,
-        'maxOutputTokens': 2048,
-        'responseMimeType': 'application/json',
+'temperature': 0.3,
+          'maxOutputTokens': 2048,
+          // The model spends thinking tokens out of the same budget, and a reply
+          // cut off mid-JSON will not parse. Measured on this key: with thinking
+          // on, a 1024 budget went 981 tokens to thinking and returned
+          // MAX_TOKENS with a truncated body. None of these three calls needs it.
+          'thinkingConfig': {'thinkingBudget': 0},
+          'responseMimeType': 'application/json',
       },
     }),
   );
@@ -339,9 +344,10 @@ The child should work it out or be shown, not told off. Keep every value under 2
       'generationConfig': {
         // Higher than the script call: this one is meant to surprise you, and a
         // predictable idea generator returns the same story every time.
-        'temperature': 1.0,
-        'maxOutputTokens': 2048,
-        'responseMimeType': 'application/json',
+'temperature': 1.0,
+          'maxOutputTokens': 2048,
+          'thinkingConfig': {'thinkingBudget': 0},
+          'responseMimeType': 'application/json',
       },
     }),
   );
@@ -497,9 +503,10 @@ Return ONLY valid JSON:
       'contents': [{'parts': [{'text': prompt}]}],
       'generationConfig': {
         // High: five replies that all sound alike defeat the purpose of having five.
-        'temperature': 0.9,
-        'maxOutputTokens': 2048,
-        'responseMimeType': 'application/json',
+'temperature': 0.9,
+          'maxOutputTokens': 2048,
+          'thinkingConfig': {'thinkingBudget': 0},
+          'responseMimeType': 'application/json',
       },
     }),
   );

@@ -204,6 +204,7 @@ class FormatAdapter {
       'activity': 'real home setting, items clearly visible, characters doing activity',
       'humor': 'expressive faces, chaotic-cute energy, meme-style relatable',
       'age_practice': 'clean checklist style, consistent icons, warm not clinical',
+      'community': 'friendly open energy, choices shown clearly, inviting',
     };
     
     // Use carousel format specs as default for static images
@@ -309,6 +310,7 @@ High quality, 4K, soft pastel watercolor storybook illustration.
       'activity': 'hands-on action, process visible, real movement',
       'humor': 'expressive reactions, comedic timing, zoom on faces',
       'age_practice': 'clean progression, checkmark animations, warm',
+      'community': 'friendly poll energy, options appear one by one, inviting',
     };
     
     final formatSpec = ContentFormat.reel;
@@ -584,6 +586,7 @@ QUALITY: 4K, 30fps, high detail
       'activity': 'hands-on process shot, materials visible, action frozen',
       'humor': 'expressive faces, comedic timing frozen, relatable chaos',
       'age_practice': 'clean checklist aesthetic, skill in progress, encouraging',
+      'community': 'friendly open energy, options side by side, inviting',
     };
     
     final formatSpec = ContentFormat.singleImage;

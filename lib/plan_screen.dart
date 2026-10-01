@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'day14_posts.dart';
+import 'content_ideas.dart';
 import 'plan_data.dart';
 import 'reply_assistant.dart';
 import 'theme.dart';

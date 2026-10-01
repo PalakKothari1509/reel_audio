@@ -9,7 +9,12 @@ import 'content_generator.dart';
 import 'regenerator.dart';
 
 class GeminiClient implements AIProvider {
-  static const String _modelName = 'gemini-1.5-flash';
+  // This client talks to Gemini through the google_generative_ai package rather
+  // than through geminiPost, so it gets none of that helper's model fallback and
+  // 404 handling. The name therefore has to be one this key can actually serve.
+  // It was 'gemini-1.5-flash', which no longer resolves; the rest of the app
+  // already uses the name below, so both paths now ask for the same model.
+  static const String _modelName = 'gemini-3.6-flash';
   static const int _maxOutputTokens = 8192;
   static const double _temperature = 0.7;
   static const Duration _timeout = Duration(seconds: 45);
@@ -34,7 +39,7 @@ class GeminiClient implements AIProvider {
         );
 
   @override
-  String get providerName => 'Gemini 1.5 Flash';
+  String get providerName => 'Gemini 3.6 Flash';
 
   @override
   bool get isAvailable => _apiKey.isNotEmpty;
@@ -324,14 +329,23 @@ Match the JSON schema exactly.
   ContentPackage _parseResponse(String jsonText, IdeaInput input) {
     try {
       final map = jsonDecode(jsonText) as Map<String, dynamic>;
-      
-      final slides = (map['slides'] as List).map((s) => SlideContent(
-        index: s['slideNumber'] as int,
-        title: s['headline'] as String,
-        body: s['body'] as String,
-        visualPrompt: s['imagePrompt'] as String,
-        overlayText: s['cta'] as String,
-      )).toList();
+
+      // This runs on a live model reply, so nothing in it can be assumed. A
+      // missing or reshaped field used to throw a TypeError here and take the
+      // whole generation down; now it produces an empty or partial result.
+      final slides = ((map['slides'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((s) {
+            final m = s.cast<String, dynamic>();
+            return SlideContent(
+              index: m['slideNumber'] as int? ?? 0,
+              title: m['headline'] as String? ?? '',
+              body: m['body'] as String? ?? '',
+              visualPrompt: m['imagePrompt'] as String? ?? '',
+              overlayText: m['cta'] as String?,
+            );
+          })
+          .toList();
 
       return ContentPackage(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
