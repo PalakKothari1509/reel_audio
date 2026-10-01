@@ -82,6 +82,139 @@ class QualityReport {
 }
 
 class QualityChecker {
+  // ── Reach-scorer phrase lists ────────────────────────────────────────────────
+  //
+  // Matched case-insensitively against the lowercased text. Deliberately narrow: a
+  // broad list would flag innocent phrasing and train you to ignore the warnings,
+  // which is the same failure as a quality gate nobody trusts.
+
+  /// Openings that spend the first seconds on nothing.
+  static const _kIntroOpeners = [
+    'ek baar ki baat',
+    'aaj hum',
+    'hello dosto',
+    'welcome to',
+    'introducing',
+    'let me tell you',
+    'in this video',
+    'namaste',
+  ];
+
+  /// Bait the reel has to earn, and usually does not.
+  static const _kBaitPhrases = [
+    'wait for the end',
+    "you won't believe",
+    'you will not believe',
+    'part 2',
+    'watch till the end',
+    'subscribe',
+  ];
+
+  /// Phrases that mean a cold viewer is missing context they do not have.
+  static const _kAssumedContext = [
+    'as you know',
+    'as we all know',
+    'in our last',
+    'in my last',
+    'if you have been watching',
+    'my subscribers',
+    'regulars dekho',
+    'part of our series',
+  ];
+
+  /// Claims the brand is not allowed to make, since there are no real results.
+  static const _kFabricatedClaims = [
+    'i tried this for',
+    'we tried this for',
+    'after just one week',
+    'guaranteed',
+    '100% proven',
+    'studies show',
+    'research shows',
+    'doctors recommend',
+    'trusted by thousands',
+    'our results show',
+  ];
+
+  static const _kQuestionMarks = ['?', 'kya', 'kyun', 'kaise', 'kab'];
+
+  static const _kSaveWords = ['save', 'save karo', 'save this', 'note down', 'likh lo'];
+  static const _kShareWords = ['share', 'bhejo', 'bhej do', 'forward'];
+  static const _kReferenceWords = [
+    'list',
+    'steps',
+    'step 1',
+    'ideas',
+    'items',
+    'ways',
+    'kitne',
+    '5 ',
+    'seven',
+    'age ',
+    'months',
+  ];
+
+  static String _allText(ContentPackage pkg) =>
+      '${pkg.hook} ${pkg.caption} ${pkg.cta} ${pkg.pinnedComment} ${pkg.idea} '
+      '${pkg.slides.map((s) => '${s.title} ${s.body}').join(' ')}'
+      .toLowerCase();
+
+  static bool _opensAQuestion(String hook) {
+    final h = hook.toLowerCase();
+    return _kQuestionMarks.any(h.contains);
+  }
+
+  /// The hook withholds the outcome if it states the trouble without resolving it.
+  static bool _withholdsOutcome(String hook) {
+    final h = hook.toLowerCase();
+    final resolvers = ['because', 'solution', 'fix', 'answer', 'here is how', 'yeh kaam', 'isse'];
+    return !resolvers.any(h.contains);
+  }
+
+  static bool _checkSpecificSituation(ContentPackage pkg) {
+    final t = _allText(pkg);
+    final generic = ['toddler behaviour', 'parenting tips', 'good parenting', 'child development'];
+    if (generic.any(t.contains)) return false;
+    // A specific situation is named by a concrete everyday anchor.
+    const anchors = [
+      'khana', 'khana', 'phone', 'bath', 'brush', 'shoes', 'kapde', 'sone',
+      'neend', 'toys', 'bathroom', 'kitchen', 'tiffin', 'chai', 'screen',
+      'chocolate', 'milk', 'park', 'towel', 'hair', 'nails', 'bottle',
+    ];
+    return anchors.any(t.contains);
+  }
+
+  static bool _payoffIsHeldBack(ContentPackage pkg) {
+    if (pkg.slides.isEmpty) return false;
+    final first = pkg.slides.first;
+    final combined = '${first.title} ${first.body}'.toLowerCase();
+    const spoilers = ['solution', 'here is how', 'answer', 'just do this', 'fix:', 'try this'];
+    return !spoilers.any(combined.contains);
+  }
+
+  static bool _looksLikeReference(ContentPackage pkg) =>
+      _kReferenceWords.any(_allText(pkg).contains) || pkg.slides.length >= 5;
+
+  static bool _asksToSave(ContentPackage pkg) {
+    final c = pkg.cta.toLowerCase();
+    return _kSaveWords.any(c.contains) || _kSaveWords.any(pkg.pinnedComment.toLowerCase().contains);
+  }
+
+  static bool _asksToShare(ContentPackage pkg) {
+    final c = pkg.cta.toLowerCase();
+    return _kShareWords.any(c.contains) || _kShareWords.any(pkg.pinnedComment.toLowerCase().contains);
+  }
+
+  static bool _hasSpecificMoment(ContentPackage pkg) => _checkSpecificSituation(pkg);
+
+  static bool _endsWithQuestion(String s) {
+    final t = s.trim();
+    if (t.isEmpty) return false;
+    if (t.contains('?')) return true;
+    final lower = t.toLowerCase();
+    return ['aap', 'tum', 'comment', 'bataye', 'batao', 'which', 'kaun'].any(lower.contains);
+  }
+
   static final List<QualityRule> _rules = [
     // ==================== HOOK RULES ====================
     QualityRule(
@@ -425,6 +558,106 @@ class QualityChecker {
       severity: QualitySeverity.warn,
       check: (pkg, _) => _checkReadability(pkg),
       fixSuggestion: (pkg) => 'Simplify language: shorter words, shorter sentences, avoid jargon.',
+    ),
+
+    // ==================== REACH POTENTIAL ====================
+    //
+    // Ten dimensions from the growth scorecard, folded in here rather than built as a
+    // third scorer. The app already had two quality checkers disagreeing with each
+    // other; this keeps one gate.
+    //
+    // Every one is a WARN on purpose. `isReadyToPost` is `failCount == 0`, so a warn
+    // can never block a post. These are the model's own opinion of its own output, so
+    // they are a prompt to reconsider, never a verdict, and never a view prediction.
+    // The UI must label them as an internal heuristic.
+    QualityRule(
+      id: 'reach_hook_strength',
+      name: 'Reach: Hook Strength',
+      description: 'Hook is short enough to land in the first second and carries a concrete image',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => pkg.hook.trim().isNotEmpty && pkg.hook.trim().length <= 125,
+      fixSuggestion: (pkg) => 'Shorten the hook to under 125 characters and name something concrete that happens on screen.',
+    ),
+    QualityRule(
+      id: 'reach_hook_no_intro',
+      name: 'Reach: No Opening Filler',
+      description: 'Hook starts in the middle of the trouble, not with an introduction',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => !_kIntroOpeners.any((o) => pkg.hook.trim().toLowerCase().startsWith(o)),
+      fixSuggestion: (pkg) => 'Open on the moment itself. Cut "ek baar ki baat hai", greetings, and any series introduction.',
+    ),
+    QualityRule(
+      id: 'reach_no_bait',
+      name: 'Reach: No Bait',
+      description: 'No bait the story does not pay off. Hooks must be true of the content',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => !_kBaitPhrases.any((b) => pkg.hook.toLowerCase().contains(b)),
+      fixSuggestion: (pkg) => 'Remove "wait for the end" / "you will not believe". A hook that is not true of the reel wins one view and loses a follower.',
+    ),
+    QualityRule(
+      id: 'reach_curiosity',
+      name: 'Reach: Curiosity Gap',
+      description: 'Hook opens a question the content answers later, rather than stating the outcome up front',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => _opensAQuestion(pkg.hook) || _withholdsOutcome(pkg.hook),
+      fixSuggestion: (pkg) => 'Say what happened, not what it means, and do not answer it in the same line.',
+    ),
+    QualityRule(
+      id: 'reach_non_follower',
+      name: 'Reach: Non-Follower Appeal',
+      description: 'Hook is understandable to someone who has never seen the page before',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => !_kAssumedContext.any((a) => pkg.hook.toLowerCase().contains(a)),
+      fixSuggestion: (pkg) => 'Drop references that need prior context ("as you know", "in our last reel", "my series"). A stranger should get it cold.',
+    ),
+    QualityRule(
+      id: 'reach_relatable',
+      name: 'Reach: Relatability',
+      description: 'Names a specific everyday situation, not a generic parenting problem',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => _checkSpecificSituation(pkg),
+      fixSuggestion: (pkg) => 'Name the exact moment, e.g. "phone chahiye at meal time", not "toddler behaviour issues".',
+    ),
+    QualityRule(
+      id: 'reach_watchtime',
+      name: 'Reach: Watch-Time Potential',
+      description: 'Enough beats to hold, and the payoff is not given away in the first beat',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => pkg.slides.length >= 3 && _payoffIsHeldBack(pkg),
+      fixSuggestion: (pkg) => 'Show the problem first, then the turn. Do not put the solution in the opening slide.',
+    ),
+    QualityRule(
+      id: 'reach_save',
+      name: 'Reach: Save Potential',
+      description: 'Something a parent returns to, or an explicit reason to save',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => _looksLikeReference(pkg) || _asksToSave(pkg),
+      fixSuggestion: (pkg) => 'Make it a reference (a list, steps, ages, quantities) or give a concrete reason to save it.',
+    ),
+    QualityRule(
+      id: 'reach_share',
+      name: 'Reach: Share Potential',
+      description: 'Contains a specific moment a parent would send to another parent',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => _asksToShare(pkg) || _hasSpecificMoment(pkg),
+      fixSuggestion: (pkg) => 'Name the exact shared moment, e.g. the next time the phone is demanded at dinner.',
+    ),
+    QualityRule(
+      id: 'reach_comment',
+      name: 'Reach: Comment Potential',
+      description: 'Ends in something a parent would actually answer',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) =>
+          _endsWithQuestion(pkg.cta) || _endsWithQuestion(pkg.pinnedComment) || _endsWithQuestion(pkg.replyComments.lastOrNull ?? ''),
+      fixSuggestion: (pkg) => 'Close with one real question. A question gets answered; "follow for more" does not.',
+    ),
+    QualityRule(
+      id: 'reach_originality',
+      name: 'Reach: Originality and No Invented Claims',
+      description: 'No fabricated statistics, results, clients or personal experience',
+      severity: QualitySeverity.warn,
+      check: (pkg, _) => !_kFabricatedClaims.any((c) => _allText(pkg).contains(c)),
+      fixSuggestion: (pkg) => 'Remove invented numbers and first-person results. Describe the situation instead of claiming an outcome.',
     ),
   ];
 

@@ -24,7 +24,9 @@ import 'gemini_call.dart';
 import 'secrets.dart';
 import 'theme.dart';
 
-const _lightModel = 'gemini-3.6-flash-lite';
+/// Google's Lite tier is 3.5. There is no 3.6 Lite: this was `3.6-flash-lite`, which
+/// 404'd and then silently fell back to the full model on every call.
+const _lightModel = 'gemini-3.5-flash-lite';
 const _fullModel = 'gemini-3.6-flash';
 const _timeout = Duration(seconds: 60);
 

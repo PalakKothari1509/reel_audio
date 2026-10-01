@@ -14,7 +14,7 @@ class BrandDefaults {
   static const String name = 'Fun Learning With Palak';
   static const String handle = '@funlearningwithpalak';
 
-  static const String audience = 'Parents of preschoolers (1.5-5 years)';
+  static const String audience = 'Indian moms and parents of children aged 1-4';
   static const String tone = 'Warm, playful, parent-relatable, simple';
 
   /// The single definition of how this brand looks. Every image and video prompt in
@@ -68,6 +68,12 @@ class Character {
   final String personality;
   final String role;
 
+  /// How this character sounds, in words. Separate from [personality] on purpose:
+  /// personality decides what Mumma does, this decides what comes out of her mouth.
+  /// A prompt that only knows she is "patient" writes a scolding-adjacent line,
+  /// whereas knowing she says "arre mera bachha" gets the tone right.
+  final String speechPattern;
+
   const Character({
     required this.id,
     required this.name,
@@ -76,6 +82,7 @@ class Character {
     required this.appearance,
     required this.personality,
     required this.role,
+    this.speechPattern = '',
   });
 
   String get fullProfile => '''
@@ -83,7 +90,7 @@ $name ($emoji)
 Role: $role
 Appearance: $appearance
 Personality: $personality
-Description: $description''';
+Description: $description${speechPattern.isEmpty ? '' : '\nSpeech: $speechPattern'}''';
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -93,6 +100,7 @@ Description: $description''';
         'appearance': appearance,
         'personality': personality,
         'role': role,
+        'speechPattern': speechPattern,
       };
 }
 
@@ -102,7 +110,7 @@ class CharacterLibrary {
     name: 'Ria',
     emoji: '🌸',
     description: 'Indian preschool girl, curious and playful',
-    appearance: 'Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, no glasses, preschool age (3-4)',
+    appearance: 'Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, no glasses, preschool age (3-4). Toofani: round chubby cheeks and a soft plump build, not thin',
     personality: 'Curious and expressive, energetic and playful, asks questions and leads activities, sometimes stubborn, a little harmless chaos',
     role: 'Protagonist / explorer',
   );
@@ -127,7 +135,31 @@ class CharacterLibrary {
     role: 'Mascot / observer',
   );
 
-  static const List<Character> all = [ria, rio, cuty];
+  /// The fourth character, and the one who carries the whole Jugaadu Mummy direction.
+  ///
+  /// She was missing from the library while every flagship example ("Phone chahiye →
+  /// simple home activity") is a Mumma story, so those prompts were reaching the
+  /// model with no description of her at all.
+  static const Character mumma = Character(
+    id: 'mumma',
+    name: 'Mumma',
+    emoji: '👩',
+    description: 'Young Indian mother in her early 30s, warm and patient',
+    appearance: 'Young Indian mother, early 30s, warm brown eyes, gentle radiant smile, '
+        'hair neatly styled in a soft high bun with loose face-framing strands, small red bindi '
+        'on the forehead. Wearing a mustard yellow kurti with white chikankari embroidery, '
+        'classic blue slim-fit jeans, casual brown flat slide sandals. Stylized 3D '
+        'Pixar/Disney character design, soft rim lighting, clean white backdrop.',
+    personality: 'Warm, patient and observant. Playfully redirects tantrums rather than '
+        'scolding, never lectures. A master of low-cost screen-free household hacks. '
+        'Her solutions come from noticing what is already in the kitchen, not from buying '
+        'anything.',
+    role: 'Warm problem-solver, the parent the viewer identifies with',
+    speechPattern: 'Calm Hinglish, encouraging, warm. Soft terms of endearment such as '
+        '"arre mera bachha" and "dekho toh". Never scolding, never impatient.',
+  );
+
+  static const List<Character> all = [ria, rio, cuty, mumma];
 
   static Character? byId(String id) {
     for (final c in all) {
@@ -136,21 +168,30 @@ class CharacterLibrary {
     return null;
   }
 
-  /// Built from [all] rather than naming characters, so adding one to the library is
-  /// enough to put it in front of the model. It used to list Ria, Rio and Cuty by
-  /// hand, which meant Mumma, Papa, Daadi and Teacher could be added to [all] and
-  /// still never reach a prompt.
-  static String get characterLockBlock => '''
+  /// Built from [characters], defaulting to the whole library, rather than naming
+  /// characters by hand. It used to list Ria, Rio and Cuty by hand, which meant
+  /// Mumma could be added to [all] and still never reach a prompt.
+  ///
+  /// Takes the cast it should describe so that a post featuring only Mumma does not
+  /// also carry Ria, Rio and Cuty into the prompt and invite the generator to put
+  /// them in the frame.
+  static String characterLockFor([List<Character>? characters]) {
+    final cast = (characters == null || characters.isEmpty) ? all : characters;
+    return '''
 CHARACTER LOCK — Use these exact descriptions in EVERY prompt. Do not vary.
 
-${all.map((c) => c.fullProfile).join('\n\n')}
+${cast.map((c) => c.fullProfile).join('\n\n')}
 
 RULES:
 - Ria and Rio NEVER wear glasses.
 - Cuty is ALWAYS a small white bunny with a pink bow.
+- Only the characters listed above may appear in this post.
 - Outfits may change per scene but hair/eyes/face stay consistent.
 - Visual style: ${BrandDefaults.visualStyle}
 ''';
+  }
+
+  static String get characterLockBlock => characterLockFor();
 }
 
 // ============================================================================
@@ -492,10 +533,14 @@ Visual Prompt Spec (for AI image/video generation):
 String buildBrandContext({
   required ContentBucket bucket,
   required ContentFormat format,
-  required List<Character> characters,
+  List<Character> characters = const [],
   String? customIdea,
 }) {
-  final charBlock = characters.map((c) => c.fullProfile).join('\n\n');
+  // One character block, not two. This used to build a block from `characters` and
+  // then append the full library lock block regardless, so a Mumma-only post also
+  // received Ria, Rio and Cuty and the generator was free to put them in frame.
+  final cast = characters.isEmpty ? CharacterLibrary.all : characters;
+  final charBlock = CharacterLibrary.characterLockFor(cast);
 
   return '''
 BRAND CONTEXT (auto-injected, do not modify):
@@ -507,8 +552,6 @@ Default Hashtags: ${BrandDefaults.hashtagPool.take(BrandDefaults.hashtagCount).j
 CTA Style: ${BrandDefaults.ctaOptions.join(' | ')}
 
 $charBlock
-
-${CharacterLibrary.characterLockBlock}
 
 FORMAT: ${format.label} (${format.description})
 Default slides/shots: ${format.defaultSlideCount} (range: ${format.minSlides}-${format.maxSlides})

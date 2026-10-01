@@ -15,7 +15,7 @@
 // folding them into 'conversation' would have quietly changed what they were about.
 
 import 'brand_system.dart';
-import 'quick_content.dart';
+import 'models/quick_idea.dart';
 
 // -- Buckets ---------------------------------------------------------------------
 //

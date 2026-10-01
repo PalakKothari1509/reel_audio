@@ -42,11 +42,23 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- INTERNET used to live only in the debug and profile manifests, so every
+         release APK shipped without network access and every Gemini and ElevenLabs
+         call failed at the socket. CI only built the debug variant, so nothing
+         caught it. Note that XML comments cannot contain a double hyphen, which is
+         why the flag is spelled out rather than written literally. -->
+
+    <!-- RECORD_AUDIO was removed at the same time: nothing in the app records
+         audio. MainActivity only calls synthesizeToFile for playback, and
+         flutter_tts does not record. It appeared on the installer's permission
+         list for a capability that does not exist, which is exactly the kind of
+         thing that makes a parent hesitate to install. -->
+
     <!-- All-files access is gone: it was only ever needed to copy a video into Movies
          by hand, and that copy is what stopped the gallery seeing it. Saving through
          MediaStore needs no storage permission on Android 10 and up. -->

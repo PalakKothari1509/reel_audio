@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'brand_system.dart';
@@ -129,6 +130,21 @@ class ContentLibraryItem {
       };
 
   factory ContentLibraryItem.fromJson(Map<String, dynamic> json) {
+    // Read into locals first. The quality report used to be rebuilt inline, and it
+    // needs this item's own package and formats to exist — which an inline
+    // constructor argument list cannot see. It also read
+    // `qualityReport['package']` and `['formats']`, keys `toJson` never wrote, so
+    // every item that had a report threw on reload and `getAll` turned that into an
+    // empty library.
+    final package = json['contentPackage'] != null
+        ? ContentPackage.fromJson(Map<String, dynamic>.from(json['contentPackage']))
+        : null;
+    final formats = (json['formatOutputs'] as Map?)?.map((k, v) => MapEntry(
+          ContentFormat.values.byName(k as String),
+          FormatOutput.fromJson(Map<String, dynamic>.from(v as Map)),
+        )) ??
+        <ContentFormat, FormatOutput>{};
+
     return ContentLibraryItem(
       id: json['id'] as String,
       title: json['title'] as String,
@@ -136,34 +152,9 @@ class ContentLibraryItem {
       bucket: BucketLibrary.byId(json['bucket'] as String? ?? '') ?? BucketLibrary.challenge,
       format: ContentFormat.values.byName(json['format'] as String? ?? 'carousel'),
       status: ContentStatus.values.byName(json['status'] as String? ?? 'idea'),
-      contentPackage: json['contentPackage'] != null 
-          ? ContentPackage.fromJson(Map<String, dynamic>.from(json['contentPackage']))
-          : null,
-      formatOutputs: (json['formatOutputs'] as Map?)?.map((k, v) => MapEntry(
-        ContentFormat.values.byName(k as String),
-        FormatOutput.fromJson(Map<String, dynamic>.from(v as Map)),
-      )) ?? {},
-      qualityReport: json['qualityReport'] != null ? QualityReport(
-        package: ContentPackage.fromJson(Map<String, dynamic>.from(json['qualityReport']['package'])),
-        formats: (json['qualityReport']['formats'] as Map?)?.map((k, v) => MapEntry(
-          ContentFormat.values.byName(k as String),
-          FormatOutput.fromJson(Map<String, dynamic>.from(v as Map)),
-        )) ?? {},
-        results: (json['qualityReport']['results'] as List).map((r) => QualityResult(
-          rule: QualityRule(
-            id: r['ruleId'],
-            name: r['ruleName'],
-            description: r['details'] ?? '',
-            severity: QualitySeverity.values[r['severity']],
-            check: (pkg, formats) => true,
-            fixSuggestion: r['details'],
-          ),
-          passed: r['passed'],
-          message: r['message'],
-          details: r['details'],
-        )).toList(),
-        checkedAt: DateTime.parse(json['qualityReport']['checkedAt']),
-      ) : null,
+      contentPackage: package,
+      formatOutputs: formats,
+      qualityReport: _reportFromJson(json['qualityReport'], package, formats),
       tags: (json['tags'] as List?)?.cast<String>() ?? [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -172,6 +163,44 @@ class ContentLibraryItem {
       performanceMetrics: (json['performanceMetrics'] as Map?)?.cast<String, dynamic>() ?? {},
       reuseCount: json['reuseCount'] as int? ?? 0,
       sourceIdeaId: json['sourceIdeaId'] as String?,
+    );
+  }
+
+  /// Rebuilds a [QualityReport] from what was saved, reusing this item's package and
+  /// formats rather than saving them twice.
+  ///
+  /// Returns null rather than throwing when the saved report cannot be read. A report
+  /// is a cache of a judgement, not the content itself, so the cheapest correct
+  /// behaviour on a damaged report is to drop it and let the checker run again. What
+  /// it must not do is take the whole library down with it.
+  static QualityReport? _reportFromJson(
+    Object? raw,
+    ContentPackage? package,
+    Map<ContentFormat, FormatOutput> formats,
+  ) {
+    if (raw is! Map || package == null) return null;
+    final j = Map<String, dynamic>.from(raw);
+    final results = (j['results'] as List?) ?? const [];
+    return QualityReport(
+      package: package,
+      formats: formats,
+      results: results.whereType<Map>().map((r) {
+        final m = Map<String, dynamic>.from(r);
+        return QualityResult(
+          rule: QualityRule(
+            id: m['ruleId'] as String? ?? '',
+            name: m['ruleName'] as String? ?? '',
+            description: m['details'] as String? ?? '',
+            severity: QualitySeverity.values[(m['severity'] as num?)?.toInt() ?? 0],
+            check: (_, _) => true,
+            fixSuggestion: (_) => m['details'] as String?,
+          ),
+          passed: m['passed'] as bool? ?? false,
+          message: m['message'] as String? ?? '',
+          details: m['details'] as String?,
+        );
+      }).toList(),
+      checkedAt: DateTime.tryParse(j['checkedAt'] as String? ?? '') ?? DateTime.now(),
     );
   }
 
@@ -204,15 +233,32 @@ class ContentLibraryStore {
     return File('${dir.path}/$_fileName');
   }
 
+  /// Loads every saved item.
+  ///
+  /// Each row is decoded on its own so one damaged entry costs you that entry rather
+  /// than the whole library. It used to decode inside a single try around the entire
+  /// file, so a single unreadable row returned `[]` — the failure was invisible and it
+  /// looked exactly like having never saved anything.
   static Future<List<ContentLibraryItem>> getAll() async {
     try {
       final file = await _path();
       if (!await file.exists()) return [];
       final raw = jsonDecode(await file.readAsString());
       if (raw is! List) return [];
-      return raw.whereType<Map<String, dynamic>>().map(ContentLibraryItem.fromJson).toList()
-        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    } catch (_) {
+
+      final items = <ContentLibraryItem>[];
+      for (final row in raw) {
+        if (row is! Map) continue;
+        try {
+          items.add(ContentLibraryItem.fromJson(Map<String, dynamic>.from(row)));
+        } catch (e) {
+          debugPrint('ContentLibrary: skipped one unreadable item — $e');
+        }
+      }
+      items.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return items;
+    } catch (e) {
+      debugPrint('ContentLibrary: could not read the library file — $e');
       return [];
     }
   }

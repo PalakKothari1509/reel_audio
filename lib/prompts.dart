@@ -223,7 +223,7 @@ const kBestTimeCaveat =
 /// kept in step with the entity definitions without someone remembering to.
 final kScriptShapeRules = '''
 EVERY STORY HAS THIS SHAPE, NO EXCEPTIONS:
-1. REAL DAILY-LIFE PROBLEM — something a parent of a 2–6 year old recognises at once.
+1. REAL DAILY-LIFE PROBLEM — something a parent of a 1–4 year old recognises at once.
 2. CURIOSITY / HOOK — something that makes the watcher need to see what happens.
 3. THE PROBLEM DEVELOPS — shown happening, not described.
 4. ESCALATION OR AN UNEXPECTED EVENT — it gets worse, or something surprising happens.

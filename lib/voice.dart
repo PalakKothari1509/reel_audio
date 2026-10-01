@@ -287,12 +287,17 @@ Future<String> _geminiSpeak({
     },
   });
 
+  // Built once and reused by the retry below. The retry used to rebuild its own
+  // headers with Content-Type alone, which dropped the key and answered 401 to the
+  // one request that exists to survive throttling — the retry could only ever fail.
+  final headers = {
+    'Content-Type': 'application/json',
+    'x-goog-api-key': apiKey,
+  };
+
   var response = await http.post(
     Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': apiKey,
-    },
+    headers: headers,
     body: body,
   ).timeout(_timeout);
 
@@ -316,7 +321,7 @@ Future<String> _geminiSpeak({
     _geminiCallTimes.add(DateTime.now());
     response = await http.post(
       Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: body,
     ).timeout(_timeout);
   }

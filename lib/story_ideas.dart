@@ -53,7 +53,13 @@ const kStoryProblems = [
 //
 // If this name is not available on the key, the first call 404s once and everything
 // falls back to the full model from then on. Never worse than before, usually better.
-const _lightModel = 'gemini-3.6-flash-lite';
+//
+// The version number matters and was wrong once already. There is no
+// "gemini-3.6-flash-lite"; Google's Lite tier shipped as 3.5, so this string 404'd
+// on first use and, because the fallback above swallows it quietly, every "small job"
+// silently ran on the full model from then on. The quota separation described above
+// did not exist at all while that was true.
+const _lightModel = 'gemini-3.5-flash-lite';
 const _fullModel = 'gemini-3.6-flash';
 const _timeout = Duration(seconds: 60);
 
