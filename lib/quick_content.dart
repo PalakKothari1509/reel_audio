@@ -4229,7 +4229,7 @@ MOVEMENT: ${i < 3
                   : 'Gentle, caring'} — match mission energy
 EXPRESSION: Ria: excited/determined | Rio: focused/enthusiastic | Cuty: calm/amused
 LIGHTING: Warm morning sunlight through window, soft shadows, pastel color palette
-STYLE: Soft pastel watercolor storybook aesthetic, cream background, consistent character designs
+STYLE: Soft 3D Pixar/Disney-style render aesthetic, cream background, consistent character designs
 CONTINUITY: Characters maintain exact appearance across all shots; outfits may change per scene but hair/eyes/face consistent
 DURATION: ${timing.split('–').last.trim()} (${(double.parse(timing.split('–').first.trim().replaceAll('s', '')) * 1000).round()}ms)
 '''
@@ -4253,7 +4253,7 @@ CAMERA: Vertical 9:16, wide shot for grid, then push-in to medium close-up for c
 MOVEMENT: Fast grid animation (0.5s per icon), then energetic celebration with confetti burst
 EXPRESSION: All three characters: pure joy, accomplishment, pride
 LIGHTING: Bright celebratory, golden hour warmth, confetti sparkle
-STYLE: Soft pastel watercolor storybook, cream background, consistent characters, Instagram Reel ready
+STYLE: Soft 3D Pixar/Disney-style render, cream background, consistent characters, Instagram Reel ready
 CONTINUITY: Final celebration of all previous shots — characters unchanged, visual style locked
 DURATION: 39s (21-60 second mark)
 '''
@@ -4465,7 +4465,7 @@ class _SingleImageScreenState extends State<SingleImageScreen> {
 
     // 7 prompt styles
     final styles = [
-      'Soft pastel watercolor storybook, cream background, warm friendly preschool look',
+      'Soft 3D Pixar/Disney-style render, cream background, warm friendly preschool look',
       'Clean minimal illustration, white background, simple line art, modern kid-friendly',
       'Cozy realistic lifestyle photo, natural morning light, authentic family moment',
       'Cheerful cartoon style, bold colors, expressive characters, fun energetic vibe',

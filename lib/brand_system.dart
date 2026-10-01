@@ -16,7 +16,19 @@ class BrandDefaults {
 
   static const String audience = 'Parents of preschoolers (1.5-5 years)';
   static const String tone = 'Warm, playful, parent-relatable, simple';
-  static const String visualStyle = 'Soft pastel watercolor storybook, cream background';
+
+  /// The single definition of how this brand looks. Every image and video prompt in
+  /// the app reads this one constant.
+  ///
+  /// It was previously "Soft pastel watercolor storybook" here while `prompts.dart`
+  /// carried a private "3D Pixar" const, so every generation cycle sent the model two
+  /// opposite rendering instructions. All seven character renders in
+  /// `assets/characters/` are 3D Pixar, so that is what this says, and "NOT
+  /// watercolor" is spelled out because the opposite instruction has already been
+  /// sent to these generators in earlier runs.
+  static const String visualStyle =
+      'Soft 3D Pixar/Disney-style render, warm natural lighting, semi-realistic quality. '
+      'NOT flat 2D, NOT watercolor, NOT kawaii-chibi.';
 
   static const List<String> ctaOptions = [
     'Save this for later 📌',
@@ -41,8 +53,6 @@ class BrandDefaults {
   ];
 
   static const int hashtagCount = 5;
-
-  static const String defaultVisualStyle = 'Soft pastel watercolor storybook, cream background';
 }
 
 // ============================================================================
@@ -93,7 +103,7 @@ class CharacterLibrary {
     emoji: '🌸',
     description: 'Indian preschool girl, curious and playful',
     appearance: 'Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, no glasses, preschool age (3-4)',
-    personality: 'Energetic, playful, asks questions, leads activities, a little bit of harmless chaos',
+    personality: 'Curious and expressive, energetic and playful, asks questions and leads activities, sometimes stubborn, a little harmless chaos',
     role: 'Protagonist / explorer',
   );
 
@@ -101,9 +111,9 @@ class CharacterLibrary {
     id: 'rio',
     name: 'Rio',
     emoji: '💙',
-    description: 'Indian preschool boy, determined and thoughtful',
+    description: 'Indian preschool boy, playful and determined',
     appearance: 'Dark brown hair, blue outfit, brown eyes, no glasses, preschool age (3-4)',
-    personality: 'Stubborn, determined, says "no" before thinking, follows then leads, deep focus when interested',
+    personality: 'Energetic and playful, naturally stubborn and determined, says "no" before thinking, follows then leads, deep focus when interested',
     role: 'Co-protagonist / problem solver',
   );
 
@@ -113,7 +123,7 @@ class CharacterLibrary {
     emoji: '🐰',
     description: 'Small white bunny, the peace-bringer',
     appearance: 'Small white bunny, pink bow, soft friendly expression, unchanged always',
-    personality: 'Calm, sleepy, unbothered, watches everything, the emotional anchor',
+    personality: 'Gentle, quiet observer, calm and sleepy, unbothered, subtle comic relief and warmth, the emotional anchor, never the one who lectures',
     role: 'Mascot / observer',
   );
 
@@ -126,14 +136,14 @@ class CharacterLibrary {
     return null;
   }
 
+  /// Built from [all] rather than naming characters, so adding one to the library is
+  /// enough to put it in front of the model. It used to list Ria, Rio and Cuty by
+  /// hand, which meant Mumma, Papa, Daadi and Teacher could be added to [all] and
+  /// still never reach a prompt.
   static String get characterLockBlock => '''
 CHARACTER LOCK — Use these exact descriptions in EVERY prompt. Do not vary.
 
-${ria.fullProfile}
-
-${rio.fullProfile}
-
-${cuty.fullProfile}
+${all.map((c) => c.fullProfile).join('\n\n')}
 
 RULES:
 - Ria and Rio NEVER wear glasses.
@@ -459,11 +469,11 @@ Safe Zone (content must stay within these margins):
 
   String get visualPromptSpec => '''
 Visual Prompt Spec (for AI image/video generation):
-  Format: ${label} (${description})
+  Format: $label ($description)
   Canvas: ${canvasWidth}x${canvasHeight}px (${aspectRatio})
   Safe Zone: Top ${topMargin}px, Bottom ${bottomMargin}px, Left ${leftMargin}px, Right ${rightMargin}px
   Style: ${BrandDefaults.visualStyle}
-  Characters: Ria (brown eyes, warm skin, pink dress, two ponytails), Rio (brown eyes, warm skin, blue t-shirt), Cuty (white bunny, pink bow)''';
+  Characters: ${CharacterLibrary.all.map((c) => '${c.name} (${c.appearance})').join('; ')}''';
 
   String get aspectRatio {
     final w = canvasWidth;

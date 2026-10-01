@@ -218,7 +218,7 @@ ${bucketVibe[bucket.id] ?? 'warm, engaging'}
 Characters: ${CharacterLibrary.all.map((c) => c.name).join(', ')}.
 Character Lock: ${CharacterLibrary.characterLockBlock}
 Bucket context: ${bucket.generationPrompt}
-High quality, 4K, soft pastel watercolor storybook illustration.
+High quality, 4K, Soft 3D Pixar/Disney-style render.
 '''.trim();
   }
 
@@ -599,7 +599,7 @@ ${bucketVibe[bucket.id] ?? 'engaging, warm'}
 Characters: ${CharacterLibrary.all.map((c) => c.name).join(', ')}.
 Character Lock: ${CharacterLibrary.characterLockBlock}
 Bucket context: ${bucket.generationPrompt}
-HIGH DETAIL: 4K, professional photography quality, soft pastel watercolor storybook.
+HIGH DETAIL: 4K, professional photography quality, Soft 3D Pixar/Disney-style render.
 Perfect for Instagram single image post.
 '''.trim();
   }

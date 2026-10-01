@@ -1,3 +1,4 @@
+import 'brand_system.dart';
 import 'characters.dart';
 
 // ── Prompts for the AI tools that make the pictures and the video ─────────────
@@ -23,8 +24,14 @@ String buildCharacterBlock(List<CharacterRef> cast) {
   return lines.isEmpty ? '(no characters saved yet)' : lines.join('\n');
 }
 
-const _style = 'Soft 3D Pixar/Disney-style render, warm natural lighting, '
-    'semi-realistic quality. NOT flat 2D, NOT kawaii-chibi.';
+/// The rendering style, read from the one place that defines it.
+///
+/// This used to be a private const here saying "3D Pixar" while `brand_system.dart`
+/// said "soft pastel watercolor" and injected that into every prompt built through
+/// `buildBrandContext`. Both instructions reached the model on the same generation.
+/// `BrandDefaults.visualStyle` is now the only definition, and it matches the
+/// character renders in `assets/characters/`.
+const _style = BrandDefaults.visualStyle;
 
 /// Everything a video prompt needs that the story itself has to supply.
 class StoryBeats {
@@ -209,7 +216,12 @@ const kBestTimeCaveat =
 /// Used by the script call and by the combined call. Two copies of this would drift
 /// within a week, and the half that drifted would be the half producing weak hooks
 /// with nobody able to say why.
-const kScriptShapeRules = '''
+///
+/// `final` rather than `const` because the character line is interpolated from
+/// `CharacterLibrary`. That is deliberate: it used to be a hand-written list here
+/// that contradicted the library's own personalities, and a literal string cannot be
+/// kept in step with the entity definitions without someone remembering to.
+final kScriptShapeRules = '''
 EVERY STORY HAS THIS SHAPE, NO EXCEPTIONS:
 1. REAL DAILY-LIFE PROBLEM — something a parent of a 2–6 year old recognises at once.
 2. CURIOSITY / HOOK — something that makes the watcher need to see what happens.
@@ -231,9 +243,8 @@ Not a generic "be kind" story. Never use the old "Ria's Little Heart" series lab
 any series label.
 
 CHARACTERS — keep them consistent:
-- Ria: curious, expressive, sometimes stubborn.
-- Rio: playful, energetic, loves exploring.
-- Cuty: the playful bunny; comic relief and warmth, never the one who lectures.
+Their appearance and personality are locked and injected verbatim alongside these
+rules. Do not restate them here, and do not vary them: ${CharacterLibrary.all.map((c) => '${c.name} is ${c.personality.toLowerCase()}').join('; ')}.
 
 QUALITY RULES — every story must:
 - Suit preschool children and be understandable from the pictures alone, even with

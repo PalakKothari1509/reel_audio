@@ -331,7 +331,7 @@ String _slidePrompt({
   return '$beatLabel $number of $total — $role. Instagram image prompt for the post "$topic".\n'
       'The picture: $visual.\n'
       'Headline on the image: "$headline" — short, big and instantly readable.\n'
-      'Style: $style — soft pastel watercolour storybook shading, clean cream '
+      'Style: $style — Soft 3D Pixar/Disney-style render shading, clean cream '
       'background, warm friendly preschool look.\n'
       'Characters: $characterContract\n'
       'Set consistency: this is one of $total images in one post — same palette, '

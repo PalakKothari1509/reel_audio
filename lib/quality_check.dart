@@ -338,20 +338,21 @@ class QualityChecker {
     QualityRule(
       id: 'brand_visual_style',
       name: 'Brand Visual Style in Prompts',
-      description: 'Visual prompts should reference soft pastel watercolor storybook style',
+      description: "Visual prompts should reference the brand's 3D Pixar render style",
       severity: QualitySeverity.warn,
       check: (pkg, formats) {
         for (final output in formats.values) {
           for (final prompt in output.imagePrompts) {
             final lower = prompt.toLowerCase();
-            if (!lower.contains('watercolor') && !lower.contains('pastel') && !lower.contains('storybook')) {
+            if (!lower.contains('pixar') && !lower.contains('3d')) {
               return false;
             }
           }
         }
         return true;
       },
-      fixSuggestion: (pkg) => 'Add "soft pastel watercolor storybook, cream background" to visual prompts.',
+      fixSuggestion: (pkg) =>
+          'Add "${BrandDefaults.visualStyle}" to visual prompts.',
     ),
     QualityRule(
       id: 'brand_no_glasses',

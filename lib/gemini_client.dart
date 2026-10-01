@@ -80,7 +80,7 @@ BRAND IDENTITY (immutable - never change):
 Brand: Fun Learning With Palak (@funlearningwithpalak)
 Audience: Parents of preschoolers (1.5-5 years)
 Tone: Warm, playful, parent-relatable, simple, encouraging, never preachy
-Visual Style: Soft pastel watercolor storybook, cream backgrounds, gentle textures
+Visual Style: Soft 3D Pixar/Disney-style render, cream backgrounds, gentle textures
 
 CHARACTERS (use EXACT descriptions in EVERY prompt):
 Ria (🌸): Indian preschool girl, curious and playful. Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, no glasses, preschool age (3-4). Energetic, playful, asks questions, leads activities, a little bit of harmless chaos. Role: Protagonist / explorer.
@@ -93,7 +93,7 @@ CHARACTER LOCK RULES:
 - Ria and Rio NEVER wear glasses.
 - Cuty is ALWAYS a small white bunny with a pink bow.
 - Outfits may change per scene but hair/eyes/face stay consistent.
-- Visual style: Soft pastel watercolor storybook, cream background.
+- Visual style: Soft 3D Pixar/Disney-style render, cream background.
 
 CONTENT BUCKETS:
 1. Challenge 🔎 (id: challenge) - Observation games, pattern challenges, spot-the-hidden, puzzles. Structure: Hook → Challenge Setup → Options/Clues → Thinking Moment → Reveal → Why it works → CTA.
@@ -128,7 +128,7 @@ Challenge Example:
   "bucket": "challenge",
   "hook": "Laundry mountain? Turn it into a 3-minute game 🧦",
   "slides": [
-    {"slideNumber": 1, "headline": "The Pile", "body": "Dump clean socks on the bed. Set a timer for 3 minutes.", "imagePrompt": "Ria and Rio sitting on bed surrounded by colorful socks, Cuty hopping nearby, soft watercolor, cream background", "cta": "Ready, set..."},
+    {"slideNumber": 1, "headline": "The Pile", "body": "Dump clean socks on the bed. Set a timer for 3 minutes.", "imagePrompt": "Ria and Rio sitting on bed surrounded by colorful socks, Cuty hopping nearby, Soft 3D Pixar/Disney-style render, cream background", "cta": "Ready, set..."},
     {"slideNumber": 2, "headline": "Match & Race", "body": "Who finds the most pairs? Loser does a silly dance.", "imagePrompt": "Rio holding up matched pair triumphantly, Ria laughing, Cuty wearing a sock as hat", "cta": "Go!"},
     {"slideNumber": 3, "headline": "Why It Works", "body": "Builds observation, sorting, and matching skills disguised as play.", "imagePrompt": "Ria explaining to Rio with sock puppets, Cuty watching", "cta": "Save for laundry day!"}
   ],
