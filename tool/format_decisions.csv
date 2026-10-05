@@ -1,0 +1,39 @@
+idea_id,state,narrative_format,note
+# state is one of: approved | suggested | needsReview | invalid
+# Only `approved` is safe to write. `suggested`, `needsReview` and `invalid` are
+# migration metadata about a human decision in progress, NOT IdeaStatus values.
+# IdeaStatus stays: idea, approved, scripted, imagesReady, generated, posted,
+# tested, archived. A classifier guess and a Palak approval are different facts.
+jm-phone-meals,approved,Problem → Fix,classifier HIGH
+jm-hot-chai,approved,POV,classifier HIGH
+jm-kitchen-busy-basket,approved,Save This List,classifier HIGH
+jm-wont-brush,approved,Problem → Fix,classifier HIGH
+jm-wont-wear-shoes,approved,Problem → Fix,classifier HIGH
+jm-bath-resistance,approved,Problem → Fix,classifier HIGH
+jm-phone-chahiye-script,approved,Do This, Not That,classifier HIGH; margin 6 over Exact Script
+jm-5-kitchen-items,approved,Save This List,classifier HIGH
+jm-7-instead-of-phone,approved,Save This List,classifier HIGH
+st-rio-says-no,approved,Problem → Fix,classifier HIGH
+st-ria-wont-brush,needsReview,,"tentative lean is Problem -> Fix, but not written. Beats: Resistance → Cuty helps → done. Decide by generated output: Mumma-solved framing is Problem → Fix; Ria/Cuty narrative with an ending is Mini Story"
+st-rio-sharing,approved,Problem → Fix,classifier HIGH
+st-rio-clean-toys,approved,Problem → Fix,classifier HIGH
+lp-sort-colour,approved,Save This List,classifier HIGH
+lp-big-small,approved,Do This, Not That,classifier HIGH
+lp-shape-hunt,approved,Quick Tip,classifier HIGH; margin 7 over Three Examples
+lp-sound-matching,approved,Quick Tip,classifier HIGH
+lp-texture,approved,Save This List,classifier HIGH
+lp-colour-hunt,approved,Quick Tip,classifier HIGH
+jm-water-pouring,suggested,Quick Tip,Palak proposal. Activity demonstration; see the Quick Tip scope note
+jm-dal-chawal,suggested,Quick Tip,Palak proposal. Activity demonstration
+jm-tape-pull,suggested,Quick Tip,Palak proposal. Activity demonstration
+jm-mumma-i-am-bored,suggested,Problem → Fix,Palak proposal. Statement → Mumma's fix → play
+jm-dont-buy-use-this,approved,Do This, Not That,approved by Palak from the LOW proposals table, which marked it HIGH. Expensive thing → free thing → play
+st-ria-vegetables,suggested,Problem → Fix,Palak proposal. Refusal → one small win → she tries it
+st-cuty-wants-sleep,suggested,Mini Story,Palak proposal. Everyone plays → Cuty sleeps → lesson
+st-ria-wants-phone,suggested,Problem → Fix,Palak proposal. Asking → Mumma offers one → accepted
+st-ria-same-toy,suggested,Question → Answer,Palak proposal. Repetition → why → it is learning
+st-rio-bored-2-min,suggested,Expectation vs Reality,Palak proposal. Bored → Mumma watches too → both bored → laugh
+lp-spoon-transfer,suggested,Quick Tip,Palak proposal. Activity demonstration
+lp-pouring,suggested,Quick Tip,Palak proposal. Activity demonstration
+lp-simple-sorting,suggested,Quick Tip,Palak proposal. Activity demonstration
+lp-kitchen-counting,invalid,,insufficient evidence. Classifier tied Save This List with Unpopular Opinion. Depends on the intended presentation: a list of ways to teach counting is Save This List; stop correcting a toddler who counts wrong is Unpopular Opinion

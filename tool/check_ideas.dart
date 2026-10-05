@@ -201,16 +201,47 @@ Result classify(Idea idea) {
     review('contentType', 'missing');
   }
 
-  // -- Narrative Format. The remainder of `Format`, when it is not a content type.
-  if (!(_contentTypeNames.containsKey(rawFormat.trim().toLowerCase()))) {
-    final spec = validateNarrativeFormat(rawFormat);
+  // -- Narrative Format.
+  //
+  // Checked independently of the content type, in both places the shape can live.
+  //
+  // It used to be guarded by `if (Format is not a content type)`, which silently
+  // skipped every newer idea: their `Format` holds the publishing type, so the whole
+  // check was bypassed and the validator reported them as fine. 33 ideas had no
+  // narrative format at all and the report said the blocker was gone.
+  //
+  // `Content Format` is the other home for the shape, and on the newer ideas it holds
+  // a beat description ("Refusal -> one small win -> she tries it") rather than a
+  // handbook name. That is not a resolvable value, so it is reported as unresolved
+  // with the description quoted, not silently accepted and not silently dropped.
+  String? narrative;
+  String narrativeSource = '';
+  for (final field in ['Format', 'Content Format']) {
+    final raw = g(field);
+    if (raw.isEmpty) continue;
+    if (_contentTypeNames.containsKey(raw.trim().toLowerCase())) continue;
+    final spec = validateNarrativeFormat(raw);
     if (spec != null) {
-      proposed['narrativeFormat'] = spec.name;
-    } else if (rawFormat.trim().isEmpty) {
+      narrative = spec.name;
+      narrativeSource = field;
+      break;
+    }
+    // Unresolvable: remember the best evidence we have.
+    if (narrativeSource.isEmpty) narrativeSource = field;
+  }
+
+  if (narrative != null) {
+    proposed['narrativeFormat'] = narrative;
+  } else {
+    final evidence = g('Content Format');
+    if (g('Format').trim().isEmpty && evidence.isEmpty) {
       review('narrativeFormat', 'missing');
     } else {
-      invalid('narrativeFormat',
-          '"$rawFormat" is not one of the ${FormatLibrary.all.length} registered formats');
+      review(
+          'narrativeFormat',
+          evidence.isNotEmpty
+              ? '"$evidence" is a beat description, not a registered format name'
+              : 'no narrative format name in Format or Content Format');
     }
   }
 

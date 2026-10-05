@@ -21,10 +21,10 @@ void check(String label, bool passed, [String detail = '']) {
 
 void main() {
   stdout.writeln('Registry');
-  check('12 formats registered', FormatLibrary.all.length == 12,
+  check('16 formats registered', FormatLibrary.all.length == 16,
       'got ${FormatLibrary.all.length}');
   check('ids are unique',
-      FormatLibrary.all.map((f) => f.id).toSet().length == 12);
+      FormatLibrary.all.map((f) => f.id).toSet().length == 16);
 
   for (final f in FormatLibrary.all) {
     check('${f.id} has beats', f.structure.isNotEmpty);
@@ -38,6 +38,22 @@ void main() {
   stdout.writeln('Axes');
   final problems = validateAxes();
   check('every axis reference resolves', problems.isEmpty, problems.join('; '));
+
+  // Two defaults for one content type makes the tie-break a coin flip again, which
+  // is the exact failure `Default for` was added to remove. It cannot be caught by
+  // looking at one format, only by scanning across all of them.
+  final defaultsByType = <String, List<String>>{};
+  for (final f in FormatLibrary.all) {
+    for (final t in f.defaultFor) {
+      defaultsByType.putIfAbsent(t, () => <String>[]).add(f.id);
+    }
+  }
+  final contested = defaultsByType.entries
+      .where((e) => e.value.length > 1)
+      .map((e) => '${e.key}: ${e.value.join(" vs ")}')
+      .toList();
+  check('no content type has two default formats', contested.isEmpty,
+      contested.join('; '));
 
   stdout.writeln('');
   stdout.writeln('Lookup');

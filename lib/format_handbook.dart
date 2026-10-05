@@ -235,7 +235,7 @@ class FormatLibrary {
         'The flagship shape for this brand. It carries the whole problem-then-solution premise and it is the format the first six ideas in the library were written for.',
     bestContentTypes: ['reel', 'imageSlideshowReel', 'carousel'],
     bestGoals: ['nonFollowerReach', 'saves', 'relatability'],
-    defaultFor: ['imageSlideshowReel', 'carousel'],
+    defaultFor: ['imageSlideshowReel'],
     example:
         '"Ria refuses to brush her teeth." Mumma counts to three. Ria clamps down. The count does not work on a 3-year-old. Mumma puts the brush in Ria\'s hand and turns it into a song she has to finish. Ria brushes. Takeaway: *"Give her the job, not the order."*',
     generationRules: [
@@ -478,6 +478,119 @@ class FormatLibrary {
     ],
   );
 
+  // -- 13 Quick Tip ----------------------------------------------------
+  static const FormatSpec quickTip = FormatSpec(
+    id: 'quickTip',
+    name: 'Quick Tip',
+    definition:
+        'One simple activity or technique a parent can try immediately, demonstrated in a single beat.',
+    structure: [
+      'The situation, one line',
+      'The quick technique, shown not described',
+      'Why it works, one sentence',
+      'The result, immediate',
+    ],
+    bestFor:
+        'A single ₹0 activity or technique a parent can try today. This format owns **activity demonstrations**: water pouring, dal-chawal sensory play, tape pulling, spoon transfer, two-bowl sorting, and the rest of that family.',
+    bestContentTypes: ['reel', 'trialReel', 'imageSlideshowReel'],
+    bestGoals: ['nonFollowerReach', 'saves', 'shares'],
+    example:
+        '"Toddler maths — 1 biscuit = hungry, 2 = still hungry, 3 = MORE." Rio holds biscuits, expression escalates. Cuty unimpressed in background. No setup, just the reveal.',
+    generationRules: [
+      'Exactly one technique. Not a list.',
+      'The technique uses something already in the house. Zero purchases.',
+      '**Activity demonstrations belong here.** A setup → play → result beat sequence is not a failure to match another shape; it is this shape. The handbook previously had no format for "show the activity", so six real ideas — water pouring, dal chawal, tape pull, spoon transfer, pouring, simple sorting — matched nothing at all and were reported as unresolvable. Widening this format\'s stated scope is cheaper and more honest than inventing an Activity Demonstration format to absorb them.',
+      'No explanation of why the child behaves this way. The technique speaks.',
+      'On-screen text max 8 words. The visual is the hook.',
+      'Duration 10-15 seconds if Reel/Trial Reel.',
+    ],
+  );
+
+  // -- 14 Mini Story ---------------------------------------------------
+  static const FormatSpec miniStory = FormatSpec(
+    id: 'miniStory',
+    name: 'Mini Story',
+    definition:
+        'A short narrative with a clear beginning, middle and end, told through Ria/Rio/Cuty.',
+    structure: [
+      'The setup — character wants something',
+      'The obstacle — it doesn\'t go smoothly',
+      'The turning point — a small intervention or discovery',
+      'The resolution — character succeeds or learns',
+      'The parent takeaway, one line',
+    ],
+    bestFor:
+        'Emotional connection through character moments. The viewer watches for Ria/Rio/Cuty, not just the activity.',
+    bestContentTypes: ['imageSlideshowReel', 'reel', 'carousel'],
+    bestGoals: ['relatability', 'shares', 'follows'],
+    example:
+        '"Cuty is stuck under the sofa." Ria panics. Rio thinks. Mumma suggests the broom handle. Cuty rescued. Takeaway: "Sometimes the solution is already in your hand."',
+    generationRules: [
+      'Exactly 5 beats. Not 3, not 7.',
+      'Ria, Rio or Cuty must be the protagonist. Never a generic child.',
+      'The obstacle must be solvable with a household object, not magic.',
+      'The takeaway addresses the parent, not the child.',
+      'No moralising. The story teaches; the takeaway names the lesson.',
+    ],
+  );
+
+  // -- 15 This or That -------------------------------------------------
+  static const FormatSpec thisOrThat = FormatSpec(
+    id: 'thisOrThat',
+    name: 'This or That',
+    definition:
+        'A direct choice between two options, presented so the audience picks one.',
+    structure: [
+      'The question, visual and immediate',
+      'Option A, shown',
+      'Option B, shown',
+      'The parent context — why this choice matters',
+      'A gentle nudge toward the better option, without shame',
+    ],
+    bestFor:
+        'Engagement and comments. The format is literally a question the viewer answers.',
+    bestContentTypes: ['carousel', 'staticImage', 'story'],
+    bestGoals: ['comments', 'relatability', 'shares'],
+    example:
+        '"Toddler wants phone at dinner. Phone OR spoon-transfer activity?" Show both. Spoon-transfer wins. Caption: "Which one buys you 15 minutes of hot chai?"',
+    generationRules: [
+      'Always two options. Never three.',
+      'Both options visually distinct. Not "red spoon" vs "blue spoon".',
+      'The better option is not morally superior. It is practically superior.',
+      'The nudge is optional. The audience\'s vote is the point.',
+      'Max 6 words per option on screen.',
+    ],
+  );
+
+  // -- 16 Question → Answer --------------------------------------------
+  static const FormatSpec questionAnswer = FormatSpec(
+    id: 'questionAnswer',
+    name: 'Question → Answer',
+    definition:
+        'One parent question, the exact words to say, and why those words work.',
+    structure: [
+      'The exact question a parent asks',
+      'The common answer that lands badly',
+      'The exact words to say instead, quoted verbatim',
+      'Why this phrasing works, one sentence',
+      'One variation for a harder moment',
+    ],
+    bestFor:
+        'Language-building and TALK pillar content. Removes the cost of composing, so the parent acts today rather than later.',
+    bestContentTypes: ['carousel', 'staticImage', 'imageSlideshowReel'],
+    bestGoals: ['saves', 'shares', 'authority', 'follows'],
+    example:
+        '"What to say when toddler asks for phone at lunch." Common: "No phone." Instead: "Phone baad mein. Abhi chhuri-chammach se khelo." Variation for escalation: "Phone baad mein. Pehle ek kaam karo, phir phone."',
+    generationRules: [
+      'The quoted line must be quotable word for word. No paraphrasing.',
+      '8 to 12 words per quoted line. Longer is not memorised.',
+      'Hinglish, the way the parent actually talks. Not formal English.',
+      'Never shame the child in the quoted line.',
+      'One variation only, not a list of alternatives.',
+      'The "why it works" sentence is mandatory — otherwise it is a script, not a lesson.',
+    ],
+  );
+
   static const List<FormatSpec> all = [
     pov,
     doThisNotThat,
@@ -491,6 +604,10 @@ class FormatLibrary {
     unpopularOpinion,
     beforeYou,
     threeExamples,
+    quickTip,
+    miniStory,
+    thisOrThat,
+    questionAnswer,
   ];
 
   static FormatSpec? byId(String id) {

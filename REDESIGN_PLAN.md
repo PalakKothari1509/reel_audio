@@ -5,8 +5,8 @@ produced this list is history and no longer tracked here; its findings are folde
 the tasks below.
 
 **Last verified:** `flutter analyze lib` → **91 issues, 0 errors**.
-`tool/check_formats.dart` → all checks pass, 12 formats.
-`tool/check_ideas.dart` → 57 ideas, 0 complete, 25 need review, 32 invalid.
+`tool/check_formats.dart` → all checks pass, **16 formats**.
+`tool/check_ideas.dart` → 57 ideas, 0 complete, 31 need review, 26 invalid.
 **Branch:** `copilot_post`. Untracked: `content_ideas.md`, `content_formats.md`,
 `master_prompt.md`, `lib/models/quick_idea.dart`, `lib/format_handbook.dart`,
 `lib/content_axes.dart`, `tool/*.dart`, `tool/*.ps1`.
@@ -15,13 +15,14 @@ the tasks below.
 
 ## Read this first
 
-Three decisions are still open. Two block work below; one does not.
+One decision is open and it blocks the largest remaining task.
 
 | Open | Blocks |
 |---|---|
-| **Pixar-derived or storybook/watercolor** | Nothing. The `STYLE` constant makes it a one-line change (T-12) |
-| **The 50-format handbook** | **Closed.** 12 formats are written, generated and checked (T-13 done). The other 38 are data entry (T-22) |
-| **Naming of the content axes** | T-7. Decided, needs recording in code |
+| **Pixar-derived or storybook/watercolor** | Nothing. One constant, one line (T-12) |
+| **T-7b: 57 ideas need pillar + series + production + goal** | T-7d, T-19, and T-9's inputs |
+
+Everything else can proceed around T-7b.
 
 ---
 
@@ -115,55 +116,225 @@ would drift — recreating the duplication this refactor exists to remove. Use
 - **24 narrative formats** — Save This List 6, Problem → Fix 5, Quick Tip 4, …
 - **0 pillars at all**, and `Best content type` on only 24 of 57
 
-### T-7b Resolve the 57 ideas — **not started, needs your decisions**
+### T-7b Classify the 57 ideas — **narrative formats: 19 approved, 14 held**
 
-`tool/check_ideas.dart` classifies rather than guesses. Current state:
+**Decisions live in `tool/format_decisions.csv`**, not in chat and not in
+`content_ideas.md`.
+
+| State | Count | Writable? |
+|---|---|---|
+| `approved` | **19** | yes |
+| `suggested` | 12 | no |
+| `needsReview` | 1 — `st-ria-wont-brush` | no |
+| `invalid` | 1 — `lp-kitchen-counting` | no |
+
+**Migration state is not `IdeaStatus`.** This is enforced in code, not just documented:
+`MigrationState` is a separate enum, and `approved` there means *Palak approved the
+classification*, which has nothing to do with an idea being approved for production.
+Collapsing them would let a machine guess write the word "approved" onto an idea.
+
+**The write rule is machine-enforced.** `MigrationState.isWritable` is true for
+`approved` only, so `--apply` cannot write a suggested or held value even if asked.
+An unknown state is a **hard error**, not a silent skip — a typo would otherwise turn
+an approved decision into a missing one and the migration would quietly omit it.
+Verified by injecting `approvved`: it refuses, names the line, and lists the four
+valid states.
+
+**`jm-dont-buy-use-this` promoted to `approved`** — correctly, it was marked HIGH in
+your LOW table and had been mis-filed as `suggested`. That is why the count is 19 and
+not 18.
+
+**Your two holds stand, and one is independently confirmed.** `lp-kitchen-counting` is
+the only idea the matcher also cannot resolve, tying Save This List against
+Unpopular Opinion. `st-ria-wont-brush` stays open by your test: *"Resistance → Cuty
+helps → done"* carries an obstacle and an intervention but no problem-and-fix
+structure, so settle it by generating both packages and comparing.
+
+**The handbook gap the LOWs exposed is closed.** Six of thirteen suggestions were the
+same shape — water pouring, dal chawal, tape pull, spoon transfer, pouring, simple
+sorting — and the handbook had no format for "show the activity". Rather than add a
+seventeenth, **Quick Tip's stated scope now explicitly owns activity demonstrations.**
+Unresolved fell 14 → 10 on that one edit, which is the evidence it was a scope gap and
+not a matcher bug.
+
+**Approved decisions outrank inference.** `propose_formats.dart` reads the decisions
+file first and never re-litigates a settled idea. Without this, widening Quick Tip moved
+`lp-shape-hunt` from a clean Quick Tip match to a tie with Three Examples, silently
+regressing an approved idea.
+
+### T-7b Phase 2 — pillar, 12 missing
+
+One axis at a time, in the order the data allows. Each phase ends with the validator
+showing zero missing for that axis before the next begins.
 
 ```
-57 ideas, 57 unique ids, 0 duplicates
-  0 complete
- 25 need review
- 32 invalid
+Phase 1  narrative format   19 approved, 14 held   ← you are here
+Phase 2  pillar             12 missing
+Phase 3  series              7 missing
+Phase 4  content type        7 missing
+Phase 5  goal                6 missing
+Phase 6  production method  57/57 resolved         ← done
+Phase 7  status              1 missing
 ```
 
-| Blocker | Count | Why it cannot be automatic |
-|---|---|---|
-| `pillar` missing | **57** | Every single one. Never inferred from topic text — that is how 57 ideas quietly acquire 57 wrong pillars |
-| `productionMethod` missing | 24 | Usually derivable from content type, but "Mixed" vs "Image slideshow" is a judgement |
-| `narrativeFormat` unregistered | **9** | Quick Tip 4, Mini Story 2, This or That 2, Question → Answer 1 — see T-7c |
-| `series` unmappable | 23 | learning-through-play 10, little-stories 9, cuty-lessons 2, the-casts 2 — see below |
-| `goal` unmappable | 6 | Community 3, Engagement 2, "Reach + Shares" 1 |
-| `status` legacy | 1 | `Trial` → `idea` |
+Target before `sync_ideas.dart` becomes authoritative:
 
-**Series: 23 ideas have no correct target**, and this is the one genuinely large
-decision left:
+```
+57 ideas · 57 valid · 0 missing on every axis
+```
 
-- `learning-through-play` (10) was a **pillar**, not a series. Its content is fine; the
-  bucket it lived in was never a series identity. These need a series chosen from the
-  seven.
-- `little-stories` (9) is the retired "Little Stories, Big Lessons" name, which the
-  current direction moved away from.
-- `cuty-lessons` (2) — Cuty is a character, not a series.
-- `the-casts` (2) was audience voting. `parentRelatable` would be plausible and wrong:
-  both its ideas optimise for comments.
+Keep the dry-run architecture exactly as it is. It has already caught several cases
+where a dataset that looked complete was wrong, which is worth more than reaching
+57/57 quickly.
 
-I did **not** map these. `little-stories` → `parentRelatable` is a one-line change that
-would look right and misfile nine ideas.
+### T-7b Phase 2 — pillar, 12 decided, 0 written
 
-### T-7c Fix the 9 ideas with unregistered formats
+**Decisions in `tool/pillar_decisions.csv`**, all `suggested` or `archive_candidate`.
+`content_ideas.md` untouched. `flutter analyze` 91 issues / 0 errors.
 
-Do not silently substitute. Either add the format to `content_formats.md` or map it
-explicitly:
+I did not widen the keyword vocabulary. **That was the right call and the five
+false positives prove it** — patching the vocabulary would have produced the right
+answers at HIGH confidence without making the matcher any more semantically capable.
+A confident wrong pillar silently misfiles the performance data of a good post; an
+honest miss is strictly better.
 
-| Format | Ideas | Candidate mapping |
-|---|---|---|
-| Quick Tip | 4 | genuinely new — one activity, one beat. Spans `Try This At Home` and `Can Your Child Figure It Out?` |
-| Mini Story | 2 | genuinely new — Cuty rescue, treasure hunt. Short-narrative shape, and the 12 have none |
-| This or That | 2 | genuinely new — audience vote. Goal `comments` |
-| Question → Answer | 1 | closest is `Exact Script`; the bedtime question is literally a quotable line |
+| State | Count |
+|---|---|
+| `suggested` | 11 |
+| `archive_candidate` | 1 — `day14-favorite-format` |
 
-Three of the four look like real gaps rather than naming drift. Adding formats 13–16
-is data entry against a schema that now exists.
+**Three leans applied as you directed:** `day15-household-swaps` → PLAY,
+`jm-5-kitchen-items` → PLAY, with DISCOVER and DO recorded as the alternatives.
+`day14-favorite-format` is now `archive_candidate`, **not** forced into an axis value.
+It surveys the audience about the account rather than giving a parent something to save
+or send, so it has no pillar and inventing one would contaminate the dataset.
+
+`MigrationState.archiveCandidate` is a real enum member with a rule attached: it must
+carry **no** value. That is enforced, not documented.
+
+**Evidence flags recorded.** `st-ria-same-toy` and `lp-kitchen-counting` are marked
+`beat_only`. Both ideas have no `Topic`, `Lesson` or `Problem` field at all, so their
+decisions rest on a beat description alone — materially weaker, and now visible rather
+than indistinguishable from the other ten.
+
+**`tool/check_pillars.dart` pins the five false positives** as regressions:
+
+```
+day5-ask-tonight       TALK   not DO
+day18-mission2-concert PLAY   not THINK
+day22-mission6-treasure THINK not TALK
+jm-tape-pull           PLAY   not DO
+lp-kitchen-counting    THINK  unresolved, blocked on two axes
+```
+
+The asserted invariant is deliberately **weaker than "the matcher is right"**:
+
+> A human decision always wins, and the matcher must never be *confidently wrong*
+> about an idea a human has already decided.
+
+A tie or a miss is acceptable. A confident contradiction is not. That is the property
+worth protecting, and it is checkable without pretending the matcher understands the
+ideas.
+
+**The guard was verified to have teeth.** All five currently return `?` at LOW, so the
+check initially passed without reproducing anything. I temporarily widened the
+vocabulary naively — exactly the fix that was rejected — and `day22-mission6-treasure`
+came back as `DO` at high confidence, `3 signals for DO, 1 for TALK`. The check failed
+and exited 1. Reverted. So it will catch the regression it exists for, rather than
+sitting green for the wrong reason.
+
+**The PLAY-heavy distribution is recorded but not acted on.** PLAY 6, THINK 3, TALK 2,
+DO 1, DISCOVER 0 across these twelve. It is equally consistent with the library being
+activity-heavy and with PLAY acting as a fallback when evidence is weak, and the
+classifier has already demonstrated the second failure mode. Revisit only once all 57
+have pillars.
+
+**Shared vocabulary extracted to `tool/migration_state.dart`.** `MigrationState` and
+`Decision` were duplicated in `propose_formats.dart` and were about to be duplicated a
+third time in the pillar tool — which is how the two files drift into accepting
+different spellings of the same state.
+
+### T-7b Phase 3+ — remaining axes, consolidated
+
+`check_ideas.dart` was not reading the decisions files, so it still reported 57 missing
+pillars after twelve had been decided. Two validators disagreeing about one dataset is
+worse than one incomplete validator, so:
+
+- **`tool/check_axes.dart`** is now the authoritative coverage view. Reads
+  `content_ideas.md` plus every decisions file. A value counts as resolved only if it
+  came from the source or from a human decision — **inference is never counted**, and is
+  reported separately as `inferable`.
+- **`tool/propose_axes.dart`** emits proposals for every open axis value into one
+  reviewable file, replacing five separate artefacts.
+
+**The real remaining volume, which the piecemeal rounds understated:**
+
+| Axis | in source | decided | open |
+|---|---|---|---|
+| Pillar | 0 | 11 suggested + 1 archive | **45** |
+| Series | 34 | 0 | 23 |
+| Narrative Format | 24 | 19 approved | 2 blocked |
+| Content Type | 50 | 0 | 7 |
+| Production Method | 50 | 0 | 7 |
+| Goal | 51 | 0 | 6 |
+| Status | 57 | 0 | **0** |
+
+**Pillar was never 12 open, it was 45.** The twelve were only the ideas the keyword
+matcher *missed*. The other 45 had inferred values that were never human decisions, so
+under the established principle they still need approval. This was not visible until a
+validator read the decision files.
+
+### T-7b Phase 8 — distribution mechanics (`tool/reach_mechanics.dart`)
+
+The reach spec arrived with a 7-dimension × 85-idea score sheet. **Not built, on purpose:**
+595 numbers with no evidential basis, produced by guessing, which is the "fake viral
+score" the project explicitly rejected and the same reason the ten reach dimensions in
+`quality_check.dart` are labelled heuristics in the UI.
+
+Instead each mechanic is `pass` / `fail` / `unknown`, where `unknown` means the text
+does not state it. That separates a measurement from a guess.
+
+**The finding that matters: the library describes what a post IS, not why a stranger
+would watch it to the end or send it.**
+
+| Mechanic | unknown |
+|---|---|
+| `share_trigger` | **56 of 57** |
+| `open_loop` | 42 of 57 |
+| `visual_first` | 35 of 57 |
+| `one_second_recognition` | 32 of 57 |
+| `production_simple` | 32 of 57 |
+
+Essentially **no idea in the library has a share trigger.** That independently
+validates the spec's proposal to add `Share/Follow trigger` to the idea shape, and it is
+a far more useful output than a score would have been.
+
+Distribution of passes per idea: 1 idea at 5 of 7, 7 at 4, 14 at 3, 20 at 2, 13 at 1,
+2 at 0. Median 2 of 7.
+
+**16 ideas cannot be reach candidates as written** — 7 need filming or are reference
+content (`visual_first`), 9 need real-life video (`production_simple`). Note
+`lp-kitchen-counting` appears here *and* is the idea with both its pillar and its format
+blocked.
+
+**Two errors I made and corrected in that tool, both caught by reading the output:**
+
+- The roll-up gated on "4 passes, 0 fails" and returned **"0 of 57 viable"**, which read
+  as a verdict on the library when it was an artefact of the threshold — `unknown` counts
+  as neither. Replaced with a distribution.
+- `save_trigger` was listed as a disqualifying mechanic, so its `fail` state — the normal
+  case, since most ideas are not reference content — reported **50 of 57 ideas as
+  blocked**. "Not a saves post" is neutral for reach, not a block on it. Only
+  `visual_first` and `production_simple` now disqualify.
+
+**Seven ideas are correctly support content rather than reach candidates** and forcing
+them into a reach Reel would waste them: `day4-kitchen-challenge`, `day5-ask-tonight`,
+`day6-3year-skills`, `day10-3-questions`, `day11-4year-skills`, `day15-household-swaps`,
+`day25-week-wrap-up`.
+
+**Most complete mechanically:** `day3-mumma-says` (5 of 7), then `st-rio-says-no`,
+`jm-dal-chawal`, `lp-shape-hunt`, `st-rio-bored-2-min`, `jm-wont-brush`,
+`jm-bath-resistance` at 4.
 
 ### T-7d One migration mapper
 
@@ -328,7 +499,7 @@ script   // scene-by-scene: visual action + narration + on-screen text
 
 **Shipped:**
 
-- `content_formats.md`, 12 formats, nine canonical fields each
+- `content_formats.md`, 12 formats to begin with, nine canonical fields each
 - `lib/format_handbook.dart` — `FormatSpec` registry, `kContentTypeIds`, `kGoalIds`,
   `validateAxes()`, `recommend()` with one-line reasoning
 - `tool/sync_formats.dart` — `content_formats.md` → Dart, const preserved
@@ -355,7 +526,9 @@ script   // scene-by-scene: visual action + narration + on-screen text
   `problemFix` — that is how a format gets tested five times as the wrong shape and
   the results become unreadable.
 
-**Still open inside this task:** the remaining 38 formats, which is T-22 data entry.
+**Still open inside this task:** the remaining 34 formats, which is T-22 data entry.
+Formats 13–16 landed under T-7c, because nine existing ideas referenced narrative
+shapes no registered format covered.
 
 ### T-14 Add `imageSlideshowReel` and `story` to `ContentFormat`
 
@@ -486,7 +659,7 @@ Rules it must keep:
   `Default for` tie-break is declared in the data, not hidden in code — otherwise the
   explanation and the answer drift apart.
 
-### T-22 The remaining 38 formats
+### T-22 The remaining 34 formats
 
 Data entry into `content_formats.md`, same nine fields, then
 `dart run tool/sync_formats.dart`. **No new design work** — the schema, the id
@@ -496,9 +669,9 @@ Two rules from the shipped code:
 
 - **Never renumber an existing id.** Ideas and posted performance reference these, so
   a renumber silently rewrites history.
-- Run `tool/check_formats.dart` after each batch. It validates that every
-  `bestContentTypes` and `bestGoal` resolves, which is what caught the twelve bad axis
-  references on the first parse.
+- **One content type gets at most one `Default for`.** Claiming the same type twice is
+  invisible from inside a single format and silently makes the loser unreachable.
+  `tool/check_formats.dart` now rejects it.
 
 ---
 
@@ -695,9 +868,9 @@ T-6   age audit              grep and confirm
 DONE  T-13  content_formats.md + format_handbook + codegen + checks
 DONE  T-7   content_axes.dart  (vocabulary only; rewiring is T-7e)
 DONE  T-8   IdeaStatus enum + fromLegacy (storage migration to do)
+DONE  T-7c  formats 13-16: Quick Tip, Mini Story, This or That, Question -> Answer
   |
 T-7b  resolve 57 ideas        NEEDS YOUR DECISIONS, largest remaining
-T-7c  9 unregistered formats add or map, do not substitute
 T-7d  migration mapper        after T-7b, dry-run first
   |
 T-9   one package type       keystone; needs the axes vocabulary
@@ -714,7 +887,7 @@ T-9   one package type       keystone; needs the axes vocabulary
 T-19  sync_ideas.dart        parser already proven by check_ideas
 T-20  four missing tabs
 T-21  recommendation UI      engine already shipped in T-13
-T-22  remaining 38 formats   data entry only
+T-22  remaining 34 formats   data entry only
   |
 S-2   three character locks  15 min, unblocks a listed blocker
 T-25  generic JsonStore

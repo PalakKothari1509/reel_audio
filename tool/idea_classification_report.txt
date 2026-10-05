@@ -1,0 +1,712 @@
+Fun Learning With Palak, idea classification
+============================================
+
+Ideas            : 57
+Formats known    : 16
+
+day2-which-doesnt-belong   [Confidence.medium]
+  1. Which One Doesn't Belong?
+    Pillar: THINK  (medium)
+        narrow win: 2 for THINK vs 1 for DO
+    Series: Try This At Home  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Quick Tip  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+    note from library: Strong first carousel. Keep the answer off slide 1.
+
+day3-mumma-says   [Confidence.medium]
+  2. Mumma Says This 100x a Day
+    Pillar: PLAY  (medium)
+        narrow win: 2 for PLAY vs 1 for DO
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: POV  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (low)
+        Reel could be Character images, Real-life video or Mixed
+    note from library: Good first Trial Reel candidate. Nobody needs to follow you to enjoy it.
+
+day4-kitchen-challenge   [Confidence.high]
+  3. 5-Minute Kitchen Challenge
+    Pillar: THINK  (high)
+    Series: Try This At Home  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+day5-ask-tonight   [Confidence.low]
+  4. Ask Your Child This Tonight
+    Pillar: ?  (low)
+        DO and TALK tie at 1 signals each
+    Series: Life With Ria & Rio  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Question → Answer  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+day6-3year-skills   [Confidence.low]
+  5. Can Your 3-Year-Old Do These?
+    Pillar: ?  (low)
+        no pillar signal in the topic, lesson or problem text
+    Series: Age-Based Skills  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+    note from library: Pair this with the 4-year-old one. Same design, posted a month apart.
+
+day7-toddler-math   [Confidence.low]
+  6. Toddler Mathematics
+    Pillar: THINK  (high)
+    Series: ?  (low)
+        legacy id "cuty-lessons" has no mapping and the content gives no series signal
+    Content Type: Reel  (high)
+    Narrative Format: Expectation vs Reality  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (low)
+        Reel could be Character images, Real-life video or Mixed
+
+day8-find-cuty   [Confidence.medium]
+  7. Find the Hidden Cuty!
+    Pillar: THINK  (medium)
+        narrow win: 2 for THINK vs 1 for DO
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "cuty-lessons" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Trial Reel  (high)
+    Narrative Format: Quick Tip  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Image slideshow  (medium)
+        a Trial Reel is usually stills over audio, but Character images is also valid
+
+day9-sock-hunt   [Confidence.high]
+  8. The Sock Hunt
+    Pillar: DO  (high)
+    Series: Try This At Home  (high)
+    Content Type: Reel  (high)
+    Narrative Format: Problem → Fix  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (low)
+        Reel could be Character images, Real-life video or Mixed
+    note from library: Zero cost to make. Uses your own laundry.
+
+day10-3-questions   [Confidence.high]
+  9. 3 Questions Every Parent Should Ask This Week
+    Pillar: TALK  (high)
+    Series: Life With Ria & Rio  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+day11-4year-skills   [Confidence.high]
+  10. Can Your 4-Year-Old Do These?
+    Pillar: PLAY  (high)
+    Series: Age-Based Skills  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+day12-dinner-types   [Confidence.low]
+  11. Three Types of Kids at Dinner
+    Pillar: DO  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: Three Examples  (high)
+    Goal: ?  (low)
+        "Engagement" is a retired goal with no single correct replacement
+    Status: idea  (high)
+    Production Method: Character images  (low)
+        Reel could be Character images, Real-life video or Mixed
+
+day13-pattern-game   [Confidence.high]
+  12. What Comes Next?
+    Pillar: THINK  (high)
+    Series: Try This At Home  (high)
+    Content Type: Trial Reel  (high)
+    Narrative Format: Quick Tip  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Image slideshow  (medium)
+        a Trial Reel is usually stills over audio, but Character images is also valid
+
+day14-favorite-format   [Confidence.low]
+  13. Which New Format Was Your Favorite?
+    Pillar: ?  (low)
+        DO and THINK tie at 1 signals each
+    Series: talkWithYourChild  (medium)
+        legacy id "the-casts" has no mapping; content signals talkWithYourChild
+    Content Type: Static Image  (high)
+    Narrative Format: This or That  (high)
+    Goal: ?  (low)
+        "Community" is a retired goal with no single correct replacement
+    Status: idea  (high)
+    Production Method: Text-based  (low)
+        Text-based or Character images; the idea does not say
+
+day15-household-swaps   [Confidence.low]
+  14. How to Play Each Mission With Household Items
+    Pillar: ?  (low)
+        DO and DISCOVER tie at 1 signals each
+    Series: Try This At Home  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+    note from library: This is the one that removes the last excuse. Very high save potential.
+
+day16-voted-mission-won   [Confidence.low]
+  15. You Voted! Here's Which Mission Won
+    Pillar: THINK  (high)
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "the-casts" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Static Image  (high)
+    Narrative Format: This or That  (high)
+    Goal: ?  (low)
+        "Community" is a retired goal with no single correct replacement
+    Status: idea  (high)
+    Production Method: Text-based  (low)
+        Text-based or Character images; the idea does not say
+    note from library: Always follow this with a Reel of the winning mission. The pair works.
+
+day17-mission1-race-track   [Confidence.low]
+  16. Mission 2: On Your Mark!
+    Pillar: ?  (low)
+        no pillar signal in the topic, lesson or problem text
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Problem → Fix  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Part of the 7 Missions run. Keep them all the same length so they can be
+
+day18-mission2-concert   [Confidence.low]
+  17. Mission 3: Living Room Concert!
+    Pillar: ?  (low)
+        THINK and PLAY tie at 1 signals each
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Problem → Fix  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+day19-mission3-art-studio   [Confidence.low]
+  18. Mission 4: Art Corner Time!
+    Pillar: DO  (high)
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Problem → Fix  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+day20-mission4-detective   [Confidence.low]
+  19. Mission 5: Case Open!
+    Pillar: THINK  (high)
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Quick Tip  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+day21-mission5-rescue   [Confidence.low]
+  20. Mission 6: Rescue Time!
+    Pillar: DO  (high)
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Mini Story  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+day22-mission6-treasure   [Confidence.low]
+  21. Mission 7: Treasure Hunt!
+    Pillar: ?  (low)
+        TALK and THINK tie at 1 signals each
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Mini Story  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+day23-mission7-daily-care   [Confidence.low]
+  22. Mission 8: Self-Care Squad!
+    Pillar: DO  (high)
+    Series: Try This At Home  (high)
+    Content Type: ?  (low)
+        no content type stated and none recoverable from Format
+    Narrative Format: Problem → Fix  (high)
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Strongest of the eight for saves. Consider splitting into two posts.
+
+day24-trial-reel-7-missions   [Confidence.high]
+  23. 7 Missions in 60 Seconds
+    Pillar: DO  (high)
+    Series: Try This At Home  (high)
+    Content Type: Trial Reel  (high)
+    Narrative Format: Three Examples  (high)
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Image slideshow  (medium)
+        a Trial Reel is usually stills over audio, but Character images is also valid
+    note from library: Make this one first if you want to test whether the Missions run has legs.
+
+day25-week-wrap-up   [Confidence.low]
+  24. We Completed All 7 Missions! Here's What Happened
+    Pillar: DO  (medium)
+        narrow win: 2 for DO vs 1 for THINK
+    Series: Try This At Home  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: Save This List  (high)
+    Goal: ?  (low)
+        "Community" is a retired goal with no single correct replacement
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+jm-phone-meals   [Confidence.low]
+  25. Phone During Meals
+    Pillar: DO  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: ?  (low)
+        "Reach + Shares" is two goals; one idea optimises for one, so this needs a human choice
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: One YES alternative beats one more NO. Full worked example exists, see master prompt.
+
+jm-hot-chai   [Confidence.low]
+  26. Hot Chai
+    Pillar: ?  (low)
+        no pillar signal in the topic, lesson or problem text
+    Series: Jugaadu Mummy  (high)
+    Content Type: Trial Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Cheapest high-relatable post to make. Strong first trial candidate.
+
+jm-kitchen-busy-basket   [Confidence.low]
+  27. Kitchen Busy Basket
+    Pillar: DO  (medium)
+        narrow win: 3 for DO vs 2 for PLAY
+    Series: Jugaadu Mummy  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+jm-water-pouring   [Confidence.low]
+  28. Water Pouring
+    Pillar: PLAY  (medium)
+        narrow win: 3 for PLAY vs 2 for DO
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+jm-dal-chawal   [Confidence.low]
+  29. Dal Chawal Sensory Play
+    Pillar: PLAY  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Image Slideshow Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+jm-tape-pull   [Confidence.low]
+  30. Tape Pull Activity
+    Pillar: ?  (low)
+        DO and PLAY tie at 1 signals each
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Shares  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+jm-mumma-i-am-bored   [Confidence.low]
+  31. Mumma I am Bored
+    Pillar: PLAY  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+jm-wont-brush   [Confidence.low]
+  32. Won't Brush
+    Pillar: DO  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Image Slideshow Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Overlaps with idea 22, the self-care mission. Merge or keep both and test.
+
+jm-wont-wear-shoes   [Confidence.low]
+  33. Won't Wear Shoes
+    Pillar: DO  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+jm-bath-resistance   [Confidence.low]
+  34. Bath Time Resistance
+    Pillar: DO  (medium)
+        narrow win: 2 for DO vs 1 for PLAY
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+jm-phone-chahiye-script   [Confidence.low]
+  35. Phone Chahiye, Exact Script
+    Pillar: TALK  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+jm-5-kitchen-items   [Confidence.low]
+  36. Five Kitchen Items
+    Pillar: ?  (low)
+        DO and DISCOVER tie at 1 signals each
+    Series: Jugaadu Mummy  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+jm-dont-buy-use-this   [Confidence.low]
+  37. Don't Buy This, Use This
+    Pillar: PLAY  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Shares  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+jm-7-instead-of-phone   [Confidence.low]
+  38. Seven Things Instead of the Phone
+    Pillar: PLAY  (high)
+    Series: Jugaadu Mummy  (high)
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+st-ria-vegetables   [Confidence.low]
+  S1. Ria Doesn't Want Vegetables
+    Pillar: DO  (high)
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Overlaps hook h08, the broccoli hook. Use h08 as its hook.
+
+st-rio-says-no   [Confidence.low]
+  S2. Rio Says NO to Everything
+    Pillar: DO  (medium)
+        narrow win: 2 for DO vs 1 for TALK
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Follows  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Signature character post. This is the one that earns follows.
+
+st-ria-wont-brush   [Confidence.low]
+  S3. Ria Won't Brush
+    Pillar: DO  (high)
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Third brush post across the library. Pick one before scheduling.
+
+st-rio-sharing   [Confidence.low]
+  S4. Rio Doesn't Want to Share
+    Pillar: DO  (high)
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: ?  (low)
+        "Engagement" is a retired goal with no single correct replacement
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+st-cuty-wants-sleep   [Confidence.low]
+  S5. Cuty Wants to Sleep
+    Pillar: PLAY  (high)
+    Series: ?  (low)
+        legacy id "little-stories" has no mapping and the content gives no series signal
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Uses hook h18, Cuty bhi soti hai.
+
+st-ria-wants-phone   [Confidence.low]
+  S6. Ria Wants Mumma's Phone
+    Pillar: THINK  (high)
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Fourth phone idea in the library. Best version is Mumma offering her own phone briefly, which reverses the power.
+
+st-rio-clean-toys   [Confidence.low]
+  S7. Rio Won't Clean Toys
+    Pillar: DO  (medium)
+        narrow win: 2 for DO vs 1 for PLAY
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Shares  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+
+st-ria-same-toy   [Confidence.low]
+  S8. Ria Wants the Same Toy Again
+    Pillar: ?  (low)
+        no pillar signal in the topic, lesson or problem text
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Uses hook h15, baar baar wahi.
+
+st-rio-bored-2-min   [Confidence.low]
+  S9. Rio Gets Bored After Two Minutes
+    Pillar: PLAY  (medium)
+        narrow win: 2 for PLAY vs 1 for DO
+    Series: lifeWithRiaRio  (medium)
+        legacy id "little-stories" has no mapping; content signals lifeWithRiaRio
+    Content Type: Trial Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Novel angle, the child mirrors the parent. Worth the first trial slot.
+
+lp-sort-colour   [Confidence.low]
+  L1. Sort by Colour
+    Pillar: THINK  (medium)
+        narrow win: 2 for THINK vs 1 for DISCOVER
+    Series: ?  (low)
+        legacy id "learning-through-play" has no mapping and the content gives no series signal
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+    note from library: Overlaps L10, simple sorting game. Merge them.
+
+lp-spoon-transfer   [Confidence.low]
+  L2. Spoon Transfer
+    Pillar: PLAY  (high)
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+    note from library: Overlaps idea 3, the kitchen challenge, and idea 28, water pouring. Strongest of the three, keep it and retire the other two.
+
+lp-big-small   [Confidence.low]
+  L3. Match Big and Small
+    Pillar: THINK  (high)
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+lp-kitchen-counting   [Confidence.low]
+  L4. Kitchen Counting Game
+    Pillar: ?  (low)
+        THINK and PLAY tie at 1 signals each
+    Series: lifeWithRiaRio  (medium)
+        legacy id "learning-through-play" has no mapping; content signals lifeWithRiaRio
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+lp-shape-hunt   [Confidence.low]
+  L5. Shape Hunt at Home
+    Pillar: THINK  (high)
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Trial Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Good first trial. Same retention mechanics as the hidden Cuty idea.
+
+lp-sound-matching   [Confidence.low]
+  L6. Sound Matching
+    Pillar: THINK  (medium)
+        narrow win: 2 for THINK vs 1 for DISCOVER
+    Series: canYourChildFigureItOut  (medium)
+        legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut
+    Content Type: Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+
+lp-pouring   [Confidence.low]
+  L7. Pouring Activity
+    Pillar: PLAY  (high)
+    Series: ?  (low)
+        legacy id "learning-through-play" has no mapping and the content gives no series signal
+    Content Type: Image Slideshow Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Duplicate of idea 28, water pouring. Merge.
+
+lp-texture   [Confidence.low]
+  L8. Texture Exploration
+    Pillar: DISCOVER  (high)
+    Series: ?  (low)
+        legacy id "learning-through-play" has no mapping and the content gives no series signal
+    Content Type: Carousel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Saves  (high)
+    Status: idea  (high)
+    Production Method: Carousel  (high)
+
+lp-colour-hunt   [Confidence.low]
+  L9. Colour Hunt
+    Pillar: DISCOVER  (high)
+    Series: ?  (low)
+        legacy id "learning-through-play" has no mapping and the content gives no series signal
+    Content Type: Trial Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Character images  (high)
+    note from library: Best of the learning batch for trial. Simple to film, fast to understand.
+
+lp-simple-sorting   [Confidence.low]
+  L10. Simple Sorting Game
+    Pillar: THINK  (high)
+    Series: ?  (low)
+        legacy id "learning-through-play" has no mapping and the content gives no series signal
+    Content Type: Trial Reel  (high)
+    Narrative Format: ?  (low)
+        no narrative format name in Format or Content Format
+    Goal: Reach  (high)
+    Status: idea  (high)
+    Production Method: Real-life video  (high)
+    note from library: Duplicate of L1. Merge.
+
+------------------------------------------------------------
+HIGH   6    every creative axis has one defensible answer
+MEDIUM 3  a default was applied, worth a glance
+LOW    48    genuinely ambiguous, needs a human
+
+Production method still open: 0
+  Held apart from the verdict above, because production changes the
+  generation recipe rather than the creative intent.
+

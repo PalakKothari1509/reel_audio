@@ -13,13 +13,16 @@ assets/ideas/*.md    ->  WHAT the content is about
 her teeth" is an idea. An idea can be executed as `Problem -> Fix` or as `Do This,
 Not That` on different days, and both executions are the same idea.
 
-**Status: 12 of 50 formats specified.** These twelve were chosen because they fit the
-audience, not because they are the twelve most common formats on Instagram. They get
-built and tested against real content first. The remaining 38 are data entry into this
-same schema, not new design work.
+**Status: 16 of 50 formats specified.** These sixteen were chosen because they fit the
+audience and because real ideas needed them, not because they are the most common
+formats on Instagram. Formats 13–16 exist only because existing ideas referenced
+narrative shapes no registered format covered. They get built and tested against real
+content first. The remaining 34 are data entry into this same schema, not new design
+work.
 
 **Do not add formats just because the handbook has fifty.** A format earns its place
-when a real idea needs it.
+when a real idea needs it. That is exactly how 13–16 came to exist, and it is the only
+reason to expect the other 34.
 
 ---
 
@@ -68,6 +71,13 @@ Each format is one `##` section. The field names below are canonical; the parser
   declaration order, which is arbitrary and would have shipped as "wrong format
   recommended, no obvious reason". Set `Default for` on the format genuinely
   responsible when nothing else separates them, and leave it off the rest.
+- **One content type gets at most one default.** Two formats claiming the same type
+  made the tie-break a coin flip again, which is the failure `Default for` exists to
+  remove. It happened twice here: `pov` and `quickTip` both claimed `reel`, and
+  `problemFix` and `saveThisList` both claimed `carousel`. In the carousel case the
+  loser was invisible — `problemFix` sat earlier in the file, so `saveThisList` could
+  never be recommended for a carousel, which is the format it exists to serve.
+  `tool/check_formats.dart` now rejects a contested default.
 - Every format needs a hook rule, a pacing rule, a visual structure and an audio
   type, even if the honest answer is "no on-screen text".
 - A format must be executable by a 1-4 audience. If it needs reading speed a parent
@@ -175,7 +185,7 @@ Each format is one `##` section. The field names below are canonical; the parser
   were written for.
 - **Best content types**: `Reel`, `Image Slideshow Reel`, `Carousel`
 - **Best goals**: `Non-follower Reach`, `Saves`, `Relatability`
-- **Default for**: `Image Slideshow Reel`, `Carousel`
+- **Default for**: `Image Slideshow Reel`
 - **Example**: **Idea**: "Ria refuses to brush her teeth." Mumma counts to three. Ria
   clamps down. The count does not work on a 3-year-old. Mumma puts the brush in Ria's
   hand and turns it into a song she has to finish. Ria brushes. Takeaway: *"Give her
@@ -440,6 +450,108 @@ An idea with no matching format must **fail loudly**, naming the format that was
 missing. It must not silently fall back to `Problem -> Fix`, because that is how an
 unsupported format becomes a Problem Fix with no trace and the test results become
 unreadable.
+
+---
+
+## Quick Tip
+
+- **ID**: `quickTip`
+- **Name**: Quick Tip
+- **Definition**: One simple activity or technique a parent can try immediately, demonstrated in a single beat.
+- **Structure**:
+  1. The situation, one line
+  2. The quick technique, shown not described
+  3. Why it works, one sentence
+  4. The result, immediate
+- **Best for**: A single ₹0 activity or technique a parent can try today. This format owns **activity demonstrations**: water pouring, dal-chawal sensory play, tape pulling, spoon transfer, two-bowl sorting, and the rest of that family.
+- **Best content types**: `Reel`, `Trial Reel`, `Image Slideshow Reel`
+- **Best goals**: `Non-follower Reach`, `Saves`, `Shares`
+- **Example**: **Idea**: "Toddler maths — 1 biscuit = hungry, 2 = still hungry, 3 = MORE." Rio holds biscuits, expression escalates. Cuty unimpressed in background. No setup, just the reveal.
+- **Generation rules**:
+  - Exactly one technique. Not a list.
+  - The technique uses something already in the house. Zero purchases.
+  - **Activity demonstrations belong here.** A setup → play → result beat sequence is
+    not a failure to match another shape; it is this shape. The handbook previously had
+    no format for "show the activity", so six real ideas — water pouring, dal chawal,
+    tape pull, spoon transfer, pouring, simple sorting — matched nothing at all and
+    were reported as unresolvable. Widening this format's stated scope is cheaper and
+    more honest than inventing an Activity Demonstration format to absorb them.
+  - No explanation of why the child behaves this way. The technique speaks.
+  - On-screen text max 8 words. The visual is the hook.
+  - Duration 10-15 seconds if Reel/Trial Reel.
+
+---
+
+## Mini Story
+
+- **ID**: `miniStory`
+- **Name**: Mini Story
+- **Definition**: A short narrative with a clear beginning, middle and end, told through Ria/Rio/Cuty.
+- **Structure**:
+  1. The setup — character wants something
+  2. The obstacle — it doesn't go smoothly
+  3. The turning point — a small intervention or discovery
+  4. The resolution — character succeeds or learns
+  5. The parent takeaway, one line
+- **Best for**: Emotional connection through character moments. The viewer watches for Ria/Rio/Cuty, not just the activity.
+- **Best content types**: `Image Slideshow Reel`, `Reel`, `Carousel`
+- **Best goals**: `Relatability`, `Shares`, `Follows`
+- **Example**: **Idea**: "Cuty is stuck under the sofa." Ria panics. Rio thinks. Mumma suggests the broom handle. Cuty rescued. Takeaway: "Sometimes the solution is already in your hand."
+- **Generation rules**:
+  - Exactly 5 beats. Not 3, not 7.
+  - Ria, Rio or Cuty must be the protagonist. Never a generic child.
+  - The obstacle must be solvable with a household object, not magic.
+  - The takeaway addresses the parent, not the child.
+  - No moralising. The story teaches; the takeaway names the lesson.
+
+---
+
+## This or That
+
+- **ID**: `thisOrThat`
+- **Name**: This or That
+- **Definition**: A direct choice between two options, presented so the audience picks one.
+- **Structure**:
+  1. The question, visual and immediate
+  2. Option A, shown
+  3. Option B, shown
+  4. The parent context — why this choice matters
+  5. A gentle nudge toward the better option, without shame
+- **Best for**: Engagement and comments. The format is literally a question the viewer answers.
+- **Best content types**: `Carousel`, `Static Image`, `Story`
+- **Best goals**: `Comments`, `Relatability`, `Shares`
+- **Example**: **Idea**: "Toddler wants phone at dinner. Phone OR spoon-transfer activity?" Show both. Spoon-transfer wins. Caption: "Which one buys you 15 minutes of hot chai?"
+- **Generation rules**:
+  - Always two options. Never three.
+  - Both options visually distinct. Not "red spoon" vs "blue spoon".
+  - The better option is not morally superior. It is practically superior.
+  - The nudge is optional. The audience's vote is the point.
+  - Max 6 words per option on screen.
+
+---
+
+## Question → Answer
+
+- **ID**: `questionAnswer`
+- **Name**: Question → Answer
+- **Definition**: One parent question, the exact words to say, and why those words work.
+- **Structure**:
+  1. The exact question a parent asks
+  2. The common answer that lands badly
+  3. The exact words to say instead, quoted verbatim
+  4. Why this phrasing works, one sentence
+  5. One variation for a harder moment
+- **Best for**: Language-building and TALK pillar content. Removes the cost of composing, so the parent acts today rather than later.
+- **Best content types**: `Carousel`, `Static Image`, `Image Slideshow Reel`
+- **Best goals**: `Saves`, `Shares`, `Authority`, `Follows`
+- **Example**: **Idea**: "What to say when toddler asks for phone at lunch." Common: "No phone." Instead: "Phone baad mein. Abhi chhuri-chammach se khelo." Variation for escalation: "Phone baad mein. Pehle ek kaam karo, phir phone."
+- **Generation rules**:
+  - The quoted line must be quotable word for word. No paraphrasing.
+  - 8 to 12 words per quoted line. Longer is not memorised.
+  - Hinglish, the way the parent actually talks. Not formal English.
+  - Never shame the child in the quoted line.
+  - One variation only, not a list of alternatives.
+  - The "why it works" sentence is mandatory — otherwise it is a script, not a lesson.
 
 ---
 
