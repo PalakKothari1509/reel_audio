@@ -4,12 +4,13 @@
 produced this list is history and no longer tracked here; its findings are folded into
 the tasks below.
 
-**Last verified:** `flutter analyze lib` → **91 issues, 0 errors**.
-`tool/check_formats.dart` → all checks pass, **16 formats**.
-`tool/check_ideas.dart` → 57 ideas, 0 complete, 31 need review, 26 invalid.
+**Last verified:** `flutter analyze lib` → **91 issues, 0 errors**. `flutter test` →
+**21 tests, all passing**. Format checks pass. `check_axes`, `check_pillars` and
+`reach_mechanics` all exit 0.
 **Branch:** `copilot_post`. Untracked: `content_ideas.md`, `content_formats.md`,
 `master_prompt.md`, `lib/models/quick_idea.dart`, `lib/format_handbook.dart`,
-`lib/content_axes.dart`, `tool/*.dart`, `tool/*.ps1`.
+`lib/content_axes.dart`, `test/content_library_test.dart`,
+`test/prompt_quality_test.dart`, `tool/*.dart`, `tool/*.csv`.
 
 ---
 
@@ -26,45 +27,64 @@ Everything else can proceed around T-7b.
 
 ---
 
-## Stage A, live defects — 1 task left
+## Stage A, live defects — 0 tasks left
 
-### T-1 `test/widget_test.dart` does not compile
+`T-1` is done: **all 8 tests pass** and `flutter test` runs for the first time in this
+repo's history. It had three separate defects, not one — see the DONE entry below.
 
-`CreatorHomeScreen` takes ten required callbacks. The test passes nine, omitting
-`onCaptionGenerator`, so the file fails to compile and all seven tests are dead.
+Still open from this stage, folded into later tasks:
 
-- `test/widget_test.dart:15-25` · `creator_home.dart:15,28`
-
-Add the missing argument. **This is one line and it gates everything else** — while
-it is broken `flutter test` fails, so CI is red and no future change can be verified
-by test.
-
-Two related things in the same pass:
-
-- CI only triggers on `main` and `video-slideshow` (`build.yml:12`). You are on
+- **CI only triggers on `main` and `video-slideshow`** (`build.yml:12`). You are on
   `copilot_post`, so **CI has not been running on your branch.** Add it.
-- No mocking library in `dev_dependencies`, so nothing touching `http` or
-  `path_provider` is testable. That is why the untestable areas below are untestable.
-  Add `mocktail` or `http`'s `MockClient`.
+- **No mocking library in `dev_dependencies`**, so `http`, FFmpeg and the Gemini parse
+  path are still untestable. One component now has a test seam
+  (`PromoCommentVaultScreen.seed`). That is T-29.
 
 ---
 
-## Stage B, data loss — 2 tasks left
+## Stage B, data loss — 0 tasks left
 
-### T-2 `posting_pack.dart` cannot save anything
+`T-2` is done. See the DONE entry below for what it uncovered.
 
-`_saveToLibrary` shows "Content Library integration coming soon".
+### T-2 Wire the posting pack to the content library — **DONE, with two defects found**
 
-- `posting_pack.dart:581-586`, called from `:499`
+`PostingPackScreen._saveToLibrary` now builds a `ContentLibraryItem` from the package
+and writes it, reporting the real outcome with an Undo action.
 
-This is the single widest gap in the app. `GeminiClient` produces a complete package
-in one call, `FormatAdapter.adaptAll` converts it to four formats, and the result
-**cannot be persisted**. The flow stops at "generated" and never reaches "in my
-library".
+**The library turned out to be entirely dead code.** `ContentLibraryStore` had **zero
+call sites in the whole app** — not `add`, not `getAll`, nothing. All 19 references to
+it are inside `content_library.dart`. So the task was not "wire one button"; there was
+no writer *and* no reader.
 
-The plumbing behind it already exists — `ContentLibraryStore`,
-`ContentLibraryItem.createFromPackage` — and its silent-wipe bug is fixed. This is
-wiring, not construction.
+**`_saveAll` swallowed every exception** with `catch (_) {}`. A failed write was
+indistinguishable from a successful one, so the UI could report "saved" over data that
+was never stored — worse than refusing, because you would keep generating content
+believing you had kept it. It now throws, and `tryAdd` returns a bool for the UI path.
+
+**A latent crash in `FormatAdapter._expandToShots`, found by the new tests.** With an
+empty `slides` and a target above zero it computed `lastIdx = -1` and read `shots[-1]`,
+throwing `RangeError`. Any package generated without a scene breakdown crashed
+`createFromPackage`, which is exactly the call the save depends on. Fixed to return
+empty — a package with no scenes has no shots, and fabricating intermediate beats would
+put content in front of a parent that nobody wrote.
+
+**Tests: `test/content_library_test.dart`, 7 cases, all passing.** 15 total across the
+suite. Covers save, all four adapted formats persisted, metadata round trip, failed
+write reporting failure, repeated-save behaviour, the placeholder being gone from the
+code, and retrieval through the store filters.
+
+`ContentLibraryStore.useDirectory` is a test seam, since `getApplicationDocumentsDirectory`
+is unavailable in tests. Same pattern as `PromoCommentVaultScreen.seed`.
+
+**Still missing, and it matters:** there is **no screen that lists library items** and
+no navigation to one. A save now persists correctly, but there is still no way to see
+or reopen it. That is a viewer, not a save, and it is the natural next task.
+
+### T-2b Build the library viewer — **not started**
+
+The save is real; the library is still unreachable. Needs a list of saved items,
+filtering by the seven statuses, and a detail view exposing the four format outputs.
+Scope and design decisions, so not started unilaterally.
 
 ### T-3 `migrateBucketId` is not applied to `QuickIdea.bucket`
 
@@ -284,12 +304,41 @@ matcher *missed*. The other 45 had inferred values that were never human decisio
 under the established principle they still need approval. This was not visible until a
 validator read the decision files.
 
+### T-1 `test/widget_test.dart` — **DONE. All 8 tests pass.**
+
+`flutter test` now runs for the first time in this repo's history. Three separate
+defects, not one:
+
+1. **`onCaptionGenerator` was never passed.** `CreatorHomeScreen` takes ten required
+   callbacks and the test passed nine, so the file failed to compile and all seven
+   tests were dead. The dashboard gained a Caption Generator entry, the constructor was
+   widened, and nothing updated the test.
+2. **`MaterialApp` and `Scrollable` were not imported.** The file imported
+   `flutter_test` but not `material.dart`, and neither `creator_home.dart` nor
+   `main.dart` re-exports it. Reported as "Method not found", which reads like a broken
+   test rather than a missing import.
+3. **Two tests called `pumpAndSettle` on screens that never settle.** The vault and the
+   Idea Vault show a progress indicator while reading a local file; that future never
+   completes under `path_provider`, so `pumpAndSettle` waited forever and timed out.
+   Replaced with bounded pumps.
+
+**One production change was needed to fix a test.** `PromoCommentVaultScreen` had no
+injection point, so its "renders comments as wrapping rows" test asserted against data
+the widget could never obtain in a test. Added an optional `seed` parameter; production
+callers pass nothing and get the unchanged store-backed path.
+
+That closes a recorded limitation too: with no mocking library in `dev_dependencies`,
+anything touching `path_provider` was untestable. One component now has a seam.
+
+Still no `mocktail`, so `http`, FFmpeg and the Gemini parse path remain untestable.
+That is T-29.
+
 ### T-7b Phase 8 — distribution mechanics (`tool/reach_mechanics.dart`)
 
-The reach spec arrived with a 7-dimension × 85-idea score sheet. **Not built, on purpose:**
-595 numbers with no evidential basis, produced by guessing, which is the "fake viral
-score" the project explicitly rejected and the same reason the ten reach dimensions in
-`quality_check.dart` are labelled heuristics in the UI.
+The reach spec arrived with a 7-dimension × 85-idea score sheet. **Not built, on
+purpose:** 595 numbers with no evidential basis, produced by guessing, which is the
+"fake viral score" the project explicitly rejected and the same reason the ten reach
+dimensions in `quality_check.dart` are labelled heuristics in the UI.
 
 Instead each mechanic is `pass` / `fail` / `unknown`, where `unknown` means the text
 does not state it. That separates a measurement from a guess.
@@ -305,32 +354,37 @@ would watch it to the end or send it.**
 | `one_second_recognition` | 32 of 57 |
 | `production_simple` | 32 of 57 |
 
-Essentially **no idea in the library has a share trigger.** That independently
-validates the spec's proposal to add `Share/Follow trigger` to the idea shape, and it is
-a far more useful output than a score would have been.
+Essentially **no idea in the library has a share trigger**, which independently
+validates the spec's proposal to add `Share/Follow trigger` to the idea shape.
 
-Distribution of passes per idea: 1 idea at 5 of 7, 7 at 4, 14 at 3, 20 at 2, 13 at 1,
-2 at 0. Median 2 of 7.
+**Reach candidacy and production compatibility are now separate columns.** This
+corrected a real error. The tool previously reported *"16 ideas cannot be reach
+candidates as written"* — but nine of them are perfectly good reach ideas that happen
+to need real-life video, and the current workflow generates character images. That is a
+production constraint, not a prediction, and conflating them baked a workflow
+limitation into what the library believes about reach.
 
-**16 ideas cannot be reach candidates as written** — 7 need filming or are reference
-content (`visual_first`), 9 need real-life video (`production_simple`). Note
-`lp-kitchen-counting` appears here *and* is the idea with both its pillar and its format
-blocked.
+```
+                          reach              production
+jm-tape-pull              yes                no: production_simple
+day4-kitchen-challenge    no: support        no: visual_first
+```
 
-**Two errors I made and corrected in that tool, both caught by reading the output:**
+**Current split: 48 reach candidates, 2 unknown, 7 support content. 41 of 57 are
+production-compatible.** An idea can be `reach yes` and `production no`, and that is a
+filming job, not a bad idea.
 
-- The roll-up gated on "4 passes, 0 fails" and returned **"0 of 57 viable"**, which read
-  as a verdict on the library when it was an artefact of the threshold — `unknown` counts
-  as neither. Replaced with a distribution.
-- `save_trigger` was listed as a disqualifying mechanic, so its `fail` state — the normal
-  case, since most ideas are not reference content — reported **50 of 57 ideas as
-  blocked**. "Not a saves post" is neutral for reach, not a block on it. Only
-  `visual_first` and `production_simple` now disqualify.
+**Two earlier errors in this tool, both caught by reading output:**
 
-**Seven ideas are correctly support content rather than reach candidates** and forcing
-them into a reach Reel would waste them: `day4-kitchen-challenge`, `day5-ask-tonight`,
-`day6-3year-skills`, `day10-3-questions`, `day11-4year-skills`, `day15-household-swaps`,
-`day25-week-wrap-up`.
+- The roll-up gated on "4 passes, 0 fails" and returned *"0 of 57 viable"*, which read
+  as a verdict on the library when it was an artefact of the threshold — `unknown`
+  counts as neither. Replaced with a distribution.
+- `save_trigger` was treated as disqualifying, so its `fail` state — the normal case,
+  since most ideas are not reference content — reported **50 of 57 ideas as blocked**.
+
+**Seven ideas are correctly support content** rather than weak ideas:
+`day4-kitchen-challenge`, `day5-ask-tonight`, `day6-3year-skills`, `day10-3-questions`,
+`day11-4year-skills`, `day15-household-swaps`, `day25-week-wrap-up`.
 
 **Most complete mechanically:** `day3-mumma-says` (5 of 7), then `st-rio-says-no`,
 `jm-dal-chawal`, `lp-shape-hunt`, `st-rio-bored-2-min`, `jm-wont-brush`,
@@ -342,34 +396,51 @@ Old data → new axes, writing only `complete` and `auto-mapped` ideas and emitt
 `needs review` / `invalid` for the rest. Dry-run first; `check_ideas.dart` already
 proves the report shape.
 
-### T-4 The static hashtag injection defeats the hashtag rule
+### T-4 The static hashtag injection — **DONE**
 
-`hashtagPool.take(5)` injects a **fixed five tags into every post**:
-`#funlearningwithpalak #noscreenactivities #playbasedlearning #montessoriathome
-#toddleractivities`. Meanwhile the generation prompt asks for five tags relevant to
-the actual topic.
+`hashtagPool.take(hashtagCount)` injected the **first five tags into every request**,
+while the generation prompt simultaneously asked for five tags relevant to the topic.
+The fixed set always won, so no post could be topically tagged. Every post shipped with
+the identical set: `#funlearningwithpalak #noscreenactivities #playbasedlearning
+#montessoriathome #toddleractivities`.
 
-- `brand_system.dart:551` · `ai_provider.dart:72` · `caption_generator.dart:294`
+Fixed at all three sites (`brand_system.dart:551`, `ai_provider.dart:72`,
+`caption_generator.dart:294`). The brand block now offers the full pool as available
+rather than prescribing five, and states not to pad to reach five. The offline caption
+generator now leads with topic tags and dedupes, because a topic word like "toddler"
+can produce a tag already in the brand pool and the same tag twice looks like a bug.
 
-Every post currently gets the same five. This is the most visible quality bug left,
-and the one most likely to be costing reach.
+`#ahmedabadmoms` is still in the pool. It narrows a national audience, so removing it is
+a one-line change once you decide.
 
-Also: `#ahmedabadmoms` sits in the pool, which narrows a national audience.
+### T-5 The CTA menu fought the CTA rule — **DONE**
 
-Fix by removing the static injection, not by extending the pool. The pool can stay as
-brand-tier tags the model *may* use, never as the answer.
+`ctaOptions` injected all five options into every prompt, including *"Follow for daily
+play ideas"*, while `prompts.dart:334` **explicitly bans** "follow for more" as
+engagement bait. The app instructed the model to do the thing another file forbade.
 
-### T-5 The CTA menu fights the CTA rule
+Replaced with a single instruction to choose one CTA suited to the post, plus the
+explicit prohibition naming the banned phrases. Removed from `brand_system.dart` and
+`ai_provider.dart` together, since the same defect existed in both.
 
-`ctaOptions` injects all five options into every prompt, including "Follow for daily
-play ideas". `prompts.dart:334` **explicitly bans** "follow for more" as engagement
-bait. The app instructs the model to do the thing another file forbids.
+Still open from this task: `prompt_builder.dart:426` hardcodes
+`ctaLine: kDefaultCtaLine`, so **every reel posts an identical CTA** while
+`ContentPackage.cta` is per-bucket. Two CTAs, one screen.
 
-- `brand_system.dart:552` and `:37` vs `prompts.dart:334`
+### T-16 Six text call sites send no `thinkingConfig` — **3 of 4 fixed**
 
-Separately, `prompt_builder.dart:426` hardcodes `ctaLine: kDefaultCtaLine` rather
-than generating one, so **every reel posts an identical CTA** while
-`ContentPackage.cta` is per-bucket. Two CTAs, one screen. Decide which wins.
+Fixed the three hand-built JSON call sites: `main.dart:158`,
+`prompt_builder.dart:176` and `:336`.
+
+**`gemini_client.dart:30` cannot be fixed in place.** The `google_generative_ai` SDK has
+no `thinkingConfig` parameter at all, which is precisely why this was never applied to
+the largest call in the app. Options are dropping the SDK for a hand-built request, or
+moving off a deprecated package. Both are T-26, so the site is left documented rather
+than pretending to be fixed.
+
+This means one 8,192-token call can still spend budget thinking and return truncated,
+unparseable JSON. It is the last known instance of the bug that produced silent
+truncation.
 
 ### T-6 One audience age, verified everywhere
 
@@ -855,14 +926,17 @@ Both were one-shot migrations. `fix_style.ps1` is safe to re-run.
 ## Order
 
 ```
-T-1   tests compile          gates all verification
-T-2   posting pack saves     widest gap: generate -> library
-T-3   migrate QuickIdea      last legacy-id rendering bug
+```
+DONE  T-1   all 8 tests pass         tests run for the first time
+DONE  T-2   posting pack saves       found a dead library and a RangeError
+DONE  T-4   hashtags no longer fixed every post carried the same 5
+DONE  T-5   CTA menu no longer contradicts the brand rule
+DONE  T-16  thinking config on 3 of 4 sites; SDK blocks the fourth
+  |
+T-2b  library viewer               the save persists; nothing can see it
+T-3   migrate QuickIdea            last legacy-id rendering bug
 T-24  rotate keys            only you
 T-23  signing + appId        before any real install
-  |
-T-4   hashtags               most visible remaining quality bug
-T-5   CTA                    resolves a live contradiction
 T-6   age audit              grep and confirm
   |
 DONE  T-13  content_formats.md + format_handbook + codegen + checks

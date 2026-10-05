@@ -151,7 +151,18 @@ class PromoCommentStore {
 }
 
 class PromoCommentVaultScreen extends StatefulWidget {
-  const PromoCommentVaultScreen({super.key});
+  /// Pre-seeded comments, for tests.
+  ///
+  /// The vault loads from [PromoCommentStore], which reads a file through
+  /// `path_provider`. In a widget test that future never completes, so the screen
+  /// stays in its loading state forever and renders no rows — which is why the
+  /// "renders comments as wrapping rows" test could not be written.
+  ///
+  /// Supplying the comments here skips the async load. No behavioural change in the
+  /// app: production callers pass nothing and get the store-backed path.
+  final List<PromoComment> seed;
+
+  const PromoCommentVaultScreen({super.key, this.seed = const []});
 
   @override
   State<PromoCommentVaultScreen> createState() =>
@@ -161,6 +172,8 @@ class PromoCommentVaultScreen extends StatefulWidget {
 class _PromoCommentVaultScreenState extends State<PromoCommentVaultScreen> {
   List<PromoComment> _comments = const [];
   String _selectedBucket = '';
+
+  // Starts true and is cleared by the load, or set false up front when seeded.
   bool _loading = true;
 
   List<String> get _buckets =>
@@ -180,7 +193,13 @@ class _PromoCommentVaultScreenState extends State<PromoCommentVaultScreen> {
   @override
   void initState() {
     super.initState();
-    _loadComments();
+    if (widget.seed.isEmpty) {
+      _loadComments();
+    } else {
+      // Seeded for a test. Skips the file read, which never completes under test.
+      _comments = widget.seed;
+      _loading = false;
+    }
   }
 
   Future<void> _loadComments() async {

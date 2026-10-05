@@ -162,6 +162,10 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
       // spend part of the budget thinking before they write anything. The script came
       // back cut off after a line or two with no error at all.
       'maxOutputTokens': 8192,
+      // Reasoning is drawn from the same budget. Without this the model can spend most
+      // of 8192 thinking and return a script truncated mid-scene with no error — the
+      // same failure the comment above describes, on a budget large enough to hide it.
+      'thinkingConfig': {'thinkingBudget': 0},
     },
   });
 

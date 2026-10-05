@@ -51,13 +51,26 @@ class Mechanic {
   const Mechanic(this.name, this.because, this.judge);
 }
 
-/// Mechanics whose `fail` genuinely disqualifies an idea from reach.
+/// Mechanics whose `fail` says the idea is **incompatible with the current
+/// production workflow**.
 ///
-/// `save_trigger` is deliberately excluded. Its fail state is the common case — most
-/// ideas are not reference content — and reporting it as a "hard failure" listed 50 of
-/// 57 ideas as blocked, which reads as a verdict on the library. "Not a saves post" is
-/// neutral for reach candidacy, not a block on it.
-const _disqualifying = {'visual_first', 'production_simple'};
+/// This is deliberately NOT the same as "Instagram will not distribute this".
+///
+/// An earlier version reported these as "blocked by a hard failure", which listed 16
+/// ideas as unable to be reach candidates. Nine of them are perfectly good reach ideas
+/// that happen to need real-life video, and the current workflow generates character
+/// images. That is a production constraint, not a prediction, and conflating the two
+/// would bake a workflow limitation into what the library believes about reach.
+///
+/// Two separate questions, two separate answers:
+///
+///   ReachCandidate       can this reach non-followers?        yes / no / unknown
+///   ProductionCompatible can our pipeline build it?          yes / no
+///   ProductionConstraint why not, when it cannot             named
+///
+/// An idea can be `ReachCandidate: yes` and `ProductionCompatible: no`. That is a
+/// filming job, not a bad idea.
+const _productionConstraints = {'visual_first', 'production_simple'};
 
 String _text(Idea i) =>
     [i.g('Topic'), i.g('Problem'), i.g('Lesson'), i.g('Audience Problem'),
@@ -229,24 +242,66 @@ void main(List<String> argv) {
   }
   stdout.writeln('');
 
-  // -- Ideas blocked by a hard mechanical failure, not by weak evidence.
-  stdout.writeln('Blocked by a hard failure (cannot be a reach candidate)');
-  stdout.writeln('---------------------------------------------');
-  var blocked = 0;
-  for (final r in ranked) {
-    final idea = r[0] as Idea;
-    final fails = _mechanics
-        .where((m) => m.judge(idea) == 'fail' && _disqualifying.contains(m.name))
+  // -- Reach candidacy is a judgement about the idea. Production compatibility is a
+  // fact about our pipeline. They are reported as separate columns precisely so a
+  // workflow limitation is never recorded as a verdict on the content.
+  stdout.writeln('Reach candidacy and production compatibility, reported '
+      'separately');
+  stdout.writeln('--------------------------------------------');
+  var reachYes = 0, reachUnknown = 0, incompatible = 0;
+  final needsFilming = <String>[];
+
+  for (final idea in ideas) {
+    // Reach candidacy: passes at least one reach mechanic, and is not reference
+    // content. `unknown` is the honest default, not a fail.
+    final reachPasses = _mechanics
+        .where((m) => m.name != 'save_trigger' && m.judge(idea) == 'pass')
+        .length;
+    final isReference =
+        _mechanics.firstWhere((m) => m.name == 'save_trigger').judge(idea) == 'pass';
+
+    final reach = isReference
+        ? 'no: support content'
+        : reachPasses > 0
+            ? 'yes'
+            : 'unknown';
+
+    if (reach.startsWith('yes')) reachYes++;
+    if (reach.startsWith('unknown')) reachUnknown++;
+
+    final blockedBy = _mechanics
+        .where((m) => m.judge(idea) == 'fail' &&
+            _productionConstraints.contains(m.name))
+        .map((m) => m.name)
         .toList();
-    if (fails.isEmpty) continue;
-    blocked++;
+
+    final compat = blockedBy.isEmpty ? 'yes' : 'no: ${blockedBy.join(', ')}';
+    if (blockedBy.isNotEmpty) {
+      incompatible++;
+      needsFilming.add('${idea.id.padRight(28)} $compat');
+    }
+
     stdout.writeln('  ${idea.id.padRight(28)} '
-        '${fails.map((m) => m.name).join(', ')}');
+        'reach ${reach.padRight(20)} production $compat');
   }
+
   stdout.writeln('');
-  stdout.writeln('$blocked idea(s) cannot be reach candidates as written. '
-      '${_disqualifying.join(' and ')} are the disqualifying mechanics.');
+  stdout.writeln('Reach candidate      : $reachYes yes, $reachUnknown unknown');
+  stdout.writeln('Production compatible: ${ideas.length - incompatible} of '
+      '${ideas.length}');
   stdout.writeln('');
+  if (needsFilming.isNotEmpty) {
+    stdout.writeln('Cannot be produced by the current character-image workflow:');
+    for (final f in needsFilming) {
+      stdout.writeln('  $f');
+    }
+    stdout.writeln('');
+    stdout.writeln('These are not weak ideas and not judged as poor reach. They '
+        'need filming');
+    stdout.writeln('or are reference content, which is a production and format '
+        'decision.');
+    stdout.writeln('');
+  }
 
   // -- Mechanics the library barely states at all. This is the actionable finding.
   stdout.writeln('Mechanics the library does not state');

@@ -6,6 +6,8 @@ import 'package:share_plus/share_plus.dart';
 
 import 'brand_system.dart';
 import 'content_generator.dart';
+import 'content_library.dart';
+import 'content_library_screen.dart';
 import 'format_adapter.dart';
 import 'theme.dart';
 
@@ -578,10 +580,50 @@ class _ActionButtons extends StatelessWidget {
     await Share.share(buffer.toString(), subject: '${format.label}: ${originalPackage.idea}');
   }
 
-  void _saveToLibrary(BuildContext context) {
-    // Navigate to content library with pre-filled data
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Content Library integration coming soon!'), duration: Duration(seconds: 2)),
+  /// Saves the package into the content library.
+  ///
+  /// Previously a snackbar reading "Content Library integration coming soon!", so a
+  /// generated package could never be kept. The plumbing already existed —
+  /// [ContentLibraryItem.createFromPackage] adapts the package into all four format
+  /// outputs and [ContentLibraryStore.tryAdd] writes it — and neither had a single
+  /// call site anywhere in the app.
+  ///
+  /// Reports the real outcome. A failed write must not look like a successful one,
+  /// because the whole value of a library is that what is in it was actually kept.
+  Future<void> _saveToLibrary(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final item = ContentLibraryItem.createFromPackage(originalPackage);
+
+    final saved = await ContentLibraryStore.tryAdd(item);
+    if (!saved) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not save to the library. Nothing was stored.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Offers the way straight into the saved package. Previously the action was
+    // "Undo"; the library screen has its own delete, so undoing here was redundant and
+    // the saved item was otherwise unreachable from where it was produced.
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Saved as "${item.title}" with '
+          '${item.formatOutputs.length} format outputs.',
+        ),
+        action: SnackBarAction(
+          label: 'View',
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ContentLibraryDetailScreen(itemId: item.id),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

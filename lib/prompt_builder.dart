@@ -177,6 +177,9 @@ Rules:
         'temperature': 0.8,
         'maxOutputTokens': 8192,
         'responseMimeType': 'application/json',
+        // Caps reasoning so it cannot eat the response budget and return truncated,
+        // unparseable JSON. Applied to the caption and story calls and missing here.
+        'thinkingConfig': {'thinkingBudget': 0},
       },
     }),
   );
@@ -341,6 +344,9 @@ different one.
         // Asking for JSON is not the same as getting it — this makes Gemini return
         // parseable JSON instead of JSON wrapped in a markdown fence.
         'responseMimeType': 'application/json',
+        // Reasoning comes out of the same budget, so an uncapped thinking phase
+        // truncates the JSON the comment above is protecting.
+        'thinkingConfig': {'thinkingBudget': 0},
       },
     }),
   );

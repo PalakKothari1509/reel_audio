@@ -69,7 +69,7 @@ class BrandContext {
       audience: BrandDefaults.audience,
       tone: BrandDefaults.tone,
       visualStyle: BrandDefaults.visualStyle,
-      defaultHashtags: BrandDefaults.hashtagPool.take(BrandDefaults.hashtagCount).toList(),
+      defaultHashtags: BrandDefaults.hashtagPool.toList(),
       ctaOptions: BrandDefaults.ctaOptions,
       characters: CharacterLibrary.all,
     );
@@ -82,8 +82,10 @@ Brand: $brandName ($handle)
 Audience: $audience
 Tone: $tone
 Visual Style: $visualStyle
-Default Hashtags: ${defaultHashtags.join(' ')}
-CTA Options: ${ctaOptions.join(' | ')}
+Hashtags: relevant to this post's topic. Brand tags available if they fit:
+${defaultHashtags.join(' ')}
+CTA: one call to action suited to what this post asks for.
+Never "follow for more" or "follow for daily play ideas". Banned by brand rule.
 
 $charBlock
 

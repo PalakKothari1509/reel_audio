@@ -289,10 +289,18 @@ GeneratedCaption captionFromTemplate({
         ? 'Bacche galtiyan isliye nahi karte kyunki seekhe nahi, kyunki koi saath nahi deta.'
         : 'Little ones are not being difficult on purpose, they are still learning how to do it with you.',
     cta: 'Comment love if your child does this too.',
-    hashtags: [
-      ..._topicTags(subject),
-      ...BrandDefaults.hashtagPool.take(2),
-    ].take(5).toList(),
+    // Topic tags first, then brand tags only to fill. Deduped, because a topic word
+    // like "toddler" can produce a tag that is also in the brand pool, and the same
+    // tag twice in one caption looks like a bug to the reader.
+    hashtags: () {
+      final tags = <String>[];
+      for (final t in [..._topicTags(subject), ...BrandDefaults.hashtagPool]) {
+        final tag = t.startsWith('#') ? t.toLowerCase() : '#${t.toLowerCase()}';
+        if (!tags.contains(tag)) tags.add(tag);
+        if (tags.length == BrandDefaults.hashtagCount) break;
+      }
+      return tags;
+    }(),
   );
 }
 

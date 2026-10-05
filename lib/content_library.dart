@@ -228,8 +228,21 @@ class ContentLibraryItem {
 class ContentLibraryStore {
   static const String _fileName = 'content_library.json';
 
+  /// Overrides the storage location. Tests set this; the app never does.
+  ///
+  /// `getApplicationDocumentsDirectory` is not available in a widget test, so without
+  /// a seam the store is untestable and every save looks like a silent failure. The
+  /// same reason `PromoCommentVaultScreen` takes an optional `seed`.
+  static Directory? _directoryOverride;
+
+  @visibleForTesting
+  static void useDirectory(Directory dir) => _directoryOverride = dir;
+
+  @visibleForTesting
+  static void resetDirectory() => _directoryOverride = null;
+
   static Future<File> _path() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = _directoryOverride ?? await getApplicationDocumentsDirectory();
     return File('${dir.path}/$_fileName');
   }
 
@@ -309,10 +322,28 @@ class ContentLibraryStore {
   }
 
   static Future<void> _saveAll(List<ContentLibraryItem> list) async {
+    // Throws instead of swallowing.
+    //
+    // This used to be `catch (_) {}`, so a failed write was indistinguishable from a
+    // successful one and the caller showed "Saved to library" over data that was never
+    // written. A library that silently discards writes is worse than one that refuses:
+    // you keep generating content believing you have kept it.
+    final file = await _path();
+    await file.writeAsString(jsonEncode(list.map((e) => e.toJson()).toList()));
+  }
+
+  /// Adds an item, returning whether it was actually written.
+  ///
+  /// [add] throws on failure, which is right for callers that must know. This is for
+  /// the UI path, which needs to report the outcome rather than crash.
+  static Future<bool> tryAdd(ContentLibraryItem item) async {
     try {
-      final file = await _path();
-      await file.writeAsString(jsonEncode(list.map((e) => e.toJson()).toList()));
-    } catch (_) {}
+      await add(item);
+      return true;
+    } catch (e) {
+      debugPrint('ContentLibrary: add failed — $e');
+      return false;
+    }
   }
 
   static Future<void> updateStatus(String id, ContentStatus newStatus, {DateTime? postedAt, String? instagramUrl}) async {

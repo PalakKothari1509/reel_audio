@@ -548,8 +548,11 @@ Brand: ${BrandDefaults.name} (${BrandDefaults.handle})
 Audience: ${BrandDefaults.audience}
 Tone: ${BrandDefaults.tone}
 Visual Style: ${BrandDefaults.visualStyle}
-Default Hashtags: ${BrandDefaults.hashtagPool.take(BrandDefaults.hashtagCount).join(' ')}
-CTA Style: ${BrandDefaults.ctaOptions.join(' | ')}
+Hashtags: relevant to THIS post's topic. Brand tags are available if they fit:
+${BrandDefaults.hashtagPool.join(' ')}
+Never reuse the same tag set across posts, and never pad to reach five.
+CTA: one call to action, chosen to suit what this post asks for.
+Do NOT use "follow for more" or "follow for daily play ideas". Banned by brand rule.
 
 $charBlock
 

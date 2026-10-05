@@ -370,6 +370,18 @@ CINEMATIC VIDEO: Smooth camera movement (gentle pan/zoom/push), 2-3 second shot,
   }
 
   static List<SlideContent> _expandToShots(List<SlideContent> slides, int targetCount, ContentBucket bucket) {
+    // Nothing to expand from.
+    //
+    // With an empty `slides` and a target above zero, this reached
+    // `shots[shots.length - 1]` with an index of -1 and threw a RangeError. Any
+    // package generated without a scene breakdown therefore crashed
+    // `createFromPackage`, which is the call the content library save depends on.
+    //
+    // Returns empty rather than inventing shots. A package with no scenes has no
+    // shots, and fabricating intermediate beats would put content in front of a
+    // parent that nobody wrote.
+    if (slides.isEmpty) return const [];
+
     if (slides.length >= targetCount) {
       return slides.take(targetCount).toList();
     }

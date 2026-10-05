@@ -2,6 +2,7 @@
 // so it failed to compile. Replaced with a real check of the script parser — the part
 // most likely to break, since Gemini's output is never quite the same twice.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/creator_home.dart';
 import 'package:reel_audio/main.dart';
@@ -22,6 +23,10 @@ void main() {
           onSavedStories: () {},
           onSettings: () {},
           onPromoComments: () => openedComments = true,
+          // Required, and omitting it failed the whole file to compile, so none of
+          // these seven tests could run. The dashboard gained a Caption Generator
+          // entry and the constructor was widened; nothing updated this file.
+          onCaptionGenerator: () {},
         ),
       ),
     );
@@ -57,19 +62,41 @@ void main() {
   testWidgets('promotion vault renders comments as wrapping rows', (
     tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: PromoCommentVaultScreen()));
-    await tester.pumpAndSettle();
+    // Seeded, because the vault loads through `path_provider` and that future never
+    // completes in a widget test. Without this the screen stays in its loading state
+    // and renders no rows at all.
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PromoCommentVaultScreen(
+          seed: [
+            PromoComment(
+              text: 'A comment long enough that it has to wrap across more than one '
+                  'line so the wrapping row layout is actually exercised',
+              bucket: 'reels',
+            ),
+            const PromoComment(text: 'Short one'),
+          ],
+        ),
+      ),
+    );
+    // Bounded pumps, not pumpAndSettle: the vault shows a progress indicator while it
+    // reads, and that indicator never resolves under test.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.textContaining('Cuty ki masti'), findsOneWidget);
+    expect(find.textContaining('A comment long enough'), findsOneWidget);
+    expect(find.text('Short one'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('Idea Vault opens the add idea form', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: IdeaInboxScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     await tester.tap(find.byTooltip('Add idea'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Add New Idea'), findsOneWidget);
     expect(find.text('Save Idea'), findsOneWidget);

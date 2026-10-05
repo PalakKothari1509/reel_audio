@@ -104,10 +104,10 @@ Quick Content Studio also includes:
 - Carousel slide-count selection and prompts that follow the current slide content.
 - A posting pack view for reviewing and copying or sharing format-specific outputs.
 
-**Known gap:** the posting pack's save action is a placeholder. It reports "Content
-Library integration coming soon", so a generated package cannot yet be written into the
-library. This is the widest gap in the app: generation completes and then stops before
-persistence.
+**Known gap:** the posting pack's save action used to be a placeholder reporting
+"Content Library integration coming soon". It now writes a real
+`ContentLibraryItem`. **However there is still no screen that lists library items and
+no navigation to one** — a save persists correctly but cannot yet be seen or reopened.
 
 ### Idea Vault
 
@@ -395,8 +395,8 @@ platform permissions and native plugin support, so validate those on the target 
 
 ## Current Limitations
 
-- **The posting pack cannot save.** A generated package stops before reaching the
-  content library.
+- **The content library has no viewer.** Packages save correctly and the four adapted
+  formats persist, but nothing lists or opens them.
 - **The idea library is mid-migration.** Most axis values are not yet approved, so idea
   data is not authoritative and must not drive generation.
 - **The unified Content Package does not exist yet.** Four different models of "a
@@ -404,9 +404,6 @@ platform permissions and native plugin support, so validate those on the target 
   exist alongside them.
 - **The `script` field is generated and discarded.** Narration and per-scene dialogue are
   requested by the prompt and never read back.
-- `test/widget_test.dart` does not compile, so `flutter test` fails and no test runs.
-- Release builds are signed with the debug keystore and still use
-  `com.example.reel_audio` as the application id, so they are not distributable.
 - Calendar, Analytics and Experiments tabs do not exist yet.
 - The app prepares content; Instagram publishing and scheduling are manual.
 - Reach and view counts cannot be predicted or guaranteed by a prompt, score, or
@@ -418,6 +415,16 @@ platform permissions and native plugin support, so validate those on the target 
   access.
 - Gemini model access, rate limits, supported regions, and quotas depend on the user's
   Google AI account.
+
+## Tests
+
+`flutter test` runs 15 tests across two files. Coverage is concentrated on the parts
+most likely to break silently: the Gemini script parser, legacy store decoding, and the
+content library save path.
+
+Not yet covered: the Gemini JSON parse path, `http`, FFmpeg assembly, and the Gemini
+fallback path. `ContentLibraryStore` and `PromoCommentVaultScreen` each have a test
+seam for this reason; most other file-reading components still do not.
 
 ## Development Status
 

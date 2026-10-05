@@ -34,6 +34,14 @@ class GeminiClient implements AIProvider {
             maxOutputTokens: _maxOutputTokens,
             responseMimeType: 'application/json',
             responseSchema: _contentPackageSchema(),
+            // `thinkingConfig` is deliberately absent. The `google_generative_ai` SDK
+            // has no such parameter, which is why the reasoning cap could only ever be
+            // applied to the hand-built JSON call sites and never here.
+            //
+            // That leaves this the one large generation call that can still spend
+            // budget thinking and return truncated JSON. Fixing it means dropping the
+            // SDK for a hand-built request, or moving off a deprecated package — both
+            // are T-26, not a one-line change.
           ),
           systemInstruction: Content.system(_systemPrompt()),
         );
