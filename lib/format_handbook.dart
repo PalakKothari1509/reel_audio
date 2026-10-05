@@ -21,6 +21,26 @@
 // THE REGISTRY
 // ============================================================================
 
+/// Whether a format has been tested enough to draw a conclusion from.
+class FormatVerdict {
+  /// True only when [testsRun] has reached [minTests].
+  final bool allowed;
+  final int testsRun;
+  final int minTests;
+
+  /// Written to be shown to a person, not logged. It states what is missing and by
+  /// how much, because "insufficient data" invites ignoring and "2 of 5, three more
+  /// to go" does not.
+  final String message;
+
+  const FormatVerdict({
+    required this.allowed,
+    required this.testsRun,
+    required this.minTests,
+    required this.message,
+  });
+}
+
 /// One registered format. Every field maps to a field in `content_formats.md`.
 class FormatSpec {
   /// Stable key. Ideas and posted performance reference this, so it is never
@@ -100,6 +120,53 @@ class FormatSpec {
   /// Whether this format declared itself the default for [contentType].
   bool isDefaultFor(String contentType) => defaultFor.contains(contentType);
 
+  // ==========================================================================
+  // THE FIVE-TEST RULE, as code rather than as an intention
+  // ==========================================================================
+
+  /// The verdict on whether this format has been tested enough to judge.
+  ///
+  /// "Don't test a format once and call it a failure" is easy to agree with and easy
+  /// to forget under deadline. The whole failure mode is judging a format after one
+  /// Reel that happened to underperform, retiring it, and never finding out it worked.
+  ///
+  /// So the rule lives in the handbook, next to the format, and refuses to produce a
+  /// verdict before there is a sample. Nothing calls this yet — the Experiments tab
+  /// does not exist — but the rule is now something the app enforces rather than
+  /// something it intends.
+  FormatVerdict verdictAt(int testsRun, {int? minTests}) {
+    final required = minTests ?? FormatLibrary.minimumTests;
+
+    if (testsRun <= 0) {
+      return const FormatVerdict(
+        allowed: false,
+        testsRun: 0,
+        minTests: 5,
+        message: 'Not tested yet. Nothing can be concluded.',
+      );
+    }
+    if (testsRun < required) {
+      final left = required - testsRun;
+      return FormatVerdict(
+        allowed: false,
+        testsRun: testsRun,
+        minTests: required,
+        message: 'Tested $testsRun/$required. '
+            '$left more test${left == 1 ? '' : 's'} before any verdict. '
+            'One Reel is not evidence.',
+      );
+    }
+    return FormatVerdict(
+      allowed: true,
+      testsRun: testsRun,
+      minTests: required,
+      message: 'Tested $testsRun/$required. Enough to draw a conclusion.',
+    );
+  }
+
+  /// The verdict using the standard minimum of [FormatLibrary.minimumTests].
+  FormatVerdict verdict(int testsRun) => verdictAt(testsRun);
+
   /// The one-line reasoning shown alongside a recommendation.
   String reason({String? contentType, String? goal}) {
     final parts = <String>[];
@@ -133,6 +200,13 @@ Best for: $bestFor''';
 }
 
 class FormatLibrary {
+  /// Tests required before a format may be judged.
+  ///
+  /// Five is not a guess. It comes from a rule the handbook already states: a format
+  /// is not retired on one result, because reach varies more between two Reels of the
+  /// same shape than it does between different shapes.
+  static const int minimumTests = 5;
+
   // -- 01 POV ----------------------------------------------------------
   static const FormatSpec pov = FormatSpec(
     id: 'pov',

@@ -554,6 +554,15 @@ Never reuse the same tag set across posts, and never pad to reach five.
 CTA: one call to action, chosen to suit what this post asks for.
 Do NOT use "follow for more" or "follow for daily play ideas". Banned by brand rule.
 
+SHARE TRIGGER: before writing anything, answer this question —
+  "Why would one parent send this to another parent?"
+Then write that answer into the caption as a natural line. Name the specific parent.
+"Send this to the mom whose toddler says 'I don't like vegetables' before even
+tasting them." Not "share with your friends."
+A share is worth more to this page than a view, so this is not optional decoration.
+If you cannot name a specific person who would send it, the post is not ready —
+prefer an open loop or a surprising payoff that creates the send instead.
+
 $charBlock
 
 FORMAT: ${format.label} (${format.description})

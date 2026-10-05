@@ -1,432 +1,320 @@
-# Fun Learning With Palak App Overview
+# Fun Learning With Palak — App Overview
 
-## Product Summary
+What this app is, how it works today, and what is still missing. Written from the
+code as it actually stands.
 
-This is a Flutter content-planning and production app for the Fun Learning With Palak
-Instagram brand. It supports the creator workflow: capture an idea, develop content for
-one or more Instagram formats, prepare copy and visual prompts, build a narrated reel,
-and keep drafts on the device.
+---
 
-The brand focuses on playful learning, screen-free activities, everyday parenting
-situations, and the characters Ria, Rio, and Cuty. **Brand defaults target parents of
-children aged 1–4.** Individual briefs can narrow the age range or audience.
+## 1. What the app is for
 
-The app is local-first. It does not publish to Instagram, sync a creator account, or
-guarantee reach or view counts. Nothing in the app or its prompts predicts a view count.
+A content production app for the **Fun Learning With Palak** Instagram page. It takes
+an idea and turns it into a finished, publishable Instagram package: hook, script,
+scene-by-scene visual plan, captions, hashtags, and a call to action.
 
-## The Content Model
+The brand is **screen-free learning and play for Indian parents of children aged 1–4**,
+built around the characters **Ria, Rio and Cuty**.
 
-This is the part of the system that changed most recently, and it is what everything
-downstream depends on. A single field called `Format` was found to be doing three
-unrelated jobs, which made classification unreliable.
+The app **does not publish to Instagram**. You export the copy and post it yourself.
+It also never promises views or reach, and nothing in it tries to.
 
-### Seven independent axes
+---
 
-| Axis | Meaning | Values |
+## 2. The five content pillars
+
+Every piece of content belongs to one pillar. This is the value it gives a child:
+
+| Pillar | What it is | Example |
 | --- | --- | --- |
-| **Pillar** | What value the content gives | `PLAY` `THINK` `DISCOVER` `TALK` `DO` |
-| **Series** | Recurring brand world | the seven series, see below |
-| **Content Type** | What is published | `Reel` `Carousel` `Trial Reel` `Image Slideshow Reel` `Static Image` `Story` |
-| **Narrative Format** | How the idea is structured | the registered handbook formats |
-| **Production Method** | How the asset is created | `Character images` `Real-life video` `Image slideshow` `Text-based` `Carousel` `Mixed` |
-| **Goal** | The outcome being optimised | `Reach` `Non-follower Reach` `Saves` `Shares` `Comments` `Relatability` `Authority` `Follows` |
-| **Status** | Where the idea is in production | `idea → approved → scripted → imagesReady → generated → posted → tested → archived` |
+| **PLAY** | Activities that keep a toddler busy | Spoon transfer, water pouring |
+| **THINK** | Simple problem-solving | "Which one doesn't belong?" |
+| **DISCOVER** | Learning through everyday objects | Colours, textures, sounds |
+| **TALK** | Language and parent-child conversation | What to say instead of "NO" |
+| **DO** | Practical independence | Brushing, shoes, eating |
 
-**Series:** Jugaadu Mummy · Life With Ria & Rio · Can Your Child Figure It Out? ·
-Talk With Your Child · Try This At Home · Parent-Relatable · Age-Based Skills
+---
 
-The axes are independent and must not be collapsed into one another. A `Jugaadu Mummy`
-episode can be `PLAY` or `DO`; Trial Reel is a publishing and testing type, not a
-production method.
+## 3. The seven series
 
-`Status` is production-aware on purpose. `imagesReady` is a real stage, because image
-generation is where a Ria/Rio/Cuty story Reel spends most of its time, and an idea that
-is written and one whose images exist have different next actions.
+A series is a recurring content world. It is **not** the same as a pillar:
 
-**Migration state is not `Status`.** `MigrationState` in `lib/content_axes.dart` is a
-separate enum (`approved` / `suggested` / `needsReview` / `invalid` /
-`archiveCandidate`) describing a *classification decision in progress*. Only
-`approved` is ever written to the source file. The two share a word and mean different
-things by it, and the distinction is enforced in code.
-
-### Content Format Library
-
-Narrative formats live in `content_formats.md` and are compiled into
-`lib/format_handbook.dart` by `tool/sync_formats.dart`. **16 of 50 formats are
-specified.** Each entry has nine canonical fields: ID, Name, Definition, Structure,
-Best for, Best content types, Best goals, Example, Generation rules, plus an optional
-`Default for`.
-
-`FormatSpec.recommend()` scores a format on whether it supports the content type and
-serves the goal, and `reason()` returns one line of human-readable justification. A tie
-is broken by the declared `Default for`, which breaks ties only and never outranks a real
-score difference. When nothing matches, `recommend()` returns **null** rather than
-defaulting, so an unsupported format is never silently substituted.
-
-## Dashboard
-
-| Entry | Purpose |
+| Series | What it covers |
 | --- | --- |
-| Create Content | Prepare a post and create outputs for selected formats. Gemini can generate structured content when configured; local templates are available as a fallback. |
-| Reel | Create a story-based reel through the script, scene, voice, and video workflow. |
-| Trial Reel | Prepare a short, fast-cut compilation aimed at testing content with new viewers. Reach is not guaranteed. |
-| Carousel | Create carousel copy and image prompts. |
-| Image | Prepare a single-image post and its visual prompt and caption. |
-| Idea Vault | Capture, edit, organize, develop, and delete raw ideas. |
-| Settings | Configure the Gemini provider and selected content defaults. |
-| Promotion Comments | Open the reusable comment vault. |
-| Caption Generator | **Legacy entry. Not wired into the dashboard's primary callbacks in the same way as the others, and scheduled for removal** once the unified Content Package exists. |
+| **Jugaadu Mummy** | Low-cost Indian parenting hacks |
+| **Life With Ria & Rio** | Everyday preschool situations |
+| **Can Your Child Figure It Out?** | Interactive problem-solving |
+| **Talk With Your Child** | Conversation starters |
+| **Try This At Home** | Practical activities |
+| **Parent-Relatable** | Funny parent-and-toddler moments |
+| **Age-Based Skills** | Reference by age |
 
-Saved stories are available from the folder action in the dashboard app bar.
+The distinction matters: one idea can be a `Jugaadu Mummy` episode that is `PLAY` or
+`DO`, depending on what the child is actually doing. Series and pillar never collapse
+into each other.
+
+---
+
+## 4. The seven axes
+
+An idea is fully described by seven separate values. This separation is the most
+important design decision in the app.
+
+| Axis | Question it answers |
+| --- | --- |
+| **Pillar** | What value does this give? |
+| **Series** | Which recurring world does it belong to? |
+| **Content Type** | What are we publishing? |
+| **Narrative Format** | How is the story shaped? |
+| **Production Method** | How do we actually make it? |
+| **Goal** | What outcome are we optimising for? |
+| **Status** | Where is it in production? |
+
+### Why this matters
+
+The app used to have **one** field called `Format` doing three different jobs. Of 57
+ideas, 33 held a content type (Reel, Carousel), 24 held a narrative shape (Problem →
+Fix, Save This List), and none had a pillar at all. That made it impossible to answer
+basic questions like "which format works best?".
+
+Splitting the axes fixed it.
+
+### Content types
+
+`Reel` · `Carousel` · `Trial Reel` · `Image Slideshow Reel` · `Static Image` · `Story`
+
+**Trial Reel** is a publishing and testing type, not a production method. It is for
+testing an idea with non-followers.
+
+### Production methods
+
+`Character images` · `Real-life video` · `Image slideshow` · `Text-based` · `Carousel`
+· `Mixed`
+
+This decides what Gemini is asked to produce: image prompts, a shot list, slides, or
+text cards.
+
+### Goals
+
+`Reach` · `Non-follower Reach` · `Saves` · `Shares` · `Comments` · `Relatability` ·
+`Authority` · `Follows`
+
+### Status ladder
+
+```
+idea → approved → scripted → imagesReady → generated → posted → tested → archived
+```
+
+`imagesReady` exists because generating images is where a Ria/Rio/Cuty story Reel
+spends most of its time. An idea that is written and one whose images exist are
+different states.
+
+---
+
+## 5. Content format library
+
+Narrative formats are **shapes of a story**, not publishing types.
+
+The 12 currently registered: POV · Do This, Not That · Mistakes List · Problem → Fix ·
+Exact Script · Expectation vs Reality · Personal Mistake · Save This List · Numbered
+Framework · Unpopular Opinion · Before You · Three Examples — plus four added later:
+Quick Tip, Mini Story, This or That, Question → Answer. **16 of 50.**
+
+The format file is the source of truth (`content_formats.md`). Dart is generated from
+it, so the app can never disagree with the document.
+
+Each format records which content types it suits and which goals it serves, which is
+what lets the app **recommend a format for an idea and explain why**.
+
+---
+
+## 6. The main screens
+
+### Dashboard
+
+Nine entries: Create Content, Reel, Trial Reel, Carousel, Image, Idea Vault,
+Settings, Promotion Comments, and Caption Generator (legacy, scheduled for removal).
 
 Carousel, Trial Reel and Single Image each currently have **three separate entry
-points**. They are slated to consolidate into one Create screen.
+points**. These are meant to consolidate into one Create screen.
 
-## Main Workflows
+### Create Content
 
-### Create Content and Quick Content Studio
+Takes an idea and produces a full package across formats. Saves to the library.
 
-Quick Content Studio is for preparing post packages without going through the full
-video-rendering workflow. The form supports a title, post type, audience, goal, mood,
-hook, main idea, problem, lesson, visual style, CTA, and generated or editable copy.
+### Content Library
 
-A multi-format package adapts one core idea into format-specific content rather than
-starting with unrelated ideas. Outputs can include hooks, scripts or slide text, image
-prompts, captions, hashtags, pinned comments, and reply comments.
+Lists everything you have saved. Filter by status, open any item, copy any block.
 
-Quick Content Studio also includes:
-
-- Saved post ideas: save a completed idea, reopen it in the form, copy its contents, or
-  delete it with confirmation.
-- Recent post history: generated packages are kept locally, with history limited to the
-  most recent 50 entries.
-- Built-in post packages and bulk paste for importing structured post text.
-- Carousel slide-count selection and prompts that follow the current slide content.
-- A posting pack view for reviewing and copying or sharing format-specific outputs.
-
-**Known gap:** the posting pack's save action used to be a placeholder reporting
-"Content Library integration coming soon". It now writes a real
-`ContentLibraryItem`. **However there is still no screen that lists library items and
-no navigation to one** — a save persists correctly but cannot yet be seen or reopened.
-
-### Idea Vault
-
-The dashboard Idea Vault is implemented in `lib/quick_content.dart`. It is separate
-from the saved post-idea list in Quick Content Studio.
-
-Each raw idea can have a title, a short description, notes, a content bucket, and a
-status. The vault supports adding, editing, filtering, and confirmed deletion. An idea
-can be sent into the multi-format workflow for development.
-
-The Idea Vault's local records use `idea_inbox.json`. The saved post-idea list uses
-`quick_ideas.json`; these are separate collections with different purposes.
+**This is new.** The library previously had a working save path and **no way to see
+anything** — a save was real but unreachable.
 
 ### Reel Maker
 
-The Reel workflow starts with a story brief. It supports story suggestions for common
-preschool situations and a story check that evaluates qualities such as real-life
-relevance, hook, curiosity, emotion, originality, character fit, and potential
-save/share value. **The check is editorial guidance, not a prediction of Instagram
-performance.** The ten reach dimensions in `lib/quality_check.dart` are the same kind of
-heuristic and are surfaced as internal heuristics, never as predictions.
+Story brief → timed script and scene prompts → review and edit → images and voice →
+render locally with FFmpeg → save to gallery. Autosaves as you go.
 
-The production flow is:
+### Idea Vault
 
-1. Write or select a story and set duration, language, and style.
-2. Generate a timed script and scene/image prompts with Gemini. Short scripts can be
-   generated with prompts in one request; longer scripts can use the fallback
-   multi-request path.
-3. Review and edit script lines, cover text, scene descriptions, and image prompts.
-4. Import or select images and choose narration settings.
-5. Render the portrait video locally, review it, and save it to the device gallery.
+Raw idea capture with title, notes, bucket and status. Stored in `idea_inbox.json`.
 
-A story project autosaves locally. Existing script and prompt results are reused when
-their source story has not changed, avoiding unnecessary repeat requests.
+### Promotion Comments
 
-### Voice and Video
+A vault of reusable comment replies, filterable by bucket.
 
-Voice options include the device's text-to-speech engine, Gemini text-to-speech, and
-ElevenLabs. Phone speech works offline when the required language is installed; the
-network-based engines require their respective credentials and connectivity.
+---
 
-The local reel renderer uses FFmpeg to assemble a portrait video, images, voice audio,
-captions, motion, optional music, and closing elements. The renderer is designed around
-a 1080 x 1920, 30 fps output and includes Instagram-safe placement for captions and
-cover text.
+## 7. How content is generated
 
-The Shot Planner asks Gemini to write shot-by-shot prompts in a Veo-friendly structure.
-It is a prompt-planning feature; it does not itself call Veo to generate remote video
-clips. Image-to-video assembly remains a separate local workflow.
+Gemini is the only text AI. One call produces a complete package, then `FormatAdapter`
+converts it into four format-specific outputs (carousel, reel, trial reel, single
+image).
 
-### Planning and Content Library
+Two things learned the hard way and now fixed:
 
-The planning tools contain built-in hooks, posting-time suggestions, and a manual
-post-results log. Suggested posting times are starting assumptions; use the app's
-results log and real account data to adjust them.
+**Hashtags.** A fixed set of five tags used to be injected into every single request,
+which made topical tags impossible. Now the model is asked for tags relevant to the
+actual post.
 
-Character reference images are stored under `assets/characters/`. Additional content
-ideas are in `assets/ideas/` — note these four files are **not bundled and not read by
-the app**. Music assets are documented under `assets/music/` and must be added to the
-Flutter asset configuration before use.
+**Reasoning budget.** Gemini spends reasoning tokens out of the same budget as the
+answer. Left uncapped on large requests, it returned truncated, unparseable JSON with
+no error. Capped on all hand-built requests.
 
-### Promotion Comment Vault
+---
 
-The Promotion Comments dashboard entry opens a dedicated, scrollable vault. It shows
-one wrapping comment per row, supports copying a comment, adding a new comment, and
-filtering comments by bucket. Starter comments are built in, and custom comments are
-stored on the device.
+## 8. Brand and characters
 
-The store reads both the current object format (comment text plus optional bucket) and
-older plain-string entries, so existing saved comments remain compatible. The local file
-is `promo_comments.json`.
+`lib/brand_system.dart` holds the brand defaults and the character library.
 
-## Content Idea Library
+**Visual style is one constant.** Changing how the app describes its art is a one-line
+edit, not a change to character generation, scene generation, reel generation, prompt
+templates, or individual ideas.
 
-`content_ideas.md` is the source of truth for content ideas, holding **57 ideas**. Each
-carries an id plus the axis metadata: Topic, Problem, Lesson, Format, Best content type,
-Goal, Age, Characters, Hook Angle, Status, Priority, and Notes.
+**Characters carry a lock block** that is appended to every image-generation request,
+built from the full character library so a new character updates every prompt
+automatically.
 
-**The library is mid-migration and is not yet authoritative.** The axes are being
-resolved one at a time, and only approved values will be written. Current state, per
-`tool/check_axes.dart`:
+Approved characters: Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher.
 
-| Axis | In source | Decided | Open |
-| --- | --- | --- | --- |
-| Pillar | 0 | 11 suggested, 1 archive candidate | 45 |
-| Series | 34 | 0 | 23 |
-| Narrative Format | 24 | 19 approved | 2 blocked |
-| Content Type | 50 | 0 | 7 |
-| Production Method | 50 | 0 | 7 |
-| Goal | 51 | 0 | 6 |
-| Status | 57 | 0 | 0 |
+---
 
-A value counts as resolved only if it came from the source file or from a human
-decision. **Classifier inference is never counted as resolved.** Until every axis reads
-zero open, generated idea data must not be treated as authoritative.
+## 9. Content idea library
 
-### Distribution mechanics
+`content_ideas.md` holds **57 ideas**, each with a topic, problem, lesson, goal and
+metadata.
 
-`tool/reach_mechanics.dart` checks each idea against the mechanics that decide
-non-follower distribution — visual-first comprehension, one-second recognition, open
-loop, share trigger, production simplicity, follower independence, and save trigger.
+**It is mid-migration and is not yet authoritative.** The seven axes are being resolved
+one at a time, and only values a human has approved will be written.
 
-Each mechanic returns `pass`, `fail`, or **`unknown`**, where unknown means the idea's
-text does not state it. It deliberately does not produce a 1–10 score: a self-assigned
-score has no evidential basis and would read as calibrated data.
+Current state:
 
-The current finding: **`share_trigger` is unknown on 56 of 57 ideas.** The library
-describes what a post is, not why a stranger would watch it to the end or send it to
-someone. Sixteen ideas cannot be reach candidates as written — seven need filming or are
-reference content, nine need real-life video.
+| Axis | Decided | Open |
+| --- | --- | --- |
+| Pillar | 11 suggested, 1 archived | **45** |
+| Series | — | **23** |
+| Narrative Format | 19 approved | 2 blocked |
+| Content Type | — | 7 |
+| Production Method | — | 7 |
+| Goal | — | 6 |
+| Status | complete | 0 |
 
-## Brand and Character Model
+**Automation proposes; a human approves.** Classifier output is never counted as
+decided, because a confident wrong pillar quietly misfiles the results of a post that
+was actually good.
 
-`lib/brand_system.dart` holds the brand defaults, the `CharacterLibrary`, and the
-`ContentFormat` enum. `lib/characters.dart` holds the `CharacterStore` that persists
-character edits on device.
+### How well are these ideas built for reach?
 
-`BrandDefaults.visualStyle` is the **single** definition of visual style, read by
-`lib/prompts.dart` and injected by `buildBrandContext`. It is deliberately one constant,
-so the visual vocabulary can be changed without touching character generation, scene
-generation, reel generation, prompt templates, or individual ideas.
+Every idea is checked against what actually gets content distributed to strangers:
 
-Characters carry a lock block appended to every image-generation request, and it is
-derived from `CharacterLibrary.all` rather than a hardcoded subset, so adding a
-character updates every prompt automatically.
-
-Approved characters: Ria (two ponytails, pink bows, "toofani"), Rio (stubborn, quick to
-say no, sweet underneath), Cuty (white bunny, pink bow), Mumma, Papa, Daadi, Teacher.
-
-Content buckets (`challenge`, `conversation`, `activity`, `humor`, `agePractice`,
-`community`) still exist and are hardcoded in ten modules. They are the legacy model and
-are being replaced by the Pillar and Series axes; see the redesign plan.
-
-## AI and Credentials
-
-Gemini is the app's only text/content AI provider. There is no OpenAI client or OpenAI
-API-key field in the Flutter app. **A `backend/` directory exists in the repository
-containing a `.env` with a live OpenAI key, `node_modules`, and a `.gitignore`, but no
-source code.** It is not referenced by the app and its purpose is unclear.
-
-If Gemini is unavailable or not configured, supported Quick Content flows can fall back
-to local templates. Direct Gemini-backed story, prompt, and voice workflows still
-require a working Gemini credential.
-
-The Gemini key used by Quick Content can be configured in Settings. Other direct Gemini
-services use `lib/secrets.dart`. Keep real credentials out of Git, screenshots, exported
-files, and distributed builds. **A key embedded in a mobile app should be treated as
-extractable**; a server-side proxy with authentication and rate limits is preferable
-before distributing the app broadly.
-
-ElevenLabs is an optional voice service, not a second text/provider. Its credential is
-separate from the Gemini content workflow.
-
-**Known gap:** six call sites read `lib/secrets.dart` directly, so a key configured in
-Settings is honoured in only a minority of paths. The Settings key is also stored
-unencrypted in SharedPreferences.
-
-## Local Data and Backups
-
-Most working data is stored as JSON in the app's documents directory.
-
-| Data | Local store |
+| Check | Ideas that don't state it |
 | --- | --- |
-| Story projects, scripts, edits, prompts, voice and render state | One JSON file per story under `stories/` |
-| Raw Idea Vault records | `idea_inbox.json` |
-| Saved Quick Content ideas | `quick_ideas.json` |
-| Recent generated post history | `quick_post_history.json` |
-| Promotion comments | `promo_comments.json` |
-| Content library | `content_library.json` |
-| Character configuration | `characters.json` |
-| Planning hooks and schedule | `hooks.json` and `schedule.json` |
-| Gemini Quick Content key and selected defaults | SharedPreferences |
+| Share trigger | **56 of 57** |
+| Open loop | 42 of 57 |
+| Works with no voice | 35 of 57 |
 
-Story changes also schedule a backup through the project backup helper; the destination
-and behavior depend on the platform. Other local JSON data is not cloud-synced.
-Uninstalling the app can remove its local documents, so keep required exports
-separately.
+The clearest finding: **the library describes what a post is, not why anyone would
+watch it to the end or send it to a friend.** That is a content-quality gap, not a bug.
 
-The Settings screen labels data export/import actions, but those handlers are
-placeholders and do not yet perform an export or import.
+Each check answers **pass, fail, or unknown** — never a score out of ten, because a
+self-assigned number would look like data without being evidence.
 
-## Content Authoring Toolchain
+Two things are tracked separately on purpose:
 
-Markdown is the source of truth for authored content, and Dart is generated from it.
-This keeps prompt construction synchronous and `const`, so a malformed line becomes a
-compile error instead of a startup crash.
+- **Reach candidacy** — can this reach non-followers?
+- **Production compatibility** — can our pipeline actually build it?
 
-| Command | Purpose |
-| --- | --- |
-| `dart run tool/sync_formats.dart` | `content_formats.md` → `lib/format_handbook.dart` |
-| `dart run tool/check_formats.dart` | Validates the handbook: ids, axis references, contested defaults |
-| `dart run tool/propose_formats.dart` | Narrative-format proposals from beat descriptions |
-| `dart run tool/check_axes.dart` | **Authoritative** axis coverage across all 57 ideas |
-| `dart run tool/propose_axes.dart` | Proposals for every open axis value, in one file |
-| `tool/classify_ideas.dart` | Infers axis values; `--apply` refuses unless everything resolves |
-| `tool/check_ideas.dart` | Validates ideas against the frozen axes |
-| `tool/check_pillars.dart` | Pins the five documented classifier false positives |
-| `tool/reach_mechanics.dart` | Distribution-mechanics analysis |
-| `tool/show_ideas.dart <id>...` | Prints the full text of named ideas |
+An idea can be a good reach candidate that needs real-life video. That is a filming
+job, not a bad idea.
 
-Human decisions live in `tool/format_decisions.csv` and `tool/pillar_decisions.csv`, and
-are stored as **migration metadata, not `IdeaStatus`.** An approved decision always
-outranks classifier inference; the tools refuse to re-litigate a settled idea.
+---
 
-An unknown migration state is a hard error rather than a silent skip, because a skipped
-row turns an approved decision into a missing one.
+## 10. Tests
 
-## Important Source Files
+**21 tests, all passing.** They cover the parts that break quietly:
 
-| File | Responsibility |
-| --- | --- |
-| `lib/main.dart` | App startup, dashboard routing, story/reel workflow, Gemini-backed story operations. |
-| `lib/creator_home.dart` | Creator dashboard and entry points. |
-| `lib/content_axes.dart` | **The seven axes, `GenerationRecipe`, `MigrationState`.** |
-| `lib/format_handbook.dart` | **Generated.** Format registry and recommendation engine. |
-| `lib/content_ideas.dart` | Idea models, hooks, and the seeded day-post list. |
-| `lib/quick_content.dart` | Quick Content Studio, Idea Vault, saved ideas/history, Trial Reel, Promotion Comments vault. |
-| `lib/brand_system.dart` | Brand defaults, `CharacterLibrary`, `ContentFormat`, bucket library. |
-| `lib/characters.dart` | `CharacterRef` and the on-device `CharacterStore`. |
-| `lib/prompts.dart` | Master prompt shapes, style interpolation, character lock. |
-| `lib/content_generator.dart` | `ContentPackage` and its JSON parsing. |
-| `lib/quality_check.dart` | Quality checks and the ten reach heuristics. |
-| `lib/ai_provider.dart`, `lib/gemini_client.dart`, `lib/gemini_call.dart` | Provider contract, Gemini implementation, HTTP call helper. |
-| `lib/caption_generator.dart`, `lib/reply_assistant.dart` | **Standalone generators, scheduled for removal.** |
-| `lib/story_ideas.dart` | Story idea generation and story quality checks. |
-| `lib/prompt_builder.dart`, `lib/prompt_screen.dart` | Timed script and visual-prompt generation and review. |
-| `lib/projects.dart` | Story project persistence, autosave, and backup coordination. |
-| `lib/voice.dart` | Phone, Gemini, and ElevenLabs speech generation. |
-| `lib/video_builder.dart`, `lib/music.dart`, `lib/caption_renderer.dart` | Local video assembly, music selection, on-video captions. |
-| `lib/format_adapter.dart`, `lib/posting_pack.dart`, `lib/posting_kit.dart` | Format conversion and posting packs. |
-| `lib/content_library.dart`, `lib/regenerator.dart` | Library storage and section regeneration. |
-| `lib/plan_data.dart`, `lib/plan_screen.dart` | Hooks, posting schedule, manual results tracking. |
-| `lib/settings_screen.dart` | Gemini configuration, defaults, app behavior, data controls. |
-| `test/widget_test.dart` | **Currently does not compile**, so no test runs. |
+- the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
+- legacy store decoding
+- the content library save path (all four formats, metadata round trip, failed writes)
+- three prompt bugs that shipped silently (fixed hashtags, contradictory CTAs,
+  truncated JSON)
 
-`lib/idea_inbox.dart` and `lib/slide_prompt_list.dart` were deleted; the Idea Vault is
-implemented in `quick_content.dart` and still stores to `idea_inbox.json`.
+Not yet covered: the Gemini JSON parse path, network calls, FFmpeg assembly, and the
+AI fallback path.
 
-## Fast Android Wireless Development
+---
 
-Use `run_phone.ps1` from the project root to add Android platform-tools to the current
-PowerShell session, connect the phone, list Flutter devices, and launch the app.
+## 11. Development commands
 
-**Run it as `.\run_phone.ps1`.** A bare `run_phone.ps1` fails: PowerShell does not run
-the current directory from the command name.
+Content is authored in markdown and compiled to Dart, so prompts stay fast and a typo
+becomes a build error instead of a crash.
 
-Pair only if the phone has not already been paired with this computer:
+```bash
+flutter analyze lib          # 91 issues, 0 errors
+flutter test                 # 21 tests
 
-```powershell
-.\run_phone.ps1 -Pair
+dart run tool/sync_formats.dart      # content_formats.md -> Dart
+dart run tool/check_formats.dart     # validate the handbook
+dart run tool/check_axes.dart        # which axis values are decided
+dart run tool/review_sheet.dart      # markdown table to review and approve
+dart run tool/check_pillars.dart     # guard the known classifier mistakes
+dart run tool/reach_mechanics.dart   # distribution analysis
+dart run tool/show_ideas.dart <id>   # print one idea in full
 ```
 
-Enter the pairing IP and port from Android's "Pair device with pairing code" screen,
-then the code when ADB prompts. The script then asks for the current IP and port on the
-main Wireless debugging screen and starts the app.
-
-For later sessions, pairing is normally unnecessary:
+### Testing on your phone
 
 ```powershell
 .\run_phone.ps1
 ```
 
-To skip the prompt, pass the cached address:
+The `.\` matters — a bare `run_phone.ps1` fails. Pairing is only needed the first time
+(`.\run_phone.ps1 -Pair`). Keep the terminal open while editing: `r` reloads, `R`
+restarts, `q` stops.
 
-```powershell
-.\run_phone.ps1 -DeviceAddress "192.168.29.92:37423"
-```
+---
 
-Keep the `flutter run` terminal open while editing. Press `r` for hot reload, `R` for
-hot restart, and `q` to stop. If launching from the VS Code Flutter debugger, use its
-Hot Reload action instead.
+## 12. What is not done yet
 
-Do not run `flutter clean`, `flutter pub get`, analysis, and tests after every edit:
+In rough order of how much it matters:
 
-- Run `flutter pub get` after changing dependencies in `pubspec.yaml`.
-- Use `flutter clean` only to recover from stale build output or when native build
-  configuration requires a clean rebuild.
-- Run `flutter analyze` and the `tool/` checks at meaningful checkpoints and before
-  sharing changes.
-- Changes to Android permissions, Gradle files, or native plugins need a full
-  stop/rebuild; Dart hot reload cannot apply native changes.
+1. **The idea library is not migrated.** 45 pillars and 23 series still need a human
+   decision. Until then, idea data must not drive generation.
+2. **There is no unified Content Package.** Four different models of "a finished post"
+   exist, and separate caption, hashtag and hook generators still run alongside them.
+3. **The generated script is thrown away.** The prompt asks for narration and
+   per-scene dialogue, and it is never read back — so the app cannot yet show the
+   narration the plan promises.
+4. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+5. **Release builds are not distributable.** Signed with the debug keystore, and the
+   application id is still `com.example.reel_audio`.
+6. **Settings does not actually export or import** your data.
+7. **Most file-reading code cannot be tested.** Two components have a test seam; the
+   rest do not.
 
-Image selection, text-to-speech, FFmpeg rendering, and saving to the gallery depend on
-platform permissions and native plugin support, so validate those on the target phone.
+---
 
-## Current Limitations
+## 13. Keeping this document honest
 
-- **The content library has no viewer.** Packages save correctly and the four adapted
-  formats persist, but nothing lists or opens them.
-- **The idea library is mid-migration.** Most axis values are not yet approved, so idea
-  data is not authoritative and must not drive generation.
-- **The unified Content Package does not exist yet.** Four different models of "a
-  complete post" are in use, and separate caption, hashtag and hook generators still
-  exist alongside them.
-- **The `script` field is generated and discarded.** Narration and per-scene dialogue are
-  requested by the prompt and never read back.
-- Calendar, Analytics and Experiments tabs do not exist yet.
-- The app prepares content; Instagram publishing and scheduling are manual.
-- Reach and view counts cannot be predicted or guaranteed by a prompt, score, or
-  posting-time suggestion.
-- Veo video generation is not connected; the Shot Planner generates prompts only.
-- Data is primarily local, with no account-based cloud sync.
-- Settings export/import controls are not implemented.
-- Voice engines other than the device TTS require separate credentials and network
-  access.
-- Gemini model access, rate limits, supported regions, and quotas depend on the user's
-  Google AI account.
+`REDESIGN_PLAN.md` tracks the remaining work. Completed items are removed from it as
+they land, so it always shows only what is left.
 
-## Tests
-
-`flutter test` runs 15 tests across two files. Coverage is concentrated on the parts
-most likely to break silently: the Gemini script parser, legacy store decoding, and the
-content library save path.
-
-Not yet covered: the Gemini JSON parse path, `http`, FFmpeg assembly, and the Gemini
-fallback path. `ContentLibraryStore` and `PromoCommentVaultScreen` each have a test
-seam for this reason; most other file-reading components still do not.
-
-## Development Status
-
-See `REDESIGN_PLAN.md` for the full task list, current state, and remaining order. That
-file tracks open work only; completed items are removed as they land.
+If you change behaviour in the code, change this file in the same pass — a document
+that describes an earlier version of the app is worse than none, because it is trusted.

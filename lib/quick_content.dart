@@ -142,6 +142,22 @@ class PromoCommentStore {
     await save(list.map((c) => c.toJson()).toList());
   }
 
+  /// Removes a comment by its text.
+  ///
+  /// Text rather than id, because the built-in starter comments are created from plain
+  /// strings and do not carry a stable identifier of their own — deleting the first
+  /// starter comment by index or id would remove whichever comment happened to sort
+  /// first, which is not the same thing.
+  ///
+  /// Writing the shortened list back is what makes the deletion stick. Loading falls
+  /// back to the starters only while the file is absent, so a saved file is what
+  /// distinguishes "deleted" from "never existed".
+  static Future<void> delete(String text) async {
+    final list = await loadWithBuckets();
+    list.removeWhere((c) => c.text == text);
+    await save(list.map((c) => c.toJson()).toList());
+  }
+
   static Future<void> save(List<dynamic> comments) async {
     try {
       final file = await _path();
@@ -364,13 +380,19 @@ class _PromoCommentVaultScreenState extends State<PromoCommentVaultScreen> {
                                                 .bodyLarge,
                                           ),
                                         ),
-                                        IconButton(
-                                          tooltip: 'Copy comment',
-                                          onPressed: () =>
-                                              _copyComment(comment.text),
-                                          icon: const Icon(Icons.copy_outlined),
-                                        ),
-                                      ],
+IconButton(
+  tooltip: 'Copy comment',
+  onPressed: () =>
+  _copyComment(comment.text),
+  icon: const Icon(Icons.copy_outlined),
+  ),
+  IconButton(
+  tooltip: 'Delete comment',
+  onPressed: () =>
+  _deleteComment(comment),
+  icon: const Icon(Icons.delete_outline),
+  ),
+  ],
                                     ),
                                     if (comment.bucket.isNotEmpty)
                                       Padding(
