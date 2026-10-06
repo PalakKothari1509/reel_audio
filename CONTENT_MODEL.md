@@ -259,17 +259,23 @@ opportunities to get it half-right and no way to say which was the actual bet.
 
 ### Where this currently lives in the code
 
-Recording these so they are not lost, **not** as work done:
+Recording these so they are not lost, **not** as work done. Line numbers
+drift, so the table names symbols, not lines.
 
-| Decision | Code to change |
-| --- | --- |
-| Remove "Generate All Formats" | `quick_content.dart:1423` and `:3547` |
-| Remove the multi-format screen | `MultiFormatScreen` at `quick_content.dart:3369` |
-| Remove the all-formats generation path | `_generateAllFormats()` at `quick_content.dart:868` |
-| Generate one selected content type | Replaces all three above |
-| Drop the standalone Caption Generator | Dashboard entry, its route, its generation logic |
-| Caption is generated, and stays editable | Inside every package; editing survives generation |
-| Add delete to Promotion Comments | The vault row currently offers **copy only** |
+| Decision | Where it lives today | State |
+| --- | --- | --- |
+| Remove "Generate All Formats" | the `Generate All Formats (AI)` button calling `_generateAllFormats()` in Quick Content Studio, and the `Generate All Formats` button in `MultiFormatScreen` calling `_generateAll()` | recorded, not built |
+| Remove the multi-format screen | `MultiFormatScreen` | recorded, not built |
+| Remove the all-formats generation path | `_generateAllFormats()` and `_generateAll()` | recorded, not built |
+| Generate one selected content type | Replaces all three above | recorded, not built |
+| Drop the standalone Caption Generator | Dashboard entry (`CreatorHomeScreen.onCaptionGenerator`), its route in `main.dart`, `CaptionGeneratorScreen` in `caption_generator.dart` | recorded, not built |
+| Caption is generated, and stays editable | Inside every package; editing survives generation | recorded, not built |
+| Add delete to Promotion Comments | `PromoCommentStore.delete()`; each vault row has a delete button behind a "Delete this comment?" confirmation with **Cancel \| Delete** | **done** — covered by the widget test "deleting a promotion comment asks for confirmation first" |
+
+Removal of the all-formats path and the standalone Caption Generator is
+sequenced with the unified generation flow, not done before it: until one
+content type can be generated, deleting the existing paths would leave the
+app with no generation at all.
 
 ### One consequence that has to be handled with it
 

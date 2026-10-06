@@ -89,6 +89,40 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('deleting a promotion comment asks for confirmation first',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PromoCommentVaultScreen(
+          seed: [const PromoComment(text: 'A saved line someone relies on')],
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.byTooltip('Delete comment'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // The dialog quotes the comment, so the user can confirm they are
+    // deleting the line they think they are.
+    expect(find.text('Delete this comment?'), findsOneWidget);
+    expect(
+      find.textContaining('A saved line someone relies on'),
+      findsWidgets,
+    );
+
+    // Cancel is the safe path: a mis-tap must not remove the comment.
+    await tester.tap(find.text('Cancel'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Delete this comment?'), findsNothing);
+    expect(find.text('A saved line someone relies on'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Idea Vault opens the add idea form', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: IdeaInboxScreen()));
     await tester.pump();

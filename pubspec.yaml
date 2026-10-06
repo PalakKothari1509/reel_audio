@@ -1,5 +1,5 @@
 name: reel_audio
-description: "A new Flutter project."
+description: "Fun Learning With Palak Content Studio — a content decision system for short-form educational content for parents of children aged 1-4."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
   image_picker: ^1.1.2
   video_player: ^2.9.2
   flutter_tts: ^4.2.0
@@ -38,8 +37,6 @@ dependencies:
   path_provider: ^2.1.4
   http: ^1.2.2
   google_generative_ai: ^0.4.0
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
   shared_preferences: ^2.2.3
   # uuid was only used by lib/idea_inbox.dart, which is deleted. Every id in the app
   # is a millisecond timestamp, so nothing needs it.

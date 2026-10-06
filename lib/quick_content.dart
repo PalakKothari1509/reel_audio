@@ -227,6 +227,37 @@ class _PromoCommentVaultScreenState extends State<PromoCommentVaultScreen> {
     });
   }
 
+  Future<void> _deleteComment(PromoComment comment) async {
+    // Confirmed, because a promotion comment can be a saved line someone relies on and
+    // a mis-tap should not remove it.
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete this comment?'),
+        content: Text(
+          comment.text.length > 120
+              ? '"${comment.text.substring(0, 120)}..."'
+              : '"${comment.text}"',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await PromoCommentStore.delete(comment.text);
+    if (!mounted) return;
+    await _loadComments();
+  }
+
   Future<void> _copyComment(String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
