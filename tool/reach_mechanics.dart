@@ -6,8 +6,8 @@ import 'classify_ideas.dart';
 /// Classifies every idea against the distribution mechanics that actually decide
 /// whether a small account gets seen by non-followers.
 ///
-///   dart run tool/reach_mechanics.dart              dry run
-///   dart run tool/reach_mechanics.dart --csv        writes tool/reach_candidates.csv
+///   dart run tool/reachmechanics.dart              dry run
+///   dart run tool/reachmechanics.dart --csv        writes tool/reach_candidates.csv
 ///
 /// ── Pass, fail, unknown. Never a 1-to-10 score ───────────────────────────────
 //
@@ -52,7 +52,8 @@ class Mechanic {
 }
 
 /// Mechanics whose `fail` says the idea is **incompatible with the current
-/// production workflow**.
+/// production workflow**. Shared with `review_content.dart`, which reports
+/// the same ideas as a production notice rather than a blocker.
 ///
 /// This is deliberately NOT the same as "Instagram will not distribute this".
 ///
@@ -70,7 +71,7 @@ class Mechanic {
 ///
 /// An idea can be `ReachCandidate: yes` and `ProductionCompatible: no`. That is a
 /// filming job, not a bad idea.
-const _productionConstraints = {'visual_first', 'production_simple'};
+const productionConstraints = {'visual_first', 'production_simple'};
 
 String _text(Idea i) =>
     [i.g('Topic'), i.g('Problem'), i.g('Lesson'), i.g('Audience Problem'),
@@ -82,7 +83,12 @@ bool _has(Idea i, List<String> terms) {
   return terms.any(t.contains);
 }
 
-final _mechanics = <Mechanic>[
+/// The registered mechanics, shared with `review_content.dart` so the
+/// pre-install gate and this report judge ideas identically. Two tools
+/// with two copies of the signal lists would drift, and a drift between
+/// them is exactly the kind of silent disagreement this toolchain exists
+/// to prevent.
+final mechanics = <Mechanic>[
   Mechanic(
     'visual_first',
     'The story must survive with no voice and ~6 words of on-screen text.',
@@ -207,7 +213,7 @@ void main(List<String> argv) {
   stdout.writeln('Ideas: ${ideas.length}');
   stdout.writeln('');
   stdout.writeln('Per mechanic:');
-  for (final m in _mechanics) {
+  for (final m in mechanics) {
     final p = ideas.where((i) => m.judge(i) == 'pass').length;
     final f = ideas.where((i) => m.judge(i) == 'fail').length;
     final u = ideas.where((i) => m.judge(i) == 'unknown').length;
@@ -227,8 +233,8 @@ void main(List<String> argv) {
   final buckets = <int, int>{};
   final ranked = <List<dynamic>>[];
   for (final idea in ideas) {
-    final passes = _mechanics.where((m) => m.judge(idea) == 'pass').length;
-    final fails = _mechanics.where((m) => m.judge(idea) == 'fail').length;
+    final passes = mechanics.where((m) => m.judge(idea) == 'pass').length;
+    final fails = mechanics.where((m) => m.judge(idea) == 'fail').length;
     buckets[passes] = (buckets[passes] ?? 0) + 1;
     ranked.add([idea, passes, fails]);
   }
@@ -254,11 +260,11 @@ void main(List<String> argv) {
   for (final idea in ideas) {
     // Reach candidacy: passes at least one reach mechanic, and is not reference
     // content. `unknown` is the honest default, not a fail.
-    final reachPasses = _mechanics
+    final reachPasses = mechanics
         .where((m) => m.name != 'save_trigger' && m.judge(idea) == 'pass')
         .length;
     final isReference =
-        _mechanics.firstWhere((m) => m.name == 'save_trigger').judge(idea) == 'pass';
+        mechanics.firstWhere((m) => m.name == 'save_trigger').judge(idea) == 'pass';
 
     final reach = isReference
         ? 'no: support content'
@@ -269,9 +275,9 @@ void main(List<String> argv) {
     if (reach.startsWith('yes')) reachYes++;
     if (reach.startsWith('unknown')) reachUnknown++;
 
-    final blockedBy = _mechanics
+    final blockedBy = mechanics
         .where((m) => m.judge(idea) == 'fail' &&
-            _productionConstraints.contains(m.name))
+            productionConstraints.contains(m.name))
         .map((m) => m.name)
         .toList();
 
@@ -306,7 +312,7 @@ void main(List<String> argv) {
   // -- Mechanics the library barely states at all. This is the actionable finding.
   stdout.writeln('Mechanics the library does not state');
   stdout.writeln('-------------------------------------');
-  for (final m in _mechanics) {
+  for (final m in mechanics) {
     final unknown =
         ideas.where((i) => m.judge(i) == 'unknown').length;
     if (unknown <= ideas.length ~/ 3) continue;
@@ -328,7 +334,7 @@ void main(List<String> argv) {
   stdout.writeln('Support content, not reach candidates (by construction):');
   stdout.writeln('---------------------------------------------');
   for (final idea in ideas) {
-    if (_mechanics.firstWhere((m) => m.name == 'save_trigger').judge(idea) ==
+    if (mechanics.firstWhere((m) => m.name == 'save_trigger').judge(idea) ==
         'pass') {
       final f = validateNarrativeFormat(idea.g('Format')) ??
           validateNarrativeFormat(idea.g('Content Format'));
@@ -342,12 +348,12 @@ void main(List<String> argv) {
 
   if (argv.contains('--csv')) {
     final csv = StringBuffer()
-      ..writeln('idea_id,heading,${_mechanics.map((m) => m.name).join(',')}');
+      ..writeln('idea_id,heading,${mechanics.map((m) => m.name).join(',')}');
     for (final idea in ideas) {
       csv.writeln([
         idea.id,
         '"${idea.heading.replaceAll('"', "'")}"',
-        ..._mechanics.map((m) => m.judge(idea)),
+        ...mechanics.map((m) => m.judge(idea)),
       ].join(','));
     }
     File('tool/reach_candidates.csv').writeAsStringSync(csv.toString());

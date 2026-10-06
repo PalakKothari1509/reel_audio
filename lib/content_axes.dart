@@ -39,6 +39,13 @@
 
 import 'format_handbook.dart';
 
+String _normalizeAxisValue(String value) => value
+    .trim()
+    .toLowerCase()
+    .replaceAll(RegExp(r'[_\-\s&]+'), '')
+    .replaceAll(RegExp(r'[^a-z0-9]'), '')
+    .trim();
+
 // ============================================================================
 // PILLAR - what value the content gives
 // ============================================================================
@@ -61,9 +68,12 @@ enum ContentPillar {
   /// Renaming the concept rather than the identifier was the alternative, and it
   /// would have put a keyword-shaped word into every stored idea and every prompt.
   static ContentPillar? byLabel(String label) {
-    final lower = label.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(label);
     for (final p in ContentPillar.values) {
-      if (p.label.toLowerCase() == lower || p.name.toLowerCase() == lower) return p;
+      if (_normalizeAxisValue(p.label) == normalized ||
+          _normalizeAxisValue(p.name) == normalized) {
+        return p;
+      }
     }
     return null;
   }
@@ -75,8 +85,13 @@ enum ContentPillar {
   };
 
   /// Maps a retired pillar id onto the current set.
-  static ContentPillar? fromLegacy(String id) =>
-      _legacy[id.trim().toLowerCase().replaceAll('_', '-')];
+  static ContentPillar? fromLegacy(String id) {
+    final normalized = _normalizeAxisValue(id);
+    for (final entry in _legacy.entries) {
+      if (_normalizeAxisValue(entry.key) == normalized) return entry.value;
+    }
+    return null;
+  }
 }
 
 // ============================================================================
@@ -102,9 +117,12 @@ enum ContentSeries {
   const ContentSeries(this.label, this.description);
 
   static ContentSeries? byLabel(String label) {
-    final lower = label.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(label);
     for (final s in ContentSeries.values) {
-      if (s.label.toLowerCase() == lower || s.name == lower) return s;
+      if (_normalizeAxisValue(s.label) == normalized ||
+          _normalizeAxisValue(s.name) == normalized) {
+        return s;
+      }
     }
     return null;
   }
@@ -140,8 +158,13 @@ enum ContentSeries {
     'milestone_check': ContentSeries.ageBasedSkills,
   };
 
-  static ContentSeries? fromLegacy(String id) =>
-      _legacy[id.trim().toLowerCase()];
+  static ContentSeries? fromLegacy(String id) {
+    final normalized = _normalizeAxisValue(id);
+    for (final entry in _legacy.entries) {
+      if (_normalizeAxisValue(entry.key) == normalized) return entry.value;
+    }
+    return null;
+  }
 }
 
 // ============================================================================
@@ -165,10 +188,26 @@ enum ContentType {
   /// Matches the ids in `format_handbook.dart`'s `kContentTypeIds`.
   String get id => name;
 
+  static Map<String, ContentType> get _aliases => {
+        'reel': ContentType.reel,
+        'carousel': ContentType.carousel,
+        'trial reel': ContentType.trialReel,
+        'image reel': ContentType.imageSlideshowReel,
+        'image slideshow reel': ContentType.imageSlideshowReel,
+        'story reel': ContentType.imageSlideshowReel,
+        'static image': ContentType.staticImage,
+        'story': ContentType.story,
+      }.map((key, value) => MapEntry(_normalizeAxisValue(key), value));
+
   static ContentType? byLabel(String label) {
-    final lower = label.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(label);
+    final alias = _aliases[normalized];
+    if (alias != null) return alias;
     for (final t in ContentType.values) {
-      if (t.label.toLowerCase() == lower || t.name == lower) return t;
+      if (_normalizeAxisValue(t.label) == normalized ||
+          _normalizeAxisValue(t.name) == normalized) {
+        return t;
+      }
     }
     return null;
   }
@@ -205,10 +244,28 @@ enum ProductionMethod {
 
   const ProductionMethod(this.label, this.description);
 
+  static Map<String, ProductionMethod> get _aliases => {
+        'character': ProductionMethod.characterImages,
+        'image': ProductionMethod.characterImages,
+        'static': ProductionMethod.carousel,
+        'carousel': ProductionMethod.carousel,
+        'video': ProductionMethod.realLifeVideo,
+        'real life video': ProductionMethod.realLifeVideo,
+        'image slideshow': ProductionMethod.imageSlideshow,
+        'text': ProductionMethod.textBased,
+        'text based': ProductionMethod.textBased,
+        'mixed': ProductionMethod.mixed,
+      }.map((key, value) => MapEntry(_normalizeAxisValue(key), value));
+
   static ProductionMethod? byLabel(String label) {
-    final lower = label.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(label);
+    final alias = _aliases[normalized];
+    if (alias != null) return alias;
     for (final m in ProductionMethod.values) {
-      if (m.label.toLowerCase() == lower || m.name == lower) return m;
+      if (_normalizeAxisValue(m.label) == normalized ||
+          _normalizeAxisValue(m.name) == normalized) {
+        return m;
+      }
     }
     return null;
   }
@@ -248,9 +305,12 @@ enum ContentGoal {
   String get id => name;
 
   static ContentGoal? byLabel(String label) {
-    final lower = label.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(label);
     for (final g in ContentGoal.values) {
-      if (g.label.toLowerCase() == lower || g.name == lower) return g;
+      if (_normalizeAxisValue(g.label) == normalized ||
+          _normalizeAxisValue(g.name) == normalized) {
+        return g;
+      }
     }
     return null;
   }
@@ -269,8 +329,13 @@ enum ContentGoal {
     'authority': ContentGoal.authority,
   };
 
-  static ContentGoal? fromLegacy(String id) =>
-      _legacy[id.trim().toLowerCase()];
+  static ContentGoal? fromLegacy(String id) {
+    final normalized = _normalizeAxisValue(id);
+    for (final entry in _legacy.entries) {
+      if (_normalizeAxisValue(entry.key) == normalized) return entry.value;
+    }
+    return null;
+  }
 }
 
 // ============================================================================
@@ -297,9 +362,12 @@ enum IdeaStatus {
   const IdeaStatus(this.id);
 
   static IdeaStatus? byId(String id) {
-    final lower = id.trim().toLowerCase();
+    final normalized = _normalizeAxisValue(id);
     for (final s in IdeaStatus.values) {
-      if (s.id == lower || s.name == lower) return s;
+      if (_normalizeAxisValue(s.id) == normalized ||
+          _normalizeAxisValue(s.name) == normalized) {
+        return s;
+      }
     }
     return null;
   }

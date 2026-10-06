@@ -1,0 +1,17 @@
+idea_id,decision,note
+# One row per idea, filled by a human. This is the idea-level verdict,
+# separate from the axis decisions in pillar_decisions.csv and
+# format_decisions.csv, which decide what an idea IS. This file decides
+# what the library does with it.
+#
+#   keep     curated and fully classified; the only sync candidates
+#   rework   worth keeping, but not as written; fix it before it can sync
+#   archive  not active, but the history stays in the library
+#   delete   remove it. An idea with no packages, tests or results is
+#            removed completely; one that has them is removed from the
+#            active ideas while its history is retained (CONTENT_MODEL.md)
+#
+# Only `keep` ideas enter the app. An idea with no row is undecided, and
+# an undecided library is never ready to sync.
+#
+# Read by: dart run tool/review_content.dart

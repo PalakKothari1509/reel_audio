@@ -7,7 +7,7 @@ import 'migration_state.dart';
 
 /// The authoritative view of axis coverage across all 57 ideas.
 ///
-///   dart run tool/check_axes.dart
+///   dart run tool/checkaxes.dart
 ///
 /// Reads `content_ideas.md` plus every decisions file, and reports what is genuinely
 /// resolved versus what still needs a human. This exists because `check_ideas.dart`
@@ -55,7 +55,9 @@ const _contentTypeNames = {
   'static image': 'Static Image',
 };
 
-final _axes = <AxisSpec>[
+/// The registered axes, shared with `review_content.dart` so the
+/// pre-install gate and this report resolve ideas identically.
+final axes = <AxisSpec>[
   AxisSpec(
     'pillar', 'Pillar', 'tool/pillar_decisions.csv',
     hasEvidence: true,
@@ -155,7 +157,7 @@ void main() {
 
   // Decisions, keyed by axis name. Loaded once, not per idea.
   final decisions = <String, Map<String, Decision>>{};
-  for (final a in _axes) {
+  for (final a in axes) {
     if (a.decisionsFile == null) {
       decisions[a.name] = {};
       continue;
@@ -175,7 +177,7 @@ void main() {
   var anyBlocked = false;
   var allResolved = true;
 
-  for (final axis in _axes) {
+  for (final axis in axes) {
     final d = decisions[axis.name]!;
     var fromSource = 0, approved = 0, suggested = 0;
     var needsReview = 0, invalid = 0, archive = 0;
