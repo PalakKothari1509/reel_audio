@@ -5,8 +5,10 @@ Everything left to do on Fun Learning With Palak, in plain language.
 **How to read this:** tasks are grouped by what they unblock. Anything marked **YOURS**
 cannot be finished by me — it needs your decision or your keys.
 
-**Last checked:** `flutter analyze lib` → 91 issues, 0 errors. `flutter test` → 21
-tests, all passing. All checker scripts pass.
+**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 36
+tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and
+`review_content` report the open axes below — OPEN is the correct result for
+unresolved taxonomy, not a failure.
 
 ---
 
@@ -21,14 +23,23 @@ I can propose a value for almost every idea, with a reason. What I cannot do is 
 them for you — **a wrong pillar is invisible later**. It just quietly files the results
 of a good post under the wrong heading, and six months of testing becomes unreadable.
 
+**Two inputs unblock the next work, and neither is mine to produce:**
+
+- **(A) Source details for 12 approved new ideas.** They are staged in
+  `tool/approved_12_reconstruction.md` (temporary, non-authoritative) with only
+  the recovered fields. I will not invent the missing fields.
+- **(B) Explicit Phase D decisions for the existing 57.** These are human
+  classification decisions. I will not manufacture them, and `OPEN` is not
+  approval.
+
 | Axis | Decided | Still open |
 | --- | --- | --- |
-| Pillar | 11 suggested, 1 archived | **45** |
+| Pillar | 12 suggested | **43** |
 | Series | — | **23** |
-| Narrative Format | 19 approved | 2 blocked |
-| Content Type | — | 7 |
-| Production Method | — | 7 |
-| Goal | — | 6 |
+| Narrative Format | 19 approved, 12 suggested | 2 (1 needs review, 1 invalid) |
+| Content Type | 57 in source | 0 |
+| Production Method | — | **7** |
+| Goal | — | **6** |
 | Status | done | 0 |
 
 ### How to clear it quickly
@@ -63,7 +74,10 @@ Four old series names never mapped, and I did not guess:
 | `cuty-lessons` | 2 | Cuty is a character, not a series |
 | `the-casts` | 2 | Audience voting — neither of its posts is relatable content |
 
-This is the largest single editorial decision left.
+This is the largest single editorial decision left, and it is **deliberately
+not automated**: `little-stories` and `learning-through-play` stay OPEN until
+the Phase D pass decides what those 19 legacy ideas actually become. The
+checker reporting them OPEN is the correct signal, not a bug to fix.
 
 ### Two ideas that should not be forced
 
@@ -78,11 +92,15 @@ This is the largest single editorial decision left.
 
 ## Next: one generator instead of five
 
-Right now the app has separate caption, hashtag and hook tools, plus four different
-ideas of what a "finished post" looks like. That is the fragmentation problem.
+The standalone Caption Generator and the "Generate All Formats" multi-select are
+**already removed**. Create Content now generates one package for the selected
+content type, and caption is part of that package. What remains: the app still has
+multiple representations of a finished post, and they need to collapse into
+one `ContentPackage`.
 
-**This cannot be designed yet.** A finished package has to know what it is generating —
-which pillar, which series, which format — and right now most ideas don't.
+**The unified `ContentPackage` cannot be designed yet.** A finished package has to
+know what it is generating — which pillar, which series, which format — and right
+now most ideas don't.
 
 Once the axes are settled:
 
@@ -90,7 +108,7 @@ Once the axes are settled:
 - **Keep the script.** The prompt already asks for narration and per-scene dialogue,
   and the app throws it away. This is why narration isn't showing up in the output you
   asked for.
-- **Delete the standalone generators** once nothing needs them
+- **Delete the remaining standalone generators** once nothing needs them
 - **Delete dead screens** — a quality check screen nobody opens, a shot planner that
   redirects, an old home screen
 
@@ -109,8 +127,8 @@ clear:
 
 **The library explains what a post is, not why anyone would watch it or send it.**
 
-No idea in the library has a share trigger. That is a content gap, not a bug, and it
-is the highest-value thing to fix — a share is worth more than a view for this page.
+56 of 57 ideas currently do not have an evaluated share trigger. That is a
+content gap, not a bug, and it is the highest-value thing to fix.
 
 Once the axes are done, these become real fields on each idea rather than something I
 check from outside.
@@ -124,7 +142,7 @@ Four of the six tabs you planned do not exist:
 | Tab | State |
 | --- | --- |
 | Ideas | Split across three places |
-| Create | Five buttons where there should be one workflow |
+| Create | One workflow (one content type per generation); the multi-format path is gone |
 | **Calendar** | Does not exist |
 | **Analytics** | Does not exist |
 | **Experiments** | Does not exist — no place for the 1/5 through 5/5 rule |
@@ -180,9 +198,10 @@ exports (`tool/idea_classification_report.txt`,
   rotated**. It has no source code and nothing references
   it, but the key is live until rotated.
 - Standalone Caption Generator and "Generate All Formats"
-  code — only once the unified one-type generation flow
-  exists (`CONTENT_MODEL.md` §7b). Removing them first
-  would leave the app with no generation at all.
+  code — **done.** The unified one-type generation flow now
+  exists (`CONTENT_MODEL.md` §7b), so both were removed.
+  Caption is part of the package; Create Content generates
+  one content type at a time.
 - The 57 ideas and all content history — **never** deleted
   to make the folder look clean. They are curated through
   the Master Content Sheet (KEEP / REWORK / ARCHIVE /
@@ -192,11 +211,12 @@ exports (`tool/idea_classification_report.txt`,
 
 ## Testing gaps
 
-21 tests cover the quiet failures. Still untested: the Gemini JSON parser, network
-calls, video assembly, and what happens when AI fails.
+36 tests currently cover several quiet failure modes. Still untested: the Gemini
+JSON parser, network calls, video assembly, and what happens when AI fails.
 
 **Worth knowing:** most file-reading code cannot be tested at all, because the storage
-layer has no test seam. Two components now have one. The rest need the same.
+layer has no test seam. Three components now have one — the promotion vault, the
+idea inbox, and the content library. The rest need the same.
 
 ---
 
@@ -210,7 +230,7 @@ decided this: *"learn from your real Instagram results rather than manufacture a
 score."* The mechanics are checked honestly instead, as pass / fail / unknown.
 
 **Regenerating all the ideas right now.** New ideas would discard the 19 narrative
-formats and 11 pillars already decided, then restart the same review on a bigger set.
+formats and 12 pillars already decided, then restart the same review on a bigger set.
 
 **More formats before these 16 are proven.** A format should earn its place because a
 real idea needs it — which is exactly how the last four got added.
@@ -226,12 +246,19 @@ real idea needs it — which is exactly how the last four got added.
 ```
 CLEAR THE BLOCKER
   review sheet  ->  you decide  ->  migration writes approved values
+  (Phase D: the existing 57 ideas' KEEP / REWORK / ARCHIVE / DELETE)
+
+WAITING ON INPUT
+  (A) source details for the approved 12 — staged in
+      tool/approved_12_reconstruction.md, not written until the
+      missing fields arrive: the app never invents an idea
+  (B) explicit Phase D decisions for the existing 57
 
 THEN
   one ContentPackage
   keep the script (this is where narration comes from)
   production method decides the output
-  delete the standalone generators
+  delete the remaining standalone generators
 
 THEN
   experiments tab, with the 5-test rule enforced
