@@ -70,6 +70,55 @@ a caption baked in is a package that was never given the chance to be a differen
 
 ---
 
+## 3b. Delete and Archive are different things
+
+**Delete** means "I don't want this idea in my app anymore."
+**Archive** means "this idea is not active, but I want to keep
+the history." They are not the same operation and must not
+share a button.
+
+Deletion is permanent only after confirmation:
+
+```text
+Delete this idea?
+This will permanently remove the idea from the application.
+                Cancel | Delete
+```
+
+### What deletion does to history
+
+Deleting an idea must not automatically destroy unrelated
+historical data.
+
+```text
+Idea
+ └── ContentPackage
+      └── Test
+           └── Result
+```
+
+- An idea with **nothing generated from it** is removed
+  completely.
+- An idea that **already has packages, tests or results** is
+  removed from the active ideas while its historical records
+  are retained internally. "I don't want to see this idea
+  anymore" and "destroy every result this idea ever produced"
+  are different requests, and only the second one destroys
+  data.
+
+No idea has packages yet — `ContentPackage` is not
+implemented — so every delete in the current app is a
+complete removal. The rule above is the contract deletion
+must honour the moment packages exist.
+
+Both actions exist in the Ideas screens today, each behind
+a confirmation dialog. Archive is a lifecycle status
+(`archived`, §9); delete is a removal. A per-row Archive
+action does not exist yet and is recorded here as the
+design, not as work done.
+
+---
+
 ## 4. Classification — what it is
 
 Seven independent values. They answer seven different questions and must never be
@@ -419,6 +468,64 @@ is generated. Only the fields that matter for that content type are shown.
 - The exact storage shape
 
 Each can wait until something depends on it.
+
+---
+
+## 14. The Master Content Sheet
+
+One structured view of every idea intended for the
+application. The sheet is deliberately **not a new file**:
+it is the existing source files read together, because a
+second copy of the library would fork the source of truth
+and the two would drift.
+
+| Sheet field | Where it lives |
+| --- | --- |
+| ID, Series, Idea Title, Idea, Pillar, Content Type, Narrative Format, Production Method, Goal, Status, Notes | `content_ideas.md` |
+| Decision (KEEP / REWORK / DELETE / ARCHIVE) | `tool/idea_decisions.csv` |
+| Share Sender, Share Recipient, Share Situation, Share Reason, Share Status | not yet per-idea fields — checked mechanically by `tool/reach_mechanics.dart` until the axes settle, then written onto each idea |
+| Open Loop, Voice Mode | same |
+| Series Collision | `tool/review_content.dart` reports duplicate titles as possible collisions |
+
+The Decision vocabulary:
+
+- **KEEP** — curated and fully classified; the only sync candidates
+- **REWORK** — worth keeping, but not as written
+- **ARCHIVE** — not active, history retained (§3b)
+- **DELETE** — remove (§3b for what happens to history)
+
+### The pre-install gate
+
+```bash
+dart run tool/review_content.dart
+```
+
+prints the decision counts, every blocking issue, and
+`Ready to sync: YES / NO`, and exits non-zero when the
+library is not ready so it can guard a build. Only KEEP
+ideas that resolve every axis and state a share trigger
+can sync. A suggested axis value is a proposal and does
+not resolve; an UNKNOWN share trigger blocks, because an
+unanswered "would a specific parent send this" is a
+curation gap.
+
+## 15. Work order
+
+```text
+Phase A  Master Content Sheet structure       the files above
+Phase B  Existing ideas in the sheet          57 ideas, done
+Phase C  Pressure test against the checks     reach_mechanics, review_content
+Phase D  Clean                                KEEP / REWORK / ARCHIVE / DELETE
+Phase E  Classification freeze                the seven axes settled
+Phase F  App sync                             only KEEP ideas enter Flutter
+Phase G  ContentPackage                       the generation architecture
+```
+
+Phases A–C exist. Phase D is the current blocker: it
+needs human decisions, one pass over
+`tool/review_sheet.md` and `tool/idea_decisions.csv`.
+Phase E cannot start until D is done, and G cannot
+start until E.
 
 ---
 

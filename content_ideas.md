@@ -549,7 +549,7 @@ Status ladder: Idea → Ready → Generated → Trial → Posted → Testing →
 - **Series:** play-at-home
 - **Topic:** Toddler brushing their own teeth, properly
 - **Problem:** You used to do it, now they want to, now it is a battle
-- **Lesson:** Letting them take over badly first is how they learn to do it well
+- **Lesson:** Letting them take over badly first is how they learn to do it well. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.
 - **Format:** Problem → Fix
 - **Best content type:** Image Reel
 - **Alternative:** Carousel
@@ -558,7 +558,7 @@ Status ladder: Idea → Ready → Generated → Trial → Posted → Testing →
 - **Language:** Hinglish
 - **Status:** Idea
 - **Priority:** High
-- **Notes:** Strongest of the eight for saves. Consider splitting into two posts.
+- **Notes:** Strongest of the eight for saves. The 5-second wait before helping is folded into this idea, not split into a second post.
 
 ### 23. 7 Missions in 60 Seconds
 

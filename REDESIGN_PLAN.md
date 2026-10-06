@@ -149,8 +149,44 @@ until it has a real sample.
 | Remove unused packages | `hive`, `hive_flutter`, `cupertino_icons` are installed and never used |
 | Google AI SDK is deprecated | And it has no thinking-budget control, which is why one large Gemini call can still return truncated text |
 | Six near-identical storage classes | About 450 lines of repeated code with inconsistent error handling |
+| Two `IdeaStatus` enums | `content_axes.dart` has the lifecycle ladder (idea → … → archived); `quick_content.dart` has a separate UI enum (idea / developing / ready / posted / reuse) with emoji and label. Only `idea` and `posted` exist in both, so the two ladders can drift. Consolidate when the Idea Vault moves to the model's ladder |
 | README is template boilerplate | Says "A new Flutter project" |
 | CI does not run on this branch | Only tests `main` and `video-slideshow` |
+
+### File-by-file policy
+
+Recorded so cleanup is deliberate, not a file-count
+reduction. The final project is clean because every
+remaining file has a known purpose.
+
+**Keep:** `lib/`, `test/`, `tool/`, `android/`, `ios/`,
+`web/` if still supported, `assets/`, `pubspec.yaml`,
+`pubspec.lock`, `analysis_options.yaml`, `.gitignore`,
+and the documentation that is part of the system:
+`CONTENT_MODEL.md`, `content_formats.md`, `content_ideas.md`,
+`REDESIGN_PLAN.md`, `README.md`.
+
+**Review before deleting:** old generators, old screens and
+routes, duplicate storage classes, old content JSON, obsolete
+scripts, old planning documents (`master_prompt.md`,
+`POSTS_REVIEW.md`, `APP_OVERVIEW.md`, the chat-export
+`.md` files), temporary test files, and regenerable
+exports (`tool/idea_classification_report.txt`,
+`tool/reach_candidates.csv`, `debug_report.txt`).
+
+**Remove only when confirmed obsolete:**
+
+- `backend/` — **after the OpenAI key inside it has been
+  rotated**. It has no source code and nothing references
+  it, but the key is live until rotated.
+- Standalone Caption Generator and "Generate All Formats"
+  code — only once the unified one-type generation flow
+  exists (`CONTENT_MODEL.md` §7b). Removing them first
+  would leave the app with no generation at all.
+- The 57 ideas and all content history — **never** deleted
+  to make the folder look clean. They are curated through
+  the Master Content Sheet (KEEP / REWORK / ARCHIVE /
+  DELETE), not deleted by hand.
 
 ---
 

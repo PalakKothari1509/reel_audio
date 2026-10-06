@@ -840,7 +840,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
 
   // AI Provider for content generation
   AIProvider? _aiProvider;
-  bool _generatingAllFormats = false;
+  bool _generating = false;
 
   @override
   void initState() {
@@ -918,24 +918,27 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     setState(() {});
   }
 
-  Future<void> _generateAllFormats() async {
-    if (_ideaCtrl.text.trim().isEmpty) {
+  Future<void> _generateSelectedFormat() async {
+    final idea = _ideaCtrl.text.trim();
+    if (idea.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter an idea first')),
       );
       return;
     }
 
+    final normalized = _postType.trim();
+    final target = _contentFormatFor(normalized);
+
     if (_aiProvider == null || !_aiProvider!.isAvailable) {
-      // Fallback to template generation
       final bucket = _bucketValue.isNotEmpty
           ? BucketLibrary.byId(_bucketValue) ?? BucketLibrary.challenge
           : BucketLibrary.challenge;
 
       final pkg = await ContentGenerator.generate(
-        idea: _ideaCtrl.text,
+        idea: idea,
         bucket: bucket,
-        format: ContentFormat.carousel,
+        format: target,
         characters: CharacterLibrary.all,
         slideCount: _slideCount,
       );
@@ -953,7 +956,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
       return;
     }
 
-    setState(() => _generatingAllFormats = true);
+    setState(() => _generating = true);
 
     try {
       final bucket = _bucketValue.isNotEmpty
@@ -961,9 +964,9 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
           : BucketLibrary.challenge;
 
       final input = IdeaInput(
-        topic: _ideaCtrl.text,
+        topic: idea,
         bucket: bucket,
-        targetFormats: ContentFormat.values,
+        targetFormats: [target],
         brand: BrandContext.defaultContext(),
         characters: CharacterLibrary.all,
         slideCount: _slideCount,
@@ -974,7 +977,6 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
 
       if (!mounted) return;
 
-      // Run quality check
       final report = QualityChecker.check(pkg, formats);
 
       if (!report.isReadyToPost && mounted) {
@@ -1012,7 +1014,23 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Generation failed: $e')));
     } finally {
-      if (mounted) setState(() => _generatingAllFormats = false);
+      if (mounted) setState(() => _generating = false);
+    }
+  }
+
+  ContentFormat _contentFormatFor(String? type) {
+    switch ((type ?? '').trim().toLowerCase()) {
+      case 'reel':
+        return ContentFormat.reel;
+      case 'static image':
+      case 'image':
+        return ContentFormat.singleImage;
+      case 'trial reel':
+      case 'trialreel':
+        return ContentFormat.trialReel;
+      case 'carousel':
+      default:
+        return ContentFormat.carousel;
     }
   }
 
@@ -1457,10 +1475,8 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: _generatingAllFormats
-                          ? null
-                          : _generateAllFormats,
-                      icon: _generatingAllFormats
+                      onPressed: _generating ? null : _generateSelectedFormat,
+                      icon: _generating
                           ? const SizedBox(
                               width: 18,
                               height: 18,
@@ -1469,14 +1485,14 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Icon(Icons.auto_awesome_mosaic),
+                          : const Icon(Icons.auto_awesome),
                       label: Text(
-                        _generatingAllFormats
-                            ? 'Generating All Formats...'
-                            : 'Generate All Formats (AI)',
+                        _generating
+                            ? 'Generating ${_postType}...'
+                            : 'Generate ${_postType}',
                       ),
                       style: FilledButton.styleFrom(
-                        backgroundColor: Colors.purple,
+                        backgroundColor: AppColors.primary,
                       ),
                     ),
                   ),
@@ -2959,7 +2975,15 @@ class IdeaInboxStore {
 }
 
 class IdeaInboxScreen extends StatefulWidget {
-  const IdeaInboxScreen({super.key});
+  const IdeaInboxScreen({super.key, this.seed = const []});
+
+  /// Test seam: when non-empty, the screen renders these
+  /// items instead of reading the store. The store read
+  /// never completes in a widget test, so without this the
+  /// list — and the delete confirmation on it — cannot be
+  /// tested at all.
+  final List<IdeaInboxItem> seed;
+
   @override
   State<IdeaInboxScreen> createState() => _IdeaInboxScreenState();
 }
@@ -2972,7 +2996,12 @@ class _IdeaInboxScreenState extends State<IdeaInboxScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    if (widget.seed.isEmpty) {
+      _load();
+    } else {
+      _items = widget.seed;
+      _loading = false;
+    }
   }
 
   Future<void> _load() async {
@@ -3431,12 +3460,7 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
   final _ideaCtrl = TextEditingController();
   final _titleCtrl = TextEditingController();
   ContentBucket _selectedBucket = BucketLibrary.challenge;
-  final Set<ContentFormat> _selectedFormats = {
-    ContentFormat.carousel,
-    ContentFormat.reel,
-    ContentFormat.trialReel,
-    ContentFormat.singleImage,
-  };
+  ContentFormat _selectedFormat = ContentFormat.carousel;
   bool _generating = false;
   Map<ContentFormat, ContentPackage> _results = {};
   Map<ContentFormat, String> _errors = {};
@@ -3458,66 +3482,42 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
     super.dispose();
   }
 
-  Future<void> _generateAll() async {
-    if (_ideaCtrl.text.trim().isEmpty || _selectedFormats.isEmpty) return;
+  Future<void> _generateSelectedFormat() async {
+    if (_ideaCtrl.text.trim().isEmpty) return;
     setState(() {
       _generating = true;
       _results.clear();
       _errors.clear();
     });
 
-    final idea = _ideaCtrl.text.trim();
-    final title = _titleCtrl.text.trim().isEmpty
-        ? idea
-        : _titleCtrl.text.trim();
-
-    for (final format in _selectedFormats) {
-      try {
-        final package = await ContentGenerator.generate(
-          idea: idea,
-          bucket: _selectedBucket,
-          format: format,
-        );
-        // Override title with user's title
-        final updatedPackage = ContentPackage(
-          id: package.id,
-          idea: package.idea,
-          bucket: package.bucket,
-          format: package.format,
-          characters: package.characters,
-          hook: package.hook,
-          slides: package.slides,
-          visualPrompts: package.visualPrompts,
-          caption: package.caption,
-          cta: package.cta,
-          hashtags: package.hashtags,
-          pinnedComment: package.pinnedComment,
-          replyComments: package.replyComments,
-          createdAt: package.createdAt,
-        );
-        _results[format] = updatedPackage;
-      } catch (e) {
-        _errors[format] = e.toString();
-      }
+    try {
+      final package = await ContentGenerator.generate(
+        idea: _ideaCtrl.text.trim(),
+        bucket: _selectedBucket,
+        format: _selectedFormat,
+      );
+      _results[_selectedFormat] = package;
+    } catch (e) {
+      _errors[_selectedFormat] = e.toString();
+    } finally {
+      if (mounted) setState(() => _generating = false);
     }
-
-    setState(() => _generating = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('One Idea → Multiple Formats')),
+      appBar: AppBar(title: const Text('Generate Content')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           const Text(
-            'Enter your idea once, generate all formats',
+            'Enter your idea once, pick a content type',
             style: AppText.screenTitle,
           ),
           Gap.s,
           const Text(
-            'Select formats, pick a bucket, and generate. Each format gets the same core idea with format-specific structure.',
+            'Pick a content type and bucket, and generate. The idea keeps its core with format-specific structure.',
             style: AppText.hint,
           ),
           Gap.m,
@@ -3555,38 +3555,35 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
           ),
           Gap.m,
 
-          const Text('Formats to Generate', style: AppText.section),
+          const Text('Content Type', style: AppText.section),
           Gap.s,
-          ...ContentFormat.values.map(
-            (format) => CheckboxListTile(
-              value: _selectedFormats.contains(format),
-              onChanged: (v) => setState(() {
-                if (v == true)
-                  _selectedFormats.add(format);
-                else
-                  _selectedFormats.remove(format);
-              }),
-              title: Row(
-                children: [
-                  Text(format.emoji, style: const TextStyle(fontSize: 20)),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(format.label, style: AppText.body)),
-                  Text(
-                    '${format.defaultSlideCount} ${format == ContentFormat.singleImage ? 'image' : 'slides/shots'}',
-                    style: AppText.hint,
+          DropdownButtonFormField<ContentFormat>(
+            value: _selectedFormat,
+            items: ContentFormat.values
+                .map(
+                  (f) => DropdownMenuItem(
+                    value: f,
+                    child: Row(
+                      children: [
+                        Text(f.emoji, style: const TextStyle(fontSize: 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(f.label, style: AppText.body)),
+                        Text(
+                          '${f.defaultSlideCount} ${f == ContentFormat.singleImage ? 'image' : 'slides/shots'}',
+                          style: AppText.hint,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-            ),
+                )
+                .toList(),
+            onChanged: (v) =>
+                setState(() => _selectedFormat = v ?? ContentFormat.carousel),
           ),
           Gap.m,
 
           FilledButton.icon(
-            onPressed: _generating || _selectedFormats.isEmpty
-                ? null
-                : _generateAll,
+            onPressed: _generating ? null : _generateSelectedFormat,
             icon: _generating
                 ? const SizedBox(
                     width: 20,
@@ -3597,7 +3594,9 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
                     ),
                   )
                 : const Icon(Icons.auto_awesome),
-            label: Text(_generating ? 'Generating...' : 'Generate All Formats'),
+            label: Text(
+              _generating ? 'Generating...' : 'Generate ${_selectedFormat.label}',
+            ),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -3607,7 +3606,7 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
           if (_results.isNotEmpty || _errors.isNotEmpty) ...[
             const Text('Results', style: AppText.screenTitle),
             Gap.s,
-            ...ContentFormat.values.where((f) => _selectedFormats.contains(f)).map((
+            ..._results.keys.map((
               format,
             ) {
               final pkg = _results[format];

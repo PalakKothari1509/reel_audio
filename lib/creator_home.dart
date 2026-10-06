@@ -7,12 +7,11 @@ class CreatorHomeScreen extends StatelessWidget {
   final VoidCallback onTrialReel;
   final VoidCallback onCarousel;
   final VoidCallback onSingleImage;
-  final VoidCallback onMultiFormat;
+  final VoidCallback? onMultiFormat;
   final VoidCallback onIdeaVault;
   final VoidCallback onSavedStories;
   final VoidCallback onSettings;
   final VoidCallback onPromoComments;
-  final VoidCallback onCaptionGenerator;
 
   const CreatorHomeScreen({
     super.key,
@@ -20,12 +19,11 @@ class CreatorHomeScreen extends StatelessWidget {
     required this.onTrialReel,
     required this.onCarousel,
     required this.onSingleImage,
-    required this.onMultiFormat,
+    this.onMultiFormat,
     required this.onIdeaVault,
     required this.onSavedStories,
     required this.onSettings,
     required this.onPromoComments,
-    required this.onCaptionGenerator,
   });
 
   @override
@@ -59,8 +57,8 @@ class CreatorHomeScreen extends StatelessWidget {
             colour: AppColors.primary,
             title: 'Create Content',
             subtitle:
-                'One idea → Carousel, Reel, Trial Reel, Image (all at once)',
-            onTap: onMultiFormat,
+                'One idea → pick a content type and generate one package at a time',
+            onTap: onMultiFormat ?? () {},
           ),
           Gap.m,
           _ActionCard(
@@ -119,15 +117,8 @@ class CreatorHomeScreen extends StatelessWidget {
             subtitle: 'Copy and organize reusable profile replies',
             onTap: onPromoComments,
           ),
-          Gap.m,
-          _ActionCard(
-            icon: Icons.edit_note_outlined,
-            colour: AppColors.accent,
-            title: 'Caption Generator',
-            subtitle:
-                'One topic in, ready to post caption out (hook, body, CTA, 5 tags)',
-            onTap: onCaptionGenerator,
-          ),
+          // Caption generation is part of the selected content package, not a
+          // standalone dashboard action.
         ],
       ),
     );

@@ -23,10 +23,6 @@ void main() {
           onSavedStories: () {},
           onSettings: () {},
           onPromoComments: () => openedComments = true,
-          // Required, and omitting it failed the whole file to compile, so none of
-          // these seven tests could run. The dashboard gained a Caption Generator
-          // entry and the constructor was widened; nothing updated this file.
-          onCaptionGenerator: () {},
         ),
       ),
     );
@@ -120,6 +116,46 @@ void main() {
 
     expect(find.text('Delete this comment?'), findsNothing);
     expect(find.text('A saved line someone relies on'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('deleting an idea asks for confirmation first',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: IdeaInboxScreen(
+          seed: [
+            IdeaInboxItem(
+              id: 'test-1',
+              title: 'A saved idea someone relies on',
+              rawIdea: 'the raw idea text',
+              bucketId: 'challenge',
+              notes: '',
+              status: IdeaStatus.idea,
+              createdAt: DateTime(2026, 1, 1),
+              updatedAt: DateTime(2026, 1, 1),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Delete idea?'), findsOneWidget);
+    expect(find.text('This cannot be undone.'), findsOneWidget);
+
+    // Cancel is the safe path: a mis-tap must not remove the idea.
+    await tester.tap(find.text('Cancel'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Delete idea?'), findsNothing);
+    expect(find.text('A saved idea someone relies on'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
