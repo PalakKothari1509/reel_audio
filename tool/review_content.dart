@@ -1,7 +1,12 @@
 import 'dart:io';
 
+import 'package:reel_audio/content_quality_gate.dart';
+import 'package:reel_audio/content_axes.dart';
+import 'package:reel_audio/format_handbook.dart';
+
 import 'check_axes.dart';
 import 'classify_ideas.dart';
+import 'idea_decisions.dart';
 import 'migration_state.dart';
 import 'reach_mechanics.dart';
 
@@ -42,67 +47,10 @@ import 'reach_mechanics.dart';
 /// untouched. Exits non-zero when the library is not ready, so
 /// the gate can guard a build.
 
-/// The idea-level verdict, separate from the axis decisions.
-///
-/// `delete` means "remove from the library". An idea that already
-/// has packages, tests or results is not destroyed by it — see
-/// CONTENT_MODEL.md §3b. No idea has packages yet, so every
-/// delete is currently a complete removal.
-enum IdeaVerdict { keep, rework, archive, delete }
-
-/// One idea-level decision from `tool/idea_decisions.csv`.
-class IdeaDecision {
-  final String ideaId;
-  final IdeaVerdict verdict;
-  final String note;
-
-  IdeaDecision(this.ideaId, this.verdict, this.note);
-}
-
-/// Reads `tool/idea_decisions.csv`, failing loudly on anything
-/// malformed. A skipped row would turn a human decision into an
-/// undecided idea, and the gate would then report the wrong
-/// verdict — the same failure mode [readDecisions] exists to
-/// prevent.
-Map<String, IdeaDecision> readIdeaDecisions(String path) {
-  final file = File(path);
-  if (!file.existsSync()) return {};
-  final out = <String, IdeaDecision>{};
-  final lines = file.readAsLinesSync();
-
-  for (var i = 1; i < lines.length; i++) {
-    final l = lines[i];
-    if (l.trim().isEmpty || l.trimLeft().startsWith('#')) continue;
-
-    final m = RegExp(r'^([^,]+),([^,]+),(.*)$').firstMatch(l);
-    if (m == null) {
-      stderr.writeln('$path line ${i + 1}: cannot parse.');
-      exitCode = 1;
-      return {};
-    }
-
-    final raw = m.group(2)!.trim().toLowerCase();
-    IdeaVerdict? verdict;
-    for (final v in IdeaVerdict.values) {
-      if (v.name == raw) {
-        verdict = v;
-        break;
-      }
-    }
-    if (verdict == null) {
-      stderr.writeln('$path line ${i + 1}: unknown decision "$raw". '
-          'Expected one of ${IdeaVerdict.values.map((v) => v.name).join(', ')}.');
-      exitCode = 1;
-      return {};
-    }
-
-    var note = m.group(3)!.trim();
-    if (note.startsWith('"') && note.endsWith('"') && note.length > 1) {
-      note = note.substring(1, note.length - 1);
-    }
-    out[m.group(1)!.trim()] = IdeaDecision(m.group(1)!.trim(), verdict, note);
-  }
-  return out;
+/// Maps a [MigrationState] to the equivalent [AxisResolution].
+AxisResolution _migrationToResolution(MigrationState ms) {
+  return AxisResolution.values
+      .firstWhere((r) => r.name == ms.name, orElse: () => AxisResolution.approved);
 }
 
 void main() {
@@ -163,6 +111,7 @@ void main() {
     final title = idea.heading.trim().toLowerCase();
     keepTitles.putIfAbsent(title, () => []).add(idea.id);
 
+    // Check each axis for resolution.
     for (final axis in axes) {
       final d = axisDecisions[axis.name]![idea.id];
       final resolved =
@@ -171,6 +120,29 @@ void main() {
         unresolved.putIfAbsent(axis.axisLabel, () => []).add(idea.id);
       }
     }
+
+    // Build a classification snapshot for the quality gate.
+    final axisStates = <String, AxisResolution?>{};
+    for (final axis in axes) {
+      final d = axisDecisions[axis.name]?[idea.id];
+      final fromSource = axis.fromSource(idea);
+      if (d == null && fromSource == null) {
+        axisStates[axis.axisLabel] = null;
+      } else if (d != null) {
+        axisStates[axis.axisLabel] = _migrationToResolution(d.state);
+      } else {
+        axisStates[axis.axisLabel] = AxisResolution.approved;
+      }
+    }
+
+    final snapshot = ClassificationSnapshot(axisStates: axisStates);
+
+    // Run through the quality gate for a structured verdict.
+    final gateReport = QualityGate.evaluateIdea(
+      ideaId: idea.id,
+      title: idea.heading,
+      classification: snapshot,
+    );
 
     if (shareTrigger.judge(idea) == 'unknown') noShareTrigger.add(idea.id);
     if (openLoop.judge(idea) == 'unknown') openLoopUnknown.add(idea.id);

@@ -193,18 +193,31 @@ class ShareTrigger {
 
   /// The honest verdict for the share trigger as a whole.
   ///
-  /// Returns 'pass' only when all four components are populated.
+  /// Returns 'pass' only when all four components are populated with
+  /// non-empty, specific text.
   /// Returns 'fail' when there is text but it is generic/vague.
-  /// Returns 'unknown' when the fields are empty or absent.
+  /// Returns 'unknown' when the fields are empty, absent, or not all known.
   GateVerdict get verdict {
+    // If any field is not known (not even provided), it's UNKNOWN.
     if (!senderKnown || !recipientKnown || !situationKnown || !reasonKnown) {
       return GateVerdict.unknown;
     }
+    // All four are marked as known — but if any is empty, it's still UNKNOWN.
+    if (sender == null ||
+        sender!.trim().isEmpty ||
+        recipient == null ||
+        recipient!.trim().isEmpty ||
+        situation == null ||
+        situation!.trim().isEmpty ||
+        reason == null ||
+        reason!.trim().isEmpty) {
+      return GateVerdict.unknown;
+    }
     // All four are populated — check for genericness.
-    if (_isGeneric(sender) ||
-        _isGeneric(recipient) ||
-        _isGeneric(situation) ||
-        _isGeneric(reason)) {
+    if (_isGeneric(sender!) ||
+        _isGeneric(recipient!) ||
+        _isGeneric(situation!) ||
+        _isGeneric(reason!)) {
       return GateVerdict.fail;
     }
     return GateVerdict.pass;
@@ -339,11 +352,32 @@ class ClassificationSnapshot {
   }
 
   /// Whether any axis is still OPEN (no value, not even a suggestion).
-  bool get hasOpenAxes => axisStates.values.any((s) => s == null);
+  ///
+  /// Checks both explicit null values in the map AND missing required axes.
+  bool get hasOpenAxes {
+    const requiredAxes = [
+      'pillar',
+      'series',
+      'narrativeFormat',
+      'contentType',
+      'productionMethod',
+      'goal',
+    ];
+    for (final axis in requiredAxes) {
+      if (!axisStates.containsKey(axis) || axisStates[axis] == null) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-  /// Whether any axis is blocked on a human decision (needsReview, invalid).
+   /// Whether any axis is blocked on a human decision (needsReview, invalid).
   bool get hasBlockedAxes =>
       axisStates.values.any((s) => s == AxisResolution.needsReview || s == AxisResolution.invalid);
+
+  /// Whether any axis is flagged as an archive candidate.
+  bool get hasArchiveCandidateAxes =>
+      axisStates.values.any((s) => s == AxisResolution.archiveCandidate);
 
   Map<String, dynamic> toJson() => {
         'pillar': pillar?.label,
@@ -680,7 +714,8 @@ class QualityGate {
       shareTrigger: shareTrigger,
       voiceMode: inferredVoice,
       saveValue: inferredSave,
-      isArchived: isArchived || classification.status == IdeaStatus.archived,
+      isArchived: isArchived || classification.status == IdeaStatus.archived ||
+          classification.hasArchiveCandidateAxes,
       isBlocked: isBlocked || classification.hasBlockedAxes,
       checkedAt: DateTime.now(),
     );
@@ -700,7 +735,10 @@ class QualityGate {
     final checks = <GateCheckResult>[];
 
     checks.addAll(_productionChecks(classification, null));
-    checks.addAll(_performanceChecks(testCount, null));
+    checks.addAll(_performanceChecks(
+      testCount,
+      classification.narrativeFormatName,
+    ));
 
     final inferredVoice = VoiceMode.infer(
       null,
