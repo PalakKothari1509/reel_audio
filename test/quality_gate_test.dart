@@ -110,6 +110,117 @@ void main() {
     });
   });
 
+  // ── OpenLoop ───────────────────────────────────────────────────────
+
+  group('OpenLoop', () {
+    test('an empty open loop is UNKNOWN, not PASS', () {
+      const loop = OpenLoop();
+      expect(loop.verdict, OpenLoopVerdict.unknown);
+    });
+
+    test('a fully populated specific open loop is PASS for formats that need it', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why the toddler refuses the carrot',
+        promise: 'The simple kitchen swap that changes everything',
+        mechanic: 'reveal',
+        payoff: 'Grated carrot in the pancake batter',
+        formatName: 'problemFix',
+      );
+      expect(loop.verdict, OpenLoopVerdict.pass);
+    });
+
+    test('a generic open loop is FAIL, not PASS', () {
+      final loop = OpenLoop.filled(
+        withheld: 'the answer',
+        promise: 'what happens next',
+        mechanic: 'cliffhanger',
+        payoff: 'watch to see',
+        formatName: 'problemFix',
+      );
+      expect(loop.verdict, OpenLoopVerdict.fail);
+    });
+
+    test('a partially populated open loop is UNKNOWN', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why the toddler refuses',
+        promise: 'The simple swap',
+        mechanic: 'reveal',
+        payoff: '',
+        formatName: 'problemFix',
+      );
+      expect(loop.verdict, OpenLoopVerdict.unknown);
+    });
+
+    test('format that does not need open loop returns NOT_REQUIRED', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why',
+        promise: 'The answer',
+        mechanic: 'reveal',
+        payoff: 'The reveal',
+        formatName: 'saveThisList',
+      );
+      expect(loop.verdict, OpenLoopVerdict.notRequired);
+    });
+
+    test('format explicitly without open loop returns NOT_REQUIRED', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why',
+        promise: 'The answer',
+        mechanic: 'reveal',
+        payoff: 'The reveal',
+        formatName: 'pov',
+      );
+      expect(loop.verdict, OpenLoopVerdict.notRequired);
+    });
+
+    test('unknown format with open loop is UNKNOWN (conservative)', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why the toddler refuses',
+        promise: 'The simple swap',
+        mechanic: 'reveal',
+        payoff: 'Grated carrot in batter',
+        formatName: 'unknownFormat',
+      );
+      expect(loop.verdict, OpenLoopVerdict.unknown);
+    });
+
+    test('no format specified with open loop is UNKNOWN', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why the toddler refuses',
+        promise: 'The simple swap',
+        mechanic: 'reveal',
+        payoff: 'Grated carrot in batter',
+      );
+      expect(loop.verdict, OpenLoopVerdict.unknown);
+    });
+
+    test('round-trips through JSON', () {
+      final loop = OpenLoop.filled(
+        withheld: 'Why the toddler refuses',
+        promise: 'The simple swap',
+        mechanic: 'reveal',
+        payoff: 'Grated carrot in batter',
+        formatName: 'problemFix',
+      );
+      final restored = OpenLoop.fromJson(loop.toJson());
+      expect(restored.verdict, OpenLoopVerdict.pass);
+      expect(restored.withheld, loop.withheld);
+      expect(restored.mechanic, loop.mechanic);
+    });
+
+    test('formatNeedsOpenLoop recognizes problemFix', () {
+      expect(OpenLoop.formatNeedsOpenLoop('problemFix'), isTrue);
+      expect(OpenLoop.formatNeedsOpenLoop('miniStory'), isTrue);
+      expect(OpenLoop.formatNeedsOpenLoop('thisOrThat'), isTrue);
+    });
+
+    test('formatDoesNotNeedOpenLoop recognizes saveThisList', () {
+      expect(OpenLoop.formatDoesNotNeedOpenLoop('saveThisList'), isTrue);
+      expect(OpenLoop.formatDoesNotNeedOpenLoop('pov'), isTrue);
+      expect(OpenLoop.formatDoesNotNeedOpenLoop('numberedFramework'), isTrue);
+    });
+  });
+
   // ── VoiceMode ────────────────────────────────────────────────────
 
   group('VoiceMode', () {
@@ -432,6 +543,87 @@ void main() {
       expect(report.isBlockedFromGeneration, isTrue);
     });
 
+    test('an open loop missing for a format that needs it is UNKNOWN', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(narrativeFormatName: 'problemFix'),
+      );
+      final olCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.open_loop');
+      expect(olCheck.verdict, GateVerdict.unknown);
+      expect(olCheck.reason, contains('benefits from an open loop'));
+    });
+
+    test('an open loop provided for a format that needs it is PASS', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(narrativeFormatName: 'problemFix'),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses the carrot',
+          promise: 'The simple kitchen swap that changes everything',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in the pancake batter',
+          formatName: 'problemFix',
+        ),
+      );
+      final olCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.open_loop');
+      expect(olCheck.verdict, GateVerdict.pass);
+      expect(report.isBlockedFromGeneration, isFalse);
+    });
+
+    test('a generic open loop FAILS the creative gate', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(narrativeFormatName: 'problemFix'),
+        openLoop: OpenLoop.filled(
+          withheld: 'the answer',
+          promise: 'what happens next',
+          mechanic: 'cliffhanger',
+          payoff: 'watch to see',
+          formatName: 'problemFix',
+        ),
+      );
+      final olCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.open_loop');
+      expect(olCheck.verdict, GateVerdict.fail);
+      expect(report.isBlockedFromGeneration, isTrue);
+    });
+
+    test('a format that does not need open loop gets PASS automatically', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(narrativeFormatName: 'saveThisList'),
+      );
+      final olCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.open_loop');
+      expect(olCheck.verdict, GateVerdict.pass);
+      expect(olCheck.reason, contains('does not require'));
+    });
+
+    test('an explicitly provided open loop for a format that does not need it is PASS', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(narrativeFormatName: 'pov'),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why',
+          promise: 'The answer',
+          mechanic: 'reveal',
+          payoff: 'The reveal',
+          formatName: 'pov',
+        ),
+      );
+      final olCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.open_loop');
+      expect(olCheck.verdict, GateVerdict.pass);
+      expect(olCheck.reason, contains('does not require'));
+    });
+
     test('the five-test rule produces UNKNOWN below five tests', () {
       final report = QualityGate.evaluateIdea(
         ideaId: 'test',
@@ -606,6 +798,429 @@ void main() {
         expect(dimensions.contains(dim), isTrue,
             reason: 'missing checks for ${dim.name}');
       }
+    });
+  });
+}
+
+  // ── ReadyToGenerate ─────────────────────────────────────────────────
+
+  group('ReadyToGenerateReport', () {
+      final report = ReadyToGenerateReport(
+        ideaId: 'test',
+        title: 'Test',
+        verdict: ReadyToGenerateVerdict.pass,
+        checks: [
+          ReadyCheck(
+            id: 'ready.test',
+            name: 'Test check',
+            verdict: ReadyToGenerateVerdict.pass,
+            reason: 'All good',
+          ),
+        ],
+        checkedAt: DateTime(2026, 1, 1),
+      );
+      final restored = ReadyToGenerateReport.fromJson(report.toJson());
+      expect(restored.ideaId, report.ideaId);
+      expect(restored.verdict, report.verdict);
+      expect(restored.checks.length, report.checks.length);
+      expect(restored.checks.first.verdict, ReadyToGenerateVerdict.pass);
+    });
+
+    test('isReady is true when all checks pass', () {
+      final report = ReadyToGenerateReport(
+        ideaId: 'test',
+        verdict: ReadyToGenerateVerdict.pass,
+        checks: [
+          ReadyCheck(id: '1', name: 'A', verdict: ReadyToGenerateVerdict.pass, reason: ''),
+          ReadyCheck(id: '2', name: 'B', verdict: ReadyToGenerateVerdict.pass, reason: ''),
+        ],
+        checkedAt: DateTime.now(),
+      );
+      expect(report.isReady, isTrue);
+      expect(report.isBlocked, isFalse);
+      expect(report.needsReview, isFalse);
+    });
+
+    test('isBlocked is true when any check fails', () {
+      final report = ReadyToGenerateReport(
+        ideaId: 'test',
+        verdict: ReadyToGenerateVerdict.fail,
+        checks: [
+          ReadyCheck(id: '1', name: 'A', verdict: ReadyToGenerateVerdict.pass, reason: ''),
+          ReadyCheck(id: '2', name: 'B', verdict: ReadyToGenerateVerdict.fail, reason: ''),
+        ],
+        checkedAt: DateTime.now(),
+      );
+      expect(report.isBlocked, isTrue);
+      expect(report.isReady, isFalse);
+    });
+
+    test('needsReview is true when any check is unknown', () {
+      final report = ReadyToGenerateReport(
+        ideaId: 'test',
+        verdict: ReadyToGenerateVerdict.unknown,
+        checks: [
+          ReadyCheck(id: '1', name: 'A', verdict: ReadyToGenerateVerdict.pass, reason: ''),
+          ReadyCheck(id: '2', name: 'B', verdict: ReadyToGenerateVerdict.unknown, reason: ''),
+        ],
+        checkedAt: DateTime.now(),
+      );
+      expect(report.needsReview, isTrue);
+      expect(report.isReady, isFalse);
+    });
+  });
+
+  group('QualityGate.evaluateReadyToGenerate', () {
+    test('fully ready idea → PASS', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: fullyApproved(),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.pass);
+      expect(report.isReady, isTrue);
+      expect(report.isBlocked, isFalse);
+      expect(report.needsReview, isFalse);
+    });
+
+    test('missing classification (unapproved axes) → FAIL', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: snapshot(
+          pillar: ContentPillar.doIt,
+          series: ContentSeries.tryThisAtHome,
+          narrativeFormatName: 'problemFix',
+          contentType: ContentType.reel,
+          productionMethod: ProductionMethod.characterImages,
+          goal: ContentGoal.reach,
+          axisStates: {
+            'pillar': AxisResolution.suggested, // Not approved!
+            'series': AxisResolution.approved,
+            'narrativeFormat': AxisResolution.approved,
+            'contentType': AxisResolution.approved,
+            'productionMethod': AxisResolution.approved,
+            'goal': AxisResolution.approved,
+          },
+        ),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.fail);
+      expect(report.isBlocked, isTrue);
+      final classificationCheck = report.checks.firstWhere((c) => c.id == 'ready.classification');
+      expect(classificationCheck.verdict, ReadyToGenerateVerdict.fail);
+      expect(classificationCheck.reason, contains('pillar'));
+    });
+
+    test('Share Trigger FAIL → not ready', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: fullyApproved(),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parents',
+          recipient: 'Parents',
+          situation: 'Relatable',
+          reason: 'Parents will share this',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.fail);
+      final stCheck = report.checks.firstWhere((c) => c.id == 'ready.share_trigger');
+      expect(stCheck.verdict, ReadyToGenerateVerdict.fail);
+    });
+
+    test('Share Trigger UNKNOWN → UNKNOWN', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: fullyApproved(),
+        // No share trigger provided
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.unknown);
+      final stCheck = report.checks.firstWhere((c) => c.id == 'ready.share_trigger');
+      expect(stCheck.verdict, ReadyToGenerateVerdict.unknown);
+    });
+
+    test('Open Loop FAIL → not ready', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: fullyApproved(),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'the answer',
+          promise: 'what happens next',
+          mechanic: 'cliffhanger',
+          payoff: 'watch to see',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.fail);
+      final olCheck = report.checks.firstWhere((c) => c.id == 'ready.open_loop');
+      expect(olCheck.verdict, ReadyToGenerateVerdict.fail);
+    });
+
+    test('Open Loop NOT_REQUIRED/PASS → allowed', () {
+      // Format that doesn't need open loop
+      final report1 = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test1',
+        title: 'Test',
+        classification: fullyApproved(narrativeFormatName: 'saveThisList'),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        // No open loop provided
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report1.verdict, ReadyToGenerateVerdict.pass);
+      final olCheck1 = report1.checks.firstWhere((c) => c.id == 'ready.open_loop');
+      expect(olCheck1.verdict, ReadyToGenerateVerdict.pass);
+
+      // Format that doesn't need open loop but one provided
+      final report2 = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test2',
+        title: 'Test',
+        classification: fullyApproved(narrativeFormatName: 'pov'),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why',
+          promise: 'The answer',
+          mechanic: 'reveal',
+          payoff: 'The reveal',
+          formatName: 'pov',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report2.verdict, ReadyToGenerateVerdict.pass);
+    });
+
+    test('missing voice mode → UNKNOWN', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: fullyApproved(narrativeFormatName: 'unknownFormat'),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'unknownFormat',
+        ),
+        // No voice mode provided, and format is unknown so cannot infer
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.unknown);
+      final vmCheck = report.checks.firstWhere((c) => c.id == 'ready.voice_mode');
+      expect(vmCheck.verdict, ReadyToGenerateVerdict.unknown);
+    });
+
+    test('missing production method → not ready', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: snapshot(
+          pillar: ContentPillar.doIt,
+          series: ContentSeries.tryThisAtHome,
+          narrativeFormatName: 'problemFix',
+          contentType: ContentType.reel,
+          productionMethod: null, // Missing!
+          goal: ContentGoal.reach,
+          axisStates: {
+            'pillar': AxisResolution.approved,
+            'series': AxisResolution.approved,
+            'narrativeFormat': AxisResolution.approved,
+            'contentType': AxisResolution.approved,
+            'productionMethod': AxisResolution.suggested, // Not approved
+            'goal': AxisResolution.approved,
+          },
+        ),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.fail);
+      final pmCheck = report.checks.firstWhere((c) => c.id == 'ready.production_method');
+      expect(pmCheck.verdict, ReadyToGenerateVerdict.fail);
+    });
+
+    test('missing goal → not ready', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: snapshot(
+          pillar: ContentPillar.doIt,
+          series: ContentSeries.tryThisAtHome,
+          narrativeFormatName: 'problemFix',
+          contentType: ContentType.reel,
+          productionMethod: ProductionMethod.characterImages,
+          goal: null, // Missing!
+          axisStates: {
+            'pillar': AxisResolution.approved,
+            'series': AxisResolution.approved,
+            'narrativeFormat': AxisResolution.approved,
+            'contentType': AxisResolution.approved,
+            'productionMethod': AxisResolution.approved,
+            'goal': AxisResolution.suggested, // Not approved
+          },
+        ),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.fail);
+      final goalCheck = report.checks.firstWhere((c) => c.id == 'ready.goal');
+      expect(goalCheck.verdict, ReadyToGenerateVerdict.fail);
+    });
+
+    test('insufficient source content → UNKNOWN', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'test',
+        title: 'Test',
+        classification: snapshot(
+          pillar: ContentPillar.doIt,
+          series: ContentSeries.tryThisAtHome,
+          narrativeFormatName: 'problemFix',
+          contentType: ContentType.reel,
+          productionMethod: ProductionMethod.characterImages,
+          goal: ContentGoal.reach,
+          axisStates: {
+            'pillar': AxisResolution.approved,
+            'series': AxisResolution.approved,
+            'narrativeFormat': AxisResolution.approved,
+            'contentType': AxisResolution.approved,
+            'productionMethod': AxisResolution.approved,
+            'goal': AxisResolution.approved,
+            // Only 6/7 axes - status missing
+          },
+        ),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent',
+          situation: 'Dinner battle',
+          reason: 'Exact same thing at our table',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Why the toddler refuses',
+          promise: 'The simple swap',
+          mechanic: 'reveal',
+          payoff: 'Grated carrot in batter',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      // Source content check expects 5/7 but has 6, so should be PASS
+      // But status is missing so source_content should be UNKNOWN
+      expect(report.verdict, ReadyToGenerateVerdict.unknown);
+    });
+
+    test('valid complete idea → PASS', () {
+      final report = QualityGate.evaluateReadyToGenerate(
+        ideaId: 'day9-sock-hunt',
+        title: 'The Sock Hunt',
+        classification: fullyApproved(),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent of a toddler',
+          recipient: 'Another parent whose child hides socks',
+          situation: 'Morning rush and missing socks',
+          reason: 'This is exactly our morning — I send this to my husband',
+        ),
+        openLoop: OpenLoop.filled(
+          withheld: 'Where the missing sock actually is',
+          promise: 'The hiding spot every toddler uses',
+          mechanic: 'reveal',
+          payoff: 'Inside the shoe they just took off',
+          formatName: 'problemFix',
+        ),
+        voiceMode: VoiceMode.optional,
+      );
+      expect(report.verdict, ReadyToGenerateVerdict.pass);
+      expect(report.isReady, isTrue);
+      expect(report.isBlocked, isFalse);
+      expect(report.needsReview, isFalse);
     });
   });
 }

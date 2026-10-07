@@ -285,8 +285,230 @@ class ShareTrigger {
 }
 
 // ============================================================================
-// GATE VERDICT
+// OPEN LOOP — structured
 // ============================================================================
+//
+// An open loop is something withheld that gives the viewer a reason to stay
+// (watch to the end, comment, rewatch). It is NOT required for every format.
+// Formats that benefit from open loops: Mini Story, Problem → Fix, Expectation
+// vs Reality, This or That. Formats that don't: Save This List, Quick Tip,
+// POV, Three Examples, Numbered Framework.
+
+/// The honest verdict for the open loop as a whole.
+enum OpenLoopVerdict {
+  pass('PASS', 'An open loop is present and specific.'),
+  fail('FAIL', 'Open loop claimed but is generic/vague.'),
+  unknown('UNKNOWN', 'Not provided or cannot be determined.'),
+  notRequired('NOT_REQUIRED', 'Format does not require an open loop.');
+
+  final String label;
+  final String description;
+
+  const OpenLoopVerdict(this.label, this.description);
+}
+
+/// A structured open loop with the pattern that creates retention.
+///
+/// The structure mirrors what makes content binge-worthy:
+/// - `withheld`: what is withheld from the viewer (the question, the reveal)
+/// - `promise`: what the viewer gets if they stay (the answer, the payoff)
+/// - `mechanic`: how it's delivered (cliffhanger, puzzle, twist, reveal)
+/// - `payoff`: the specific outcome (the answer, the resolution)
+///
+/// Each field defaults to UNKNOWN until a human provides a concrete answer.
+class OpenLoop {
+  /// What is withheld? Must be specific, not "the answer".
+  final String? withheld;
+  final bool withheldKnown;
+
+  /// What does the viewer get if they stay?
+  final String? promise;
+  final bool promiseKnown;
+
+  /// How is it delivered? (cliffhanger, puzzle, twist, reveal, question)
+  final String? mechanic;
+  final bool mechanicKnown;
+
+  /// What is the specific payoff?
+  final String? payoff;
+  final bool payoffKnown;
+
+  /// Which format is this for? Some formats don't need open loops.
+  final String? formatName;
+
+  const OpenLoop({
+    this.withheld,
+    this.promise,
+    this.mechanic,
+    this.payoff,
+    this.formatName,
+    this.withheldKnown = false,
+    this.promiseKnown = false,
+    this.mechanicKnown = false,
+    this.payoffKnown = false,
+  });
+
+  /// Creates a fully-populated open loop.
+  OpenLoop.filled({
+    required String this.withheld,
+    required String this.promise,
+    required String this.mechanic,
+    required String this.payoff,
+    this.formatName,
+  })  : withheldKnown = true,
+        promiseKnown = true,
+        mechanicKnown = true,
+        payoffKnown = true;
+
+  /// Formats that benefit from open loops (from reach_mechanics and format handbook).
+  static const _formatsWithOpenLoop = {
+    'ministory',
+    'problemfix',
+    'expectationreality',
+    'thisorthat',
+    'personalmistake',
+    'unpopularopinion',
+    'beforeyou',
+    'questionanswer',
+    'quicktip',
+  };
+
+  /// Formats that explicitly do NOT need open loops.
+  static const _formatsWithoutOpenLoop = {
+    'savethislist',
+    'pov',
+    'numberedframework',
+    'threeexamples',
+    'dothisnotthat',
+    'mistakeslist',
+    'exactscript',
+  };
+
+  /// Whether the given format name benefits from an open loop.
+  static bool formatNeedsOpenLoop(String? formatName) {
+    if (formatName == null) return false;
+    final lower = formatName.toLowerCase();
+    return _formatsWithOpenLoop.contains(lower);
+  }
+
+  /// Whether the given format explicitly does not need an open loop.
+  static bool formatDoesNotNeedOpenLoop(String? formatName) {
+    if (formatName == null) return false;
+    final lower = formatName.toLowerCase();
+    return _formatsWithoutOpenLoop.contains(lower);
+  }
+
+  /// The honest verdict for the open loop as a whole.
+  ///
+  /// Returns 'pass' only when all four components are populated with
+  /// non-empty, specific text AND the format benefits from open loops.
+  /// Returns 'fail' when there is text but it is generic/vague.
+  /// Returns 'notRequired' when the format doesn't need open loops.
+  /// Returns 'unknown' when the fields are empty, absent, or not all known.
+  OpenLoopVerdict get verdict {
+    // If format doesn't need open loops, return notRequired (not a failure).
+    if (formatName != null && OpenLoop.formatDoesNotNeedOpenLoop(formatName)) {
+      return OpenLoopVerdict.notRequired;
+    }
+
+    // If any field is not known (not even provided), it's UNKNOWN.
+    if (!withheldKnown || !promiseKnown || !mechanicKnown || !payoffKnown) {
+      return OpenLoopVerdict.unknown;
+    }
+
+    // All four are marked as known — but if any is empty, it's still UNKNOWN.
+    if (withheld == null ||
+        withheld!.trim().isEmpty ||
+        promise == null ||
+        promise!.trim().isEmpty ||
+        mechanic == null ||
+        mechanic!.trim().isEmpty ||
+        payoff == null ||
+        payoff!.trim().isEmpty) {
+      return OpenLoopVerdict.unknown;
+    }
+
+    // All four are populated — check for genericness.
+    if (_isGeneric(withheld!) ||
+        _isGeneric(promise!) ||
+        _isGeneric(mechanic!) ||
+        _isGeneric(payoff!)) {
+      return OpenLoopVerdict.fail;
+    }
+
+    // Format benefits from open loops and all fields are specific.
+    if (formatName != null && OpenLoop.formatNeedsOpenLoop(formatName)) {
+      return OpenLoopVerdict.pass;
+    }
+
+    // Format is not in the known lists — be conservative.
+    return OpenLoopVerdict.unknown;
+  }
+
+  static bool _isGeneric(String? s) {
+    if (s == null || s.trim().isEmpty) return true;
+    final lower = s.toLowerCase();
+    final generic = [
+      'the answer',
+      'the reveal',
+      'what happens',
+      'find out',
+      'watch to see',
+      'stay tuned',
+      'you will see',
+      'cliffhanger',
+    ];
+    return generic.any(lower.contains);
+  }
+
+  OpenLoop copyWith({
+    String? Function()? withheld,
+    String? Function()? promise,
+    String? Function()? mechanic,
+    String? Function()? payoff,
+    String? Function()? formatName,
+    bool? withheldKnown,
+    bool? promiseKnown,
+    bool? mechanicKnown,
+    bool? payoffKnown,
+  }) {
+    return OpenLoop(
+      withheld: withheld != null ? withheld() : this.withheld,
+      promise: promise != null ? promise() : this.promise,
+      mechanic: mechanic != null ? mechanic() : this.mechanic,
+      payoff: payoff != null ? payoff() : this.payoff,
+      formatName: formatName != null ? formatName() : this.formatName,
+      withheldKnown: withheldKnown ?? this.withheldKnown,
+      promiseKnown: promiseKnown ?? this.promiseKnown,
+      mechanicKnown: mechanicKnown ?? this.mechanicKnown,
+      payoffKnown: payoffKnown ?? this.payoffKnown,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'withheld': withheld,
+        'promise': promise,
+        'mechanic': mechanic,
+        'payoff': payoff,
+        'formatName': formatName,
+        'withheldKnown': withheldKnown,
+        'promiseKnown': promiseKnown,
+        'mechanicKnown': mechanicKnown,
+        'payoffKnown': payoffKnown,
+      };
+
+  factory OpenLoop.fromJson(Map<String, dynamic> json) => OpenLoop(
+        withheld: json['withheld'] as String?,
+        promise: json['promise'] as String?,
+        mechanic: json['mechanic'] as String?,
+        payoff: json['payoff'] as String?,
+        formatName: json['formatName'] as String?,
+        withheldKnown: json['withheldKnown'] as bool? ?? false,
+        promiseKnown: json['promiseKnown'] as bool? ?? false,
+        mechanicKnown: json['mechanicKnown'] as bool? ?? false,
+        payoffKnown: json['payoffKnown'] as bool? ?? false,
+      );
+}
 
 /// The three honest answers to a gate check.
 enum GateVerdict {
@@ -298,6 +520,18 @@ enum GateVerdict {
   final String description;
 
   const GateVerdict(this.label, this.description);
+}
+
+/// The three honest answers to the Ready-to-Generate gate.
+enum ReadyToGenerateVerdict {
+  pass('PASS', 'All requirements met — safe to generate.'),
+  fail('FAIL', 'Critical requirements missing — cannot generate.'),
+  unknown('UNKNOWN', 'Insufficient information to determine readiness.');
+
+  final String label;
+  final String description;
+
+  const ReadyToGenerateVerdict(this.label, this.description);
 }
 
 // ============================================================================
@@ -326,6 +560,9 @@ class ClassificationSnapshot {
   /// the decision is in progress — and the gate must NOT treat them as resolved.
   final Map<String, AxisResolution?> axisStates;
 
+  final ShareTrigger shareTrigger;
+  final OpenLoop openLoop;
+
   const ClassificationSnapshot({
     this.pillar,
     this.series,
@@ -335,19 +572,38 @@ class ClassificationSnapshot {
     this.goal,
     this.status = IdeaStatus.idea,
     this.axisStates = const {},
+    this.shareTrigger = const ShareTrigger(),
+    this.openLoop = const OpenLoop(),
   });
 
   /// Whether the snapshot carries a human-approved value on every axis
   /// that is required for generation. Returns false if any axis is OPEN
   /// (null state) or in a non-resolved state.
   bool get isFullyApproved {
-    for (final axis in ['pillar', 'series', 'narrativeFormat', 'contentType',
-        'productionMethod', 'goal']) {
+    // Check axis states
+    for (final axis in [
+      'pillar',
+      'series',
+      'narrativeFormat',
+      'contentType',
+      'productionMethod',
+      'goal'
+    ]) {
       final state = axisStates[axis];
       if (state == null || !state.isResolved) {
         return false;
       }
     }
+
+    // Check share trigger and open loop
+    if (shareTrigger.verdict != GateVerdict.pass) {
+      return false;
+    }
+    if (openLoop.verdict != OpenLoopVerdict.pass &&
+        openLoop.verdict != OpenLoopVerdict.notRequired) {
+      return false;
+    }
+
     return true;
   }
 
@@ -638,6 +894,93 @@ class GateReport {
   }
 }
 
+/// The result of the Ready-to-Generate gate.
+///
+/// This is a separate gate from the quality gate — it answers only:
+/// "Is this idea complete and safe enough to send to AI for generation?"
+/// It does NOT generate missing values; it only validates.
+class ReadyToGenerateReport {
+  final String ideaId;
+  final String title;
+  final ReadyToGenerateVerdict verdict;
+  final List<ReadyCheck> checks;
+  final DateTime checkedAt;
+
+  const ReadyToGenerateReport({
+    required this.ideaId,
+    this.title = '',
+    required this.verdict,
+    required this.checks,
+    required this.checkedAt,
+  });
+
+  /// True when every individual check is PASS.
+  bool get isReady => checks.every((c) => c.isPass);
+
+  /// True when any check is FAIL (cannot proceed).
+  bool get isBlocked => checks.any((c) => c.isFail);
+
+  /// True when any check is UNKNOWN (needs review).
+  bool get needsReview => checks.any((c) => c.isUnknown);
+
+  Map<String, dynamic> toJson() => {
+        'ideaId': ideaId,
+        'title': title,
+        'verdict': verdict.name,
+        'checks': checks.map((c) => c.toJson()).toList(),
+        'checkedAt': checkedAt.toIso8601String(),
+      };
+
+  factory ReadyToGenerateReport.fromJson(Map<String, dynamic> json) {
+    return ReadyToGenerateReport(
+      ideaId: json['ideaId'] as String,
+      title: json['title'] as String? ?? '',
+      verdict: ReadyToGenerateVerdict.values
+          .firstWhere((v) => v.name == json['verdict'] as String?),
+      checks: (json['checks'] as List?)
+              ?.whereType<Map>()
+              .map((c) => ReadyCheck.fromJson(Map<String, dynamic>.from(c)))
+              .toList() ??
+          <ReadyCheck>[],
+      checkedAt: DateTime.tryParse(json['checkedAt'] as String? ?? '') ?? DateTime.now(),
+    );
+  }
+}
+
+/// One check within the Ready-to-Generate gate.
+class ReadyCheck {
+  final String id;
+  final String name;
+  final ReadyToGenerateVerdict verdict;
+  final String reason;
+
+  const ReadyCheck({
+    required this.id,
+    required this.name,
+    required this.verdict,
+    required this.reason,
+  });
+
+  bool get isPass => verdict == ReadyToGenerateVerdict.pass;
+  bool get isFail => verdict == ReadyToGenerateVerdict.fail;
+  bool get isUnknown => verdict == ReadyToGenerateVerdict.unknown;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'verdict': verdict.name,
+        'reason': reason,
+      };
+
+  factory ReadyCheck.fromJson(Map<String, dynamic> json) => ReadyCheck(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        verdict: ReadyToGenerateVerdict.values
+            .firstWhere((v) => v.name == json['verdict'] as String?),
+        reason: json['reason'] as String? ?? '',
+      );
+}
+
 // ============================================================================
 // QUALITY GATE — the engine
 // ============================================================================
@@ -678,6 +1021,7 @@ class QualityGate {
     required ClassificationSnapshot classification,
     ShareTrigger? shareTrigger,
     VoiceMode? voiceMode,
+    OpenLoop? openLoop,
     SaveValue? saveValue,
     int testCount = 0,
     bool isArchived = false,
@@ -689,7 +1033,7 @@ class QualityGate {
     checks.addAll(_strategyChecks(classification));
 
     // ── CREATIVE dimension ──────────────────────────────────────────────
-    checks.addAll(_creativeChecks(classification, shareTrigger, voiceMode));
+    checks.addAll(_creativeChecks(classification, shareTrigger, voiceMode, openLoop));
 
     // ── PRODUCTION dimension ────────────────────────────────────────────
     checks.addAll(_productionChecks(classification, voiceMode));
@@ -704,7 +1048,7 @@ class QualityGate {
       classification.contentType,
     );
 
-      final inferredSave = saveValue ?? inferSaveValue(classification.goal);
+    final inferredSave = saveValue ?? inferSaveValue(classification.goal);
 
     return GateReport(
       ideaId: ideaId,
@@ -729,12 +1073,16 @@ class QualityGate {
   static GateReport evaluatePackage(ContentPackage pkg, {
     required ClassificationSnapshot classification,
     ShareTrigger? shareTrigger,
+    OpenLoop? openLoop,
     int testCount = 0,
     bool isArchived = false,
   }) {
     final checks = <GateCheckResult>[];
 
+    // Packages have already passed strategy/creative, but we check production
+    // and performance, plus verify creative elements still hold.
     checks.addAll(_productionChecks(classification, null));
+    checks.addAll(_creativeChecks(classification, shareTrigger, null, openLoop));
     checks.addAll(_performanceChecks(
       testCount,
       classification.narrativeFormatName,
@@ -757,7 +1105,371 @@ class QualityGate {
     );
   }
 
-  // ── Dimension: Strategy ──────────────────────────────────────────────
+  /// Evaluates whether an idea is ready for AI generation.
+  ///
+  /// This is the **Ready-to-Generate gate** — it answers only:
+  /// "Is this idea complete and safe enough to send to AI for ContentPackageV2 generation?"
+  /// It does NOT generate missing values; it only validates.
+  ///
+  /// Returns PASS only when ALL checks pass.
+  /// Returns FAIL when any critical requirement is missing.
+  /// Returns UNKNOWN when information is insufficient to decide.
+  static ReadyToGenerateReport evaluateReadyToGenerate({
+    required String ideaId,
+    required String title,
+    required ClassificationSnapshot classification,
+    ShareTrigger? shareTrigger,
+    OpenLoop? openLoop,
+    VoiceMode? voiceMode,
+    int testCount = 0,
+    bool isArchived = false,
+  }) {
+    final checks = <ReadyCheck>[];
+
+    // 1. Classification: all 7 axes must be resolved (approved in decisions)
+    checks.add(_checkClassificationComplete(classification));
+
+    // 2. Share Trigger: must be PASS
+    checks.add(_checkShareTriggerReady(shareTrigger, classification));
+
+    // 3. Open Loop: must be PASS or NOT_REQUIRED
+    checks.add(_checkOpenLoopReady(openLoop, classification));
+
+    // 4. Voice Mode: must be declared
+    checks.add(_checkVoiceModeReady(voiceMode, classification));
+
+    // 5. Production Method: must be resolved
+    checks.add(_checkProductionMethodReady(classification));
+
+    // 6. Goal: must be resolved
+    checks.add(_checkGoalReady(classification));
+
+    // 7. Content Type: must be resolved
+    checks.add(_checkContentTypeReady(classification));
+
+    // 8. Narrative Format: must be resolved
+    checks.add(_checkNarrativeFormatReady(classification));
+
+    // 9. Source content: enough information to generate
+    checks.add(_checkSourceContentSufficient(classification));
+
+    // 10. Status: appropriate pre-generation status
+    checks.add(_checkStatusReady(classification, isArchived));
+
+    // Determine overall verdict
+    final hasFail = checks.any((c) => c.isFail);
+    final hasUnknown = checks.any((c) => c.isUnknown);
+
+    ReadyToGenerateVerdict verdict;
+    if (hasFail) {
+      verdict = ReadyToGenerateVerdict.fail;
+    } else if (hasUnknown) {
+      verdict = ReadyToGenerateVerdict.unknown;
+    } else {
+      verdict = ReadyToGenerateVerdict.pass;
+    }
+
+    return ReadyToGenerateReport(
+      ideaId: ideaId,
+      title: title,
+      verdict: verdict,
+      checks: checks,
+      checkedAt: DateTime.now(),
+    );
+  }
+
+  // ── Ready-to-Generate Checks ───────────────────────────────────────────
+
+  static ReadyCheck _checkClassificationComplete(ClassificationSnapshot c) {
+    // All 7 axes must have approved values
+    const requiredAxes = [
+      'pillar',
+      'series',
+      'narrativeFormat',
+      'contentType',
+      'productionMethod',
+      'goal',
+      'status',
+    ];
+    final missing = <String>[];
+    for (final axis in requiredAxes) {
+      final state = c.axisStates[axis];
+      if (state == null || state != AxisResolution.approved) {
+        missing.add(axis);
+      }
+    }
+    if (missing.isEmpty) {
+      return ReadyCheck(
+        id: 'ready.classification',
+        name: 'All 7 axes resolved',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: 'All 7 axes (pillar, series, narrativeFormat, contentType, productionMethod, goal, status) are approved.',
+      );
+    } else {
+      return ReadyCheck(
+        id: 'ready.classification',
+        name: 'All 7 axes resolved',
+        verdict: ReadyToGenerateVerdict.fail,
+        reason: 'Missing approved decisions for: ${missing.join(', ')}.',
+      );
+    }
+  }
+
+  static ReadyCheck _checkShareTriggerReady(ShareTrigger? st, ClassificationSnapshot c) {
+    if (st == null) {
+      return ReadyCheck(
+        id: 'ready.share_trigger',
+        name: 'Share trigger is PASS',
+        verdict: ReadyToGenerateVerdict.unknown,
+        reason: 'No share trigger provided. The app never invents one.',
+      );
+    }
+    if (st.verdict == GateVerdict.pass) {
+      return ReadyCheck(
+        id: 'ready.share_trigger',
+        name: 'Share trigger is PASS',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: 'Share trigger is specific: ${st.sender} → ${st.recipient}.',
+      );
+    }
+    if (st.verdict == GateVerdict.fail) {
+      return ReadyCheck(
+        id: 'ready.share_trigger',
+        name: 'Share trigger is PASS',
+        verdict: ReadyToGenerateVerdict.fail,
+        reason: 'Share trigger is generic. Must name specific sender, recipient, situation, and reason.',
+      );
+    }
+    return ReadyCheck(
+      id: 'ready.share_trigger',
+      name: 'Share trigger is PASS',
+      verdict: ReadyToGenerateVerdict.unknown,
+      reason: 'Share trigger not yet structured. Fill in sender, recipient, situation, reason.',
+    );
+  }
+
+  static ReadyCheck _checkOpenLoopReady(OpenLoop? ol, ClassificationSnapshot c) {
+    if (ol == null) {
+      // Check if format needs open loop
+      final formatName = c.narrativeFormatName;
+      if (formatName != null && OpenLoop.formatNeedsOpenLoop(formatName)) {
+        return ReadyCheck(
+          id: 'ready.open_loop',
+          name: 'Open loop is PASS or NOT_REQUIRED',
+          verdict: ReadyToGenerateVerdict.unknown,
+          reason: 'Format "$formatName" benefits from an open loop, but none was provided.',
+        );
+      } else {
+        return ReadyCheck(
+          id: 'ready.open_loop',
+          name: 'Open loop is PASS or NOT_REQUIRED',
+          verdict: ReadyToGenerateVerdict.pass,
+          reason: 'Format does not require an open loop (or no format specified).',
+        );
+      }
+    }
+    final olVerdict = ol.verdict;
+    if (olVerdict == OpenLoopVerdict.pass || olVerdict == OpenLoopVerdict.notRequired) {
+      return ReadyCheck(
+        id: 'ready.open_loop',
+        name: 'Open loop is PASS or NOT_REQUIRED',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: olVerdict == OpenLoopVerdict.notRequired
+            ? 'Format "${ol.formatName}" does not require an open loop.'
+            : 'Open loop is specific: withheld="${ol.withheld}", mechanic="${ol.mechanic}".',
+      );
+    }
+    if (olVerdict == OpenLoopVerdict.fail) {
+      return ReadyCheck(
+        id: 'ready.open_loop',
+        name: 'Open loop is PASS or NOT_REQUIRED',
+        verdict: ReadyToGenerateVerdict.fail,
+        reason: 'Open loop is generic. Must name specific withheld element, promise, mechanic, and payoff.',
+      );
+    }
+    return ReadyCheck(
+      id: 'ready.open_loop',
+      name: 'Open loop is PASS or NOT_REQUIRED',
+      verdict: ReadyToGenerateVerdict.unknown,
+      reason: 'Open loop not yet structured. Fill in withheld, promise, mechanic, payoff.',
+    );
+  }
+
+  static ReadyCheck _checkVoiceModeReady(VoiceMode? vm, ClassificationSnapshot c) {
+    if (vm != null) {
+      return ReadyCheck(
+        id: 'ready.voice_mode',
+        name: 'Voice mode is declared',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: 'Voice mode: ${vm.label}.',
+      );
+    }
+    // Can infer from format
+    final fmt = c.narrativeFormatName != null
+        ? validateNarrativeFormat(c.narrativeFormatName!)
+        : null;
+    final inferred = VoiceMode.infer(fmt, c.contentType);
+    if (inferred != VoiceMode.optional) {
+      // Inferrable with confidence
+      return ReadyCheck(
+        id: 'ready.voice_mode',
+        name: 'Voice mode is declared',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: 'Voice mode inferred from format: ${inferred.label}.',
+      );
+    }
+    return ReadyCheck(
+      id: 'ready.voice_mode',
+      name: 'Voice mode is declared',
+      verdict: ReadyToGenerateVerdict.unknown,
+      reason: 'No voice mode declared. Cannot infer from format; specify one.',
+    );
+  }
+
+  static ReadyCheck _checkProductionMethodReady(ClassificationSnapshot c) {
+    if (c.productionMethod != null) {
+      final state = c.axisStates['productionMethod'];
+      if (state == AxisResolution.approved) {
+        return ReadyCheck(
+          id: 'ready.production_method',
+          name: 'Production method is resolved',
+          verdict: ReadyToGenerateVerdict.pass,
+          reason: 'Production method is ${c.productionMethod!.label} (approved).',
+        );
+      }
+    }
+    return ReadyCheck(
+      id: 'ready.production_method',
+      name: 'Production method is resolved',
+      verdict: ReadyToGenerateVerdict.fail,
+      reason: 'Production method is not approved in decisions.',
+    );
+  }
+
+  static ReadyCheck _checkGoalReady(ClassificationSnapshot c) {
+    if (c.goal != null) {
+      final state = c.axisStates['goal'];
+      if (state == AxisResolution.approved) {
+        return ReadyCheck(
+          id: 'ready.goal',
+          name: 'Goal is resolved',
+          verdict: ReadyToGenerateVerdict.pass,
+          reason: 'Goal is ${c.goal!.label} (approved).',
+        );
+      }
+    }
+    return ReadyCheck(
+      id: 'ready.goal',
+      name: 'Goal is resolved',
+      verdict: ReadyToGenerateVerdict.fail,
+      reason: 'Goal is not approved in decisions.',
+    );
+  }
+
+  static ReadyCheck _checkContentTypeReady(ClassificationSnapshot c) {
+    if (c.contentType != null) {
+      final state = c.axisStates['contentType'];
+      if (state == AxisResolution.approved) {
+        return ReadyCheck(
+          id: 'ready.content_type',
+          name: 'Content type is resolved',
+          verdict: ReadyToGenerateVerdict.pass,
+          reason: 'Content type is ${c.contentType!.label} (approved).',
+        );
+      }
+    }
+    return ReadyCheck(
+      id: 'ready.content_type',
+      name: 'Content type is resolved',
+      verdict: ReadyToGenerateVerdict.fail,
+      reason: 'Content type is not approved in decisions.',
+    );
+  }
+
+  static ReadyCheck _checkNarrativeFormatReady(ClassificationSnapshot c) {
+    if (c.narrativeFormatName != null) {
+      final state = c.axisStates['narrativeFormat'];
+      final fmt = validateNarrativeFormat(c.narrativeFormatName!);
+      if (state == AxisResolution.approved && fmt != null) {
+        return ReadyCheck(
+          id: 'ready.narrative_format',
+          name: 'Narrative format is resolved',
+          verdict: ReadyToGenerateVerdict.pass,
+          reason: 'Format is "${fmt.name}" (${fmt.id}) (approved).',
+        );
+      }
+      if (state == AxisResolution.invalid) {
+        return ReadyCheck(
+          id: 'ready.narrative_format',
+          name: 'Narrative format is resolved',
+          verdict: ReadyToGenerateVerdict.fail,
+          reason: 'Format is marked invalid — no narrative shape is derivable.',
+        );
+      }
+      if (fmt == null) {
+        return ReadyCheck(
+          id: 'ready.narrative_format',
+          name: 'Narrative format is resolved',
+          verdict: ReadyToGenerateVerdict.fail,
+          reason: '"${c.narrativeFormatName}" is not a registered format.',
+        );
+      }
+    }
+    return ReadyCheck(
+      id: 'ready.narrative_format',
+      name: 'Narrative format is resolved',
+      verdict: ReadyToGenerateVerdict.fail,
+      reason: 'Narrative format is not approved in decisions.',
+    );
+  }
+
+  static ReadyCheck _checkSourceContentSufficient(ClassificationSnapshot c) {
+    // Check if the idea has enough source content (topic, problem, lesson)
+    // This is a proxy — in practice the idea object would have these fields
+    // For now we check if classification has at least some axes resolved
+    final resolvedCount = c.axisStates.values.where((s) => s == AxisResolution.approved).length;
+    if (resolvedCount >= 5) {
+      return ReadyCheck(
+        id: 'ready.source_content',
+        name: 'Source content is sufficient',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: '$resolvedCount/7 axes have approved decisions.',
+      );
+    }
+    return ReadyCheck(
+      id: 'ready.source_content',
+      name: 'Source content is sufficient',
+      verdict: ReadyToGenerateVerdict.unknown,
+      reason: 'Only $resolvedCount/7 axes have approved decisions. May need more source detail.',
+    );
+  }
+
+  static ReadyCheck _checkStatusReady(ClassificationSnapshot c, bool isArchived) {
+    if (isArchived || c.status == IdeaStatus.archived) {
+      return ReadyCheck(
+        id: 'ready.status',
+        name: 'Status is pre-generation',
+        verdict: ReadyToGenerateVerdict.fail,
+        reason: 'Idea is archived and cannot be generated.',
+      );
+    }
+    // Accept idea, approved, scripted as pre-generation statuses
+    const allowed = [IdeaStatus.idea, IdeaStatus.approved, IdeaStatus.scripted];
+    if (allowed.contains(c.status)) {
+      return ReadyCheck(
+        id: 'ready.status',
+        name: 'Status is pre-generation',
+        verdict: ReadyToGenerateVerdict.pass,
+        reason: 'Status is ${c.status.name} — appropriate for generation.',
+      );
+    }
+    return ReadyCheck(
+      id: 'ready.status',
+      name: 'Status is pre-generation',
+      verdict: ReadyToGenerateVerdict.unknown,
+      reason: 'Status is ${c.status.name} — may not be ready for generation.',
+    );
+  }
 
   static List<GateCheckResult> _strategyChecks(ClassificationSnapshot c) {
     final results = <GateCheckResult>[];
@@ -903,6 +1615,7 @@ class QualityGate {
     ClassificationSnapshot c,
     ShareTrigger? shareTrigger,
     VoiceMode? voiceMode,
+    OpenLoop? openLoop,
   ) {
     final results = <GateCheckResult>[];
 
@@ -949,7 +1662,61 @@ class QualityGate {
       ));
     }
 
+    // Open loop — retention mechanic, only required for formats that benefit.
+    // Formats that don't need open loops get NOT_REQUIRED (not a failure).
+    if (openLoop != null) {
+      final olVerdict = openLoop.verdict;
+      results.add(GateCheckResult(
+        id: 'creative.open_loop',
+        name: 'Open loop is specific and retained',
+        dimension: QualityDimension.creative,
+        verdict: _mapOpenLoopVerdict(olVerdict),
+        reason: olVerdict == OpenLoopVerdict.pass
+            ? 'Withheld: ${openLoop.withheld}, mechanic: ${openLoop.mechanic}.'
+            : olVerdict == OpenLoopVerdict.fail
+                ? 'Open loop is generic. Name the specific withheld element, promise, and payoff.'
+                : olVerdict == OpenLoopVerdict.notRequired
+                    ? 'Format "${openLoop.formatName}" does not require an open loop.'
+                    : 'Open loop not yet structured. Fill in withheld, promise, mechanic, payoff.',
+      ));
+    } else {
+      // No open loop provided — check if format needs one.
+      final formatName = c.narrativeFormatName;
+      if (formatName != null && OpenLoop.formatNeedsOpenLoop(formatName)) {
+        results.add(GateCheckResult(
+          id: 'creative.open_loop',
+          name: 'Open loop is specific and retained',
+          dimension: QualityDimension.creative,
+          verdict: GateVerdict.unknown,
+          reason: 'Format "$formatName" benefits from an open loop, but none was provided.',
+        ));
+      } else {
+        results.add(GateCheckResult(
+          id: 'creative.open_loop',
+          name: 'Open loop is specific and retained',
+          dimension: QualityDimension.creative,
+          verdict: GateVerdict.pass,
+          reason: 'Format does not require an open loop (or no format specified).',
+        ));
+      }
+    }
+
     return results;
+  }
+
+  /// Maps OpenLoopVerdict to GateVerdict for the gate report.
+  /// NOT_REQUIRED becomes PASS (not a failure).
+  static GateVerdict _mapOpenLoopVerdict(OpenLoopVerdict v) {
+    switch (v) {
+      case OpenLoopVerdict.pass:
+        return GateVerdict.pass;
+      case OpenLoopVerdict.fail:
+        return GateVerdict.fail;
+      case OpenLoopVerdict.unknown:
+        return GateVerdict.unknown;
+      case OpenLoopVerdict.notRequired:
+        return GateVerdict.pass;
+    }
   }
 
   // ── Dimension: Production ────────────────────────────────────────────
