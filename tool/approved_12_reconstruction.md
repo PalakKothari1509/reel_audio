@@ -2,9 +2,13 @@
 
 > **DO NOT COPY INTO `content_ideas.md` UNTIL SOURCE DETAILS ARE VERIFIED.**
 
-> **STATUS: TEMPORARY / NON-AUTHORITATIVE**
+> **STATUS: DEFERRED / SKIPPED FOR NOW**
 >
-> This file is a staging record only. It must NOT be copied into `content_ideas.md`, treated as approved source data, or used to change taxonomy until the missing original source details are verified.
+> The 12 approved new ideas are deferred. The original source is not
+> available, so they would require a fresh authoring pass, not a
+> reconstruction. This file preserves the recovered fields so the work is
+> not lost, but it is **not active work** until the original source details
+> are supplied or the user decides to re-author them from scratch.
 >
 > **Baseline remains locked.** No code, content data, taxonomy, or `tool/idea_decisions.csv` is changed by this file.
 

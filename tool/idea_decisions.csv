@@ -1,17 +1,71 @@
 idea_id,decision,note
-# One row per idea, filled by a human. This is the idea-level verdict,
-# separate from the axis decisions in pillar_decisions.csv and
-# format_decisions.csv, which decide what an idea IS. This file decides
-# what the library does with it.
+# Phase D decisions — what the library does with each idea
 #
 #   keep     curated and fully classified; the only sync candidates
 #   rework   worth keeping, but not as written; fix it before it can sync
 #   archive  not active, but the history stays in the library
 #   delete   remove it. An idea with no packages, tests or results is
 #            removed completely; one that has them is removed from the
-#            active ideas while its history is retained (CONTENT_MODEL.md)
+#            active ideas while its history is retained
 #
 # Only `keep` ideas enter the app. An idea with no row is undecided, and
 # an undecided library is never ready to sync.
 #
 # Read by: dart run tool/review_content.dart
+day2-which-doesnt-belong,keep,
+day3-mumma-says,keep,
+day4-kitchen-challenge,keep,
+day5-ask-tonight,keep,
+day6-3year-skills,keep,
+day7-toddler-math,keep,
+day8-find-cuty,keep,
+day9-sock-hunt,keep,
+day10-3-questions,keep,
+day11-4year-skills,keep,
+day12-dinner-types,keep,
+day13-pattern-game,keep,
+day14-favorite-format,archive,
+day15-household-swaps,rework,needs clearer PLAY/DO distinction
+day16-voted-mission-won,archive,
+day17-mission1-race-track,rework,classification/content representation needs work
+day18-mission2-concert,rework,classification/content representation needs work
+day19-mission3-art-studio,keep,
+day20-mission4-detective,keep,
+day21-mission5-rescue,keep,
+day22-mission6-treasure,keep,
+day23-mission7-daily-care,keep,
+day24-trial-reel-7-missions,keep,
+day25-week-wrap-up,archive,audience-facing/community nature
+jm-phone-meals,delete,phone idea cluster - only one phone idea kept (jm-phone-chahiye-script)
+jm-hot-chai,rework,narrative format needs to be defined
+jm-kitchen-busy-basket,keep,
+jm-water-pouring,keep,
+jm-dal-chawal,keep,
+jm-tape-pull,keep,
+jm-mumma-i-am-bored,keep,
+jm-wont-brush,delete,brushing idea cluster - only one brush idea kept (st-ria-wont-brush deleted, day23 kept)
+jm-wont-wear-shoes,keep,
+jm-bath-resistance,keep,
+jm-phone-chahiye-script,keep,
+jm-5-kitchen-items,keep,
+jm-dont-buy-use-this,keep,
+jm-7-instead-of-phone,keep,
+st-ria-vegetables,keep,
+st-rio-says-no,keep,
+st-ria-wont-brush,delete,brushing idea cluster - overlaps with day23-mission7-daily-care
+st-rio-sharing,keep,
+st-cuty-wants-sleep,keep,
+st-ria-wants-phone,rework,phone topic is crowded; needs different situation/mechanism
+st-rio-clean-toys,keep,
+st-ria-same-toy,rework,needs stronger complete learning beat before production-ready
+st-rio-bored-2-min,keep,
+lp-sort-colour,delete,duplicate of lp-simple-sorting - merge
+lp-spoon-transfer,delete,overlaps day4-kitchen-challenge and jm-water-pouring; lp-simple-sorting kept as stronger
+lp-big-small,keep,
+lp-kitchen-counting,rework,invalid narrative format must be replaced
+lp-shape-hunt,keep,
+lp-sound-matching,keep,
+lp-pouring,delete,duplicate of jm-water-pouring - merge
+lp-texture,keep,
+lp-colour-hunt,keep,
+lp-simple-sorting,keep,

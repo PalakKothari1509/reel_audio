@@ -205,29 +205,33 @@ Approved characters: Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher.
 `content_ideas.md` holds **57 ideas**, each with a topic, problem, lesson, goal and
 metadata.
 
-**It is mid-migration and is not yet authoritative.** The seven axes are being resolved
-one at a time, and only values a human has approved will be written.
+**Phase D is complete.** Every idea now has an explicit verdict in
+`tool/idea_decisions.csv`: **40 KEEP**, 8 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
+ideas are sync candidates (40 active). The 6 deleted ideas are removed from the active
+library; the 3 archived stay in `content_ideas.md` but are not sync candidates. The 8
+REWORK ideas remain in the library but are not ready to sync until their noted issue is
+resolved.
 
-Current state:
+Current axis state (proposed values in the decision CSVs; only `approved` rows are written):
 
 | Axis | Decided | Open |
 | --- | --- | --- |
-| Pillar | 12 suggested | **43** |
-| Series | — | **23** |
-| Narrative Format | 19 approved, 12 suggested | 2 (1 needs review, 1 invalid) |
+| Pillar | 12 suggested, 2 archiveCandidate | 43 (awaiting review) |
+| Series | 34 mapped | 23 |
+| Narrative Format | 19 approved, 12 suggested, 1 needsReview, 1 invalid | 1 (rework) |
 | Content Type | 57 in source | 0 |
-| Production Method | — | **7** |
-| Goal | — | **6** |
-| Status | complete | 0 |
+| Production Method | — | 7 low-confidence |
+| Goal | — | 6 low-confidence |
+| Status | done | 0 |
 
-**Automation proposes; a human approves.** Classifier output is never counted as
-decided, because a confident wrong pillar quietly misfiles the results of a post that
-was actually good.
+**Automation proposes; a human approves.** Phase D is the human step — verdicts are
+not derived from the machine's confidence scores.
 
-**12 further ideas are approved but not yet in this file.** They are staged
-in `tool/approved_12_reconstruction.md` (temporary, non-authoritative) with
-only the fields recovered so far. They are not written here until their
-missing source details arrive — the app never invents an idea.
+**12 further ideas are approved but deferred.** They are staged in
+`tool/approved_12_reconstruction.md` (temporary, non-authoritative) with
+only the fields recovered so far. They are **skipped for now** — the original
+source is not available, so they would be a fresh authoring pass, not a
+reconstruction. They are not written here until that work is resumed.
 
 ### How well are these ideas built for reach?
 
@@ -307,24 +311,26 @@ restarts, `q` stops.
 
 In rough order of how much it matters:
 
-1. **The idea library is not migrated.** 43 pillars and 23 series still need a human
-   decision. Until then, idea data must not drive generation. Separately, **12
-   approved ideas are staged, not written** — they wait in
-   `tool/approved_12_reconstruction.md` (temporary) for missing source details.
-   Two inputs unblock the next work: **(A)** source details for those 12, and
-   **(B)** explicit Phase D decisions for the existing 57.
-2. **There is no unified Content Package.** The app still has multiple
+1. **Phase D decisions are complete.** All 57 ideas now have verdicts in
+   `tool/idea_decisions.csv`: 40 KEEP, 8 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
+   ideas are sync candidates (40 active). The 8 REWORK ideas need their noted issues
+   fixed before they can sync. The 12 approved new ideas remain **deferred** — they
+   wait in `tool/approved_12_reconstruction.md` until original source details arrive.
+2. **Phase 1 + Phase 2 are the immediate repo work.** Stabilize the content
+   decision layer (taxonomy + quality gates) before touching generation, analytics,
+   calendar, experiments, storage refactor, or a large UI rewrite.
+3. **There is no unified Content Package.** The app still has multiple
    representations of a finished post. The standalone Caption Generator and
    the "Generate All Formats" multi-select are removed; the remaining
-   representations need to collapse into one `ContentPackage`.
-3. **The generated script is thrown away.** The prompt asks for narration and
+    representations need to collapse into one `ContentPackage`.
+4. **The generated script is thrown away.** The prompt asks for narration and
    per-scene dialogue, and it is never read back — so the app cannot yet show the
    narration the plan promises.
-4. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
-5. **Release builds are not distributable.** Signed with the debug keystore, and the
+5. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+6. **Release builds are not distributable.** Signed with the debug keystore, and the
    application id is still `com.example.reel_audio`.
-6. **Settings does not actually export or import** your data.
-7. **Most file-reading code cannot be tested.** Three components have a test seam
+7. **Settings does not actually export or import** your data.
+8. **Most file-reading code cannot be tested.** Three components have a test seam
    (the promotion vault, the idea inbox, and the content library); the rest do not.
 
 ---
