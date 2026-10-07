@@ -89,10 +89,13 @@ The legacy/non-content escape hatch (Phase 1.3) is no longer needed for these â
   description because they have no Topic or Lesson text. Marked `beat_only`
   so you know the evidence is weaker.
 
-### Two review items to decide by hand — RESOLVED
+### Two review items to decide by hand
 
-- `day11-4year-skills` → **DO** (aligned with `day6-3year-skills` as competence checklist)
-- `day16-voted-mission-won` → **ARCHIVE** (audience announcement, not educational content)
+- `day11-4year-skills` â€” don't decide from the title. Compare the actual
+  child outcome with `day6-3year-skills` (its twin, already DO).
+- `day16-voted-mission-won` â€” is it educational content, or
+  community/announcement/meta? If it's not educational content, don't force
+  it into a pillar.
 
 ---
 
@@ -126,17 +129,27 @@ ARCHIVE), separate from lifecycle `status`.
 
 ---
 
-## Phase 2 — Build the quality-gate system — **COMPLETE**
+## Phase 2 â€” Build the quality-gate system (NEXT)
 
-The quality-gate system is implemented in `lib/content_quality_gate.dart` with 37 tests:
+Once classification is trustworthy, build the evaluation layer. This is where
+the app becomes a decision system.
 
-- **Share Trigger** — structured 4-part (sender, recipient, situation, reason); PASS/FAIL/UNKNOWN
-- **Voice Mode** — `none | optional | required` with inference from format
-- **Save Value** — `measurable | notApplicable | unknown` from goal
-- **Four dimensions** — strategy, creative, production, performance
-- **Production failures** → `needsFilming`, never blocks generation
-- **Classification snapshots** — preserved at generation time
-- **Five-test rule** — enforced in data model, UNKNOWN below 5 tests
+- **Share Trigger** â€” structured: sender, recipient, situation, reason.
+  Validated as PASS / FAIL / UNKNOWN. PASS needs all four; FAIL is generic
+  ("parents will share because it's relatable"); UNKNOWN is insufficient
+  information. Never convert UNKNOWN â†’ PASS or UNKNOWN â†’ FAIL.
+- **Open Loop** â€” same PASS / FAIL / UNKNOWN model. Only require it where
+  the selected narrative/content strategy benefits from one. Don't force fake
+  open loops onto every idea.
+- **Voice Mode** â€” replace `worksWithNoVoice` with `voiceMode`: `none` (must
+  work through visuals/text/actions/expressions), `optional` (voice
+  enhances), `required` (genuinely depends on audio).
+- **Production Compatibility** â€” keep separate from idea quality. A good idea
+  that needs real-life child footage is "needs filming," not "bad idea."
+- **Ready-to-Generate Gate** â€” before Gemini is called: classification
+  complete? share trigger valid? open loop valid where required? voice mode
+  defined? production method, goal, content type, narrative format selected?
+  enough source information? READY â†’ generate; NOT READY â†’ fix first.
 
 ---
 

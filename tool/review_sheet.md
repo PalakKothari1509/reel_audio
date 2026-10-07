@@ -15,39 +15,39 @@ decision is shown as settled and needs nothing.
 | `day2-which-doesnt-belong` | 1. Which One Doesn't Belong? | **THINK** | medium | narrow win: 2 for THINK vs 1 for DO |  |
 | `day3-mumma-says` | 2. Mumma Says This 100x a Day | **PLAY** | medium | narrow win: 2 for PLAY vs 1 for DO |  |
 | `day4-kitchen-challenge` | 3. 5-Minute Kitchen Challenge | **THINK** | high | 3 signals for THINK, 1 for DO |  |
-| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **TALK** | suggested | "Topic is one question to ask at bedtime instead of how was your day. Lesson is better questions get better stories. TALK is the outcome; DO was a keyword false positive on the word ask" | pending |
-| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **DO** | suggested | "Age 3 skill checklist, problem is parents worry they are behind. Reference content about what a child can practically do, which is the DO pillar. Not THINK: it is not a puzzle, it is a competence list" | pending |
+| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **TALK** | approved | "Topic is one question to ask at bedtime instead of how was your day. Lesson is better questions get better stories. TALK is the outcome; DO was a keyword false positive on the word ask" | settled |
+| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **DO** | approved | "Age 3 skill checklist, problem is parents worry they are behind. Reference content about what a child can practically do, which is the DO pillar. Not THINK: it is not a puzzle, it is a competence list" | settled |
 | `day7-toddler-math` | 6. Toddler Mathematics | **THINK** | high | 2 signals for THINK, no other pillar matched |  |
 | `day8-find-cuty` | 7. Find the Hidden Cuty! | **THINK** | medium | narrow win: 2 for THINK vs 1 for DO |  |
 | `day9-sock-hunt` | 8. The Sock Hunt | **DO** | high | 3 signals for DO, 1 for THINK |  |
 | `day10-3-questions` | 9. 3 Questions Every Parent Should Ask This Week | **TALK** | high | 3 signals for TALK, no other pillar matched |  |
-| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **DO** | suggested | "Age 4 skill checklist, problem is the same as the 3-year-old list, lesson is age 4 is about joining two ideas together. Same competence-checklist shape as day6-3year-skills (DO): reference content about what a child can practically do. The classifier's single PLAY signal is a false positive; the child outcome is competence, not play" | pending |
+| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **DO** | approved | "Age 4 skill checklist, problem is the same as the 3-year-old list, lesson is age 4 is about joining two ideas together. Same competence-checklist shape as day6-3year-skills (DO): reference content about what a child can practically do. The classifier's single PLAY signal is a false positive; the child outcome is competence, not play" | settled |
 | `day12-dinner-types` | 11. Three Types of Kids at Dinner | **DO** | high | 2 signals for DO, no other pillar matched |  |
 | `day13-pattern-game` | 12. What Comes Next? | **THINK** | high | 1 signal for THINK, no other pillar matched |  |
 | `day14-favorite-format` | 13. Which New Format Was Your Favorite? | **(none)** | archiveCandidate | "Asks the audience which format worked best. It surveys the audience about the account rather than giving a parent something to save or send, so it has no pillar. Marked archive_candidate rather than forced into an axis value" | pending |
-| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **PLAY** | suggested | "Palak leans PLAY: the central lesson is that the toy does not matter, the child does. The activity is the vehicle. DISCOVER was the alternative and stays recorded" | pending |
+| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **PLAY** | approved | "Palak leans PLAY: the central lesson is that the toy does not matter, the child does. The activity is the vehicle. DISCOVER was the alternative and stays recorded" | settled |
 | `day16-voted-mission-won` | 15. You Voted! Here's Which Mission Won | **(none)** | archiveCandidate | "Announces the audience's winning mission. It closes a loop the audience started rather than giving a parent something to save or send, so it has no pillar. Same class as day14-favorite-format. Also carries the retired Goal 'Community' and the unmappable legacy Series 'the-casts'" | pending |
-| `day17-mission1-race-track` | 16. Mission 2: On Your Mark! | **PLAY** | suggested | "Race track from cushions and masking tape, problem is a toddler and a lot of energy. Outcome is burning off energy through play. Could read as DO since the parent builds the track" | pending |
-| `day18-mission2-concert` | 17. Mission 3: Living Room Concert! | **PLAY** | suggested | "Living room concert with pots and spoons, lesson is noise is fine when it is music. Play is the whole point. THINK was a false positive on match" | pending |
+| `day17-mission1-race-track` | 16. Mission 2: On Your Mark! | **PLAY** | approved | "Race track from cushions and masking tape, problem is a toddler and a lot of energy. Outcome is burning off energy through play. Could read as DO since the parent builds the track" | settled |
+| `day18-mission2-concert` | 17. Mission 3: Living Room Concert! | **PLAY** | approved | "Living room concert with pots and spoons, lesson is noise is fine when it is music. Play is the whole point. THINK was a false positive on match" | settled |
 | `day19-mission3-art-studio` | 18. Mission 4: Art Corner Time! | **DO** | high | 1 signal for DO, no other pillar matched |  |
 | `day20-mission4-detective` | 19. Mission 5: Case Open! | **THINK** | high | 2 signals for THINK, no other pillar matched |  |
 | `day21-mission5-rescue` | 20. Mission 6: Rescue Time! | **DO** | high | 1 signal for DO, no other pillar matched |  |
-| `day22-mission6-treasure` | 21. Mission 7: Treasure Hunt! | **THINK** | suggested | "Treasure hunt with three clues, lesson is clues are language in play. Following clues is the reasoning act, which is THINK. TALK was a false positive on clues" | pending |
+| `day22-mission6-treasure` | 21. Mission 7: Treasure Hunt! | **THINK** | approved | "Treasure hunt with three clues, lesson is clues are language in play. Following clues is the reasoning act, which is THINK. TALK was a false positive on clues" | settled |
 | `day23-mission7-daily-care` | 22. Mission 8: Self-Care Squad! | **DO** | high | 1 signal for DO, no other pillar matched |  |
 | `day24-trial-reel-7-missions` | 23. 7 Missions in 60 Seconds | **DO** | high | 2 signals for DO, no other pillar matched |  |
 | `day25-week-wrap-up` | 24. We Completed All 7 Missions! Here's What Happened | **DO** | medium | narrow win: 2 for DO vs 1 for THINK |  |
 | `jm-phone-meals` | 25. Phone During Meals | **DO** | high | 2 signals for DO, no other pillar matched |  |
-| `jm-hot-chai` | 26. Hot Chai | **PLAY** | suggested | "Mumma finally drinks her chai while the child plays independently. The child's activity is what makes it work, so the value is play enabling parental relief" | pending |
+| `jm-hot-chai` | 26. Hot Chai | **PLAY** | approved | "Mumma finally drinks her chai while the child plays independently. The child's activity is what makes it work, so the value is play enabling parental relief" | settled |
 | `jm-kitchen-busy-basket` | 27. Kitchen Busy Basket | **DO** | medium | narrow win: 3 for DO vs 2 for PLAY |  |
 | `jm-water-pouring` | 28. Water Pouring | **PLAY** | medium | narrow win: 3 for PLAY vs 2 for DO |  |
 | `jm-dal-chawal` | 29. Dal Chawal Sensory Play | **PLAY** | high | 5 signals for PLAY, 1 for DO |  |
-| `jm-tape-pull` | 30. Tape Pull Activity | **PLAY** | suggested | "Masking tape stuck to the floor for small hands to pull. Pure activity. DO was a false positive on the word hands" | pending |
+| `jm-tape-pull` | 30. Tape Pull Activity | **PLAY** | approved | "Masking tape stuck to the floor for small hands to pull. Pure activity. DO was a false positive on the word hands" | settled |
 | `jm-mumma-i-am-bored` | 31. Mumma I am Bored | **PLAY** | high | 3 signals for PLAY, no other pillar matched |  |
 | `jm-wont-brush` | 32. Won't Brush | **DO** | high | 2 signals for DO, no other pillar matched |  |
 | `jm-wont-wear-shoes` | 33. Won't Wear Shoes | **DO** | high | 3 signals for DO, no other pillar matched |  |
 | `jm-bath-resistance` | 34. Bath Time Resistance | **DO** | medium | narrow win: 2 for DO vs 1 for PLAY |  |
 | `jm-phone-chahiye-script` | 35. Phone Chahiye, Exact Script | **TALK** | high | 2 signals for TALK, no other pillar matched |  |
-| `jm-5-kitchen-items` | 36. Five Kitchen Items | **PLAY** | suggested | "Palak leans PLAY: the stated value is independent play. The parent sourcing materials is a preparation task, not the content purpose" | pending |
+| `jm-5-kitchen-items` | 36. Five Kitchen Items | **PLAY** | approved | "Palak leans PLAY: the stated value is independent play. The parent sourcing materials is a preparation task, not the content purpose" | settled |
 | `jm-dont-buy-use-this` | 37. Don't Buy This, Use This | **PLAY** | high | 1 signal for PLAY, no other pillar matched |  |
 | `jm-7-instead-of-phone` | 38. Seven Things Instead of the Phone | **PLAY** | high | 2 signals for PLAY, no other pillar matched |  |
 | `st-ria-vegetables` | S1. Ria Doesn't Want Vegetables | **DO** | high | 1 signal for DO, no other pillar matched |  |
@@ -57,252 +57,16 @@ decision is shown as settled and needs nothing.
 | `st-cuty-wants-sleep` | S5. Cuty Wants to Sleep | **PLAY** | high | 1 signal for PLAY, no other pillar matched |  |
 | `st-ria-wants-phone` | S6. Ria Wants Mumma's Phone | **THINK** | high | 1 signal for THINK, no other pillar matched |  |
 | `st-rio-clean-toys` | S7. Rio Won't Clean Toys | **DO** | medium | narrow win: 2 for DO vs 1 for PLAY |  |
-| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **THINK** | suggested | "Repetition of the same toy, and the lesson is why it is learning. Recognising repetition as a learning mechanism is a THINK outcome. This idea has no Topic or Lesson field at all, only a beat description, so the evidence is materially weaker than the other eleven" | pending |
+| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **THINK** | approved | "Repetition of the same toy, and the lesson is why it is learning. Recognising repetition as a learning mechanism is a THINK outcome. This idea has no Topic or Lesson field at all, only a beat description, so the evidence is materially weaker than the other eleven" | settled |
 | `st-rio-bored-2-min` | S9. Rio Gets Bored After Two Minutes | **PLAY** | medium | narrow win: 2 for PLAY vs 1 for DO |  |
 | `lp-sort-colour` | L1. Sort by Colour | **THINK** | medium | narrow win: 2 for THINK vs 1 for DISCOVER |  |
 | `lp-spoon-transfer` | L2. Spoon Transfer | **PLAY** | high | 3 signals for PLAY, no other pillar matched |  |
 | `lp-big-small` | L3. Match Big and Small | **THINK** | high | 1 signal for THINK, no other pillar matched |  |
-| `lp-kitchen-counting` | L4. Kitchen Counting Game | **THINK** | suggested | "Counting kitchen items together and laughing at a wrong count. Counting is the reasoning act. This idea is blocked on two axes at once: its narrative format is invalid in format_decisions.csv and its pillar is here. Decide what the content is for and the format follows" | pending |
+| `lp-kitchen-counting` | L4. Kitchen Counting Game | **THINK** | approved | "Counting kitchen items together and laughing at a wrong count. Counting is the reasoning act. This idea is blocked on two axes at once: its narrative format is invalid in format_decisions.csv and its pillar is here. Decide what the content is for and the format follows" | settled |
 | `lp-shape-hunt` | L5. Shape Hunt at Home | **THINK** | high | 1 signal for THINK, no other pillar matched |  |
 | `lp-sound-matching` | L6. Sound Matching | **THINK** | medium | narrow win: 2 for THINK vs 1 for DISCOVER |  |
 | `lp-pouring` | L7. Pouring Activity | **PLAY** | high | 3 signals for PLAY, no other pillar matched |  |
 | `lp-texture` | L8. Texture Exploration | **DISCOVER** | high | 2 signals for DISCOVER, no other pillar matched |  |
 | `lp-colour-hunt` | L9. Colour Hunt | **DISCOVER** | high | 1 signal for DISCOVER, no other pillar matched |  |
 | `lp-simple-sorting` | L10. Simple Sorting Game | **THINK** | high | 2 signals for THINK, no other pillar matched |  |
-
-## series
-
-34 high · 16 medium · 0 low
-
-| Idea | Title | Proposed | Confidence | Reason | Decision |
-| --- | --- | --- | --- | --- | --- |
-| `day2-which-doesnt-belong` | 1. Which One Doesn't Belong? | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day3-mumma-says` | 2. Mumma Says This 100x a Day | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `day4-kitchen-challenge` | 3. 5-Minute Kitchen Challenge | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **Life With Ria & Rio** | high | legacy id "ria-adventures" maps directly |  |
-| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **Age-Based Skills** | high | legacy id "milestone-check" maps directly |  |
-| `day8-find-cuty` | 7. Find the Hidden Cuty! | **canYourChildFigureItOut** | medium | legacy id "cuty-lessons" has no mapping; content signals canYourChildFigureItOut |  |
-| `day9-sock-hunt` | 8. The Sock Hunt | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day10-3-questions` | 9. 3 Questions Every Parent Should Ask This Week | **Life With Ria & Rio** | high | legacy id "ria-adventures" maps directly |  |
-| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **Age-Based Skills** | high | legacy id "milestone-check" maps directly |  |
-| `day12-dinner-types` | 11. Three Types of Kids at Dinner | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `day13-pattern-game` | 12. What Comes Next? | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day14-favorite-format` | 13. Which New Format Was Your Favorite? | **talkWithYourChild** | medium | legacy id "the-casts" has no mapping; content signals talkWithYourChild |  |
-| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day16-voted-mission-won` | 15. You Voted! Here's Which Mission Won | **canYourChildFigureItOut** | medium | legacy id "the-casts" has no mapping; content signals canYourChildFigureItOut |  |
-| `day17-mission1-race-track` | 16. Mission 2: On Your Mark! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day18-mission2-concert` | 17. Mission 3: Living Room Concert! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day19-mission3-art-studio` | 18. Mission 4: Art Corner Time! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day20-mission4-detective` | 19. Mission 5: Case Open! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day21-mission5-rescue` | 20. Mission 6: Rescue Time! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day22-mission6-treasure` | 21. Mission 7: Treasure Hunt! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day23-mission7-daily-care` | 22. Mission 8: Self-Care Squad! | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day24-trial-reel-7-missions` | 23. 7 Missions in 60 Seconds | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `day25-week-wrap-up` | 24. We Completed All 7 Missions! Here's What Happened | **Try This At Home** | high | legacy id "play-at-home" maps directly |  |
-| `jm-phone-meals` | 25. Phone During Meals | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-hot-chai` | 26. Hot Chai | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-kitchen-busy-basket` | 27. Kitchen Busy Basket | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-water-pouring` | 28. Water Pouring | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-dal-chawal` | 29. Dal Chawal Sensory Play | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-tape-pull` | 30. Tape Pull Activity | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-mumma-i-am-bored` | 31. Mumma I am Bored | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-wont-brush` | 32. Won't Brush | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-wont-wear-shoes` | 33. Won't Wear Shoes | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-bath-resistance` | 34. Bath Time Resistance | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-phone-chahiye-script` | 35. Phone Chahiye, Exact Script | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-5-kitchen-items` | 36. Five Kitchen Items | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-dont-buy-use-this` | 37. Don't Buy This, Use This | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `jm-7-instead-of-phone` | 38. Seven Things Instead of the Phone | **Jugaadu Mummy** | high | legacy id "jugaadu-mummy" maps directly |  |
-| `st-ria-vegetables` | S1. Ria Doesn't Want Vegetables | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-rio-says-no` | S2. Rio Says NO to Everything | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-ria-wont-brush` | S3. Ria Won't Brush | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-rio-sharing` | S4. Rio Doesn't Want to Share | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-ria-wants-phone` | S6. Ria Wants Mumma's Phone | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-rio-clean-toys` | S7. Rio Won't Clean Toys | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `st-rio-bored-2-min` | S9. Rio Gets Bored After Two Minutes | **lifeWithRiaRio** | medium | legacy id "little-stories" has no mapping; content signals lifeWithRiaRio |  |
-| `lp-spoon-transfer` | L2. Spoon Transfer | **canYourChildFigureItOut** | medium | legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut |  |
-| `lp-big-small` | L3. Match Big and Small | **canYourChildFigureItOut** | medium | legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut |  |
-| `lp-kitchen-counting` | L4. Kitchen Counting Game | **lifeWithRiaRio** | medium | legacy id "learning-through-play" has no mapping; content signals lifeWithRiaRio |  |
-| `lp-shape-hunt` | L5. Shape Hunt at Home | **canYourChildFigureItOut** | medium | legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut |  |
-| `lp-sound-matching` | L6. Sound Matching | **canYourChildFigureItOut** | medium | legacy id "learning-through-play" has no mapping; content signals canYourChildFigureItOut |  |
-
-## contentType
-
-50 high · 0 medium · 0 low
-
-| Idea | Title | Proposed | Confidence | Reason | Decision |
-| --- | --- | --- | --- | --- | --- |
-| `day2-which-doesnt-belong` | 1. Which One Doesn't Belong? | **Carousel** | high | stated as "Best content type" |  |
-| `day3-mumma-says` | 2. Mumma Says This 100x a Day | **Reel** | high | stated as "Best content type" |  |
-| `day4-kitchen-challenge` | 3. 5-Minute Kitchen Challenge | **Carousel** | high | stated as "Best content type" |  |
-| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **Carousel** | high | stated as "Best content type" |  |
-| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **Carousel** | high | stated as "Best content type" |  |
-| `day7-toddler-math` | 6. Toddler Mathematics | **Reel** | high | stated as "Best content type" |  |
-| `day8-find-cuty` | 7. Find the Hidden Cuty! | **Trial Reel** | high | stated as "Best content type" |  |
-| `day9-sock-hunt` | 8. The Sock Hunt | **Reel** | high | stated as "Best content type" |  |
-| `day10-3-questions` | 9. 3 Questions Every Parent Should Ask This Week | **Carousel** | high | stated as "Best content type" |  |
-| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **Carousel** | high | stated as "Best content type" |  |
-| `day12-dinner-types` | 11. Three Types of Kids at Dinner | **Reel** | high | stated as "Best content type" |  |
-| `day13-pattern-game` | 12. What Comes Next? | **Trial Reel** | high | stated as "Best content type" |  |
-| `day14-favorite-format` | 13. Which New Format Was Your Favorite? | **Static Image** | high | stated as "Best content type" |  |
-| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **Carousel** | high | stated as "Best content type" |  |
-| `day16-voted-mission-won` | 15. You Voted! Here's Which Mission Won | **Static Image** | high | stated as "Best content type" |  |
-| `day24-trial-reel-7-missions` | 23. 7 Missions in 60 Seconds | **Trial Reel** | high | stated as "Best content type" |  |
-| `day25-week-wrap-up` | 24. We Completed All 7 Missions! Here's What Happened | **Carousel** | high | stated as "Best content type" |  |
-| `jm-phone-meals` | 25. Phone During Meals | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-hot-chai` | 26. Hot Chai | **Trial Reel** | high | recovered from the overloaded Format field |  |
-| `jm-kitchen-busy-basket` | 27. Kitchen Busy Basket | **Carousel** | high | recovered from the overloaded Format field |  |
-| `jm-water-pouring` | 28. Water Pouring | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-dal-chawal` | 29. Dal Chawal Sensory Play | **Image Slideshow Reel** | high | recovered from the overloaded Format field |  |
-| `jm-tape-pull` | 30. Tape Pull Activity | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-mumma-i-am-bored` | 31. Mumma I am Bored | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-wont-brush` | 32. Won't Brush | **Image Slideshow Reel** | high | recovered from the overloaded Format field |  |
-| `jm-wont-wear-shoes` | 33. Won't Wear Shoes | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-bath-resistance` | 34. Bath Time Resistance | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-phone-chahiye-script` | 35. Phone Chahiye, Exact Script | **Carousel** | high | recovered from the overloaded Format field |  |
-| `jm-5-kitchen-items` | 36. Five Kitchen Items | **Carousel** | high | recovered from the overloaded Format field |  |
-| `jm-dont-buy-use-this` | 37. Don't Buy This, Use This | **Reel** | high | recovered from the overloaded Format field |  |
-| `jm-7-instead-of-phone` | 38. Seven Things Instead of the Phone | **Carousel** | high | recovered from the overloaded Format field |  |
-| `st-ria-vegetables` | S1. Ria Doesn't Want Vegetables | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-rio-says-no` | S2. Rio Says NO to Everything | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-ria-wont-brush` | S3. Ria Won't Brush | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-rio-sharing` | S4. Rio Doesn't Want to Share | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-cuty-wants-sleep` | S5. Cuty Wants to Sleep | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-ria-wants-phone` | S6. Ria Wants Mumma's Phone | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-rio-clean-toys` | S7. Rio Won't Clean Toys | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **Reel** | high | recovered from the overloaded Format field |  |
-| `st-rio-bored-2-min` | S9. Rio Gets Bored After Two Minutes | **Trial Reel** | high | recovered from the overloaded Format field |  |
-| `lp-sort-colour` | L1. Sort by Colour | **Carousel** | high | recovered from the overloaded Format field |  |
-| `lp-spoon-transfer` | L2. Spoon Transfer | **Reel** | high | recovered from the overloaded Format field |  |
-| `lp-big-small` | L3. Match Big and Small | **Carousel** | high | recovered from the overloaded Format field |  |
-| `lp-kitchen-counting` | L4. Kitchen Counting Game | **Reel** | high | recovered from the overloaded Format field |  |
-| `lp-shape-hunt` | L5. Shape Hunt at Home | **Trial Reel** | high | recovered from the overloaded Format field |  |
-| `lp-sound-matching` | L6. Sound Matching | **Reel** | high | recovered from the overloaded Format field |  |
-| `lp-pouring` | L7. Pouring Activity | **Image Slideshow Reel** | high | recovered from the overloaded Format field |  |
-| `lp-texture` | L8. Texture Exploration | **Carousel** | high | recovered from the overloaded Format field |  |
-| `lp-colour-hunt` | L9. Colour Hunt | **Trial Reel** | high | recovered from the overloaded Format field |  |
-| `lp-simple-sorting` | L10. Simple Sorting Game | **Trial Reel** | high | recovered from the overloaded Format field |  |
-
-## productionMethod
-
-48 high · 3 medium · 6 low
-
-| Idea | Title | Proposed | Confidence | Reason | Decision |
-| --- | --- | --- | --- | --- | --- |
-| `day2-which-doesnt-belong` | 1. Which One Doesn't Belong? | **Carousel** | high | a carousel is produced as slides |  |
-| `day3-mumma-says` | 2. Mumma Says This 100x a Day | **Character images** | low | Reel could be Character images, Real-life video or Mixed |  |
-| `day4-kitchen-challenge` | 3. 5-Minute Kitchen Challenge | **Carousel** | high | a carousel is produced as slides |  |
-| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **Carousel** | high | a carousel is produced as slides |  |
-| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **Carousel** | high | a carousel is produced as slides |  |
-| `day7-toddler-math` | 6. Toddler Mathematics | **Character images** | low | Reel could be Character images, Real-life video or Mixed |  |
-| `day8-find-cuty` | 7. Find the Hidden Cuty! | **Image slideshow** | medium | a Trial Reel is usually stills over audio, but Character images is also valid |  |
-| `day9-sock-hunt` | 8. The Sock Hunt | **Character images** | low | Reel could be Character images, Real-life video or Mixed |  |
-| `day10-3-questions` | 9. 3 Questions Every Parent Should Ask This Week | **Carousel** | high | a carousel is produced as slides |  |
-| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **Carousel** | high | a carousel is produced as slides |  |
-| `day12-dinner-types` | 11. Three Types of Kids at Dinner | **Character images** | low | Reel could be Character images, Real-life video or Mixed |  |
-| `day13-pattern-game` | 12. What Comes Next? | **Image slideshow** | medium | a Trial Reel is usually stills over audio, but Character images is also valid |  |
-| `day14-favorite-format` | 13. Which New Format Was Your Favorite? | **Text-based** | low | Text-based or Character images; the idea does not say |  |
-| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **Carousel** | high | a carousel is produced as slides |  |
-| `day16-voted-mission-won` | 15. You Voted! Here's Which Mission Won | **Text-based** | low | Text-based or Character images; the idea does not say |  |
-| `day17-mission1-race-track` | 16. Mission 2: On Your Mark! | **Character images** | high | a story Reel is generated character images |  |
-| `day18-mission2-concert` | 17. Mission 3: Living Room Concert! | **Character images** | high | a story Reel is generated character images |  |
-| `day19-mission3-art-studio` | 18. Mission 4: Art Corner Time! | **Character images** | high | a story Reel is generated character images |  |
-| `day20-mission4-detective` | 19. Mission 5: Case Open! | **Character images** | high | a story Reel is generated character images |  |
-| `day21-mission5-rescue` | 20. Mission 6: Rescue Time! | **Character images** | high | a story Reel is generated character images |  |
-| `day22-mission6-treasure` | 21. Mission 7: Treasure Hunt! | **Character images** | high | a story Reel is generated character images |  |
-| `day23-mission7-daily-care` | 22. Mission 8: Self-Care Squad! | **Character images** | high | a story Reel is generated character images |  |
-| `day24-trial-reel-7-missions` | 23. 7 Missions in 60 Seconds | **Image slideshow** | medium | a Trial Reel is usually stills over audio, but Character images is also valid |  |
-| `day25-week-wrap-up` | 24. We Completed All 7 Missions! Here's What Happened | **Carousel** | high | a carousel is produced as slides |  |
-| `jm-phone-meals` | 25. Phone During Meals | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `jm-hot-chai` | 26. Hot Chai | **Character images** | high | legacy production "Image Reel" maps to Character images |  |
-| `jm-kitchen-busy-basket` | 27. Kitchen Busy Basket | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `jm-water-pouring` | 28. Water Pouring | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `jm-dal-chawal` | 29. Dal Chawal Sensory Play | **Character images** | high | legacy production "Image" maps to Character images |  |
-| `jm-tape-pull` | 30. Tape Pull Activity | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `jm-mumma-i-am-bored` | 31. Mumma I am Bored | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `jm-wont-brush` | 32. Won't Brush | **Character images** | high | legacy production "Image" maps to Character images |  |
-| `jm-wont-wear-shoes` | 33. Won't Wear Shoes | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `jm-bath-resistance` | 34. Bath Time Resistance | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `jm-phone-chahiye-script` | 35. Phone Chahiye, Exact Script | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `jm-5-kitchen-items` | 36. Five Kitchen Items | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `jm-dont-buy-use-this` | 37. Don't Buy This, Use This | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `jm-7-instead-of-phone` | 38. Seven Things Instead of the Phone | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `st-ria-vegetables` | S1. Ria Doesn't Want Vegetables | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-rio-says-no` | S2. Rio Says NO to Everything | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-ria-wont-brush` | S3. Ria Won't Brush | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-rio-sharing` | S4. Rio Doesn't Want to Share | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-cuty-wants-sleep` | S5. Cuty Wants to Sleep | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-ria-wants-phone` | S6. Ria Wants Mumma's Phone | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-rio-clean-toys` | S7. Rio Won't Clean Toys | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `st-rio-bored-2-min` | S9. Rio Gets Bored After Two Minutes | **Character images** | high | legacy production "Character" maps to Character images |  |
-| `lp-sort-colour` | L1. Sort by Colour | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `lp-spoon-transfer` | L2. Spoon Transfer | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `lp-big-small` | L3. Match Big and Small | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `lp-kitchen-counting` | L4. Kitchen Counting Game | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `lp-shape-hunt` | L5. Shape Hunt at Home | **Character images** | high | legacy production "Image" maps to Character images |  |
-| `lp-sound-matching` | L6. Sound Matching | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-| `lp-pouring` | L7. Pouring Activity | **Character images** | high | legacy production "Image" maps to Character images |  |
-| `lp-texture` | L8. Texture Exploration | **Carousel** | high | legacy production "Static" maps to Carousel |  |
-| `lp-colour-hunt` | L9. Colour Hunt | **Character images** | high | legacy production "Image" maps to Character images |  |
-| `lp-simple-sorting` | L10. Simple Sorting Game | **Real-life video** | high | legacy production "Video" maps to Real-life video |  |
-
-## goal
-
-51 high · 0 medium · 0 low
-
-| Idea | Title | Proposed | Confidence | Reason | Decision |
-| --- | --- | --- | --- | --- | --- |
-| `day2-which-doesnt-belong` | 1. Which One Doesn't Belong? | **Saves** | high | already stated |  |
-| `day3-mumma-says` | 2. Mumma Says This 100x a Day | **Reach** | high | already stated |  |
-| `day4-kitchen-challenge` | 3. 5-Minute Kitchen Challenge | **Saves** | high | already stated |  |
-| `day5-ask-tonight` | 4. Ask Your Child This Tonight | **Saves** | high | already stated |  |
-| `day6-3year-skills` | 5. Can Your 3-Year-Old Do These? | **Saves** | high | already stated |  |
-| `day7-toddler-math` | 6. Toddler Mathematics | **Reach** | high | already stated |  |
-| `day8-find-cuty` | 7. Find the Hidden Cuty! | **Reach** | high | already stated |  |
-| `day9-sock-hunt` | 8. The Sock Hunt | **Reach** | high | already stated |  |
-| `day10-3-questions` | 9. 3 Questions Every Parent Should Ask This Week | **Saves** | high | already stated |  |
-| `day11-4year-skills` | 10. Can Your 4-Year-Old Do These? | **Saves** | high | already stated |  |
-| `day13-pattern-game` | 12. What Comes Next? | **Saves** | high | already stated |  |
-| `day15-household-swaps` | 14. How to Play Each Mission With Household Items | **Saves** | high | already stated |  |
-| `day17-mission1-race-track` | 16. Mission 2: On Your Mark! | **Reach** | high | already stated |  |
-| `day18-mission2-concert` | 17. Mission 3: Living Room Concert! | **Reach** | high | already stated |  |
-| `day19-mission3-art-studio` | 18. Mission 4: Art Corner Time! | **Saves** | high | already stated |  |
-| `day20-mission4-detective` | 19. Mission 5: Case Open! | **Reach** | high | already stated |  |
-| `day21-mission5-rescue` | 20. Mission 6: Rescue Time! | **Reach** | high | already stated |  |
-| `day22-mission6-treasure` | 21. Mission 7: Treasure Hunt! | **Reach** | high | already stated |  |
-| `day23-mission7-daily-care` | 22. Mission 8: Self-Care Squad! | **Saves** | high | already stated |  |
-| `day24-trial-reel-7-missions` | 23. 7 Missions in 60 Seconds | **Reach** | high | already stated |  |
-| `jm-hot-chai` | 26. Hot Chai | **Reach** | high | already stated |  |
-| `jm-kitchen-busy-basket` | 27. Kitchen Busy Basket | **Saves** | high | already stated |  |
-| `jm-water-pouring` | 28. Water Pouring | **Reach** | high | already stated |  |
-| `jm-dal-chawal` | 29. Dal Chawal Sensory Play | **Reach** | high | already stated |  |
-| `jm-tape-pull` | 30. Tape Pull Activity | **Shares** | high | already stated |  |
-| `jm-mumma-i-am-bored` | 31. Mumma I am Bored | **Reach** | high | already stated |  |
-| `jm-wont-brush` | 32. Won't Brush | **Reach** | high | already stated |  |
-| `jm-wont-wear-shoes` | 33. Won't Wear Shoes | **Reach** | high | already stated |  |
-| `jm-bath-resistance` | 34. Bath Time Resistance | **Reach** | high | already stated |  |
-| `jm-phone-chahiye-script` | 35. Phone Chahiye, Exact Script | **Saves** | high | already stated |  |
-| `jm-5-kitchen-items` | 36. Five Kitchen Items | **Saves** | high | already stated |  |
-| `jm-dont-buy-use-this` | 37. Don't Buy This, Use This | **Shares** | high | already stated |  |
-| `jm-7-instead-of-phone` | 38. Seven Things Instead of the Phone | **Saves** | high | already stated |  |
-| `st-ria-vegetables` | S1. Ria Doesn't Want Vegetables | **Reach** | high | already stated |  |
-| `st-rio-says-no` | S2. Rio Says NO to Everything | **Follows** | high | legacy goal "Followers" maps to Follows |  |
-| `st-ria-wont-brush` | S3. Ria Won't Brush | **Reach** | high | already stated |  |
-| `st-cuty-wants-sleep` | S5. Cuty Wants to Sleep | **Reach** | high | already stated |  |
-| `st-ria-wants-phone` | S6. Ria Wants Mumma's Phone | **Reach** | high | already stated |  |
-| `st-rio-clean-toys` | S7. Rio Won't Clean Toys | **Shares** | high | already stated |  |
-| `st-ria-same-toy` | S8. Ria Wants the Same Toy Again | **Reach** | high | already stated |  |
-| `st-rio-bored-2-min` | S9. Rio Gets Bored After Two Minutes | **Reach** | high | already stated |  |
-| `lp-sort-colour` | L1. Sort by Colour | **Saves** | high | already stated |  |
-| `lp-spoon-transfer` | L2. Spoon Transfer | **Reach** | high | already stated |  |
-| `lp-big-small` | L3. Match Big and Small | **Saves** | high | already stated |  |
-| `lp-kitchen-counting` | L4. Kitchen Counting Game | **Reach** | high | already stated |  |
-| `lp-shape-hunt` | L5. Shape Hunt at Home | **Reach** | high | already stated |  |
-| `lp-sound-matching` | L6. Sound Matching | **Reach** | high | already stated |  |
-| `lp-pouring` | L7. Pouring Activity | **Reach** | high | already stated |  |
-| `lp-texture` | L8. Texture Exploration | **Saves** | high | already stated |  |
-| `lp-colour-hunt` | L9. Colour Hunt | **Reach** | high | already stated |  |
-| `lp-simple-sorting` | L10. Simple Sorting Game | **Reach** | high | already stated |  |
 

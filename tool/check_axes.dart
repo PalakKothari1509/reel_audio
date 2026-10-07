@@ -65,7 +65,8 @@ final axes = <AxisSpec>[
     isValid: (v) => ContentPillar.byLabel(v) != null,
   ),
   AxisSpec(
-    'series', 'Series', null,
+    'series', 'Series', 'tool/series_decisions.csv',
+    hasEvidence: true,
     fromSource: (i) => ContentSeries.fromLegacy(i.g('Series'))?.label,
     isValid: (v) => ContentSeries.byLabel(v) != null,
   ),
@@ -96,7 +97,8 @@ final axes = <AxisSpec>[
     isValid: (v) => validateNarrativeFormat(v) != null,
   ),
   AxisSpec(
-    'productionMethod', 'Production Method', null,
+    'productionMethod', 'Production Method', 'tool/production_method_decisions.csv',
+    hasEvidence: true,
     fromSource: (i) {
       final raw = i.g('Production').toLowerCase();
       const map = {
@@ -126,7 +128,8 @@ final axes = <AxisSpec>[
     isValid: (v) => ProductionMethod.byLabel(v) != null,
   ),
   AxisSpec(
-    'goal', 'Goal', null,
+    'goal', 'Goal', 'tool/goal_decisions.csv',
+    hasEvidence: true,
     fromSource: (i) {
       final raw = i.g('Goal');
       if (raw.contains('+') || raw.contains('/')) return null;

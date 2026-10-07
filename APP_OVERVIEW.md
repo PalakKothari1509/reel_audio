@@ -206,26 +206,25 @@ Approved characters: Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher.
 metadata.
 
 **Phase D is complete.** Every idea now has an explicit verdict in
-`tool/idea_decisions.csv`: **40 KEEP**, 8 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
-ideas are sync candidates (40 active). The 6 deleted ideas are removed from the active
-library; the 3 archived stay in `content_ideas.md` but are not sync candidates. The 8
+`tool/idea_decisions.csv`: **41 KEEP**, 7 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
+ideas are sync candidates (41 active). The 6 deleted ideas are removed from the active
+library; the 3 archived stay in `content_ideas.md` but are not sync candidates. The 7
 REWORK ideas remain in the library but are not ready to sync until their noted issue is
 resolved.
 
-Current axis state (proposed values in the decision CSVs; only `approved` rows are written):
+Current axis state (all decisions in CSVs; only `approved` rows are written):
 
 | Axis | Decided | Open |
 | --- | --- | --- |
-| Pillar | 12 suggested, 2 archiveCandidate | 43 (awaiting review) |
-| Series | 34 mapped | 23 |
-| Narrative Format | 19 approved, 12 suggested, 1 needsReview, 1 invalid | 1 (rework) |
+| Pillar | **55 approved, 2 archiveCandidate** | **0** |
+| Series | **51 approved, 2 archiveCandidate** | **4 (DELETE)** |
+| Narrative Format | 19 approved, 12 suggested, 1 needsReview, 1 invalid | 2 (blocked) |
 | Content Type | 57 in source | 0 |
-| Production Method | — | 7 low-confidence |
-| Goal | — | 6 low-confidence |
+| Production Method | **51 approved, 2 archiveCandidate** | **0** |
+| Goal | **47 approved, 4 from source** | **6 (2 ARCHIVE, 2 DELETE, 2 ambiguous)** |
 | Status | done | 0 |
 
-**Automation proposes; a human approves.** Phase D is the human step — verdicts are
-not derived from the machine's confidence scores.
+**Automation proposes; a human approves.** **Phase 1 taxonomy is complete for the sync set** (41 KEEP ideas). The remaining OPEN items are ARCHIVE/DELETE or have ambiguous source goals — they do not block the active library.
 
 **12 further ideas are approved but deferred.** They are staged in
 `tool/approved_12_reconstruction.md` (temporary, non-authoritative) with
@@ -261,7 +260,7 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**36 tests, all passing.** They currently cover several quiet failure modes:
+**36 + 37 = 73 tests, all passing.** They currently cover several quiet failure modes:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
@@ -270,6 +269,8 @@ job, not a bad idea.
   truncated JSON)
 - the five-test rule (the minimum can be raised for a specific format)
 - delete confirmations (a promotion comment and an idea both ask first)
+- **quality gate system** (ShareTrigger, VoiceMode, SaveValue, ClassificationSnapshot,
+  QualityGate.evaluateIdea, QualityGate.evaluatePackage, design invariants)
 
 Not yet covered: the Gemini JSON parse path, network calls, FFmpeg assembly, and
 the AI fallback path.
@@ -283,7 +284,7 @@ becomes a build error instead of a crash.
 
 ```bash
 flutter analyze lib          # 0 errors
-flutter test                 # 36 tests
+flutter test                 # 73 tests
 
 dart run tool/sync_formats.dart      # content_formats.md -> Dart
 dart run tool/check_formats.dart     # validate the handbook
@@ -312,25 +313,37 @@ restarts, `q` stops.
 In rough order of how much it matters:
 
 1. **Phase D decisions are complete.** All 57 ideas now have verdicts in
-   `tool/idea_decisions.csv`: 40 KEEP, 8 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
-   ideas are sync candidates (40 active). The 8 REWORK ideas need their noted issues
+   `tool/idea_decisions.csv`: 41 KEEP, 7 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
+   ideas are sync candidates (41 active). The 7 REWORK ideas need their noted issues
    fixed before they can sync. The 12 approved new ideas remain **deferred** — they
    wait in `tool/approved_12_reconstruction.md` until original source details arrive.
-2. **Phase 1 + Phase 2 are the immediate repo work.** Stabilize the content
-   decision layer (taxonomy + quality gates) before touching generation, analytics,
-   calendar, experiments, storage refactor, or a large UI rewrite.
-3. **There is no unified Content Package.** The app still has multiple
+
+2. **Phase 1 taxonomy is complete** — all seven axes resolved for the 41 KEEP ideas.
+   The 2 Narrative Format and 6 Goal items still OPEN are ARCHIVE/DELETE/ambiguous
+   source and do not block the sync set.
+
+3. **Phase 2 quality-gate system is complete** — implemented in
+   `lib/content_quality_gate.dart` with 37 tests covering Share Trigger,
+   Voice Mode, Save Value, four evaluation dimensions, classification snapshots,
+   and the five-test rule.
+
+4. **There is no unified Content Package.** The app still has multiple
    representations of a finished post. The standalone Caption Generator and
    the "Generate All Formats" multi-select are removed; the remaining
-    representations need to collapse into one `ContentPackage`.
-4. **The generated script is thrown away.** The prompt asks for narration and
+   representations need to collapse into one `ContentPackage`.
+
+5. **The generated script is thrown away.** The prompt asks for narration and
    per-scene dialogue, and it is never read back — so the app cannot yet show the
    narration the plan promises.
-5. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
-6. **Release builds are not distributable.** Signed with the debug keystore, and the
+
+6. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+
+7. **Release builds are not distributable.** Signed with the debug keystore, and the
    application id is still `com.example.reel_audio`.
-7. **Settings does not actually export or import** your data.
-8. **Most file-reading code cannot be tested.** Three components have a test seam
+
+8. **Settings does not actually export or import** your data.
+
+9. **Most file-reading code cannot be tested.** Three components have a test seam
    (the promotion vault, the idea inbox, and the content library); the rest do not.
 
 ---
