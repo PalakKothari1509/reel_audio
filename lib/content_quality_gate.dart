@@ -32,7 +32,6 @@
 // needsFilming and routed to a plan, not retired.
 
 import 'content_axes.dart';
-import 'content_generator.dart';
 import 'format_handbook.dart';
 
   /// The resolution state of an axis, as known to the quality gate.
@@ -1059,7 +1058,10 @@ class QualityGate {
   /// This is a lighter check than [evaluateIdea] — a package has already passed
   /// the strategy and creative gates to get here. It focuses on production
   /// compatibility and performance tracking.
-  static GateReport evaluatePackage(ContentPackage pkg, {
+  ///
+  /// Takes [ideaId] and [title] directly rather than a ContentPackage to avoid
+  /// pulling Flutter dependencies into the gate library.
+  static GateReport evaluatePackage(String ideaId, String title, {
     required ClassificationSnapshot classification,
     ShareTrigger? shareTrigger,
     OpenLoop? openLoop,
@@ -1083,8 +1085,8 @@ class QualityGate {
     );
 
     return GateReport(
-      ideaId: pkg.idea,
-      title: pkg.hook,
+      ideaId: ideaId,
+      title: title,
       classification: classification,
       checks: checks,
       shareTrigger: shareTrigger,

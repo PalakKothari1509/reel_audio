@@ -114,13 +114,13 @@
 | File | Tests | Purpose |
 |------|-------|---------|
 | `test/widget_test.dart` | 9 | Widget tests: home screen, delete confirmations, promotion comments, Gemini parser, Hinglish splitting |
-| `test/quality_gate_test.dart` | 34 | Quality gate engine: ShareTrigger verdicts, VoiceMode inference, SaveValue, ClassificationSnapshot, evaluateIdea/evaluatePackage, 5-test rule, design invariants |
+| `test/quality_gate_test.dart` | 53 | Quality gate engine: ShareTrigger verdicts, VoiceMode inference, SaveValue, ClassificationSnapshot, evaluateIdea/evaluatePackage, 5-test rule, design invariants |
 | `test/five_test_rule_test.dart` | 8 | Format verdict: minimumTests=5, 1/5 insufficient, 5/5 sufficient, all registered formats |
 | `test/content_axes_test.dart` | 2 | Content axis parsing: canonical labels, slugged variants, punctuation normalization |
 | `test/content_library_test.dart` | 6 | Content library: save/retrieve, JSON round-trip, failure handling |
-| `test/content_package_v2_test.dart` | 1 | Content package v2 serialization |
+| `test/content_package_v2_test.dart` | 13 | Content package v2 serialization + gate integration |
 | `test/prompt_quality_test.dart` | 6 | Prompt quality: no fixed hashtags, no truncation, Gemini thinking budget caps |
-| **TOTAL** | **98** | **All passing** |
+| **TOTAL** | **102** | **All passing** |
 
 ---
 
@@ -297,7 +297,8 @@ tool/idea_decisions.dart ◄────────── tool/review_content.d
    └── readIdeaDecisions()
        
 test/quality_gate_test.dart ◄────── lib/content_quality_gate.dart
-   ├── 34 tests covering everything  └── 98 total tests, all passing
+   ├── 53 tests covering everything
+   └── 102 total tests, all passing
    ├── ShareTrigger, VoiceMode, SaveValue
    ├── ClassificationSnapshot, QualityGate
    └── GateReport JSON serialization
@@ -320,6 +321,7 @@ assets/ideas/*.md ◄────────────────── lib/
 | Phase 1: Single-format generation | ✅ Complete | quick_content.dart, content_generator.dart, content_library.dart |
 | Phase 1: Remove Caption Generator | ✅ Complete | main.dart (route removed), creator_home.dart (card removed) |
 | Phase 1: Delete confirmations | ✅ Complete | widget_test.dart |
-| Phase 2: Quality Gate System | ✅ Complete | content_quality_gate.dart, quality_gate_test.dart (34 tests), quality_gate.dart (tool) |
+| Phase 2: Quality Gate System | ✅ Complete | content_quality_gate.dart, quality_gate_test.dart (53 tests), quality_gate.dart (tool) |
 | Phase 2: review_content.dart integration | ⚠️ Partial | Uses QualityGate but has import issues with `dart run` |
+| Phase 2: ContentPackage handoff | ✅ Complete | content_package_v2.dart with GateReport field + fromGateReport() factory, content_package_v2_test.dart (13 tests) |
 | 12 Approved New Ideas (Reconstruction) | ⏸️ Deferred | approved_12_reconstruction.md |

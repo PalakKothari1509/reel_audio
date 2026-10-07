@@ -9,7 +9,11 @@ import 'content_axes.dart';
 import 'content_quality_gate.dart';
 
 /// Classification snapshot captured at package generation time.
-/// Ensures redefining a format later doesn't retroactively change old content.
+/// Ensures redefining a format later doesn’t retroactively change old content.
+///
+/// This is the frozen state the quality gate evaluated. Axes that were OPEN
+/// (no decision yet) are stored as null — they must NOT be silently replaced
+/// with an inferred value.
 class ClassificationSnapshotV2 {
   final ContentPillar? pillar;
   final ContentSeries? series;
@@ -18,7 +22,7 @@ class ClassificationSnapshotV2 {
   final ProductionMethod? productionMethod;
   final ContentGoal? goal;
   final IdeaStatus status;
-  final Map<String, AxisResolution> axisStates;
+  final Map<String, AxisResolution?> axisStates;
   final DateTime capturedAt;
 
   const ClassificationSnapshotV2({
@@ -34,20 +38,23 @@ class ClassificationSnapshotV2 {
   });
 
   Map<String, dynamic> toJson() => {
-        'pillar': pillar?.label,
-        'series': series?.label,
-        'narrativeFormatName': narrativeFormatName,
-        'contentType': contentType?.label,
-        'productionMethod': productionMethod?.label,
-        'goal': goal?.label,
-        'status': status.name,
-        'axisStates': axisStates.map((k, v) => MapEntry(k, v.name)),
-        'capturedAt': capturedAt.toIso8601String(),
-      };
+          'pillar': pillar?.label,
+          'series': series?.label,
+          'narrativeFormatName': narrativeFormatName,
+          'contentType': contentType?.label,
+          'productionMethod': productionMethod?.label,
+          'goal': goal?.label,
+          'status': status.name,
+          'axisStates':
+              axisStates.map((k, v) => MapEntry(k, v?.name ?? 'open')),
+          'capturedAt': capturedAt.toIso8601String(),
+        };
 
   factory ClassificationSnapshotV2.fromJson(Map<String, dynamic> json) {
-    AxisResolution parseAxis(String? s) =>
-        s == null ? AxisResolution.needsReview : AxisResolution.values.byName(s);
+    AxisResolution? parseAxis(String? s) =>
+        s == null || s == 'open'
+            ? null
+            : AxisResolution.values.byName(s);
     return ClassificationSnapshotV2(
       pillar: json['pillar'] != null
           ? ContentPillar.byLabel(json['pillar'] as String)
@@ -77,14 +84,36 @@ class ClassificationSnapshotV2 {
     );
   }
 
-  bool get isFullyApproved =>
-      axisStates.values.every((s) => s == AxisResolution.approved);
+  /// Whether the snapshot carries a human-approved value on every axis
+  /// required for generation. Returns false if any axis is OPEN (null)
+  /// or in a non-resolved state.
+  bool get isFullyApproved {
+    for (final axis in [
+      'pillar',
+      'series',
+      'narrativeFormat',
+      'contentType',
+      'productionMethod',
+      'goal',
+    ]) {
+      final state = axisStates[axis];
+      if (state == null || !state.isResolved) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-  bool get hasOpenAxes =>
-      axisStates.values.any((s) => s == AxisResolution.needsReview);
+  /// Whether any axis is still OPEN (no value, not even a suggestion).
+  bool get hasOpenAxes => axisStates.values.any((s) => s == null);
 
-  bool get hasBlockedAxes =>
-      axisStates.values.any((s) => s == AxisResolution.invalid);
+  /// Whether any axis is blocked on a human decision (needsReview, invalid).
+  bool get hasBlockedAxes => axisStates.values.any(
+      (s) => s == AxisResolution.needsReview || s == AxisResolution.invalid);
+
+  /// Whether any axis is flagged as an archive candidate.
+  bool get hasArchiveCandidateAxes =>
+      axisStates.values.any((s) => s == AxisResolution.archiveCandidate);
 }
 
 /// Reach candidacy assessment for a package.
@@ -268,6 +297,11 @@ class ContentPackageV2 {
   final int? testNumber;
   final int? testCount;
 
+  // Gate result — the verdict from QualityGate.evaluateIdea() at generation time.
+  // This is the authoritative readiness check. The package must NOT be generated
+  // if the gate did not PASS.
+  final GateReport? gateReport;
+
   const ContentPackageV2({
     required this.id,
     required this.ideaId,
@@ -301,6 +335,7 @@ class ContentPackageV2 {
     this.experimentGroup,
     this.testNumber,
     this.testCount,
+    this.gateReport,
   });
 
   Map<String, dynamic> toJson() => {
@@ -336,6 +371,7 @@ class ContentPackageV2 {
         'experimentGroup': experimentGroup,
         'testNumber': testNumber,
         'testCount': testCount,
+        'gateReport': gateReport?.toJson(),
       };
 
   factory ContentPackageV2.fromJson(Map<String, dynamic> json) {
@@ -384,6 +420,10 @@ class ContentPackageV2 {
       experimentGroup: json['experimentGroup'] as String?,
       testNumber: json['testNumber'] as int?,
       testCount: json['testCount'] as int?,
+      gateReport: json['gateReport'] != null
+          ? GateReport.fromJson(
+              Map<String, dynamic>.from(json['gateReport'] as Map))
+          : null,
     );
   }
 
@@ -418,9 +458,10 @@ class ContentPackageV2 {
     DateTime? publishedAt,
     String? platform,
     String? postUrl,
-    String? experimentGroup,
+     String? experimentGroup,
     int? testNumber,
     int? testCount,
+    GateReport? gateReport,
   }) {
     return ContentPackageV2(
       id: id ?? this.id,
@@ -456,6 +497,7 @@ class ContentPackageV2 {
       experimentGroup: experimentGroup ?? this.experimentGroup,
       testNumber: testNumber ?? this.testNumber,
       testCount: testCount ?? this.testCount,
+      gateReport: gateReport ?? this.gateReport,
     );
   }
 
@@ -469,6 +511,46 @@ class ContentPackageV2 {
   /// Returns true if this package is part of an experiment.
   bool get isExperiment =>
       experimentGroup != null && testNumber != null && testCount != null;
+
+  // ── Ready-to-Generate Gate Integration ────────────────────────────
+
+  /// The gate verdict from [QualityGate.evaluateIdea()], captured at
+  /// generation time. Null when no gate was run.
+  ///
+  /// The package must NOT proceed to generation if [canGenerate] is false.
+
+  /// Whether this package passed the Ready-to-Generate Gate.
+  ///
+  /// Returns true only when [gateReport] is present and
+  /// [GateReport.isBlockedFromGeneration] is false. When the report is null,
+  /// returns false — generation must never bypass the gate.
+  bool get canGenerate =>
+      gateReport != null && !gateReport!.isBlockedFromGeneration;
+
+  /// Whether this package is blocked from generation by the gate.
+  ///
+  /// Strategy or creative failures set this true. The package must not be
+  /// generated even if someone manually bypasses [canGenerate].
+  bool get isBlockedByGate => gateReport?.isBlockedFromGeneration ?? false;
+
+  /// Whether the gate verdict is PASS — all checks satisfied, safe to generate.
+  bool get isReadyToGenerate =>
+      gateReport != null && gateReport!.overall == GateVerdict.pass;
+
+  /// Whether the gate verdict is UNKNOWN — needs more data, not blocked.
+  bool get isNotReady =>
+      gateReport != null && gateReport!.overall == GateVerdict.unknown;
+
+  /// Whether the package is ready but production-incompatible (needs filming).
+  ///
+  /// Production failures do NOT block generation — they route to a filming plan.
+  bool get needsFilming => gateReport?.needsFilming ?? false;
+
+  /// Whether the package is fully ready and production-compatible.
+  bool get isReadyAndProducible => isReadyToGenerate && !needsFilming;
+
+  /// Human-readable list of what is blocking generation, if anything.
+  List<String> get blockingReasons => gateReport?.blockingReasons ?? [];
 }
 
 /// Factory for creating ContentPackageV2 from an Idea and generation parameters.
@@ -499,9 +581,10 @@ class ContentPackageV2Factory {
     required List<ShotListItem> shotList,
     required List<String> imagePrompts,
     String? productionNotes,
-    String? experimentGroup,
+     String? experimentGroup,
     int? testNumber,
     int? testCount,
+    GateReport? gateReport,
   }) {
     final now = DateTime.now();
     return ContentPackageV2(
@@ -534,6 +617,7 @@ class ContentPackageV2Factory {
       experimentGroup: experimentGroup,
       testNumber: testNumber,
       testCount: testCount,
+      gateReport: gateReport,
     );
   }
 
@@ -572,6 +656,89 @@ class ContentPackageV2Factory {
       productionMethod: ProductionMethod.characterImages,
       shotList: [],
       imagePrompts: [],
+    );
+  }
+
+  /// Creates a ContentPackageV2 from a [GateReport] result.
+  ///
+  /// This is the canonical handoff point: the quality gate evaluates an idea,
+  /// and the resulting GateReport is embedded in the package so generation
+  /// can check [canGenerate] before proceeding.
+  ///
+  /// The classification is converted from [ClassificationSnapshot] (in
+  /// content_quality_gate.dart) to [ClassificationSnapshotV2].
+  static ContentPackageV2 fromGateReport({
+    required String id,
+    required String ideaId,
+    required GateReport report,
+    String? hook,
+    String? title,
+    String? script,
+    String? narration,
+    String? dialogue,
+    String? caption,
+    List<String>? hashtags,
+    List<Scene>? scenes,
+    List<ShotListItem>? shotList,
+    List<String>? imagePrompts,
+    String? productionNotes,
+    DateTime? publishedAt,
+    String? platform,
+    String? postUrl,
+    String? experimentGroup,
+    int? testNumber,
+    int? testCount,
+  }) {
+    final now = DateTime.now();
+    final cls = ClassificationSnapshotV2(
+      pillar: report.classification.pillar,
+      series: report.classification.series,
+      narrativeFormatName: report.classification.narrativeFormatName,
+      contentType: report.classification.contentType,
+      productionMethod: report.classification.productionMethod,
+      goal: report.classification.goal,
+      status: report.classification.status,
+      axisStates: report.classification.axisStates,
+      capturedAt: now,
+    );
+
+    return ContentPackageV2(
+      id: id,
+      ideaId: ideaId,
+      createdAt: now,
+      updatedAt: now,
+      classification: cls,
+      audience: '',
+      problem: '',
+      lesson: '',
+      hook: hook ?? report.title,
+      shareTrigger: report.shareTrigger ?? const ShareTrigger(),
+      openLoop: null,
+      voiceMode: report.voiceMode,
+      cta: '',
+      reachCandidacy: report.classification.goal != null
+          ? ReachCandidacy.yes
+          : ReachCandidacy.unknown,
+      productionCompatibility: ProductionCompatibility.unknown,
+      title: title ?? report.title,
+      script: script ?? '',
+      narration: narration ?? '',
+      dialogue: dialogue ?? '',
+      caption: caption ?? '',
+      hashtags: hashtags ?? [],
+      scenes: scenes ?? [],
+      productionMethod:
+          report.classification.productionMethod ?? ProductionMethod.characterImages,
+      shotList: shotList ?? [],
+      imagePrompts: imagePrompts ?? [],
+      productionNotes: productionNotes,
+      publishedAt: publishedAt,
+      platform: platform,
+      postUrl: postUrl,
+      experimentGroup: experimentGroup,
+      testNumber: testNumber,
+      testCount: testCount,
+      gateReport: report,
     );
   }
 }
