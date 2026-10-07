@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:reel_audio/content_quality_gate.dart';
-import 'package:reel_audio/content_axes.dart';
-import 'package:reel_audio/format_handbook.dart';
 
 import 'check_axes.dart';
 import 'classify_ideas.dart';
@@ -138,7 +136,7 @@ void main() {
     final snapshot = ClassificationSnapshot(axisStates: axisStates);
 
     // Run through the quality gate for a structured verdict.
-    final gateReport = QualityGate.evaluateIdea(
+    QualityGate.evaluateIdea(
       ideaId: idea.id,
       title: idea.heading,
       classification: snapshot,

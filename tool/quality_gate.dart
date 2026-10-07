@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:reel_audio/content_axes.dart';
 import 'package:reel_audio/content_quality_gate.dart';
-import 'package:reel_audio/format_handbook.dart';
 
 import 'check_axes.dart';
 import 'classify_ideas.dart';
@@ -41,11 +39,12 @@ void main(List<String> args) {
 
   if (args.isNotEmpty) {
     final id = args.first;
-    final idea = ideas.firstWhere((i) => i.id == id, orElse: () {
+    final idea = ideas.cast<Idea?>().firstWhere((i) => i?.id == id, orElse: () {
       stderr.writeln('Idea "$id" not found.');
       exitCode = 1;
-      return null as Idea;
+      return null;
     });
+    if (idea == null) return;
     final report = _evaluateIdea(idea, decisions, axisDecisions);
     _printReport(report);
     return;
@@ -65,7 +64,7 @@ void main(List<String> args) {
 
     if (report.isBlockedFromGeneration) {
       failures.add(report);
-    } else if (!report.isFullyApproved) {
+    } else if (!report.classification.isFullyApproved) {
       needsReview.add(report);
     }
   }
@@ -120,11 +119,13 @@ GateReport _evaluateIdea(
     }
   }
 
-  return QualityGate.evaluateIdea(
-    ideaId: idea.id,
-    title: idea.heading,
-    classification: ClassificationSnapshot(axisStates: axisStates),
-  );
+    final snapshot = ClassificationSnapshot(axisStates: axisStates);
+    final report = QualityGate.evaluateIdea(
+      ideaId: idea.id,
+      title: idea.heading,
+      classification: snapshot,
+    );
+    return report;
 }
 
 AxisResolution _migrationToResolution(MigrationState ms) {

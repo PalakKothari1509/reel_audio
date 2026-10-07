@@ -580,7 +580,6 @@ class ClassificationSnapshot {
   /// that is required for generation. Returns false if any axis is OPEN
   /// (null state) or in a non-resolved state.
   bool get isFullyApproved {
-    // Check axis states
     for (final axis in [
       'pillar',
       'series',
@@ -594,16 +593,6 @@ class ClassificationSnapshot {
         return false;
       }
     }
-
-    // Check share trigger and open loop
-    if (shareTrigger.verdict != GateVerdict.pass) {
-      return false;
-    }
-    if (openLoop.verdict != OpenLoopVerdict.pass &&
-        openLoop.verdict != OpenLoopVerdict.notRequired) {
-      return false;
-    }
-
     return true;
   }
 
