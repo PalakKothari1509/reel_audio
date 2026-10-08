@@ -714,24 +714,9 @@ void main() {
 
   group('QualityGate.evaluatePackage', () {
     test('evaluates a package with production and performance checks', () {
-      final pkg = ContentPackage(
-        id: '1',
-        idea: 'test idea',
-        bucket: BucketLibrary.challenge,
-        format: ContentFormat.carousel,
-        characters: CharacterLibrary.all,
-        hook: 'test hook',
-        slides: const [],
-        visualPrompts: const [],
-        caption: 'test caption',
-        cta: 'test cta',
-        hashtags: const [],
-        pinnedComment: 'test',
-        replyComments: const [],
-        createdAt: DateTime.now(),
-      );
       final report = QualityGate.evaluatePackage(
-        pkg,
+        'test idea',
+        'Test Title',
         classification: fullyApproved(),
         testCount: 5,
       );
@@ -800,3 +785,4 @@ void main() {
       }
     });
   });
+}

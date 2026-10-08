@@ -323,13 +323,45 @@ test/pipeline_integration_test.dart ◄─── lib/ai_content_service_impl.dar
     ├── 9 tests: end-to-end data flow, failure propagation, data losslessness
     └── MockAIProvider simulates Gemini + validator + AiContentService
 
+test/ai_parser_validator_test.dart ◄─── lib/ai_parser_validator.dart
+    ├── 34 tests: valid responses, malformed JSON, missing fields, type mismatches
+    └── AiParserValidator.validate / validateOrThrow / isValidResponse
+
+test/package_store_test.dart ◄─── lib/package_store.dart, lib/package_store_impl.dart
+    ├── 35 tests: save/load/delete/update/count, query by ideaId, JSON round-trip
+    └── PackageStoreFile resilient to corrupted files
+
+lib/project_bridge.dart ◄─── lib/projects.dart, lib/content_package_v2.dart
+    ├── ProjectToPackageBridge.convertProject() → ContentPackageV2
+    └── saveProjectAsPackage() wires ProjectStore → PackageStore
+
+lib/main.dart ◄────────────── lib/package_store.dart, lib/project_bridge.dart
+    ├── getPackageStore() initializes PackageStoreFile lazily
+    ├── getAiContentService() wraps GeminiClient
+    ├── getProductionAdapter() creates ReelProductionAdapter
+    └── _savePackageV2() called after video build in _mergeWithImages
+
+lib/main.dart ◄────────────── lib/gemini_client.dart
+    └── _parseResponse now calls AiParserValidator.validateOrThrow()
+
+lib/main.dart ◄────────────── lib/projects.dart
+    └── ProjectStore.getProject() added for ProjectToPackageBridge
+
+lib/package_store.dart ◄────── lib/content_package_v2.dart
+    ├── PackageStore (abstract) + PackageStoreFile (concrete)
+    └── PackageMetadata tracks production status without modifying package
+
+lib/project_bridge.dart ◄────── lib/projects.dart, lib/content_package_v2.dart
+    ├── ProjectToPackageBridge.convertProject() → ContentPackageV2
+    └── saveProjectAsPackage() wires ProjectStore → PackageStore
+
 lib/ai_parser_validator.dart ◄─── lib/gemini_client.dart
     ├── AiParserValidator.validateOrThrow() called in _parseResponse
     └── Throws AiContentFailure on malformed/missing required fields
 
 test/quality_gate_test.dart ◄────── lib/content_quality_gate.dart
     ├── 55 tests covering everything
-    └── 161 total tests, all passing
+    └── 205 total tests, all passing
     ├── ShareTrigger, VoiceMode, SaveValue
     ├── ClassificationSnapshot, QualityGate
     └── GateReport JSON serialization
@@ -396,3 +428,5 @@ assets/ideas/*.md ◄────────────────── lib/
 | Phase 3: Production Adapter | ✅ Complete | production_adapter.dart (pure-Dart boundary), production_adapter_impl.dart (ReelProductionAdapter), production_adapter_test.dart (10 tests) |
 | Phase 3: AI Parser Validator | ✅ Complete | ai_parser_validator.dart (validate/validateOrThrow/isValidResponse), ai_parser_validator_test.dart (34 tests), gemini_client.dart (_parseResponse hardened) |
 | Phase 3: Pipeline Integration Tests | ✅ Complete | pipeline_integration_test.dart (9 tests: end-to-end data flow, failure propagation, data losslessness) |
+| Phase 3: Package Storage | ✅ Complete | package_store.dart (pure-Dart boundary), package_store_impl.dart (PackageStoreFile), package_store_test.dart (35 tests) |
+| Phase 3: Project-to-Package Bridge | ✅ Complete | project_bridge.dart (converts Project → ContentPackageV2), wires PackageStore into main.dart _mergeWithImages |

@@ -322,6 +322,9 @@ class ProjectStore {
     }
   }
 
+  /// Loads a single project by ID.
+  static Future<Project?> getProject(String id) => _read(id);
+
   /// Writes one story. Silent on failure by design — this is called on every edit,
   /// and an alert box about a failed autosave in the middle of typing would be worse
   /// than the thing it is warning about.

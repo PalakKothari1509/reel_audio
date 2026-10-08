@@ -34,7 +34,14 @@ import 'quick_content.dart' as qc;
 import 'creator_home.dart';
 import 'shot_planner.dart';
 import 'ai_provider.dart';
+import 'ai_content_service.dart';
+import 'ai_content_service_impl.dart';
 import 'gemini_client.dart';
+import 'package_store.dart';
+import 'package_store_impl.dart';
+import 'project_bridge.dart';
+import 'production_adapter.dart';
+import 'production_adapter_impl.dart';
 import 'settings_screen.dart';
 import 'content_ideas.dart';
 
@@ -61,6 +68,40 @@ const _geminiModel = 'gemini-3.6-flash';
 /// longer than that to answer the first request of a session, and the old timeout
 /// turned a slow reply into what looked like a broken app.
 const _geminiTimeout = Duration(seconds: 60);
+
+// ── New pipeline services ─────────────────────────────────────────────────────
+//
+// PackageStore persists ContentPackageV2 alongside the existing ProjectStore.
+// AiContentService wraps the Gemini client for future use in the pipeline.
+// These are initialized lazily — PackageStore needs the app docs directory,
+// which is only available after the Flutter bindings are initialized.
+PackageStore? _packageStore;
+
+/// Returns the shared PackageStore, initializing it if needed.
+Future<PackageStore> getPackageStore() async {
+  if (_packageStore != null) return _packageStore!;
+  final dir = await getApplicationDocumentsDirectory();
+  _packageStore = PackageStoreFile('${dir.path}/packages.json');
+  return _packageStore!;
+}
+
+/// The shared AI content service wrapping the Gemini client.
+AiContentService? _aiContentService;
+
+Future<AiContentService> getAiContentService() async {
+  if (_aiContentService != null) return _aiContentService!;
+  _aiContentService = AiContentServiceImpl(GeminiClient(apiKey: _geminiKey));
+  return _aiContentService!;
+}
+
+/// The shared production adapter.
+ProductionAdapter? _productionAdapter;
+
+ProductionAdapter getProductionAdapter() {
+  if (_productionAdapter != null) return _productionAdapter!;
+  _productionAdapter = ReelProductionAdapter(geminiApiKey: _geminiKey);
+  return _productionAdapter!;
+}
 
 // Writes a timed script from the story you type. It never sees the video or the images —
 // the description is all Gemini gets, which is why that field matters.
@@ -2746,7 +2787,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           if (mounted) setState(() => _status = message);
         },
       );
-      // Out of the cache folder and into the app's own storage, with a note of what it
+       // Out of the cache folder and into the app's own storage, with a note of what it
       // was made from. This is what lets you leave, come back, and find it waiting.
       var reelPath = outPath;
       if (widget.projectId.isNotEmpty) {
@@ -2764,6 +2805,12 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             look: look,
           ),
         );
+
+        // ALSO save to PackageStore as a ContentPackageV2 for the new pipeline.
+        // This is non-blocking — if it fails, the reel is still saved via ProjectStore.
+        _savePackageV2(widget.projectId, kept).catchError((e) {
+          debugPrint('PackageStore: failed to save package for ${widget.projectId} — $e');
+        });
       }
 
       if (!mounted) return;
@@ -2780,6 +2827,28 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       });
     }
     if (mounted) setState(() => _isMerging = false);
+  }
+
+  /// Saves the current reel state as a ContentPackageV2 in PackageStore.
+  /// This bridges the existing Project-based flow with the new pipeline.
+  Future<void> _savePackageV2(String projectId, String reelPath) async {
+    if (projectId.isEmpty) return;
+    try {
+      final store = await getPackageStore();
+      final project = await ProjectStore.getProject(projectId);
+      if (project == null) return;
+
+      final pkg = await ProjectToPackageBridge.convertProject(project);
+      final updatedPkg = pkg.copyWith(
+        productionNotes: 'Video built at: $reelPath',
+        publishedAt: DateTime.now(),
+        postUrl: reelPath,
+      );
+      await store.update(updatedPkg);
+      await store.updateStatus(pkg.id, PackageStatus.videoBuilt);
+    } catch (e) {
+      debugPrint('PackageStore: error saving package — $e');
+    }
   }
 
   Future<void> _mergeWithVideo() async {

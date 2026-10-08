@@ -20,10 +20,25 @@ can I realistically produce it?"** â€” not merely "What can AI generate?"
 **How to read this:** tasks are grouped by phase. Anything marked **YOURS**
 cannot be finished by me â€” it needs your decision or your keys.
 
-**Last checked:** `flutter analyze` â†’ 0 errors. `flutter test` â†’ 36
-tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and
-`review_content` report the open axes below â€” OPEN is the correct result for
-unresolved taxonomy, not a failure.
+**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 205 tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and `review_content` report the open axes below — OPEN is the correct result for unresolved taxonomy, not a failure.
+
+**Orders 13-17 COMPLETE:**
+
+| Order | Work | Status |
+|-------|------|--------|
+| 13 | Unified AI Service | ✅ Complete |
+| 14 | Production Adapters | ✅ Complete |
+| 15 | Harden Gemini Parser/Tests | ✅ Complete |
+| 16 | Refactor Storage | ✅ Complete |
+| 17 | Integration: Wire to main.dart | ✅ Complete |
+
+Phases 3-5 (Unified generation architecture, AI reliability, Storage refactor) are complete. The architecture now has clean boundaries:
+
+```
+IDEA → Classification → QualityGate → GateReport → AiContentService → AiParserValidator → ContentPackageV2 → ProductionAdapter → ProductionResult → PackageStore
+```
+
+The integration hardening pass (verifying end-to-end data flow, failure propagation, and strategic data losslessness) is complete with 9 pipeline integration tests. PackageStore is wired into main.dart's `_mergeWithImages` flow alongside ProjectStore.
 
 ---
 
