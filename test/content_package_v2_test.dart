@@ -336,5 +336,102 @@ void main() {
       expect(restored.canGenerate, isTrue);
       expect(restored.isReadyToGenerate, isTrue);
     });
+
+    test('multiple packages share ideaId but have unique ids and snapshots', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'day9-sock-hunt',
+        title: 'The Sock Hunt',
+        classification: fullyApprovedSnapshot(),
+        shareTrigger: ShareTrigger.filled(
+          sender: 'Parent',
+          recipient: 'Friend',
+          situation: 'Sock refusal',
+          reason: 'Same thing',
+        ),
+        voiceMode: VoiceMode.required,
+        testCount: 5,
+      );
+
+      final pkgA = ContentPackageV2Factory.fromGateReport(
+        id: 'pkg-A',
+        ideaId: 'day9-sock-hunt',
+        report: report,
+        hook: 'Sock refusal',
+        narration: 'Where are your socks?',
+        dialogue: 'Cuty: I hid them!',
+      );
+
+      final pkgB = ContentPackageV2Factory.fromGateReport(
+        id: 'pkg-B',
+        ideaId: 'day9-sock-hunt',
+        report: report,
+        hook: 'Sock victory',
+        narration: 'Found them!',
+        dialogue: 'Cuty: Here they are!',
+      );
+
+      expect(pkgA.id, isNot(pkgB.id));
+      expect(pkgA.ideaId, pkgB.ideaId);
+      expect(pkgA.hook, isNot(pkgB.hook));
+      expect(pkgA.narration, isNot(pkgB.narration));
+      expect(pkgA.dialogue, isNot(pkgB.dialogue));
+
+      final json = pkgB.toJson();
+      final restored = ContentPackageV2.fromJson(json);
+      expect(restored.id, 'pkg-B');
+      expect(restored.ideaId, 'day9-sock-hunt');
+      expect(restored.narration, 'Found them!');
+      expect(restored.dialogue, 'Cuty: Here they are!');
+    });
+
+    test('each package carries an independent gate report', () {
+      final reportA = QualityGate.evaluateIdea(
+        ideaId: 'idea-1',
+        title: 'Package A',
+        classification: ClassificationSnapshot(
+          contentType: ContentType.reel,
+          narrativeFormatName: 'problemFix',
+          productionMethod: ProductionMethod.characterImages,
+          goal: ContentGoal.reach,
+          axisStates: {
+            'pillar': AxisResolution.approved,
+            'series': AxisResolution.approved,
+            'narrativeFormat': AxisResolution.approved,
+            'contentType': AxisResolution.approved,
+            'productionMethod': AxisResolution.approved,
+            'goal': AxisResolution.approved,
+          },
+          shareTrigger: ShareTrigger.filled(
+            sender: 'A', recipient: 'B', situation: 'C', reason: 'D',
+          ),
+        ),
+        testCount: 5,
+      );
+
+      final reportB = QualityGate.evaluateIdea(
+        ideaId: 'idea-1',
+        title: 'Package B',
+        classification: ClassificationSnapshot(
+          axisStates: {
+            'narrativeFormat': AxisResolution.invalid,
+          },
+        ),
+      );
+
+      final pkgA = ContentPackageV2Factory.fromGateReport(
+        id: 'pkg-A',
+        ideaId: 'idea-1',
+        report: reportA,
+      );
+      final pkgB = ContentPackageV2Factory.fromGateReport(
+        id: 'pkg-B',
+        ideaId: 'idea-1',
+        report: reportB,
+      );
+
+      expect(pkgA.isReadyToGenerate, isTrue);
+      expect(pkgB.isBlockedByGate, isTrue);
+      expect(pkgA.gateReport!.checkedAt, isNotNull);
+    });
   });
 }

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:reel_audio/content_quality_gate.dart';
+import '../lib/content_quality_gate.dart';
 
 import 'check_axes.dart';
 import 'classify_ideas.dart';

@@ -60,5 +60,5 @@ Map<String, IdeaDecision> readIdeaDecisions(String path) {
     }
     out[m.group(1)!.trim()] = IdeaDecision(m.group(1)!.trim(), verdict, note);
   }
-  return {};
+  return out;
 }

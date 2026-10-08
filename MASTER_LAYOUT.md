@@ -118,9 +118,9 @@
 | `test/five_test_rule_test.dart` | 8 | Format verdict: minimumTests=5, 1/5 insufficient, 5/5 sufficient, all registered formats |
 | `test/content_axes_test.dart` | 2 | Content axis parsing: canonical labels, slugged variants, punctuation normalization |
 | `test/content_library_test.dart` | 6 | Content library: save/retrieve, JSON round-trip, failure handling |
-| `test/content_package_v2_test.dart` | 13 | Content package v2 serialization + gate integration |
+| `test/content_package_v2_test.dart` | 15 | Content package v2 serialization, gate integration, narration/dialogue, multi-package-per-idea |
 | `test/prompt_quality_test.dart` | 6 | Prompt quality: no fixed hashtags, no truncation, Gemini thinking budget caps |
-| **TOTAL** | **102** | **All passing** |
+| **TOTAL** | **104** | **All passing** |
 
 ---
 
@@ -297,8 +297,8 @@ tool/idea_decisions.dart ◄────────── tool/review_content.d
    └── readIdeaDecisions()
        
 test/quality_gate_test.dart ◄────── lib/content_quality_gate.dart
-   ├── 53 tests covering everything
-   └── 102 total tests, all passing
+   ├── 55 tests covering everything
+   └── 104 total tests, all passing
    ├── ShareTrigger, VoiceMode, SaveValue
    ├── ClassificationSnapshot, QualityGate
    └── GateReport JSON serialization
@@ -322,6 +322,9 @@ assets/ideas/*.md ◄────────────────── lib/
 | Phase 1: Remove Caption Generator | ✅ Complete | main.dart (route removed), creator_home.dart (card removed) |
 | Phase 1: Delete confirmations | ✅ Complete | widget_test.dart |
 | Phase 2: Quality Gate System | ✅ Complete | content_quality_gate.dart, quality_gate_test.dart (53 tests), quality_gate.dart (tool) |
-| Phase 2: review_content.dart integration | ⚠️ Partial | Uses QualityGate but has import issues with `dart run` |
-| Phase 2: ContentPackage handoff | ✅ Complete | content_package_v2.dart with GateReport field + fromGateReport() factory, content_package_v2_test.dart (13 tests) |
+| Phase 2: review_content.dart integration | ✅ Complete | Fixed package import to relative, fixed readIdeaDecisions return bug, now works with `dart run` |
+| Phase 2: ContentPackage handoff | ✅ Complete | content_package_v2.dart with GateReport field + fromGateReport() factory, content_package_v2_test.dart (15 tests) |
+| Phase 2: evaluatePackage API refactor | ✅ Complete | Changed to accept (ideaId, title) params instead of ContentPackage to avoid Flutter dependency |
+| Phase 3: Preserve narration/dialogue | ✅ Complete | First-class fields in Scene and ContentPackageV2, round-trips through JSON, hasVoiceContent getter |
+| Phase 3: Separate Idea → ContentPackage | ✅ Complete | ContentPackageV2 has unique id + ideaId foreign key, multiple packages per idea verified |
 | 12 Approved New Ideas (Reconstruction) | ⏸️ Deferred | approved_12_reconstruction.md |
