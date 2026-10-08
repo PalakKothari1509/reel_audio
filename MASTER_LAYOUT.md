@@ -237,8 +237,27 @@ QualityGate.evaluateIdea()  ← lib/content_quality_gate.dart
   └── Performance: five-test rule (1 check)
   │
   ▼
-If PASS → QuickContentScreen (single-format generation)
-  │ → ContentPackage → PostingKit → BrandBlock → VideoBuilder
+GateReport (PASS / UNKNOWN / BLOCKED)
+  │
+  │  QualityGate = decision authority
+  │  AiContentService = generation only
+  │  ProductionAdapter = media only
+  │
+  ▼
+If PASS → AiContentService.generate(GenerationRequest)
+  │       lib/ai_content_service.dart (boundary)
+  │       lib/ai_content_service_impl.dart (wraps AIProvider)
+  │       → GeneratedContent (intermediate)
+  │       → ContentPackageV2 (via fromGateReport)
+  │
+  ▼
+ProductionAdapter.produce(ProductionInput)
+  │       lib/production_adapter.dart (boundary)
+  │       lib/production_adapter_impl.dart (voice.dart + video_builder.dart)
+  │       Production-incompatible → needsFilming (NOT a gate failure)
+  │
+  ▼
+ContentPackageV2 (persisted in ContentLibrary)
   │
   ▼
 5 tests min → FormatSpec.verdict()
@@ -296,12 +315,57 @@ tool/idea_decisions.dart ◄────────── tool/review_content.d
    ├── IdeaDecision
    └── readIdeaDecisions()
        
+test/ai_parser_validator_test.dart ◄─── lib/ai_parser_validator.dart
+    ├── 34 tests: valid responses, malformed JSON, missing fields, type mismatches
+    └── AiParserValidator.validate / validateOrThrow / isValidResponse
+
+test/pipeline_integration_test.dart ◄─── lib/ai_content_service_impl.dart, lib/gemini_client.dart, lib/production_adapter.dart
+    ├── 9 tests: end-to-end data flow, failure propagation, data losslessness
+    └── MockAIProvider simulates Gemini + validator + AiContentService
+
+lib/ai_parser_validator.dart ◄─── lib/gemini_client.dart
+    ├── AiParserValidator.validateOrThrow() called in _parseResponse
+    └── Throws AiContentFailure on malformed/missing required fields
+
 test/quality_gate_test.dart ◄────── lib/content_quality_gate.dart
-   ├── 55 tests covering everything
-   └── 104 total tests, all passing
-   ├── ShareTrigger, VoiceMode, SaveValue
-   ├── ClassificationSnapshot, QualityGate
-   └── GateReport JSON serialization
+    ├── 55 tests covering everything
+    └── 161 total tests, all passing
+    ├── ShareTrigger, VoiceMode, SaveValue
+    ├── ClassificationSnapshot, QualityGate
+    └── GateReport JSON serialization
+
+test/ai_content_service_test.dart ◄─── lib/ai_content_service.dart
+    ├── 13 tests: gate enforcement, failure wrapping, JSON round-trip
+    └── TestableAiContentService extends AiContentServiceImplBase
+
+test/production_adapter_test.dart ◄─── lib/production_adapter.dart
+    ├── 10 tests: result states, input defaults, contract verification
+    └── ProductionResult sealed-style result classification
+
+lib/ai_content_service.dart ◄────── lib/content_quality_gate.dart
+    ├── GateReport (consumed, not constructed)
+    ├── ClassificationSnapshot (read-only)
+    └── ContentPackageV2 (produced via fromGateReport)
+
+lib/ai_content_service.dart ◄────── lib/content_package_v2.dart
+    ├── GeneratedContent (intermediate, pure Dart)
+    ├── GenerationRequest (input)
+    └── ContentPackageV2 (assembled from GeneratedContent)
+
+lib/production_adapter.dart ◄────── lib/ai_content_service.dart
+    ├── ProductionInput wraps ContentPackageV2
+    └── ProductionResult is independent of AiContentService
+
+lib/production_adapter_impl.dart ◄─── lib/voice.dart, lib/video_builder.dart
+    ├── synthesizeWholeScript / synthesizeLine
+    ├── SlideshowBuilder.build
+    └── brand_system.dart (BucketLibrary, CaptionStyle)
+
+lib/production_adapter_impl.dart ◄─── lib/content_package_v2.dart
+    ├── reads productionCompatibility (needsFilming check)
+    ├── reads voiceMode (narration requirement)
+    ├── reads scenes (narration/dialogue for voice)
+    └── reads imagePrompts (for image generation)
 
 tool/review_sheet.dart ◄──────────── tool/review_sheet.md
    └── generates human-approval markdown
@@ -328,3 +392,7 @@ assets/ideas/*.md ◄────────────────── lib/
 | Phase 3: Preserve narration/dialogue | ✅ Complete | First-class fields in Scene and ContentPackageV2, round-trips through JSON, hasVoiceContent getter |
 | Phase 3: Separate Idea → ContentPackage | ✅ Complete | ContentPackageV2 has unique id + ideaId foreign key, multiple packages per idea verified |
 | 12 Approved New Ideas (Reconstruction) | ⏸️ Deferred | approved_12_reconstruction.md |
+| Phase 3: Unified AI Service | ✅ Complete | ai_content_service.dart (abstract boundary), ai_content_service_impl.dart (wraps AIProvider), ai_content_service_test.dart (13 tests) |
+| Phase 3: Production Adapter | ✅ Complete | production_adapter.dart (pure-Dart boundary), production_adapter_impl.dart (ReelProductionAdapter), production_adapter_test.dart (10 tests) |
+| Phase 3: AI Parser Validator | ✅ Complete | ai_parser_validator.dart (validate/validateOrThrow/isValidResponse), ai_parser_validator_test.dart (34 tests), gemini_client.dart (_parseResponse hardened) |
+| Phase 3: Pipeline Integration Tests | ✅ Complete | pipeline_integration_test.dart (9 tests: end-to-end data flow, failure propagation, data losslessness) |

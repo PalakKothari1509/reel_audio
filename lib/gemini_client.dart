@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
 
+ import 'ai_parser_validator.dart';
 import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_generator.dart';
@@ -335,44 +335,44 @@ Match the JSON schema exactly.
   }
 
   ContentPackage _parseResponse(String jsonText, IdeaInput input) {
-    try {
-      final map = jsonDecode(jsonText) as Map<String, dynamic>;
+    // Validate the AI response before attempting to parse fields.
+    // This produces typed failures (AiContentFailure) instead of
+    // silent empty results or unhandled TypeErrors.
+    final validated = AiParserValidator.validateOrThrow(jsonText);
+    final map = validated.data;
 
-      // This runs on a live model reply, so nothing in it can be assumed. A
-      // missing or reshaped field used to throw a TypeError here and take the
-      // whole generation down; now it produces an empty or partial result.
-      final slides = ((map['slides'] as List?) ?? const [])
-          .whereType<Map>()
-          .map((s) {
-            final m = s.cast<String, dynamic>();
-            return SlideContent(
-              index: m['slideNumber'] as int? ?? 0,
-              title: m['headline'] as String? ?? '',
-              body: m['body'] as String? ?? '',
-              visualPrompt: m['imagePrompt'] as String? ?? '',
-              overlayText: m['cta'] as String?,
-            );
-          })
-          .toList();
+    // This runs on a live model reply, so nothing in it can be assumed. A
+    // missing or reshaped field used to throw a TypeError here and take the
+    // whole generation down; now it produces an empty or partial result.
+    final slides = ((map['slides'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((s) {
+          final m = s.cast<String, dynamic>();
+          return SlideContent(
+            index: m['slideNumber'] as int? ?? 0,
+            title: m['headline'] as String? ?? '',
+            body: m['body'] as String? ?? '',
+            visualPrompt: m['imagePrompt'] as String? ?? '',
+            overlayText: m['cta'] as String?,
+          );
+        })
+        .toList();
 
-      return ContentPackage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        idea: map['topic'] as String? ?? input.topic,
-        bucket: BucketLibrary.byId(map['bucket'] as String? ?? '') ?? input.bucket,
-        format: input.targetFormats.first,
-        characters: input.characters,
-        hook: map['hook'] as String? ?? '',
-        slides: slides,
-        visualPrompts: slides.map((s) => s.visualPrompt).toList(),
-        caption: map['caption'] as String? ?? '',
-        cta: slides.isNotEmpty ? slides.last.overlayText ?? '' : '',
-        hashtags: (map['hashtags'] as List?)?.cast<String>() ?? [],
-        pinnedComment: map['pinnedComment'] as String? ?? '',
-        replyComments: (map['replyComments'] as List?)?.cast<String>() ?? [],
-        createdAt: DateTime.now(),
-      );
-    } catch (e) {
-      throw Exception('Failed to parse Gemini response: $e\nResponse: $jsonText');
-    }
+    return ContentPackage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      idea: map['topic'] as String? ?? input.topic,
+      bucket: BucketLibrary.byId(map['bucket'] as String? ?? '') ?? input.bucket,
+      format: input.targetFormats.first,
+      characters: input.characters,
+      hook: map['hook'] as String? ?? '',
+      slides: slides,
+      visualPrompts: slides.map((s) => s.visualPrompt).toList(),
+      caption: map['caption'] as String? ?? '',
+      cta: slides.isNotEmpty ? slides.last.overlayText ?? '' : '',
+      hashtags: (map['hashtags'] as List?)?.cast<String>() ?? [],
+      pinnedComment: map['pinnedComment'] as String? ?? '',
+      replyComments: (map['replyComments'] as List?)?.cast<String>() ?? [],
+      createdAt: DateTime.now(),
+    );
   }
 }

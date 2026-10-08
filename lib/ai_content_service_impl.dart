@@ -35,6 +35,8 @@ class AiContentServiceImpl extends AiContentServiceImplBase {
     try {
       final pkg = await _provider.generate(input);
       return _convert(pkg);
+    } on AiContentFailure {
+      rethrow;
     } on Exception catch (e) {
       throw AiContentFailure('AI generation failed: $e', e);
     }
@@ -55,25 +57,42 @@ class AiContentServiceImpl extends AiContentServiceImplBase {
     return ContentFormat.values;
   }
 
+  /// Converts a legacy ContentPackage (v1) to GeneratedContent.
+  ///
+  /// Narration is extracted from the package's script field (if available)
+  /// or synthesized from slide bodies. Dialogue is left empty unless the
+  /// AI provider supplies it in the future.
   GeneratedContent _convert(ContentPackage pkg) {
+    // Build scenes with per-sceline content split from narration/dialogue.
     final scenes = pkg.slides.asMap().entries.map((entry) {
+      final body = entry.value.body;
+      final dialogue = _extractDialogue(body);
+      final narration = dialogue != null && dialogue.isNotEmpty
+          ? body.replaceFirst(dialogue, '').trim()
+          : body;
+
       return Scene(
         index: entry.key,
         title: entry.value.title,
-        description: entry.value.body,
+        description: body,
         visualPrompt: entry.value.visualPrompt,
-        narration: null,
-        dialogue: null,
+        narration: narration.isNotEmpty ? narration : null,
+        dialogue: dialogue,
         overlayText: entry.value.overlayText,
         durationSeconds: null,
       );
     }).toList();
 
+    final narration = pkg.slides
+        .map((s) => s.body)
+        .where((s) => s.isNotEmpty)
+        .join('\n');
+
     return GeneratedContent(
       title: pkg.hook,
       hook: pkg.hook,
-      script: pkg.slides.map((s) => s.body).join('\n\n'),
-      narration: '',
+      script: narration,
+      narration: narration,
       dialogue: '',
       caption: pkg.caption,
       cta: pkg.cta,
@@ -94,5 +113,13 @@ class AiContentServiceImpl extends AiContentServiceImplBase {
         );
       }).toList(),
     );
+  }
+
+  /// Extracts a dialogue line from a script body if it contains
+  /// character speech patterns (e.g., "Ria: ...").
+  static String? _extractDialogue(String body) {
+    if (body.isEmpty) return null;
+    final match = RegExp(r'(Ria|Rio|Cuty|Mumma|Papa|Daadi|Teacher):\s*(.*)').firstMatch(body);
+    return match?.group(0);
   }
 }
