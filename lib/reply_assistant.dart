@@ -12,7 +12,8 @@ import 'theme.dart';
 
 /// Opens the assistant as a sheet. [storyContext] is the reel's title and lesson when
 /// opened from a story, so replies can mention what happened in it.
-Future<void> showReplyAssistant(BuildContext context, {String storyContext = ''}) =>
+Future<void> showReplyAssistant(BuildContext context,
+    {String storyContext = '', String? apiKey}) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -23,14 +24,18 @@ Future<void> showReplyAssistant(BuildContext context, {String storyContext = ''}
         minChildSize: 0.5,
         maxChildSize: 0.95,
         builder: (ctx, scroll) => ReplyAssistant(
-          storyContext: storyContext, scroll: scroll),
+          storyContext: storyContext,
+          scroll: scroll,
+          apiKey: apiKey,
+        ),
       ),
     );
 
 class ReplyAssistant extends StatefulWidget {
   final String storyContext;
   final ScrollController? scroll;
-  const ReplyAssistant({super.key, this.storyContext = '', this.scroll});
+  final String? apiKey;
+  const ReplyAssistant({super.key, this.storyContext = '', this.scroll, this.apiKey});
 
   @override
   State<ReplyAssistant> createState() => _ReplyAssistantState();
@@ -53,6 +58,7 @@ class _ReplyAssistantState extends State<ReplyAssistant> {
     setState(() { _busy = true; _status = ''; _result = null; });
     try {
       final result = await suggestReplies(_comment.text,
+        apiKey: widget.apiKey,
         storyContext: widget.storyContext,
         onWait: (m) { if (mounted) setState(() => _status = m); });
       if (!mounted) return;

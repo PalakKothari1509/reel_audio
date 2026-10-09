@@ -87,8 +87,10 @@ Future<StoryPackage> generateEverything({
   required String style,
   required int seconds,
   required int expectedLines,
+  String? apiKey,
   void Function(String message)? onWait,
 }) async {
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
   final isHinglish = language == 'Hinglish';
 
   final scriptShape = isHinglish
@@ -168,7 +170,7 @@ Rules:
 
   final response = await geminiPost(
     model: _model,
-    apiKey: geminiApiKey,
+    apiKey: key,
     timeout: _timeout,
     onWait: onWait,
     body: jsonEncode({
@@ -178,7 +180,7 @@ Rules:
         'maxOutputTokens': 8192,
         'responseMimeType': 'application/json',
         // Caps reasoning so it cannot eat the response budget and return truncated,
-        // unparseable JSON. Applied to the caption and story calls and missing here.
+        // unparseable JSON.
         'thinkingConfig': {'thinkingBudget': 0},
       },
     }),
@@ -253,9 +255,11 @@ Future<PromptSet> generatePrompts({
   required String storyDescription,
   required List<String> scriptLines,
   required int seconds,
+  String? apiKey,
   void Function(String message)? onWait,
 }) async {
   if (scriptLines.isEmpty) throw Exception('Write the script first.');
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
   final numbered = [
     for (var i = 0; i < scriptLines.length; i++) '${i + 1}. ${scriptLines[i]}'
@@ -331,7 +335,7 @@ different one.
 
   final response = await geminiPost(
     model: _model,
-    apiKey: geminiApiKey,
+    apiKey: key,
     timeout: _timeout,
     onWait: onWait,
     body: jsonEncode({

@@ -13,7 +13,8 @@ import 'content_package_v2.dart';
 import 'content_quality_gate.dart';
 import 'production_adapter.dart';
 import 'voice.dart';
-import 'video_builder.dart';
+  import 'video_builder.dart';
+  import 'api_key_store.dart';
 
 /// Production adapter that builds reels using the app's existing voice and
 /// video tools.
@@ -27,6 +28,16 @@ class ReelProductionAdapter implements ProductionAdapter {
     this.elevenLabsApiKey,
     this.elevenLabsVoiceId,
   });
+
+  /// Creates an adapter that reads keys through [ApiKeyStore], honoring
+  /// the Settings-screen override.
+  factory ReelProductionAdapter.withKeyStore(ApiKeyStore store) {
+    return ReelProductionAdapter(
+      geminiApiKey: store.getGeminiApiKey(),
+      elevenLabsApiKey: store.getElevenLabsApiKey(),
+      elevenLabsVoiceId: store.getElevenVoiceId(),
+    );
+  }
 
   @override
   String get adapterName => 'ReelProduction';

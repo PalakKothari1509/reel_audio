@@ -167,10 +167,12 @@ class StoryCheck {
 /// weak voiceover and seven weak pictures, and by then it has cost twenty minutes.
 /// Ten seconds here saves all of that.
 Future<StoryCheck> checkStory(String story,
-    {void Function(String message)? onWait}) async {
+    {String? apiKey, void Function(String message)? onWait}) async {
   if (story.trim().length < 15) {
     throw Exception('Write a bit more of the story first.');
   }
+
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
   final prompt = '''
 Judge this story for a 30 second Instagram reel for Indian parents of preschoolers.
@@ -223,7 +225,7 @@ rewordings of one line. The examples show the style only; write new ones for thi
   final response = await geminiPost(
     model: _lightModel,
     fallbackModel: _fullModel,
-    apiKey: geminiApiKey,
+    apiKey: key,
     timeout: _timeout,
     onWait: onWait,
     body: jsonEncode({
@@ -294,8 +296,10 @@ rewordings of one line. The examples show the style only; write new ones for thi
 Future<StoryIdea> generateStoryIdea({
   required String age,
   required String problem,
+  String? apiKey,
   void Function(String message)? onWait,
 }) async {
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
   final prompt = '''
 Think of one short story for an Instagram reel for Indian parents of preschoolers.
 
@@ -342,7 +346,7 @@ The child should work it out or be shown, not told off. Keep every value under 2
   final response = await geminiPost(
     model: _lightModel,
     fallbackModel: _fullModel,
-    apiKey: geminiApiKey,
+    apiKey: key,
     timeout: _timeout,
     onWait: onWait,
     body: jsonEncode({
@@ -450,8 +454,9 @@ class ReplySuggestions {
 /// [storyContext] is the reel's title and lesson when opened from a story, so replies
 /// can refer to what actually happened in it. Empty works too.
 Future<ReplySuggestions> suggestReplies(String comment,
-    {String storyContext = '', void Function(String message)? onWait}) async {
+    {String? apiKey, String storyContext = '', void Function(String message)? onWait}) async {
   if (comment.trim().isEmpty) throw Exception('Paste the comment first.');
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
   final prompt = '''
 You reply to comments on "Fun Learning With Palak", an Instagram page of short original
@@ -502,7 +507,7 @@ Return ONLY valid JSON:
   final response = await geminiPost(
     model: _lightModel,
     fallbackModel: _fullModel,
-    apiKey: geminiApiKey,
+    apiKey: key,
     timeout: _timeout,
     onWait: onWait,
     body: jsonEncode({

@@ -33,7 +33,16 @@ The project stores API keys in Dart source code compiled into the APK. This is *
 | **In APK** | Yes — compiled into native code, easily extracted |
 | **Safe to keep** | No — rotate before Play Store release |
 
-**Finding:** Only ~2 of 10 call sites honor the Settings-screen API key. The other 8 use the hardcoded value from `secrets.dart` directly. This is the "Settings key honoured in 2 of 10 places" issue from the roadmap.
+**Finding:** A new `ApiKeyStore` class centralizes all key resolution. Every
+code path through `ApiKeyStore` honors the Settings-screen override,
+including: `main.dart` (story checker, story generator, combined call),
+`prompt_screen.dart` (prompt generator), `posting_kit.dart` (reply assistant),
+`caption_generator.dart`, `production_adapter_impl.dart` (via factory).
+The `geminiApiKey`/`elevenLabsApiKey` constants in `secrets.dart` are now
+only read from within `ApiKeyStore` itself.
+
+**Remaining gap:** `elevenLabsApiKey` still has no Settings-screen override
+— it always uses the default key.
 
 ### 2. ElevenLabs API Key (`elevenLabsApiKey`)
 

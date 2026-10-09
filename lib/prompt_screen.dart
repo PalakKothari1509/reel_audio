@@ -22,6 +22,7 @@ class PromptScreen extends StatefulWidget {
   /// The saved story these belong to, so the prompts are written down once and read
   /// back on every later visit instead of being bought again. Empty in video mode.
   final String projectId;
+  final String? apiKey;
 
   const PromptScreen({
     super.key,
@@ -29,6 +30,7 @@ class PromptScreen extends StatefulWidget {
     required this.scriptLines,
     required this.seconds,
     this.projectId = '',
+    this.apiKey,
   });
 
   @override
@@ -121,6 +123,7 @@ class _PromptScreenState extends State<PromptScreen> {
         storyDescription: widget.storyDescription,
         scriptLines: widget.scriptLines,
         seconds: widget.seconds,
+        apiKey: widget.apiKey,
         // Shown under the spinner: a silent thirty second wait reads as a hang.
         onWait: (message) { if (mounted) setState(() => _waiting = message); },
       );
@@ -452,7 +455,7 @@ class _PromptScreenState extends State<PromptScreen> {
             icon: Icons.checklist,
             colour: AppColors.accent,
             onPressed: () async {
-              await showPostingKit(context, widget.projectId);
+              await showPostingKit(context, widget.projectId, apiKey: widget.apiKey);
               // Choices made there are edits; read them back so these cards match.
               final project = await loadProject(widget.projectId);
               if (mounted && project != null) {

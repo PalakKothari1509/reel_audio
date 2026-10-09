@@ -19,7 +19,7 @@ import 'theme.dart';
 // and editable in place, with edits shared with the prompts screen so the two never
 // disagree about what the caption says.
 
-Future<void> showPostingKit(BuildContext context, String projectId) =>
+Future<void> showPostingKit(BuildContext context, String projectId, {String? apiKey}) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -29,14 +29,19 @@ Future<void> showPostingKit(BuildContext context, String projectId) =>
         initialChildSize: 0.85,
         minChildSize: 0.4,
         maxChildSize: 0.95,
-        builder: (ctx, scroll) => _PostingKit(projectId: projectId, scroll: scroll),
+        builder: (ctx, scroll) => _PostingKit(
+          projectId: projectId,
+          scroll: scroll,
+          apiKey: apiKey,
+        ),
       ),
     );
 
 class _PostingKit extends StatefulWidget {
   final String projectId;
   final ScrollController scroll;
-  const _PostingKit({required this.projectId, required this.scroll});
+  final String? apiKey;
+  const _PostingKit({required this.projectId, required this.scroll, this.apiKey});
 
   @override
   State<_PostingKit> createState() => _PostingKitState();
@@ -220,7 +225,7 @@ class _PostingKitState extends State<_PostingKit> {
       child: SecondaryButton(
         label: 'Reply to a comment',
         icon: Icons.chat_bubble_outline,
-        onPressed: () => showReplyAssistant(context, storyContext: _storyContext),
+        onPressed: () => showReplyAssistant(context, storyContext: _storyContext, apiKey: widget.apiKey),
       ),
     );
 

@@ -17,11 +17,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'brand_system.dart';
 import 'gemini_call.dart';
 import 'secrets.dart';
+import 'api_key_store.dart';
 import 'theme.dart';
 
 /// Google's Lite tier is 3.5. There is no 3.6 Lite: this was `3.6-flash-lite`, which
@@ -318,6 +318,25 @@ List<String> _topicTags(String topic) {
   return words.map((w) => '#$w').toList();
 }
 
+/// Asks Gemini for a caption using keys from [store], which honors the
+/// Settings-screen override. Falls back to the template on any failure.
+Future<GeneratedCaption> generateCaptionWithStore({
+  required String topic,
+  required CaptionLanguage language,
+  required ApiKeyStore store,
+  String bucket = '',
+  String extraNotes = '',
+  void Function(String message)? onWait,
+}) =>
+    generateCaption(
+      topic: topic,
+      language: language,
+      bucket: bucket,
+      extraNotes: extraNotes,
+      apiKey: store.getGeminiApiKey(),
+      onWait: onWait,
+    );
+
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class CaptionGeneratorScreen extends StatefulWidget {
@@ -354,17 +373,16 @@ class _CaptionGeneratorScreenState extends State<CaptionGeneratorScreen> {
       _error = null;
     });
 
-    // Read the key here rather than taking it as a constructor argument, so a
-    // key changed in Settings is picked up without going back to the home screen.
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getString('gemini_api_key')?.trim() ?? '';
+    // Read the key through ApiKeyStore so a key changed in Settings is picked
+    // up without going back to the home screen.
+    final store = await ApiKeyStore.fromSharedPreferences();
 
     try {
       final caption = await generateCaption(
         topic: topic,
         language: _language,
         extraNotes: _notesCtrl.text.trim(),
-        apiKey: stored,
+        apiKey: store.getGeminiApiKey(),
         onWait: (message) {
           if (mounted) setState(() => _error = message);
         },

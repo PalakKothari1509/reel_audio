@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'secrets.dart';
+  import 'api_key_store.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -50,12 +50,13 @@ import 'content_ideas.dart';
 const _mediaChannel = MethodChannel('com.example.reel_audio/media');
 
 // ── API Keys ──────────────────────────────────────────────────────────────────
+// All key access goes through ApiKeyStore, which honors the Settings-screen
+// override before falling back to defaults.
 
-const _geminiKey = geminiApiKey;
-const _elevenLabsKey = elevenLabsApiKey;
+ApiKeyStore? _keyStore;
+
 // ElevenLabs voice ID — "Aria" multilingual (works well for Hinglish)
 const _elevenVoiceId = elevenVoiceId;
-
 // ── Gemini Service ────────────────────────────────────────────────────────────
 //
 // One place for the model name. Google retires and renames these, and a name the key
@@ -90,7 +91,7 @@ AiContentService? _aiContentService;
 
 Future<AiContentService> getAiContentService() async {
   if (_aiContentService != null) return _aiContentService!;
-  _aiContentService = AiContentServiceImpl(GeminiClient(apiKey: _geminiKey));
+  _aiContentService = AiContentServiceImpl(GeminiClient(apiKey: _keyStore!.getGeminiApiKey()));
   return _aiContentService!;
 }
 
@@ -99,7 +100,7 @@ ProductionAdapter? _productionAdapter;
 
 ProductionAdapter getProductionAdapter() {
   if (_productionAdapter != null) return _productionAdapter!;
-  _productionAdapter = ReelProductionAdapter(geminiApiKey: _geminiKey);
+  _productionAdapter = ReelProductionAdapter.withKeyStore(_keyStore!);
   return _productionAdapter!;
 }
 
@@ -213,7 +214,7 @@ Now output exactly $expectedLines lines for a $totalSecs second video:
   try {
     response = await geminiPost(
       model: _geminiModel,
-      apiKey: _geminiKey,
+      apiKey: _keyStore!.getGeminiApiKey(),
       body: body,
       timeout: _geminiTimeout,
       onWait: onWait,
@@ -447,11 +448,10 @@ Future<void> main() async {
   // Hooks, posting times and results go into the Downloads backup with the stories.
   onPlanSaved = ProjectBackup.schedule;
 
-  final preferences = await SharedPreferences.getInstance();
-  final savedGeminiKey = preferences.getString('gemini_api_key')?.trim() ?? '';
-  final geminiKey = savedGeminiKey.isNotEmpty
-      ? savedGeminiKey
-      : _geminiKey.trim();
+  // Set up the shared key store. This must happen before any service
+  // that reads API keys is accessed.
+  _keyStore = await ApiKeyStore.fromSharedPreferences();
+  final geminiKey = _keyStore!.getGeminiApiKey();
   AIProvider? aiProvider = geminiKey.isEmpty
       ? null
       : GeminiClient(apiKey: geminiKey);
@@ -834,6 +834,7 @@ class _StoryScreenState extends State<StoryScreen> {
     try {
       final check = await checkStory(
         _descCtrl.text,
+        apiKey: _keyStore?.getGeminiApiKey(),
         onWait: (message) {
           if (mounted) setState(() => _status = message);
         },
@@ -1114,6 +1115,7 @@ class _StoryScreenState extends State<StoryScreen> {
       final idea = await generateStoryIdea(
         age: age,
         problem: problem,
+        apiKey: _keyStore?.getGeminiApiKey(),
         onWait: (message) {
           if (mounted) setState(() => _status = message);
         },
@@ -1356,6 +1358,7 @@ class _StoryScreenState extends State<StoryScreen> {
             style: _style,
             seconds: _seconds,
             expectedLines: expectedLines,
+            apiKey: _keyStore?.getGeminiApiKey(),
             onWait: (message) {
               if (mounted) setState(() => _status = message);
             },
@@ -2313,7 +2316,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
     final path = await synthesizeWholeScript(
       lines: _lines.map((l) => cleanForTts(l.spoken)).toList(),
       basePath: '${dir.path}/narration_gemini',
-      apiKey: _geminiKey,
+      apiKey: _keyStore!.getGeminiApiKey(),
       styleHint: voiceDirection(style),
       onWait: (message) {
         if (mounted) setState(() => _status = message);
@@ -2360,7 +2363,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
       final dir = await getTemporaryDirectory();
       final style = widget.style.replaceAll(RegExp(r'[^\w\s-]'), '').trim();
       final wav = await speakSample(
-        apiKey: _geminiKey,
+        apiKey: _keyStore!.getGeminiApiKey(),
         style: style,
         onWait: (message) {
           if (mounted) setState(() => _status = message);
@@ -2542,8 +2545,8 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
             languageTag: locale,
             rate: _vp.rate,
             pitch: _vp.pitch,
-            geminiKey: _geminiKey,
-            elevenLabsKey: _elevenLabsKey,
+            geminiKey: _keyStore!.getGeminiApiKey(),
+            elevenLabsKey: _keyStore!.getElevenLabsApiKey(),
             elevenVoiceId: _elevenVoiceId,
             // Waiting out a rate limit takes longer than the speaking does, so say so
             // rather than leaving the button spinning with nothing happening.
@@ -2712,6 +2715,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               : _lines.map((l) => l.text).join(' '),
           scriptLines: _lines.map((l) => l.text).toList(),
           seconds: widget.seconds,
+          apiKey: _keyStore?.getGeminiApiKey(),
           // So the prompts are written down against this story and read back next time
           // instead of being asked for again.
           projectId: widget.projectId,
@@ -3737,7 +3741,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               colour: AppColors.accent,
               onPressed: busy
                   ? null
-                  : () => showPostingKit(context, widget.projectId).then((_) {
+                  : () => showPostingKit(context, widget.projectId, apiKey: _keyStore?.getGeminiApiKey()).then((_) {
                       _loadHookChoices();
                       _checkSavedReel();
                     }),
@@ -4461,7 +4465,7 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
                   PrimaryButton(
                     label: 'Caption & comments',
                     icon: Icons.content_copy,
-                    onPressed: () => showPostingKit(context, widget.projectId),
+                    onPressed: () => showPostingKit(context, widget.projectId, apiKey: _keyStore?.getGeminiApiKey()),
                   ),
                   Gap.s,
                 ],
@@ -4630,7 +4634,7 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                 subtitle: const Text('Copy for posting'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  showPostingKit(context, p.id);
+                  showPostingKit(context, p.id, apiKey: _keyStore?.getGeminiApiKey());
                 },
               ),
             if (lines.isNotEmpty)
@@ -4676,6 +4680,7 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                         scriptLines: lines.map((l) => l.text).toList(),
                         seconds: p.seconds,
                         projectId: p.id,
+                        apiKey: _keyStore?.getGeminiApiKey(),
                       ),
                     ),
                   );
