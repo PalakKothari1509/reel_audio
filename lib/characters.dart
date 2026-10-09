@@ -1,7 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+
+import 'json_file_store.dart';
 
 // ── The cast ──────────────────────────────────────────────────────────────────
 //
@@ -103,33 +104,39 @@ const kDefaultCast = <CharacterRef>[
   ),
 ];
 
+class _CharacterFileStore extends JsonFileStore<CharacterRef> {
+  _CharacterFileStore() : super('characters.json');
+
+  @override
+  String idOf(CharacterRef item) => item.name;
+
+  @override
+  CharacterRef fromJson(Map<String, dynamic> json) => CharacterRef.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(CharacterRef item) => item.toJson();
+}
+
 class CharacterStore {
-  static const _fileName = 'characters.json';
   static const _folder = 'character_faces';
+
+  /// Internal store instance handling JSON file I/O.
+  static final _CharacterFileStore _store = _CharacterFileStore();
 
   /// Loads the saved cast, seeding the defaults the first time the app runs.
   static Future<List<CharacterRef>> load() async {
     try {
-      final file = await _indexFile();
-      if (!await file.exists()) {
+      final saved = await _store.loadAll(
+        shouldKeep: (c) => c.name.isNotEmpty,
+      );
+      if (saved.isEmpty) {
         await save(kDefaultCast);
         return List.of(kDefaultCast);
       }
 
-      final raw = jsonDecode(await file.readAsString());
-      if (raw is! List) return List.of(kDefaultCast);
-
-      final saved = raw
-          .whereType<Map<String, dynamic>>()
-          .map(CharacterRef.fromJson)
-          .where((c) => c.name.isNotEmpty)
-          .toList();
-
-      if (saved.isEmpty) return List.of(kDefaultCast);
-
       // A picture can go missing if the phone is wiped or the app reinstalled, so
       // check rather than hand back a path that points at nothing. The bundled face
-      // is re-attached from the build by name, since it is not saved — that way a
+      // is re-attached from the build by name, since it is not saved â that way a
       // character whose picked face has gone falls back to the shipped one instead
       // of showing an empty tile.
       final checked = <CharacterRef>[];
@@ -154,8 +161,7 @@ class CharacterStore {
   }
 
   static Future<void> save(List<CharacterRef> cast) async {
-    final file = await _indexFile();
-    await file.writeAsString(jsonEncode(cast.map((c) => c.toJson()).toList()));
+    await _store.saveAll(cast);
   }
 
   /// Copies a picked image into permanent storage and returns its new path.
@@ -185,7 +191,4 @@ class CharacterStore {
     final file = File(character.imagePath!);
     if (await file.exists()) await file.delete();
   }
-
-  static Future<File> _indexFile() async =>
-      File('${(await getApplicationDocumentsDirectory()).path}/$_fileName');
 }

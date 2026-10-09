@@ -1,15 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_generator.dart';
 import 'content_ideas.dart' as ideas;
 import 'format_adapter.dart';
+import 'json_file_store.dart';
 import 'models/quick_idea.dart';
 import 'posting_pack.dart';
 import 'quality_check.dart';
@@ -38,8 +35,22 @@ class PromoComment {
   factory PromoComment.fromString(String text) => PromoComment(text: text);
 }
 
+class _PromoCommentFileStore extends JsonFileStore<PromoComment> {
+  _PromoCommentFileStore() : super('promo_comments.json');
+
+  @override
+  String idOf(PromoComment item) => item.text;
+
+  @override
+  PromoComment fromJson(Map<String, dynamic> json) => PromoComment.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(PromoComment item) => item.toJson();
+}
+
 class PromoCommentStore {
-  static const _fileName = 'promo_comments.json';
+  static final _PromoCommentFileStore _store = _PromoCommentFileStore();
+
   static const starterComments = [
     'Thank you ! ❤️ Meri Profile pe Ria, Rio & Cuty ki full masti chal rahi hai - miss mat karna! 👇',
     'Meri Profile pe Ria, Rio & Cuty ki full masti chal rahi hai - miss mat karna! ❤️',
@@ -97,20 +108,13 @@ class PromoCommentStore {
     'Chhoti stories, big little lessons ❤️🌱',
   ];
 
-  static Future<File> _path() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
-  }
-
   /// Load comments as PromoComment objects with bucket tags.
   static Future<List<PromoComment>> loadWithBuckets() async {
     try {
-      final file = await _path();
-      if (!await file.exists()) {
-        return starterComments.map((s) => PromoComment.fromString(s)).toList();
-      }
-      final raw = jsonDecode(await file.readAsString());
-      return decode(raw);
+      final items = await _store.loadAll(shouldKeep: (c) => c.text.isNotEmpty);
+      return items.isNotEmpty
+          ? items
+          : starterComments.map((s) => PromoComment.fromString(s)).toList();
     } catch (_) {
       return starterComments.map((s) => PromoComment.fromString(s)).toList();
     }
@@ -139,13 +143,13 @@ class PromoCommentStore {
   static Future<void> add(PromoComment comment) async {
     final list = await loadWithBuckets();
     list.insert(0, comment);
-    await save(list.map((c) => c.toJson()).toList());
+    await _store.saveAll(list);
   }
 
   /// Removes a comment by its text.
   ///
   /// Text rather than id, because the built-in starter comments are created from plain
-  /// strings and do not carry a stable identifier of their own — deleting the first
+  /// strings and do not carry a stable identifier of their own â deleting the first
   /// starter comment by index or id would remove whichever comment happened to sort
   /// first, which is not the same thing.
   ///
@@ -155,14 +159,11 @@ class PromoCommentStore {
   static Future<void> delete(String text) async {
     final list = await loadWithBuckets();
     list.removeWhere((c) => c.text == text);
-    await save(list.map((c) => c.toJson()).toList());
+    await _store.saveAll(list);
   }
 
-  static Future<void> save(List<dynamic> comments) async {
-    try {
-      final file = await _path();
-      await file.writeAsString(jsonEncode(comments));
-    } catch (_) {}
+  static Future<void> save(List<PromoComment> comments) async {
+    await _store.saveAll(comments);
   }
 }
 
@@ -2929,48 +2930,49 @@ class IdeaInboxItem {
       BucketLibrary.byId(bucketId) ?? BucketLibrary.challenge;
 }
 
-class IdeaInboxStore {
-  static const _fileName = 'idea_inbox.json';
+class _IdeaInboxFileStore extends JsonFileStore<IdeaInboxItem> {
+  _IdeaInboxFileStore() : super('idea_inbox.json');
 
-  static Future<File> _file() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
-  }
+  @override
+  String idOf(IdeaInboxItem item) => item.id;
+
+  @override
+  IdeaInboxItem fromJson(Map<String, dynamic> json) => IdeaInboxItem.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(IdeaInboxItem item) => item.toJson();
+}
+
+class IdeaInboxStore {
+  static final _IdeaInboxFileStore _store = _IdeaInboxFileStore();
 
   static Future<List<IdeaInboxItem>> load() async {
-    final file = await _file();
-    if (!await file.exists()) return [];
-    final content = await file.readAsString();
-    if (content.trim().isEmpty) return [];
-    final List<dynamic> jsonList = jsonDecode(content);
-    return jsonList.map((e) => IdeaInboxItem.fromJson(e)).toList();
+    return _store.loadAll();
   }
 
   static Future<void> save(List<IdeaInboxItem> items) async {
-    final file = await _file();
-    final jsonList = items.map((e) => e.toJson()).toList();
-    await file.writeAsString(jsonEncode(jsonList));
+    await _store.saveAll(items);
   }
 
   static Future<void> add(IdeaInboxItem item) async {
-    final items = await load();
-    items.insert(0, item);
-    await save(items);
+    final list = await load();
+    list.insert(0, item);
+    await _store.saveAll(list);
   }
 
   static Future<void> update(IdeaInboxItem item) async {
-    final items = await load();
-    final index = items.indexWhere((e) => e.id == item.id);
+    final list = await load();
+    final index = list.indexWhere((e) => e.id == item.id);
     if (index != -1) {
-      items[index] = item;
-      await save(items);
+      list[index] = item;
+      await _store.saveAll(list);
     }
   }
 
   static Future<void> delete(String id) async {
-    final items = await load();
-    items.removeWhere((e) => e.id == id);
-    await save(items);
+    final list = await load();
+    list.removeWhere((e) => e.id == id);
+    await _store.saveAll(list);
   }
 }
 

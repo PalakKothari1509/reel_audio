@@ -357,10 +357,13 @@ In rough order of how much it matters:
    providing a testable seam. 11 integration tests added. Duplicate `_parseCanned`
    removed from `pipeline_integration_test.dart`.
 
-5. **Order 16 (Storage refactor) — marked for Later.** The codebase still has
-   ~450 lines of near-identical storage classes across 6 files. The `PackageStore`
-   abstraction is in place (`lib/package_store.dart` + `lib/package_store_impl.dart`),
-   but the refactoring to consolidate all storage through it is deferred.
+5. **Order 16 — Storage refactor is complete.** A generic `JsonFileStore<T>` base class
+   (`lib/json_file_store.dart`) consolidates the ~450 lines of duplicated file I/O
+   across 6+ storage classes. `ContentLibraryStore`, `PromoCommentStore`,
+   `IdeaInboxStore`, `QuickIdeaStore`, `QuickHistoryStore`, `CharacterStore`,
+   `HookStore`, `ScheduleStore`, and `PostLogStore` all now delegate file I/O to
+   `JsonFileStore`, keeping consistent error handling and a single test seam.
+   `ProjectStore` and `PackageStoreFile` already had their own patterns and remain as-is.
 
 6. **ContentPackage is implemented** — `ContentPackageV2` in `lib/content_package_v2.dart`
    is the unified model with classification snapshot, creative fields, production plan,
@@ -418,6 +421,7 @@ pure-Dart abstract class with a Flutter implementation:
 - `ContentPackageV2` (`lib/content_package_v2.dart`) → unified package model
 - `ProductionAdapter` (`lib/production_adapter.dart`) → `ProductionAdapterImpl` (FFmpeg, voice, images)
 - `PackageStore` (`lib/package_store.dart`) → `PackageStoreFile` (JSON persistence)
+- `JsonFileStore<T>` (`lib/json_file_store.dart`) → generic base for all JSON file stores (ContentLibraryStore, PromoCommentStore, IdeaInboxStore, QuickIdeaStore, QuickHistoryStore, CharacterStore, HookStore, ScheduleStore, PostLogStore)
 
 ---
 

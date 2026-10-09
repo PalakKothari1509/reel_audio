@@ -1,12 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'brand_system.dart';
 import 'content_generator.dart';
 import 'format_adapter.dart';
+import 'json_file_store.dart';
 import 'quality_check.dart';
 
 enum ContentStatus {
@@ -225,26 +224,30 @@ class ContentLibraryItem {
   }
 }
 
+class _ContentLibraryFileStore extends JsonFileStore<ContentLibraryItem> {
+  _ContentLibraryFileStore() : super('content_library.json');
+
+  @override
+  String idOf(ContentLibraryItem item) => item.id;
+
+  @override
+  ContentLibraryItem fromJson(Map<String, dynamic> json) =>
+      ContentLibraryItem.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(ContentLibraryItem item) => item.toJson();
+}
+
 class ContentLibraryStore {
-  static const String _fileName = 'content_library.json';
+  static final JsonFileStore<ContentLibraryItem> _store = _ContentLibraryFileStore();
 
-  /// Overrides the storage location. Tests set this; the app never does.
-  ///
-  /// `getApplicationDocumentsDirectory` is not available in a widget test, so without
-  /// a seam the store is untestable and every save looks like a silent failure. The
-  /// same reason `PromoCommentVaultScreen` takes an optional `seed`.
-  static Directory? _directoryOverride;
+  /// Delegates to [JsonFileStore.setTestDirectory]; tests set this so the
+  /// store reads/writes to a temp dir instead of the app's documents directory.
+  @visibleForTesting
+  static void useDirectory(Directory dir) => JsonFileStore.setTestDirectory(dir);
 
   @visibleForTesting
-  static void useDirectory(Directory dir) => _directoryOverride = dir;
-
-  @visibleForTesting
-  static void resetDirectory() => _directoryOverride = null;
-
-  static Future<File> _path() async {
-    final dir = _directoryOverride ?? await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
-  }
+  static void resetDirectory() => JsonFileStore.clearTestDirectory();
 
   /// Loads every saved item.
   ///
@@ -253,27 +256,9 @@ class ContentLibraryStore {
   /// file, so a single unreadable row returned `[]` — the failure was invisible and it
   /// looked exactly like having never saved anything.
   static Future<List<ContentLibraryItem>> getAll() async {
-    try {
-      final file = await _path();
-      if (!await file.exists()) return [];
-      final raw = jsonDecode(await file.readAsString());
-      if (raw is! List) return [];
-
-      final items = <ContentLibraryItem>[];
-      for (final row in raw) {
-        if (row is! Map) continue;
-        try {
-          items.add(ContentLibraryItem.fromJson(Map<String, dynamic>.from(row)));
-        } catch (e) {
-          debugPrint('ContentLibrary: skipped one unreadable item — $e');
-        }
-      }
-      items.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      return items;
-    } catch (e) {
-      debugPrint('ContentLibrary: could not read the library file — $e');
-      return [];
-    }
+    final items = await _store.loadAll();
+    items.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return items;
   }
 
   static Future<List<ContentLibraryItem>> getByStatus(ContentStatus status) async {
@@ -303,7 +288,7 @@ class ContentLibraryStore {
   static Future<void> add(ContentLibraryItem item) async {
     final list = await getAll();
     list.insert(0, item);
-    await _saveAll(list);
+    await _store.saveAll(list);
   }
 
   static Future<void> update(ContentLibraryItem item) async {
@@ -311,25 +296,14 @@ class ContentLibraryStore {
     final index = list.indexWhere((i) => i.id == item.id);
     if (index != -1) {
       list[index] = item.copyWith(updatedAt: DateTime.now());
-      await _saveAll(list);
+      await _store.saveAll(list);
     }
   }
 
   static Future<void> delete(String id) async {
     final list = await getAll();
     list.removeWhere((i) => i.id == id);
-    await _saveAll(list);
-  }
-
-  static Future<void> _saveAll(List<ContentLibraryItem> list) async {
-    // Throws instead of swallowing.
-    //
-    // This used to be `catch (_) {}`, so a failed write was indistinguishable from a
-    // successful one and the caller showed "Saved to library" over data that was never
-    // written. A library that silently discards writes is worse than one that refuses:
-    // you keep generating content believing you have kept it.
-    final file = await _path();
-    await file.writeAsString(jsonEncode(list.map((e) => e.toJson()).toList()));
+    await _store.saveAll(list);
   }
 
   /// Adds an item, returning whether it was actually written.
@@ -341,7 +315,7 @@ class ContentLibraryStore {
       await add(item);
       return true;
     } catch (e) {
-      debugPrint('ContentLibrary: add failed — $e');
+      debugPrint('ContentLibrary: add failed â $e');
       return false;
     }
   }

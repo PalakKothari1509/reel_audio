@@ -1,9 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
-
 import 'content_ideas.dart';
+import 'json_file_store.dart';
 
 // ── The content plan, kept on the phone ───────────────────────────────────────
 //
@@ -39,23 +35,30 @@ String migrateBucketId(String id) => const {
 // HookIdea and the built-in hook list moved to content_ideas.dart, where the rest
 // of the content ideas live. This file keeps the stores that save them to the phone.
 
+class _HookFileStore extends JsonFileStore<HookIdea> {
+  _HookFileStore() : super('hooks.json');
+
+  @override
+  String idOf(HookIdea item) => item.id;
+
+  @override
+  HookIdea fromJson(Map<String, dynamic> json) => HookIdea.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(HookIdea item) => item.toJson();
+}
+
 class HookStore {
-  static const _file = 'hooks.json';
+  static final _HookFileStore _store = _HookFileStore();
 
   /// Your list: built-in hooks with your edits applied, then the ones you added.
   /// New built-in hooks from an update appear without touching anything you changed.
   static Future<List<HookIdea>> load() async {
     final saved = <String, HookIdea>{};
     try {
-      final f = await _path(_file);
-      if (await f.exists()) {
-        final raw = jsonDecode(await f.readAsString());
-        if (raw is List) {
-          for (final e in raw.whereType<Map<String, dynamic>>()) {
-            final h = HookIdea.fromJson(e);
-            if (h.id.isNotEmpty) saved[h.id] = h;
-          }
-        }
+      final items = await _store.loadAll(shouldKeep: (h) => h.id.isNotEmpty);
+      for (final h in items) {
+        saved[h.id] = h;
       }
     } catch (_) {}
 
@@ -67,8 +70,7 @@ class HookStore {
 
   static Future<void> save(List<HookIdea> hooks) async {
     try {
-      final f = await _path(_file);
-      await f.writeAsString(jsonEncode(hooks.map((h) => h.toJson()).toList()));
+      await _store.saveAll(hooks);
     } catch (_) {}
     // Hooks, times and results belong in the backup too; see onPlanSaved.
     onPlanSaved?.call();
@@ -116,26 +118,33 @@ const kDefaultSchedule = <PostSlot>[
   PostSlot(7, '11:00', '20:30', 'Warm story with a question for parents'),
 ];
 
+class _ScheduleFileStore extends JsonFileStore<PostSlot> {
+  _ScheduleFileStore() : super('schedule.json');
+
+  @override
+  String idOf(PostSlot item) => '';
+
+  @override
+  PostSlot fromJson(Map<String, dynamic> json) => PostSlot.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(PostSlot item) => item.toJson();
+}
+
 class ScheduleStore {
-  static const _file = 'schedule.json';
+  static final _ScheduleFileStore _store = _ScheduleFileStore();
 
   static Future<List<PostSlot>> load() async {
     try {
-      final f = await _path(_file);
-      if (await f.exists()) {
-        final raw = jsonDecode(await f.readAsString());
-        if (raw is List && raw.length == 7) {
-          return raw.whereType<Map<String, dynamic>>().map(PostSlot.fromJson).toList();
-        }
-      }
+      final items = await _store.loadAll();
+      if (items.length == 7) return items;
     } catch (_) {}
     return List.of(kDefaultSchedule);
   }
 
   static Future<void> save(List<PostSlot> slots) async {
     try {
-      await (await _path(_file))
-          .writeAsString(jsonEncode(slots.map((s) => s.toJson()).toList()));
+      await _store.saveAll(slots);
     } catch (_) {}
     // Hooks, times and results belong in the backup too; see onPlanSaved.
     onPlanSaved?.call();
@@ -230,28 +239,34 @@ class PostRecord {
       );
 }
 
+class _PostLogFileStore extends JsonFileStore<PostRecord> {
+  _PostLogFileStore() : super('posts.json');
+
+  @override
+  String idOf(PostRecord item) => item.id;
+
+  @override
+  PostRecord fromJson(Map<String, dynamic> json) => PostRecord.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(PostRecord item) => item.toJson();
+}
+
 class PostLogStore {
-  static const _file = 'posts.json';
+  static final _PostLogFileStore _store = _PostLogFileStore();
 
   static Future<List<PostRecord>> load() async {
     try {
-      final f = await _path(_file);
-      if (await f.exists()) {
-        final raw = jsonDecode(await f.readAsString());
-        if (raw is List) {
-          final out = raw.whereType<Map<String, dynamic>>().map(PostRecord.fromJson).toList()
-            ..sort((a, b) => b.postedAt.compareTo(a.postedAt));
-          return out;
-        }
-      }
+      final items = await _store.loadAll();
+      items.sort((a, b) => b.postedAt.compareTo(a.postedAt));
+      return items;
     } catch (_) {}
     return [];
   }
 
   static Future<void> save(List<PostRecord> posts) async {
     try {
-      await (await _path(_file))
-          .writeAsString(jsonEncode(posts.map((p) => p.toJson()).toList()));
+      await _store.saveAll(posts);
     } catch (_) {}
     // Hooks, times and results belong in the backup too; see onPlanSaved.
     onPlanSaved?.call();
@@ -344,8 +359,5 @@ List<ContentBucketResult> resultsByBucket(List<PostRecord> posts) {
           totalShares: e.value.fold(0, (sum, p) => sum + p.shares),
         ))
       .toList()
-    ..sort((a, b) => b.avgViews.compareTo(a.avgViews));
+      ..sort((a, b) => b.avgViews.compareTo(a.avgViews));
 }
-
-Future<File> _path(String name) async =>
-    File('${(await getApplicationDocumentsDirectory()).path}/$name');

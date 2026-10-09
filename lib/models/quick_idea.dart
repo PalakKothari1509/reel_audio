@@ -11,10 +11,10 @@
 // the whole point of the file.
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
+
+import '../json_file_store.dart';
 
 /// One saved idea or post package.
 ///
@@ -145,48 +145,43 @@ List<QuickIdea> decodeIdeas(String text) {
 }
 
 /// Saved ideas, kept indefinitely.
-class QuickIdeaStore {
-  static const _fileName = 'quick_ideas.json';
+class _QuickIdeaFileStore extends JsonFileStore<QuickIdea> {
+  _QuickIdeaFileStore() : super('quick_ideas.json');
 
-  static Future<File> _path() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
-  }
+  @override
+  String idOf(QuickIdea item) => item.id;
+
+  @override
+  QuickIdea fromJson(Map<String, dynamic> json) => QuickIdea.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(QuickIdea item) => item.toJson();
+}
+
+class QuickIdeaStore {
+  static final _QuickIdeaFileStore _store = _QuickIdeaFileStore();
 
   static Future<List<QuickIdea>> load() async {
-    final file = await _path();
-    if (!await file.exists()) return const [];
-    return decodeIdeas(await file.readAsString());
+    return _store.loadAll();
   }
 
   static Future<QuickIdea?> getById(String id) async {
-    final all = await load();
-    for (final i in all) {
-      if (i.id == id) return i;
-    }
-    return null;
+    return _store.loadById(id);
   }
 
   static Future<void> saveAll(List<QuickIdea> ideas) async {
-    try {
-      final file = await _path();
-      await file.writeAsString(
-        jsonEncode(ideas.map((e) => e.toJson()).toList()),
-      );
-    } catch (e) {
-      debugPrint('quick_ideas: save failed — $e');
-    }
+    await _store.saveAll(ideas);
   }
 
   static Future<void> add(QuickIdea idea) async {
     final list = await load();
-    await saveAll([idea, ...list]);
+    await _store.saveAll([idea, ...list]);
   }
 
   static Future<void> delete(String id) async {
     final list = await load();
     list.removeWhere((i) => i.id == id);
-    await saveAll(list);
+    await _store.saveAll(list);
   }
 }
 
@@ -194,31 +189,30 @@ class QuickIdeaStore {
 ///
 /// A second copy of the same objects under a different name and a different retention
 /// rule. It exists because the recent list wants a cap and the library does not.
+class _QuickHistoryFileStore extends JsonFileStore<QuickIdea> {
+  _QuickHistoryFileStore() : super('quick_post_history.json');
+
+  @override
+  String idOf(QuickIdea item) => item.id;
+
+  @override
+  QuickIdea fromJson(Map<String, dynamic> json) => QuickIdea.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson(QuickIdea item) => item.toJson();
+}
+
 class QuickHistoryStore {
-  static const _fileName = 'quick_post_history.json';
+  static final _QuickHistoryFileStore _store = _QuickHistoryFileStore();
   static const maxItems = 50;
 
-  static Future<File> _path() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_fileName');
-  }
-
   static Future<List<QuickIdea>> load() async {
-    final file = await _path();
-    if (!await file.exists()) return const [];
-    return decodeIdeas(await file.readAsString());
+    return _store.loadAll();
   }
 
   static Future<void> add(QuickIdea idea) async {
     final existing = await load();
     final updated = [idea, ...existing].take(maxItems).toList();
-    try {
-      final file = await _path();
-      await file.writeAsString(
-        jsonEncode(updated.map((item) => item.toJson()).toList()),
-      );
-    } catch (e) {
-      debugPrint('quick_post_history: save failed — $e');
-    }
+    await _store.saveAll(updated);
   }
 }
