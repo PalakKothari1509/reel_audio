@@ -149,9 +149,10 @@ final axes = <AxisSpec>[
 ];
 
 void main() {
-  final file = File('content_ideas.md');
+  final file = File('documentation/content_ideas.md');
   if (!file.existsSync()) {
     stderr.writeln('content_ideas.md not found. Run from the project root.');
+    stderr.writeln('  dart run tool/check_axes.dart');
     exitCode = 1;
     return;
   }

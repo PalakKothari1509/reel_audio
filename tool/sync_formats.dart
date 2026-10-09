@@ -1,8 +1,8 @@
-// Regenerates lib/format_handbook.dart from content_formats.md.
+// Regenerates lib/format_handbook.dart from documentation/content_formats.md.
 //
 //   dart run tool/sync_formats.dart
 //
-// content_formats.md is the source of truth for formats, the same way
+// documentation/content_formats.md is the source of truth for formats, the same way
 // content_ideas.md is for ideas. This exists so the handbook is data you can edit,
 // while prompt construction stays synchronous and every FormatSpec stays const.
 //
@@ -20,11 +20,11 @@
 
 import 'dart:io';
 
-/// Reads content_formats.md and returns the raw Dart registry body.
+/// Reads documentation/content_formats.md and returns the raw Dart registry body.
 String buildRegistry(String markdown) {
   final sections = parseFormatSections(markdown);
   if (sections.isEmpty) {
-    throw FormatException('No format sections found in content_formats.md');
+    throw FormatException('No format sections found in documentation/content_formats.md');
   }
 
   final buffer = StringBuffer();
@@ -216,7 +216,7 @@ List<String> requireList(FormatSection s, String key) {
 
 /// Removes a leading `**Something**:` from a continuation line.
 ///
-/// `content_formats.md` writes examples as:
+/// `documentation/content_formats.md` writes examples as:
 ///
 /// ```
 /// - **Example**: **Idea**: "Ria refuses to brush her teeth." Mumma counts...
@@ -229,7 +229,7 @@ String stripLeadingLabel(String value) =>
 
 /// Strips the markdown inline decoration off a field value.
 ///
-/// `content_formats.md` writes ids and quotes as `**ID**: \`pov\`` and rules as
+/// `documentation/content_formats.md` writes ids and quotes as `**ID**: \`pov\`` and rules as
 /// `- Never open with "save this post".` Emitting those markers into Dart would put
 /// backticks and asterisks inside generated strings, which then reach a prompt and
 /// eventually a caption.
@@ -278,7 +278,7 @@ List<String> requireEnumList(FormatSection s, String key) {
   return out;
 }
 
-/// The display labels `content_formats.md` uses, mapped to the ids Dart uses.
+/// The display labels `documentation/content_formats.md` uses, mapped to the ids Dart uses.
 ///
 /// The markdown is written for a human ("Image Slideshow Reel", "Non-follower Reach")
 /// and the ids are camelCase, so translating here means a readable file and a stable
@@ -348,10 +348,10 @@ String dashes(int n) => '-' * (68 - n);
 
 void main() {
   final root = Directory.current;
-  final source = File('${root.path}${Platform.pathSeparator}content_formats.md');
+  final source = File('${root.path}${Platform.pathSeparator}documentation${Platform.pathSeparator}content_formats.md');
 
   if (!source.existsSync()) {
-    stderr.writeln('content_formats.md not found at ${source.path}');
+    stderr.writeln('documentation/content_formats.md not found at ${source.path}');
     stderr.writeln('Run this from the project root: dart run tool/sync_formats.dart');
     exitCode = 1;
     return;
@@ -362,7 +362,7 @@ void main() {
   try {
     registry = buildRegistry(markdown);
   } on FormatException catch (e) {
-    stderr.writeln('Failed to parse content_formats.md: ${e.message}');
+    stderr.writeln('Failed to parse documentation/content_formats.md: ${e.message}');
     exitCode = 1;
     return;
   }

@@ -584,7 +584,7 @@ void main(List<String> argv) {
   final apply = argv.contains('--apply');
   final wantReport = argv.contains('--report') || apply;
 
-  final file = File('content_ideas.md');
+  final file = File('documentation/content_ideas.md');
   if (!file.existsSync()) {
     stderr.writeln('content_ideas.md not found. Run from the project root.');
     exitCode = 1;
@@ -695,7 +695,7 @@ void main(List<String> argv) {
     return;
   }
 
-  final backup = File('content_ideas.md.bak');
+  final backup = File('documentation/content_ideas.md.bak');
   backup.writeAsStringSync(original);
   stdout.writeln('Backup written: ${backup.path}');
 

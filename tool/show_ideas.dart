@@ -51,7 +51,7 @@ void main(List<String> argv) {
     pending.clear();
   }
 
-  for (final raw in File('content_ideas.md').readAsStringSync().split('\n')) {
+  for (final raw in File('documentation/content_ideas.md').readAsStringSync().split('\n')) {
     final line = raw.replaceAll('\r', '').trimRight();
 
     if (line.trimLeft().startsWith('```')) {

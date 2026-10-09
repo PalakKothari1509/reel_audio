@@ -52,7 +52,7 @@ AxisResolution _migrationToResolution(MigrationState ms) {
 }
 
 void main() {
-  final file = File('content_ideas.md');
+  final file = File('documentation/content_ideas.md');
   if (!file.existsSync()) {
     stderr.writeln('content_ideas.md not found. Run from the project root.');
     exitCode = 1;

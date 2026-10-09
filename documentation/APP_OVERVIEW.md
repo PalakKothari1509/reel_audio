@@ -120,7 +120,7 @@ Exact Script · Expectation vs Reality · Personal Mistake · Save This List · 
 Framework · Unpopular Opinion · Before You · Three Examples — plus four added later:
 Quick Tip, Mini Story, This or That, Question → Answer. **16 of 50.**
 
-The format file is the source of truth (`content_formats.md`). Dart is generated from
+The format file is the source of truth (`documentation/content_formats.md`). Dart is generated from
 it, so the app can never disagree with the document.
 
 Each format records which content types it suits and which goals it serves, which is
@@ -182,6 +182,22 @@ actual post.
 answer. Left uncapped on large requests, it returned truncated, unparseable JSON with
 no error. Capped on all hand-built requests.
 
+### API key management
+
+As of October 2026, API key access is centralized through `ApiKeyStore` (`lib/api_key_store.dart`).
+All ~20 Gemini call sites now route through `ApiKeyStore` with Settings-first fallback:
+the user's key from Settings (`SharedPreferences`) is checked before the default key
+in `lib/secrets.dart`. The `apiKeyStore` variable in `main.dart` provides a test-friendly
+constructor for unit tests, and `ApiKeyStore.fromSharedPreferences()` is used in production.
+Every code path through `ApiKeyStore` honors the Settings-screen override, including:
+`main.dart` (story checker, story generator, combined call), `prompt_screen.dart`
+(prompt generator), `posting_kit.dart` (reply assistant), `caption_generator.dart`,
+`production_adapter_impl.dart` (via factory).
+
+**Remaining gap:** The ElevenLabs API key still has no Settings-screen override — it
+always uses the hardcoded key from `secrets.dart`. See §12, item 11 for the rotation
+requirement.
+
 ---
 
 ## 8. Brand and characters
@@ -202,13 +218,13 @@ Approved characters: Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher.
 
 ## 9. Content idea library
 
-`content_ideas.md` holds **57 ideas**, each with a topic, problem, lesson, goal and
+`documentation/content_ideas.md` holds **57 ideas**, each with a topic, problem, lesson, goal and
 metadata.
 
 **Phase D is complete.** Every idea now has an explicit verdict in
 `tool/idea_decisions.csv`: **41 KEEP**, 7 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
 ideas are sync candidates (41 active). The 6 deleted ideas are removed from the active
-library; the 3 archived stay in `content_ideas.md` but are not sync candidates. The 7
+library; the 3 archived stay in `documentation/content_ideas.md` but are not sync candidates. The 7
 REWORK ideas remain in the library but are not ready to sync until their noted issue is
 resolved.
 
@@ -260,25 +276,29 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**205 tests, all passing.** They cover:
+**225 tests, all passing.** They cover:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
 - the content library save path (all four formats, metadata round trip, failed writes)
 - three prompt bugs that shipped silently (fixed hashtags, contradictory CTAs,
   truncated JSON)
-- the five-test rule (the minimum can be raised for a specific format)
+- the five-test rule (the minimum may be raised for a specific format)
 - delete confirmations (a promotion comment and an idea both ask first)
 - **quality gate system** (ShareTrigger, VoiceMode, SaveValue, ClassificationSnapshot,
   QualityGate.evaluateIdea, QualityGate.evaluatePackage, design invariants)
 - **AI content service** (generation, validation, failure handling, narration/dialogue)
-- **ai_parser_validator** (JSON schema validation, malformed/truncated responses)
+- **ai_parser_validator** (JSON schema validation, malformed/truncated responses,
+  markdown-wrapped JSON, 11 new edge-case tests for Order 15)
 - **production_adapter** (production result states, input defaults)
 - **package_store** (CRUD, queries, corruption resilience, persistence)
-- **pipeline integration** (end-to-end Gemini → validator → ContentPackageV2)
+- **pipeline integration** (end-to-end Gemini → validator → ContentPackageV2, duplicate
+  `_parseCanned` removed)
+- **ApiKeyStore** (9 new tests covering Settings-screen override, trimming,
+  whitespace handling, fallback behavior)
 
-Not yet covered: the Gemini JSON parse path, network calls, FFmpeg assembly, and
-the AI fallback path.
+Not yet covered: the Gemini JSON parse path (now partially covered via static
+`parseResponse` seam), network calls, FFmpeg assembly, and the AI fallback path.
 
 ---
 
@@ -289,9 +309,8 @@ becomes a build error instead of a crash.
 
 ```bash
 flutter analyze lib          # 0 errors
-flutter test                 # 205 tests
-
-dart run tool/sync_formats.dart      # content_formats.md -> Dart
+flutter test                 # 225 tests
+dart run tool/sync_formats.dart      # documentation/content_formats.md -> Dart
 dart run tool/check_formats.dart     # validate the handbook
 dart run tool/check_axes.dart        # which axis values are decided
 dart run tool/check_pillars.dart     # guard the known classifier mistakes
@@ -332,38 +351,56 @@ In rough order of how much it matters:
    Voice Mode, Save Value, four evaluation dimensions, classification snapshots,
    and the five-test rule.
 
-4. **ContentPackage is implemented** — `ContentPackageV2` in `lib/content_package_v2.dart`
+4. **Order 15 (enhanced) — AI parser hardening is complete.** `AiParserValidator`
+   handles markdown-wrapped JSON + truncated JSON detection via `_stripMarkdownCodeBlocks()`
+   and `_looksTruncated()`. `GeminiClient.parseResponse()` is now a static method,
+   providing a testable seam. 11 integration tests added. Duplicate `_parseCanned`
+   removed from `pipeline_integration_test.dart`.
+
+5. **Order 16 (Storage refactor) — marked for Later.** The codebase still has
+   ~450 lines of near-identical storage classes across 6 files. The `PackageStore`
+   abstraction is in place (`lib/package_store.dart` + `lib/package_store_impl.dart`),
+   but the refactoring to consolidate all storage through it is deferred.
+
+6. **ContentPackage is implemented** — `ContentPackageV2` in `lib/content_package_v2.dart`
    is the unified model with classification snapshot, creative fields, production plan,
    and lifecycle. The standalone Caption Generator and Generate All Formats are removed.
 
-5. **AI parser is validated** — `AiParserValidator` in `lib/ai_parser_validator.dart`
+7. **AI parser is validated** — `AiParserValidator` in `lib/ai_parser_validator.dart`
    validates raw AI JSON before conversion. Schema validation, malformed/truncated
-   response handling, and 34 validator tests are in place.
+   response handling, markdown extraction, and 34+ validator tests are in place.
 
-6. **Storage is refactored** — `PackageStore` in `lib/package_store.dart` with a JSON
-   file implementation. 35 tests cover CRUD, queries, corruption resilience.
+8. **Storage is refactored** — `PackageStore` in `lib/package_store.dart` with a JSON
+   file implementation (`lib/package_store_impl.dart`). 35 tests cover CRUD, queries,
+   corruption resilience. Full consolidation deferred (see item 5).
 
-7. **Production pipeline is integrated** — `ProductionAdapter` in
+9. **Production pipeline is integrated** — `ProductionAdapter` in
    `lib/production_adapter.dart` provides the boundary layer for media generation.
    10 tests cover production result states.
 
-8. **Five tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+10. **Five tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
 
-9. **Release builds are not distributable.** Signed with the debug keystore, and the
-   application id is still `com.example.reel_audio`.
+11. **Release builds are not distributable.** Signed with the debug keystore, and the
+    application id is still `com.example.reel_audio`.
 
-10. **Settings does not actually export or import** your data.
+12. **Settings does not actually export or import** your data.
 
-11. **API keys have not been rotated.** `lib/secrets.dart` holds live Gemini and
-    ElevenLabs keys (`.gitignore`'d but present locally). The OpenAI key in `backend/`
-    needs rotation before `backend/` can be removed.
+13. **API keys have not been rotated.** `lib/secrets.dart` holds live Gemini and
+    ElevenLabs keys (`.gitignore`'d but present locally). The OpenAI key that was in `backend/`
+    was never committed and `backend/` has been deleted. The `ApiKeyStore` centralization
+    is complete (see §7 and `documentation/SECURITY_AUDIT.md`), but the ElevenLabs key still
+    lacks a Settings-screen override. Both keys need rotation before Play Store release
+    because they are compiled into the APK.
+
+14. **`backend/` directory is deleted.** The only file ever tracked there was
+    `backend/.gitignore` (with `.env` pattern). The OpenAI API key was never in git
+    history.
 
 ---
 
-## 13. Keeping this document honest
+## 13. Architecture boundary layer
 
-This file is kept in sync with `REDESIGN_PLAN2.md`, which tracks the remaining work.
-The architecture boundary layer is complete (Orders 13–17):
+The boundary pattern is complete (Orders 13–17):
 
 ```
 IDEA → Classification → QualityGate → GateReport → AiContentService
@@ -371,5 +408,43 @@ IDEA → Classification → QualityGate → GateReport → AiContentService
 → ProductionResult → PackageStore
 ```
 
-If you change behaviour in the code, change this file in the same pass — a document
-that describes an earlier version of the app is worse than none, because it is trusted.
+Production failures report as `needsFilming` (package state), NOT gate failures — the
+gate verdict is never touched by the production layer. Each boundary component is a
+pure-Dart abstract class with a Flutter implementation:
+
+- `QualityGate` (`lib/content_quality_gate.dart`) → `QualityGateReport`
+- `AiContentService` (`lib/ai_content_service.dart`) → Gemini/ElevenLabs
+- `AiParserValidator` (`lib/ai_parser_validator.dart`) → JSON schema validation, markdown stripping, truncation detection
+- `ContentPackageV2` (`lib/content_package_v2.dart`) → unified package model
+- `ProductionAdapter` (`lib/production_adapter.dart`) → `ProductionAdapterImpl` (FFmpeg, voice, images)
+- `PackageStore` (`lib/package_store.dart`) → `PackageStoreFile` (JSON persistence)
+
+---
+
+## 14. Keeping this document honest
+
+This file is kept in sync with `REDESIGN_PLAN2.md`. All documentation files now live in
+`documentation/`. If you change behaviour in the code, change this file in the same pass —
+a document that describes an earlier version of the app is worse than none, because it is
+trusted.
+
+### File location changes (October 2026)
+
+All markdown documentation files moved from the project root to `documentation/`:
+
+| File | Purpose |
+|---|---|
+| `APP_OVERVIEW.md` | This document |
+| `content_formats.md` | Source of truth for narrative formats (data file for `tool/sync_formats.dart`) |
+| `content_ideas.md` | Source of truth for the 57 content ideas (data file for tool scripts) |
+| `CONTENT_MODEL.md` | Content model specification |
+| `Ideas from chat gpt for marketing posts.md` | Legacy marketing post ideas |
+| `MASTER_CONTENT.md` | Content archive |
+| `MASTER_LAYOUT.md` | Layout reference |
+| `master_prompt.md` | Master prompt templates |
+| `POSTS_REVIEW.md` | Post review history |
+| `README.md` | Project README |
+| `REDESIGN_PLAN2.md` | Active redesign roadmap |
+| `SECURITY_AUDIT.md` | Security audit report |
+
+Tool scripts in `tool/` have been updated to read data files from `documentation/`.
