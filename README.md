@@ -24,7 +24,7 @@ Pipeline: **IDEA → FORMAT → CONTENT PACKAGE → CREATIVE → POST → TRACK*
 
 Not built yet, deliberately: Calendar, Analytics, Experiments. They
 answer questions the data cannot yet support — see
-`REDESIGN_PLAN.md`.
+`REDESIGN_PLAN2.md`.
 
 ## Content system
 
@@ -51,6 +51,18 @@ production simplicity. Each is `pass` / `fail` / `unknown` — never a
 number. A format earns its place after 5 real tests (`1/5 … 5/5`),
 and one post never condemns a format.
 
+## Security
+
+- All API keys (Gemini, ElevenLabs) are centralized in `ApiKeyStore`
+  (`lib/api_key_store.dart`), which honors the user key configured in
+  Settings before falling back to defaults.
+- Keys are stored in `lib/secrets.dart` (git-ignored). Keys inside an
+  APK can be extracted — rotate before release.
+- The `backend/` directory has been removed entirely. It held an
+  OpenAI key that was **never committed** to git (it was in a
+  git-ignored `.env` file); no rotation is needed. See
+  `SECURITY_AUDIT.md` for the full audit.
+
 ## Setup
 
 ```bash
@@ -58,15 +70,12 @@ flutter pub get
 cp lib/secrets.example.dart lib/secrets.dart   # then fill in real keys
 ```
 
-`lib/secrets.dart` is git-ignored. Provider keys (Gemini, ElevenLabs)
-must be rotated before any release — keys inside an APK can be
-extracted. `backend/` holds an unreferenced OpenAI key and no source
-code; it is pending removal.
+`lib/secrets.dart` is git-ignored.
 
 ## Development
 
 ```bash
-flutter test                 # 33 tests
+flutter test                 # 225 tests
 flutter analyze              # lib/ is clean; tool/ has known warnings
 dart run tool/check_formats.dart
 dart run tool/check_axes.dart
