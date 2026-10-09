@@ -55,3 +55,7 @@ run_app.bat
 *.log
 
 lib/secrets.dart
+
+# Generated reports (regenerable via `dart run tool/classify_ideas.dart --report`)
+tool/idea_classification_report.txt
+tool/reach_candidates.csv
