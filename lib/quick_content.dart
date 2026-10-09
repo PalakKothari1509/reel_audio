@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'ai_provider.dart';
 import 'brand_system.dart';
+import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_ideas.dart' as ideas;
 import 'format_adapter.dart';
@@ -2852,19 +2853,6 @@ class _PostingSection extends StatelessWidget {
 // Idea Inbox — Capture raw ideas, develop into content
 // ============================================================================
 
-enum IdeaStatus {
-  idea('💡', 'Idea'),
-  developing('📝', 'Developing'),
-  ready('✅', 'Ready'),
-  posted('📤', 'Posted'),
-  reuse('♻️', 'Reuse');
-
-  final String emoji;
-  final String label;
-
-  const IdeaStatus(this.emoji, this.label);
-}
-
 class IdeaInboxItem {
   final String id;
   final String title;
@@ -2921,7 +2909,7 @@ class IdeaInboxItem {
     rawIdea: json['rawIdea'] as String,
     bucketId: json['bucketId'] as String,
     notes: json['notes'] as String,
-    status: IdeaStatus.values.byName(json['status'] as String),
+       status: IdeaStatus.fromLegacy(json['status'] as String),
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
@@ -3256,7 +3244,7 @@ class _IdeaInboxScreenState extends State<IdeaInboxScreen> {
 
   Future<void> _generateFromIdea(IdeaInboxItem item) async {
     final updated = item.copyWith(
-      status: IdeaStatus.developing,
+      status: IdeaStatus.scripted,
       updatedAt: DateTime.now(),
     );
     await IdeaInboxStore.update(updated);

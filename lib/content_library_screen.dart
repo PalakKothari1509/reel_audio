@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'content_axes.dart';
 import 'content_library.dart';
 import 'format_adapter.dart';
 
@@ -49,7 +50,7 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
       ? _items
       : _items.where((i) => i.status.name == _statusFilter).toList();
 
-  Future<void> _setStatus(ContentLibraryItem item, ContentStatus status) async {
+  Future<void> _setStatus(ContentLibraryItem item, IdeaStatus status) async {
     await ContentLibraryStore.updateStatus(item.id, status);
     await _load();
   }
@@ -113,8 +114,8 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         children: [
           _chip('', 'All', _items.length),
-          for (final s in ContentStatus.values)
-            _chip(s.name, _label(s), counts[s.name] ?? 0),
+          for (final s in IdeaStatus.values)
+            _chip(s.name, s.label, counts[s.name] ?? 0),
         ],
       ),
     );
@@ -132,24 +133,6 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
     );
   }
 
-  /// Human labels. The enum names are storage values and read as plumbing.
-  String _label(ContentStatus s) {
-    switch (s) {
-      case ContentStatus.idea:
-        return 'Idea';
-      case ContentStatus.draft:
-        return 'Draft';
-      case ContentStatus.ready:
-        return 'Ready';
-      case ContentStatus.posted:
-        return 'Posted';
-      case ContentStatus.reused:
-        return 'Reused';
-      case ContentStatus.archived:
-        return 'Archived';
-    }
-  }
-
   Widget _body() {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
@@ -163,8 +146,8 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
     }
     if (_visible.isEmpty) {
       return _empty(
-        'No ${_label(ContentStatus.values.byName(_statusFilter)).toLowerCase()} '
-            'items',
+         'No ${IdeaStatus.values.byName(_statusFilter).label.toLowerCase()} '
+             'items',
         'Try a different filter.',
       );
     }
@@ -189,12 +172,12 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
                 _delete(item);
                 return;
               }
-              _setStatus(item, ContentStatus.values.byName(value));
-            },
-            itemBuilder: (context) => [
-              for (final s in ContentStatus.values)
-                if (s != item.status)
-                  PopupMenuItem(value: s.name, child: Text('Move to ${_label(s)}')),
+              _setStatus(item, IdeaStatus.values.byName(value));
+             },
+             itemBuilder: (context) => [
+               for (final s in IdeaStatus.values)
+                 if (s != item.status)
+                   PopupMenuItem(value: s.name, child: Text('Move to ${s.label}')),
               const PopupMenuDivider(),
               const PopupMenuItem(value: 'delete', child: Text('Delete')),
             ],

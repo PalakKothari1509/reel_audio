@@ -9,7 +9,7 @@ name: build
 
 on:
   push:
-    branches: [main, video-slideshow]
+    branches: [main, video-slideshow, copilot_post]
   pull_request:
   # So a check can be run by hand without pushing.
   workflow_dispatch:

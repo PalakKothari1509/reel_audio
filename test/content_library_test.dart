@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/brand_system.dart';
+import 'package:reel_audio/content_axes.dart';
 import 'package:reel_audio/content_generator.dart';
 import 'package:reel_audio/content_library.dart';
 import 'package:reel_audio/format_adapter.dart';
@@ -89,7 +90,7 @@ void main() {
     expect(reloaded.contentPackage?.hook, pkg.hook);
     expect(reloaded.contentPackage?.hashtags, pkg.hashtags);
     expect(reloaded.contentPackage?.pinnedComment, pkg.pinnedComment);
-    expect(reloaded.status, ContentStatus.draft);
+    expect(reloaded.status, IdeaStatus.scripted);
     expect(reloaded.title, pkg.hook);
   });
 
@@ -154,8 +155,49 @@ void main() {
     final item = ContentLibraryItem.createFromPackage(samplePackage());
     await ContentLibraryStore.tryAdd(item);
 
-    expect(await ContentLibraryStore.getByStatus(ContentStatus.draft), hasLength(1));
+    expect(await ContentLibraryStore.getByStatus(IdeaStatus.scripted), hasLength(1));
     expect(await ContentLibraryStore.getById(item.id), isNotNull);
     expect(await ContentLibraryStore.getByFormat(item.format), hasLength(1));
+  });
+
+  // Old persisted data used different spellings; fromLegacy handles them.
+  test('legacy status strings are migrated to canonical values on reload', () {
+    final item = ContentLibraryItem(
+      id: 'legacy-1',
+      title: 'Legacy',
+      topic: 'topic',
+      bucket: BucketLibrary.challenge,
+      format: ContentFormat.reel,
+      status: IdeaStatus.tested,
+      formatOutputs: const {},
+      tags: const [],
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+      reuseCount: 0,
+      performanceMetrics: const {},
+    );
+
+    final roundTrip = ContentLibraryItem.fromJson(item.toJson());
+    expect(roundTrip.status, IdeaStatus.tested);
+  });
+
+  test('legacy status strings in JSON migrate via fromLegacy', () {
+    final json = {
+      'id': 'legacy-2',
+      'title': 'Legacy',
+      'topic': 'topic',
+      'bucket': 'challenge',
+      'format': 'reel',
+      'status': 'reused',
+      'formatOutputs': {},
+      'tags': [],
+      'createdAt': '2026-01-01T00:00:00',
+      'updatedAt': '2026-01-01T00:00:00',
+      'performanceMetrics': {},
+      'reuseCount': 0,
+    };
+
+    final item = ContentLibraryItem.fromJson(json);
+    expect(item.status, IdeaStatus.tested);
   });
 }

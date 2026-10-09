@@ -276,7 +276,7 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**225 tests, all passing.** They cover:
+**236 tests, all passing.** They cover:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
@@ -294,8 +294,10 @@ job, not a bad idea.
 - **package_store** (CRUD, queries, corruption resilience, persistence)
 - **pipeline integration** (end-to-end Gemini → validator → ContentPackageV2, duplicate
   `_parseCanned` removed)
-- **ApiKeyStore** (9 new tests covering Settings-screen override, trimming,
+- **ApiKeyStore** (9 tests covering Settings-screen override, trimming,
   whitespace handling, fallback behavior)
+- **JsonFileStore** (11 tests covering load/save, corrupted-row isolation,
+  non-list JSON, empty file, loadById, add, deleteById, shouldKeep filter)
 
 Not yet covered: the Gemini JSON parse path (now partially covered via static
 `parseResponse` seam), network calls, FFmpeg assembly, and the AI fallback path.

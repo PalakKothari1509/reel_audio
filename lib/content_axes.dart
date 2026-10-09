@@ -348,18 +348,20 @@ enum ContentGoal {
 /// where a Ria/Rio/Cuty story Reel spends most of its time. An idea that is written
 /// and one whose images exist are different states with different next actions.
 enum IdeaStatus {
-  idea('idea'),
-  approved('approved'),
-  scripted('scripted'),
-  imagesReady('imagesReady'),
-  generated('generated'),
-  posted('posted'),
-  tested('tested'),
-  archived('archived');
+  idea('idea', '💡', 'Idea'),
+  approved('approved', '✅', 'Approved'),
+  scripted('scripted', '📝', 'Scripted'),
+  imagesReady('imagesReady', '🖼️', 'Images Ready'),
+  generated('generated', '⚙️', 'Generated'),
+  posted('posted', '📤', 'Posted'),
+  tested('tested', '🧪', 'Tested'),
+  archived('archived', '📦', 'Archived');
 
   final String id;
+  final String emoji;
+  final String label;
 
-  const IdeaStatus(this.id);
+  const IdeaStatus(this.id, this.emoji, this.label);
 
   static IdeaStatus? byId(String id) {
     final normalized = _normalizeAxisValue(id);

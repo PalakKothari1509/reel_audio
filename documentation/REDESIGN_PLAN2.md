@@ -20,7 +20,7 @@ can I realistically produce it?"** â€” not merely "What can AI generate?"
 **How to read this:** tasks are grouped by phase. Anything marked **YOURS**
 cannot be finished by me â€” it needs your decision or your keys.
 
-**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 205 tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and `review_content` report the open axes below — OPEN is the correct result for unresolved taxonomy, not a failure.
+**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 240 tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and `review_content` report the open axes below — OPEN is the correct result for unresolved taxonomy, not a failure.
 
 **Orders 13-17 COMPLETE:**
 
@@ -332,7 +332,7 @@ learned from real results, not predicted by AI.
 | 13 | Build unified AI service | ðŸŸ  Then |
 | 14 | Connect production adapters | ðŸŸ  Then |
 | 15 | Harden Gemini parser/tests | ðŸŸ  Then |
-| 16 | Refactor storage | ðŸŸ¡ Later |
+| 16 | Refactor storage | ✅ Complete |
 | 17 | Simplify UI around Ideas/Create/Library | ðŸŸ¡ Later |
 | 18 | Security/release cleanup | ðŸŸ¡ Before release |
 | 19 | Real 5-test experiment tracking | ðŸŸ¢ After real posts |
@@ -346,15 +346,13 @@ learned from real results, not predicted by AI.
 
 | Task | Why it matters |
 | --- | --- |
-| Rotate your API keys | `lib/secrets.dart` holds live Gemini and ElevenLabs keys. Keys in an APK can be extracted. **`backend/` also holds a live OpenAI key and has no source code â€” what is it for?** |
+| Rotate your API keys | `lib/secrets.dart` holds live Gemini and ElevenLabs keys. Keys in an APK can be extracted. `backend/` has been deleted; the OpenAI key it held was never in git. |
 | Release signing and app id | Still signed with the debug key, still called `com.example.reel_audio`. Not installable from Play |
 | Settings key honoured in 2 of 10 places | Configure Gemini in Settings and most of the app ignores it |
-| Remove unused packages | `hive`, `hive_flutter`, `cupertino_icons` are installed and never used |
 | Google AI SDK is deprecated | And it has no thinking-budget control, which is why one large Gemini call can still return truncated text |
-| Six near-identical storage classes | About 450 lines of repeated code with inconsistent error handling |
-| Two `IdeaStatus` enums | `content_axes.dart` has the lifecycle ladder (idea â†’ â€¦ â†’ archived); `quick_content.dart` has a separate UI enum (idea / developing / ready / posted / reuse) with emoji and label. Only `idea` and `posted` exist in both, so the two ladders can drift. Consolidate when the Idea Vault moves to the model's ladder |
+| Duplicate status enums | RESOLVED: `ContentStatus` in `content_library.dart` and a UI-specific `IdeaStatus` in `quick_content.dart` are both replaced by the canonical `IdeaStatus` in `content_axes.dart` (8-value lifecycle ladder with emoji/label). `fromLegacy` migrates old stored spellings (developing, ready, reuse, draft, reused) to canonical values. |
 | README is template boilerplate | Says "A new Flutter project" |
-| CI does not run on this branch | Only tests `main` and `video-slideshow` |
+| CI does not run on this branch | Only tests `main` and `video-slideshow`. `copilot_post` added. |
 
 ### File-by-file policy
 
@@ -364,11 +362,12 @@ project is clean because every remaining file has a known purpose.
 **Keep:** `lib/`, `test/`, `tool/`, `android/`, `ios/`, `web/` if still
 supported, `assets/`, `pubspec.yaml`, `pubspec.lock`, `analysis_options.yaml`,
 `.gitignore`, and the documentation that is part of the system:
-`CONTENT_MODEL.md`, `content_formats.md`, `content_ideas.md`,
-`REDESIGN_PLAN.md`, `README.md`.
+`documentation/CONTENT_MODEL.md`, `documentation/content_formats.md`,
+`documentation/content_ideas.md`, `documentation/REDESIGN_PLAN2.md`,
+`documentation/README.md`.
 
-**Review before deleting:** old generators, old screens and routes, duplicate
-storage classes, old content JSON, obsolete scripts, old planning documents
+**Review before deleting:** old generators, old screens and routes,
+old content JSON, obsolete scripts, old planning documents
 (`master_prompt.md`, `POSTS_REVIEW.md`, `APP_OVERVIEW.md`, `MASTER_CONTENT.md`,
 the chat-export `.md` files), temporary test files, and regenerable exports
 (`tool/idea_classification_report.txt`, `tool/reach_candidates.csv`,
@@ -376,8 +375,9 @@ the chat-export `.md` files), temporary test files, and regenerable exports
 
 **Remove only when confirmed obsolete:**
 
-- `backend/` â€” **after the OpenAI key inside it has been rotated**. It has no
-  source code and nothing references it, but the key is live until rotated.
+- `backend/` â **already deleted.** It contained only `backend/.gitignore`
+  (with `.env` pattern). The OpenAI key was never in git history and the
+  directory has been removed.
 - The 57 ideas and all content history â€” **never** deleted to make the folder
   look clean. They are curated through the Master Content Sheet (KEEP /
   REWORK / ARCHIVE / DELETE), not deleted by hand.
@@ -386,7 +386,7 @@ the chat-export `.md` files), temporary test files, and regenerable exports
 
 ## Testing gaps
 
-36 tests currently cover several quiet failure modes. Still untested: the
+240 tests currently cover several quiet failure modes. Still untested: the
 Gemini JSON parser, network calls, video assembly, and what happens when AI
 fails.
 

@@ -50,12 +50,12 @@
 ### B. Content Model & Taxonomy
 | File | Purpose | Key Exports |
 |------|---------|-------------|
-| `lib/content_axes.dart` | **THE TAXONOMY** — ContentPillar (4), ContentSeries (7 with fromLegacy/byLabel), ContentType (10), ProductionMethod (4), ContentGoal (8), IdeaStatus (6) | All enums, validateNarrativeFormat() |
+| `lib/content_axes.dart` | **THE TAXONOMY** — ContentPillar (4), ContentSeries (7 with fromLegacy/byLabel), ContentType (10), ProductionMethod (4), ContentGoal (8), IdeaStatus (8: idea, approved, scripted, imagesReady, generated, posted, tested, archived, with emoji/label) | All enums, validateNarrativeFormat() |
 | `lib/format_handbook.dart` | **THE FORMAT LIBRARY** — 16 FormatSpec entries with 4-dim scoring, 5-test minimum rule | FormatLibrary (pov, doThisNotThat, mistakesList, problemFix, quickTip, miniStory, questionAnswer, etc.), FormatSpec, FormatLibrary.minimumTests=5 |
 | `lib/content_quality_gate.dart` | **NEW** — Phase 2 quality gate engine: VoiceMode (3), SaveValue (3), ShareTrigger (4-field structured), AxisResolution (5), ClassificationSnapshot (frozen state), QualityDimension (4), GateCheckResult, GateReport, QualityGate.evaluateIdea()/evaluatePackage() | QualityGate, GateReport, ShareTrigger, ClassificationSnapshot |
 | `lib/content_generator.dart` | ContentPackage, SlideContent, generation pipeline | ContentPackage, SlideContent, GeneratedContent |
-| `lib/content_library.dart` | Local content storage and retrieval | ContentLibrary, ContentRecord |
-| `lib/content_library_screen.dart` | UI for browsing/saving generated content | ContentLibraryScreen |
+| `lib/content_library.dart` | Local content storage and retrieval (uses IdeaStatus from content_axes) | ContentLibrary, ContentRecord |
+| `lib/content_library_screen.dart` | UI for browsing/saving generated content (uses IdeaStatus from content_axes) | ContentLibraryScreen |
 | `lib/content_package_v2.dart` | Content package v2 format | ContentPackageV2 |
 
 ### C. Content Generation

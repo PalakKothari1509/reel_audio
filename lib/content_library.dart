@@ -3,19 +3,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'brand_system.dart';
+import 'content_axes.dart';
 import 'content_generator.dart';
 import 'format_adapter.dart';
 import 'json_file_store.dart';
 import 'quality_check.dart';
-
-enum ContentStatus {
-  idea,
-  draft,
-  ready,
-  posted,
-  reused,
-  archived,
-}
 
 class ContentLibraryItem {
   final String id;
@@ -23,7 +15,7 @@ class ContentLibraryItem {
   final String topic;
   final ContentBucket bucket;
   final ContentFormat format;
-  final ContentStatus status;
+  final IdeaStatus status;
   final ContentPackage? contentPackage;
   final Map<ContentFormat, FormatOutput> formatOutputs;
   final QualityReport? qualityReport;
@@ -61,7 +53,7 @@ class ContentLibraryItem {
     String? topic,
     ContentBucket? bucket,
     ContentFormat? format,
-    ContentStatus? status,
+    IdeaStatus? status,
     ContentPackage? contentPackage,
     Map<ContentFormat, FormatOutput>? formatOutputs,
     QualityReport? qualityReport,
@@ -150,7 +142,7 @@ class ContentLibraryItem {
       topic: json['topic'] as String,
       bucket: BucketLibrary.byId(json['bucket'] as String? ?? '') ?? BucketLibrary.challenge,
       format: ContentFormat.values.byName(json['format'] as String? ?? 'carousel'),
-      status: ContentStatus.values.byName(json['status'] as String? ?? 'idea'),
+      status: IdeaStatus.fromLegacy(json['status'] as String? ?? 'idea'),
       contentPackage: package,
       formatOutputs: formats,
       qualityReport: _reportFromJson(json['qualityReport'], package, formats),
@@ -211,7 +203,7 @@ class ContentLibraryItem {
       topic: pkg.idea,
       bucket: pkg.bucket,
       format: pkg.format,
-      status: ContentStatus.draft,
+      status: IdeaStatus.scripted,
       contentPackage: pkg,
       formatOutputs: formats,
       tags: [pkg.bucket.id],
@@ -261,7 +253,7 @@ class ContentLibraryStore {
     return items;
   }
 
-  static Future<List<ContentLibraryItem>> getByStatus(ContentStatus status) async {
+  static Future<List<ContentLibraryItem>> getByStatus(IdeaStatus status) async {
     final all = await getAll();
     return all.where((i) => i.status == status).toList();
   }
@@ -320,12 +312,12 @@ class ContentLibraryStore {
     }
   }
 
-  static Future<void> updateStatus(String id, ContentStatus newStatus, {DateTime? postedAt, String? instagramUrl}) async {
+  static Future<void> updateStatus(String id, IdeaStatus newStatus, {DateTime? postedAt, String? instagramUrl}) async {
     final item = await getById(id);
     if (item != null) {
       await update(item.copyWith(
         status: newStatus,
-        postedAt: postedAt ?? (newStatus == ContentStatus.posted ? DateTime.now() : item.postedAt),
+        postedAt: postedAt ?? (newStatus == IdeaStatus.posted ? DateTime.now() : item.postedAt),
         instagramPostUrl: instagramUrl ?? item.instagramPostUrl,
       ));
     }
@@ -335,7 +327,7 @@ class ContentLibraryStore {
     final item = await getById(id);
     if (item != null) {
       await update(item.copyWith(
-        status: ContentStatus.reused,
+        status: IdeaStatus.tested,
         reuseCount: item.reuseCount + 1,
       ));
     }
@@ -348,10 +340,10 @@ class ContentLibraryStore {
     }
   }
 
-  static Future<Map<ContentStatus, int>> getStatusCounts() async {
+  static Future<Map<IdeaStatus, int>> getStatusCounts() async {
     final all = await getAll();
-    final counts = <ContentStatus, int>{};
-    for (final status in ContentStatus.values) {
+    final counts = <IdeaStatus, int>{};
+    for (final status in IdeaStatus.values) {
       counts[status] = all.where((i) => i.status == status).length;
     }
     return counts;

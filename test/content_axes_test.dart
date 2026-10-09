@@ -39,5 +39,25 @@ void main() {
       expect(IdeaStatus.byId('imagesReady'), IdeaStatus.imagesReady);
       expect(IdeaStatus.byId('images_ready'), IdeaStatus.imagesReady);
     });
+
+    test('IdeaStatus emoji and label are present on every value', () {
+      expect(IdeaStatus.values.every((s) => s.emoji.trim().isNotEmpty), isTrue);
+      expect(IdeaStatus.values.every((s) => s.label.trim().isNotEmpty), isTrue);
+      expect(IdeaStatus.idea.emoji, '💡');
+      expect(IdeaStatus.idea.label, 'Idea');
+      expect(IdeaStatus.archived.emoji, '📦');
+    });
+
+    test('IdeaStatus.fromLegacy maps old spellings to canonical values', () {
+      expect(IdeaStatus.fromLegacy('idea'), IdeaStatus.idea);
+      expect(IdeaStatus.fromLegacy('developing'), IdeaStatus.scripted);
+      expect(IdeaStatus.fromLegacy('ready'), IdeaStatus.approved);
+      expect(IdeaStatus.fromLegacy('reuse'), IdeaStatus.tested);
+      expect(IdeaStatus.fromLegacy('reused'), IdeaStatus.tested);
+      expect(IdeaStatus.fromLegacy('draft'), IdeaStatus.idea);
+      expect(IdeaStatus.fromLegacy('posted'), IdeaStatus.posted);
+      expect(IdeaStatus.fromLegacy('archived'), IdeaStatus.archived);
+      expect(IdeaStatus.fromLegacy('unknown_value'), IdeaStatus.idea);
+    });
   });
 }
