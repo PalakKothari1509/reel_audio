@@ -260,7 +260,7 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**36 + 37 = 73 tests, all passing.** They currently cover several quiet failure modes:
+**205 tests, all passing.** They cover:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
@@ -271,6 +271,11 @@ job, not a bad idea.
 - delete confirmations (a promotion comment and an idea both ask first)
 - **quality gate system** (ShareTrigger, VoiceMode, SaveValue, ClassificationSnapshot,
   QualityGate.evaluateIdea, QualityGate.evaluatePackage, design invariants)
+- **AI content service** (generation, validation, failure handling, narration/dialogue)
+- **ai_parser_validator** (JSON schema validation, malformed/truncated responses)
+- **production_adapter** (production result states, input defaults)
+- **package_store** (CRUD, queries, corruption resilience, persistence)
+- **pipeline integration** (end-to-end Gemini → validator → ContentPackageV2)
 
 Not yet covered: the Gemini JSON parse path, network calls, FFmpeg assembly, and
 the AI fallback path.
@@ -284,16 +289,16 @@ becomes a build error instead of a crash.
 
 ```bash
 flutter analyze lib          # 0 errors
-flutter test                 # 73 tests
+flutter test                 # 205 tests
 
 dart run tool/sync_formats.dart      # content_formats.md -> Dart
 dart run tool/check_formats.dart     # validate the handbook
 dart run tool/check_axes.dart        # which axis values are decided
-dart run tool/review_sheet.dart      # markdown table to review and approve
 dart run tool/check_pillars.dart     # guard the known classifier mistakes
 dart run tool/review_content.dart    # pre-install gate: decisions + blockers
 dart run tool/reach_mechanics.dart   # distribution analysis
 dart run tool/show_ideas.dart <id>   # print one idea in full
+dart run tool/quality_gate.dart      # evaluate ideas through the quality gate
 ```
 
 ### Testing on your phone
@@ -323,35 +328,48 @@ In rough order of how much it matters:
    source and do not block the sync set.
 
 3. **Phase 2 quality-gate system is complete** — implemented in
-   `lib/content_quality_gate.dart` with 37 tests covering Share Trigger,
+   `lib/content_quality_gate.dart` with comprehensive tests covering Share Trigger,
    Voice Mode, Save Value, four evaluation dimensions, classification snapshots,
    and the five-test rule.
 
-4. **There is no unified Content Package.** The app still has multiple
-   representations of a finished post. The standalone Caption Generator and
-   the "Generate All Formats" multi-select are removed; the remaining
-   representations need to collapse into one `ContentPackage`.
+4. **ContentPackage is implemented** — `ContentPackageV2` in `lib/content_package_v2.dart`
+   is the unified model with classification snapshot, creative fields, production plan,
+   and lifecycle. The standalone Caption Generator and Generate All Formats are removed.
 
-5. **The generated script is thrown away.** The prompt asks for narration and
-   per-scene dialogue, and it is never read back — so the app cannot yet show the
-   narration the plan promises.
+5. **AI parser is validated** — `AiParserValidator` in `lib/ai_parser_validator.dart`
+   validates raw AI JSON before conversion. Schema validation, malformed/truncated
+   response handling, and 34 validator tests are in place.
 
-6. **Four tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+6. **Storage is refactored** — `PackageStore` in `lib/package_store.dart` with a JSON
+   file implementation. 35 tests cover CRUD, queries, corruption resilience.
 
-7. **Release builds are not distributable.** Signed with the debug keystore, and the
+7. **Production pipeline is integrated** — `ProductionAdapter` in
+   `lib/production_adapter.dart` provides the boundary layer for media generation.
+   10 tests cover production result states.
+
+8. **Five tabs do not exist:** Calendar, Analytics, Experiments, and a proper Ideas tab.
+
+9. **Release builds are not distributable.** Signed with the debug keystore, and the
    application id is still `com.example.reel_audio`.
 
-8. **Settings does not actually export or import** your data.
+10. **Settings does not actually export or import** your data.
 
-9. **Most file-reading code cannot be tested.** Three components have a test seam
-   (the promotion vault, the idea inbox, and the content library); the rest do not.
+11. **API keys have not been rotated.** `lib/secrets.dart` holds live Gemini and
+    ElevenLabs keys (`.gitignore`'d but present locally). The OpenAI key in `backend/`
+    needs rotation before `backend/` can be removed.
 
 ---
 
 ## 13. Keeping this document honest
 
-`REDESIGN_PLAN.md` tracks the remaining work. Completed items are removed from it as
-they land, so it always shows only what is left.
+This file is kept in sync with `REDESIGN_PLAN2.md`, which tracks the remaining work.
+The architecture boundary layer is complete (Orders 13–17):
+
+```
+IDEA → Classification → QualityGate → GateReport → AiContentService
+→ AiParserValidator → ContentPackageV2 → ProductionAdapter
+→ ProductionResult → PackageStore
+```
 
 If you change behaviour in the code, change this file in the same pass — a document
 that describes an earlier version of the app is worse than none, because it is trusted.

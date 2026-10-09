@@ -64,14 +64,14 @@ class GeminiClient implements AIProvider {
   Future<ContentPackage> generate(IdeaInput input) async {
     final prompt = _buildGeneratePrompt(input);
     final response = await _model.generateContent([Content.text(prompt)]).timeout(_timeout);
-    return _parseResponse(response.text ?? '{}', input);
+    return parseResponse(response.text ?? '{}', input);
   }
 
   @override
   Future<ContentPackage> regenerate(ContentPackage pkg, RegenerateTarget target, RegenerateStyle style) async {
     final prompt = _buildRegeneratePrompt(pkg, target, style);
     final response = await _model.generateContent([Content.text(prompt)]).timeout(_timeout);
-    return _parseResponse(response.text ?? '{}', IdeaInput(
+    return parseResponse(response.text ?? '{}', IdeaInput(
       topic: pkg.idea,
       bucket: pkg.bucket,
       targetFormats: [pkg.format],
@@ -334,7 +334,10 @@ Match the JSON schema exactly.
     }
   }
 
-  ContentPackage _parseResponse(String jsonText, IdeaInput input) {
+   /// Static parse seam — callable without a live model instance.
+  /// Extracted from [_parseResponse] for testability so integration tests
+  /// can exercise the parse path without hitting the Gemini API.
+  static ContentPackage parseResponse(String jsonText, IdeaInput input) {
     // Validate the AI response before attempting to parse fields.
     // This produces typed failures (AiContentFailure) instead of
     // silent empty results or unhandled TypeErrors.

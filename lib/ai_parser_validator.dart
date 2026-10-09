@@ -100,27 +100,55 @@ class AiParserValidator {
     'hashtags', 'replyComments', 'slides',
   ];
 
-  /// Validates raw JSON text from an AI provider.
+   /// Validates raw JSON text from an AI provider.
+  ///
+  /// Handles several common failure modes:
+  /// - Markdown-wrapped JSON (Gemini often wraps in ```json blocks)
+  /// - Truncated JSON (incomplete response due to token limits)
+  /// - Empty or whitespace-only responses
+  /// - Non-object roots
+  /// - Missing required fields
+  /// - Wrong field types
   ///
   /// Returns a [ValidatedResponse] with findings. The caller can choose
   /// to throw ([ValidatedResponse.requireValid]) or proceed with warnings.
   static ValidatedResponse validate(String jsonText) {
     final findings = <ParseFinding>[];
 
+    // ── Strip markdown wrapping ───────────────────────────────────────
+    // Gemini often wraps JSON in ```json ... ``` blocks.
+    final stripped = _stripMarkdownCodeBlocks(jsonText);
+    if (stripped != jsonText.trim()) {
+      findings.add(ParseFinding(
+        severity: ParseSeverity.warning,
+        code: 'markdown_wrapped',
+        message: 'AI response was wrapped in markdown code block — extracted inner JSON',
+      ));
+    }
+
     // ── Must be valid JSON ────────────────────────────────────────────
-    if (jsonText.isEmpty || jsonText.trim() == '{}') {
+    final workText = stripped.trim();
+    if (workText.isEmpty || workText == '{}') {
       return ValidatedResponse.withFindings({}, [
-        ParseFinding(
-          severity: ParseSeverity.error,
-          code: 'empty_response',
-          message: 'AI response was empty or just "{}"',
-        ),
+        if (workText.isEmpty)
+          ParseFinding(
+            severity: ParseSeverity.error,
+            code: 'empty_response',
+            message: 'AI response was empty or whitespace only',
+          )
+        else
+          ParseFinding(
+            severity: ParseSeverity.error,
+            code: 'empty_response',
+            message: 'AI response was empty or just "{}"',
+          ),
+        ...findings,
       ]);
     }
 
     late final Map<String, dynamic> data;
     try {
-      final decoded = jsonDecode(jsonText);
+      final decoded = jsonDecode(workText);
       if (decoded is! Map<String, dynamic>) {
         return ValidatedResponse.withFindings({}, [
           ParseFinding(
@@ -129,16 +157,32 @@ class AiParserValidator {
             message: 'AI response root is not a JSON object',
             value: decoded.runtimeType.toString(),
           ),
+          ...findings,
         ]);
       }
       data = decoded;
     } on FormatException catch (e) {
+      // Truncated JSON (e.g. '{"hook": "test", "slides": [{"headline": "H"')
+      // produces a FormatException. Distinguish from general JSON errors.
+      final isTruncated = _looksTruncated(workText);
       return ValidatedResponse.withFindings({}, [
         ParseFinding(
           severity: ParseSeverity.error,
-          code: 'invalid_json',
-          message: 'AI response is not valid JSON: ${e.message}',
+          code: isTruncated ? 'truncated_json' : 'invalid_json',
+          message: isTruncated
+              ? 'AI response appears truncated (incomplete JSON): ${e.message}'
+              : 'AI response is not valid JSON: ${e.message}',
         ),
+        ...findings,
+      ]);
+    } catch (e) {
+      return ValidatedResponse.withFindings({}, [
+        ParseFinding(
+          severity: ParseSeverity.error,
+          code: 'parse_error',
+          message: 'Failed to parse AI response: $e',
+        ),
+        ...findings,
       ]);
     }
 
@@ -294,7 +338,7 @@ class AiParserValidator {
     return result;
   }
 
-  /// Validates and returns true if the response passes validation.
+   /// Validates and returns true if the response passes validation.
   static bool isValidResponse(String jsonText) {
     try {
       validateOrThrow(jsonText);
@@ -302,5 +346,75 @@ class AiParserValidator {
     } on AiContentFailure {
       return false;
     }
+  }
+
+  /// Strips markdown code fence wrapping (```json ... ```) from AI output.
+  /// Returns the original string if no wrapping is detected.
+  static String _stripMarkdownCodeBlocks(String text) {
+    final trimmed = text.trim();
+    // Match ```json, ```, or ```json followed by optional whitespace and content
+    final match = RegExp(r'^```(?:\w+)?\s*([\s\S]*?)\s*```$').firstMatch(trimmed);
+    if (match != null) {
+      return match.group(1)!;
+    }
+    // Also handle case where there's a leading ``` without trailing
+    final startMatch = RegExp(r'^```(?:\w+)?\s*\n').firstMatch(trimmed);
+    if (startMatch != null) {
+      final rest = trimmed.substring(startMatch.end);
+      final endIdx = rest.lastIndexOf('```');
+      if (endIdx != -1) {
+        return rest.substring(0, endIdx).trim();
+      }
+    }
+    return text;
+  }
+
+  /// Heuristic: does the text look like truncated JSON?
+  /// Truncated JSON typically has an unclosed string, bracket, or brace.
+  static bool _looksTruncated(String text) {
+    final trimmed = text.trim();
+
+    // Count open vs close brackets/braces
+    var openBraces = 0;
+    var closeBraces = 0;
+    var openBrackets = 0;
+    var closeBrackets = 0;
+    var openStrings = 0;
+    var escaped = false;
+
+    for (var i = 0; i < trimmed.length; i++) {
+      final c = trimmed[i];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (c == '\\') {
+        escaped = true;
+        continue;
+      }
+      if (c == '"') {
+        openStrings++;
+        continue;
+      }
+      if (openStrings.isOdd) continue; // inside a string
+
+      switch (c) {
+        case '{':
+          openBraces++;
+        case '}':
+          closeBraces++;
+        case '[':
+          openBrackets++;
+        case ']':
+          closeBrackets++;
+      }
+    }
+
+    // Unbalanced brackets/braces or unclosed string suggest truncation
+    final hasUnclosedString = openStrings.isOdd;
+    final hasUnclosedBraces = openBraces > closeBraces;
+    final hasUnclosedBrackets = openBrackets > closeBrackets;
+
+    return hasUnclosedString || hasUnclosedBraces || hasUnclosedBrackets;
   }
 }

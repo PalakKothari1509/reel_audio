@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/ai_content_service.dart';
 import 'package:reel_audio/ai_content_service_impl.dart';
 import 'package:reel_audio/ai_provider.dart';
-import 'package:reel_audio/ai_parser_validator.dart';
+import 'package:reel_audio/gemini_client.dart';
 import 'package:reel_audio/brand_system.dart';
 import 'package:reel_audio/content_axes.dart';
 import 'package:reel_audio/content_generator.dart';
@@ -29,8 +29,7 @@ class MockAIProvider implements AIProvider {
     if (cannedJson == null) {
       throw Exception('No canned response set');
     }
-    // Simulate what GeminiClient would do: parse JSON → ContentPackage
-    return _parseCanned(cannedJson!, input);
+    return GeminiClient.parseResponse(cannedJson!, input);
   }
 
   @override
@@ -47,42 +46,6 @@ class MockAIProvider implements AIProvider {
 
   @override
   bool get isAvailable => error == null;
-
-  static ContentPackage _parseCanned(String jsonText, IdeaInput input) {
-    final validated = AiParserValidator.validateOrThrow(jsonText);
-    final map = validated.data;
-
-    final slides = ((map['slides'] as List?) ?? const [])
-        .whereType<Map>()
-        .map((s) {
-          final m = s.cast<String, dynamic>();
-          return SlideContent(
-            index: m['slideNumber'] as int? ?? 0,
-            title: m['headline'] as String? ?? '',
-            body: m['body'] as String? ?? '',
-            visualPrompt: m['imagePrompt'] as String? ?? '',
-            overlayText: m['cta'] as String?,
-          );
-        })
-        .toList();
-
-    return ContentPackage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      idea: map['topic'] as String? ?? input.topic,
-      bucket: BucketLibrary.byId(map['bucket'] as String? ?? '') ?? input.bucket,
-      format: input.targetFormats.first,
-      characters: input.characters,
-      hook: map['hook'] as String? ?? '',
-      slides: slides,
-      visualPrompts: slides.map((s) => s.visualPrompt).toList(),
-      caption: map['caption'] as String? ?? '',
-      cta: slides.isNotEmpty ? slides.last.overlayText ?? '' : '',
-      hashtags: (map['hashtags'] as List?)?.cast<String>() ?? [],
-      pinnedComment: map['pinnedComment'] as String? ?? '',
-      replyComments: (map['replyComments'] as List?)?.cast<String>() ?? [],
-      createdAt: DateTime.now(),
-    );
-  }
 }
 
 void main() {
@@ -402,6 +365,42 @@ void main() {
           ),
         ),
         throwsA(isA<StateError>()),
+      );
+    });
+  });
+
+  group('GeminiClient.parseResponse seam', () {
+    test('markdown-wrapped JSON is extracted during parsing', () {
+      const wrappedJson = '```json\n{"hook": "Test", "slides": [{"headline": "T", "body": "B"}]}\n```';
+      final input = IdeaInput(
+        topic: 'test',
+        bucket: BucketLibrary.challenge,
+        targetFormats: [ContentFormat.reel],
+        brand: BrandContext.defaultContext(),
+        characters: [],
+        slideCount: 1,
+      );
+
+      final pkg = GeminiClient.parseResponse(wrappedJson, input);
+      expect(pkg.hook, 'Test');
+      expect(pkg.slides.length, 1);
+      expect(pkg.slides.first.title, 'T');
+    });
+
+    test('truncated JSON throws AiContentFailure', () {
+      const truncatedJson = '{"hook": "Test", "slides": [{"headline": "T"';
+      final input = IdeaInput(
+        topic: 'test',
+        bucket: BucketLibrary.challenge,
+        targetFormats: [ContentFormat.reel],
+        brand: BrandContext.defaultContext(),
+        characters: [],
+        slideCount: 1,
+      );
+
+      expect(
+        () => GeminiClient.parseResponse(truncatedJson, input),
+        throwsA(isA<AiContentFailure>()),
       );
     });
   });

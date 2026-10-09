@@ -130,8 +130,73 @@ void main() {
       expect(result.findings.any((f) => f.code == 'wrong_type' && f.field == 'hook'), isTrue);
     });
 
-    test('slides with valid fields pass', () {
+     test('slides with valid fields pass', () {
       const json = '{"hook": "Test", "slides": [{"slideNumber": 1, "headline": "Title", "body": "Body", "imagePrompt": "img", "cta": "Save"}]}';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isTrue);
+    });
+
+    test('markdown-wrapped JSON is extracted and produces warning', () {
+      const json = '```json\n{"hook": "Test", "slides": [{"headline": "T", "body": "B"}]}```\n';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isTrue);
+      expect(result.hasWarnings, isTrue);
+      expect(result.findings.any((f) => f.code == 'markdown_wrapped'), isTrue);
+    });
+
+    test('markdown without language tag is handled', () {
+      const json = '```\n{"hook": "Test", "slides": [{"headline": "T", "body": "B"}]}\n```';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isTrue);
+    });
+
+    test('truncated JSON is rejected with truncated_json error', () {
+      const json = '{"hook": "Test", "slides": [{"headline": "T"';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'truncated_json'), isTrue);
+    });
+
+    test('truncated JSON with unclosed string is rejected', () {
+      const json = '{"hook": "Test", "slides": [{"headline": "Title", "body": "Body}';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'truncated_json'), isTrue);
+    });
+
+    test('truncated JSON with unclosed brace is rejected', () {
+      const json = '{"hook": "Test", "slides": [{"headline": "T", "body": "B"}';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'truncated_json'), isTrue);
+    });
+
+    test('malformed JSON without clear truncation pattern produces invalid_json', () {
+      const json = '{hook: broken, with: extra}';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'invalid_json'), isTrue);
+    });
+
+    test('json with trailing text after the object is invalid', () {
+      const json = '{"hook": "Test", "slides": [{"headline": "T", "body": "B"}]} extra text here';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'invalid_json'), isTrue);
+    });
+
+    test('null hook is accepted with null coercion warning', () {
+      // null is not String, so it produces wrong_type error
+      const json = '{"hook": null, "slides": [{"headline": "T", "body": "B"}]}';
+      final result = AiParserValidator.validate(json);
+      expect(result.isValid, isFalse);
+      expect(result.findings.any((f) => f.code == 'wrong_type' && f.field == 'hook'), isTrue);
+    });
+
+    test('very large valid response passes', () {
+      final slide = '{"headline": "H", "body": "B", "imagePrompt": "img"}';
+      final slides = List.filled(50, slide).join(',');
+      final json = '{"hook": "Test with ' + 'a' * 500 + '", "slides": [$slides], "script": "Narration"}';
       final result = AiParserValidator.validate(json);
       expect(result.isValid, isTrue);
     });
