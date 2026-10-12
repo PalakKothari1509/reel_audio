@@ -276,7 +276,7 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**240 tests, all passing.** They cover:
+**260 tests, all passing.** They cover:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
@@ -294,6 +294,7 @@ job, not a bad idea.
 - **package_store** (CRUD, queries, corruption resilience, persistence)
 - **pipeline integration** (end-to-end Gemini → validator → ContentPackageV2, duplicate
   `_parseCanned` removed)
+- **StoryReelBuilder** (12 tests) — builds 10-second segment Reels via AI pipeline, Navratri reel structure
 - **ApiKeyStore** (9 tests covering Settings-screen override, trimming,
   whitespace handling, fallback behavior)
 - **JsonFileStore** (11 tests covering load/save, corrupted-row isolation,
@@ -311,7 +312,7 @@ becomes a build error instead of a crash.
 
 ```bash
 flutter analyze lib          # 0 errors
-flutter test                 # 240 tests
+flutter test                 # 260 tests
 dart run tool/sync_formats.dart      # documentation/content_formats.md -> Dart
 dart run tool/check_formats.dart     # validate the handbook
 dart run tool/check_axes.dart        # which axis values are decided

@@ -334,6 +334,42 @@ void main() {
       expect(restored.audioPath, '/audio.wav');
       expect(restored.imagePaths, ['/img1.png', '/img2.png']);
     });
+
+    test('metrics round-trip', () {
+      final meta = PackageMetadata(
+        id: 'pkg-1',
+        ideaId: 'idea-1',
+        reach: 1000,
+        nonFollowerReach: 300,
+        plays: 1500,
+        averageWatchTimeSeconds: 12,
+        shares: 50,
+        saves: 100,
+        profileVisits: 30,
+        followsAttributed: 5,
+        experimentCount: 3,
+        reviewNotes: const ['Strong hook', 'Try different ending'],
+      );
+      final restored = PackageMetadata.fromJson(meta.toJson());
+      expect(restored.reach, 1000);
+      expect(restored.nonFollowerReach, 300);
+      expect(restored.plays, 1500);
+      expect(restored.averageWatchTimeSeconds, 12);
+      expect(restored.shares, 50);
+      expect(restored.saves, 100);
+      expect(restored.profileVisits, 30);
+      expect(restored.followsAttributed, 5);
+      expect(restored.experimentCount, 3);
+      expect(restored.reviewNotes, ['Strong hook', 'Try different ending']);
+    });
+
+    test('metrics default to null and zero', () {
+      final meta = PackageMetadata(id: 'x', ideaId: 'y');
+      expect(meta.reach, isNull);
+      expect(meta.saves, isNull);
+      expect(meta.experimentCount, 0);
+      expect(meta.reviewNotes, isEmpty);
+    });
   });
 
   group('PackageStatus', () {

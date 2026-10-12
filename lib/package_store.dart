@@ -143,6 +143,22 @@ class PackageMetadata {
   final String? audioPath;
   final List<String> imagePaths;
 
+  /// Performance metrics from Instagram (filled after posting).
+  final int? reach;
+  final int? nonFollowerReach;
+  final int? plays;
+  final int? averageWatchTimeSeconds;
+  final int? shares;
+  final int? saves;
+  final int? profileVisits;
+  final int? followsAttributed;
+
+  /// How many times this format has been tested (for the 5-test rule).
+  final int experimentCount;
+
+  /// User notes about what worked, what to change, etc.
+  final List<String> reviewNotes;
+
   PackageMetadata({
     required this.id,
     required this.ideaId,
@@ -152,6 +168,16 @@ class PackageMetadata {
     this.videoPath,
     this.audioPath,
     this.imagePaths = const [],
+    this.reach,
+    this.nonFollowerReach,
+    this.plays,
+    this.averageWatchTimeSeconds,
+    this.shares,
+    this.saves,
+    this.profileVisits,
+    this.followsAttributed,
+    this.experimentCount = 0,
+    this.reviewNotes = const [],
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -160,6 +186,16 @@ class PackageMetadata {
     String? videoPath,
     String? audioPath,
     List<String>? imagePaths,
+    int? reach,
+    int? nonFollowerReach,
+    int? plays,
+    int? averageWatchTimeSeconds,
+    int? shares,
+    int? saves,
+    int? profileVisits,
+    int? followsAttributed,
+    int? experimentCount,
+    List<String>? reviewNotes,
     DateTime? updatedAt,
   }) {
     return PackageMetadata(
@@ -171,6 +207,17 @@ class PackageMetadata {
       videoPath: videoPath ?? this.videoPath,
       audioPath: audioPath ?? this.audioPath,
       imagePaths: imagePaths ?? this.imagePaths,
+      reach: reach ?? this.reach,
+      nonFollowerReach: nonFollowerReach ?? this.nonFollowerReach,
+      plays: plays ?? this.plays,
+      averageWatchTimeSeconds:
+          averageWatchTimeSeconds ?? this.averageWatchTimeSeconds,
+      shares: shares ?? this.shares,
+      saves: saves ?? this.saves,
+      profileVisits: profileVisits ?? this.profileVisits,
+      followsAttributed: followsAttributed ?? this.followsAttributed,
+      experimentCount: experimentCount ?? this.experimentCount,
+      reviewNotes: reviewNotes ?? this.reviewNotes,
     );
   }
 
@@ -183,6 +230,16 @@ class PackageMetadata {
         'videoPath': videoPath,
         'audioPath': audioPath,
         'imagePaths': imagePaths,
+        'reach': reach,
+        'nonFollowerReach': nonFollowerReach,
+        'plays': plays,
+        'averageWatchTimeSeconds': averageWatchTimeSeconds,
+        'shares': shares,
+        'saves': saves,
+        'profileVisits': profileVisits,
+        'followsAttributed': followsAttributed,
+        'experimentCount': experimentCount,
+        'reviewNotes': reviewNotes,
       };
 
   factory PackageMetadata.fromJson(Map<String, dynamic> json) => PackageMetadata(
@@ -198,5 +255,16 @@ class PackageMetadata {
         audioPath: json['audioPath'] as String?,
         imagePaths:
             (json['imagePaths'] as List?)?.cast<String>() ?? const [],
+        reach: json['reach'] as int?,
+        nonFollowerReach: json['nonFollowerReach'] as int?,
+        plays: json['plays'] as int?,
+        averageWatchTimeSeconds: json['averageWatchTimeSeconds'] as int?,
+        shares: json['shares'] as int?,
+        saves: json['saves'] as int?,
+        profileVisits: json['profileVisits'] as int?,
+        followsAttributed: json['followsAttributed'] as int?,
+        experimentCount: json['experimentCount'] as int? ?? 0,
+        reviewNotes:
+            (json['reviewNotes'] as List?)?.cast<String>() ?? const [],
       );
 }
