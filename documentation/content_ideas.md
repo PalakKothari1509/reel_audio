@@ -1005,6 +1005,161 @@ they are openings. A hook becomes an idea once it has a series and a topic.
 
 ---
 
+## Navratri Reel Ideas
+
+Ten short character stories for Navratri, each following **Problem → Jugaad → Result → Moral**.
+Series: `parenting-relatability`. Format: Reel. Production: Character. Goal: Reach.
+
+### N1. Garba se Ghar Kaise Laayein?
+
+- **id:** `navratri-garba-ghar`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Toddler refuses to leave the Garba after the party is over
+- **Audience Problem:** "Garba jaana hai, par bachcha ghar aane ko ready hi nahi!"
+- **Characters:** Ria + Mumma + Papa | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** High
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Navratri mein bachche ko Garba se ghar kaise laayein?" Closing: "Suddenly stop nahi—pehle se batao, phir goodbye karo."
+
+---
+
+### N2. Garba Par Bachcha RoTa Hai
+
+- **id:** `navratri-bachcha-roye`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Loud music, crowd, or lights overwhelm a toddler at a Garba event
+- **Audience Problem:** "Sab Garba kar rahe hain, par mera bachcha ro raha hai!"
+- **Characters:** Rio + Papa | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** High
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Garba night par bachcha enjoy karne ki jagah rone lage toh?" Closing: "Har bachche ka festival enjoy karne ka apna tareeka hota hai."
+
+---
+
+### N3. Junk Food Vs Lunch Box
+
+- **id:** `navratri-junk-food`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Saves
+- **Topic:** Toddler wants chips and sweets instead of the food parents brought
+- **Audience Problem:** "Navratri mein bachcha sirf junk food maangta hai!"
+- **Characters:** Ria + Mumma | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** High
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Garba jaate waqt bachche ke food tantrums ka kya karein?" Closing: "Thodi si planning, aur outing mein kam tension!"
+
+---
+
+### N4. Late Night Garba Vs Sleep
+
+- **id:** `navratri-late-night`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Toddler gets sleepy and cranky at a late-night Garba event
+- **Audience Problem:** "Late-night Garba vs bachcha ki sleep!"
+- **Characters:** Mumma + Papa + Rio | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** Medium
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Navratri enjoy karein ya bachche ka bedtime sambhalein?" Closing: "Har raat late tak rukna zaroori nahi. Happy memories chhoti outing mein bhi banti hain."
+
+---
+
+### N5. Uncomfortable Navratri Outfit
+
+- **id:** `navratri-uncomfortable-outfit`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Fancy clothes, tight waistbands, or heavy accessories irritate a toddler
+- **Audience Problem:** "Navratri outfit pehna diya, ab bachcha kuch bhi karne nahi de raha!"
+- **Characters:** Ria + Mumma | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** Medium
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Navratri ready hote hi bachcha irritate kyun ho jaata hai?" Closing: "Cute outfit se pehle comfortable outfit!"
+
+---
+
+### N6. No Garba Partner
+
+- **id:** `navratri-no-partner`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Engagement
+- **Topic:** Toddler wants to dance but cannot follow the steps or keep up
+- **Audience Problem:** "Mummy, mujhe bhi Garba karna hai… par koi partner nahi!"
+- **Characters:** Cuty + Rio + Ria | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Warm
+- **Status:** Idea | **Priority:** Medium
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Chhote bachchon ko Garba mein kaise include karein?" Closing: "Steps simple rakho, participation special banao."
+
+---
+
+### N7. Late For Garba, Toddler Not Ready
+
+- **id:** `navratri-late-ready`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Parents are ready but the toddler refuses to put on shoes or leave
+- **Audience Problem:** "Garba ke liye late ho rahe hain, aur bachcha ready hi nahi!"
+- **Characters:** Mumma + Papa + Rio | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** Medium
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Navratri party ke liye late? Toddler ready hi nahi ho raha?" Closing: "Ready hone ka pressure kam, routine simple rakho."
+
+---
+
+### N8. Bumped In The Crowd
+
+- **id:** `navratri-bumped-crowd`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Crowded Garba spaces lead to accidental bumps and conflicts between children
+- **Audience Problem:** "Garba mein kisi ne mere bachche ko dhakka de diya!"
+- **Characters:** Ria + Mumma + Papa | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** Low
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Crowded Garba mein toddler ko safe kaise rakhein?" Closing: "Festival ka maza tabhi, jab bachcha safe bhi ho."
+
+---
+
+### N9. Phone At Garba
+
+- **id:** `navratri-phone-at-event`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Reach
+- **Topic:** Toddler is handed a phone at a long event and throws a tantrum when it is taken back
+- **Audience Problem:** "Garba mein bachcha phone maang raha hai!"
+- **Characters:** Rio + Papa | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Idea | **Priority:** High
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Garba mein phone ke bina toddler ko busy kaise rakhein?" Closing: "Bachche ko sirf distract nahi, engage karne ka option bhi do."
+
+---
+
+### N10. Attention During Navratri Prep
+
+- **id:** `navratri-attention-prep`
+- **Series:** parenting-relatability | **Format:** Reel | **Production:** Character | **Goal:** Engagement
+- **Topic:** Parents are busy with preparations and the toddler wants attention
+- **Audience Problem:** "Navratri ke chakkar mein bachche ke saath quality time hi nahi!"
+- **Characters:** Mumma + Ria | **Age:** 2-4
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Warm
+- **Status:** Idea | **Priority:** Medium
+- **Duration:** 20 sec (two 10 sec videos)
+- **Notes:** Hook: "Navratri ki preparations mein bachche ko time nahi de paa rahe?" Closing: "Har baar alag playtime zaroori nahi—kabhi bachche ko apne saath kaam mein include karo."
+
+---
+
 ## Template for a new idea
 
 Copy this block, paste it at the bottom of the Ideas section, fill in what you know.
@@ -1057,3 +1212,4 @@ When you try the same idea in a second format, do not overwrite it. Add it here.
 | today | Field schema expanded to your 16 canonical fields. Added Age, Hook Angle, Production, Test Number |
 | today | Added 33 new ideas: 14 Jugaadu Mummy, 9 character stories, 10 learning activities |
 | today | Added the format recommendation table with one-line reasoning per rule |
+| Oct 2026 | Added 10 Navratri Reel Ideas (N1–N10) under parenting-relatability |
