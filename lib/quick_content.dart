@@ -5,6 +5,7 @@ import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_generator.dart';
+import 'content_service.dart';
 import 'content_ideas.dart' as ideas;
 import 'format_adapter.dart';
 import 'json_file_store.dart';
@@ -3097,6 +3098,13 @@ class _IdeaInboxScreenState extends State<IdeaInboxScreen> {
 
     if (result != null) {
       await IdeaInboxStore.add(result);
+      await ContentService.saveIdea(
+        title: result.title,
+        topic: result.rawIdea,
+        bucket: result.bucket,
+        status: result.status,
+        sourceIdeaId: result.id,
+      );
       _load();
     }
   }

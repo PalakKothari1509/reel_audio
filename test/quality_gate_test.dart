@@ -785,4 +785,336 @@ void main() {
       }
     });
   });
+
+  // ── Reel Quality Gate Checks ─────────────────────────────────────
+
+  group('Reel quality gate checks', () {
+    test('hook clarity: specific hook with short scene passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'Toddler refuses carrots because of texture — here\'s the '
+              'one swap that works',
+          firstSceneDurationSeconds: 2,
+          voiceMode: VoiceMode.none,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.pass);
+    });
+
+    test('hook clarity: generic hook fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'You won\'t believe what happens next',
+          firstSceneDurationSeconds: 2,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.fail);
+    });
+
+    test('hook clarity: no hook data returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.unknown);
+      expect(hookCheck.reason, contains('No hook text'));
+    });
+
+    test('hook clarity: non-Reel returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.carousel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'Some hook',
+          firstSceneDurationSeconds: 2,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.unknown);
+      expect(hookCheck.reason, contains('Not a Reel'));
+    });
+
+    test('hook clarity: generic hook but first scene > 3s fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'Here\'s the thing about parenting',
+          firstSceneDurationSeconds: 5,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.fail);
+      expect(hookCheck.reason, contains('Here\'s the thing'));
+    });
+
+    test('hook clarity: specific hook with scene > 3s fails on duration', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'Swap almond butter for peanut butter to avoid nut allergies',
+          firstSceneDurationSeconds: 6,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.fail);
+      expect(hookCheck.reason, contains('6s'));
+    });
+
+    test('sound-off: voiceMode none with overlay text passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          voiceMode: VoiceMode.none,
+          sceneOverlayTexts: ['Tip: Use the back of a spoon'],
+          caption: 'Full caption explaining the technique',
+        ),
+      );
+      final soundOffCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.sound_off_readability');
+      expect(soundOffCheck.verdict, GateVerdict.pass);
+    });
+
+    test('sound-off: voiceMode none without text fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          voiceMode: VoiceMode.none,
+          hook: 'Some hook',
+        ),
+      );
+      final soundOffCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.sound_off_readability');
+      expect(soundOffCheck.verdict, GateVerdict.fail);
+      expect(soundOffCheck.reason, contains('no overlay text or caption'));
+    });
+
+    test('sound-off: voiceMode optional without text is unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          voiceMode: VoiceMode.optional,
+          hook: 'Some hook',
+        ),
+      );
+      final soundOffCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.sound_off_readability');
+      expect(soundOffCheck.verdict, GateVerdict.unknown);
+    });
+
+    test('sound-off: voiceMode required passes (voice-dependent)', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          voiceMode: VoiceMode.required,
+          hook: 'Some hook',
+        ),
+      );
+      final soundOffCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.sound_off_readability');
+      expect(soundOffCheck.verdict, GateVerdict.pass);
+      expect(soundOffCheck.reason, contains('not applicable'));
+    });
+
+    test('sound-off: voiceMode optional with caption passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          voiceMode: VoiceMode.optional,
+          caption: 'Caption explaining everything',
+        ),
+      );
+      final soundOffCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.sound_off_readability');
+      expect(soundOffCheck.verdict, GateVerdict.pass);
+    });
+
+    test('character consistency: correct names pass', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria tries to put on her shoes. Rio helps her. '
+              'Cuty watches quietly.',
+        ),
+      );
+      final charCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.character_consistency');
+      expect(charCheck.verdict, GateVerdict.pass);
+      expect(charCheck.reason, contains('Ria'));
+      expect(charCheck.reason, contains('Rio'));
+      expect(charCheck.reason, contains('Cuty'));
+    });
+
+    test('character consistency: misspelling fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Riaa tries to put on her shoes. Rio helps her.',
+        ),
+      );
+      final charCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.character_consistency');
+      expect(charCheck.verdict, GateVerdict.fail);
+      expect(charCheck.reason, contains('Riaa'));
+    });
+
+    test('character consistency: generic reference fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'The girl tries to put on her shoes. The boy helps her.',
+        ),
+      );
+      final charCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.character_consistency');
+      expect(charCheck.verdict, GateVerdict.fail);
+    });
+
+    test('character consistency: no character text returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+        ),
+      );
+      final charCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.character_consistency');
+      expect(charCheck.verdict, GateVerdict.unknown);
+      expect(charCheck.reason, contains('No script'));
+    });
+
+    test('character consistency: non-Reel returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.carousel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria does something',
+        ),
+      );
+      final charCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.character_consistency');
+      expect(charCheck.verdict, GateVerdict.unknown);
+      expect(charCheck.reason, contains('Not a Reel'));
+    });
+
+    test('evaluatePackage with ReelCheckData runs reel checks', () {
+      final report = QualityGate.evaluatePackage(
+        'test', 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          hook: 'Specific and clear hook about toddler tantrums',
+          firstSceneDurationSeconds: 2,
+          voiceMode: VoiceMode.none,
+          sceneOverlayTexts: ['Overlay tip text'],
+          script: 'Ria has a tantrum. Rio comforts her. Cuty nuzzles.',
+        ),
+      );
+       final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.pass);
+    });
+
+    test('evaluatePackage without ReelCheckData skips reel checks gracefully', () {
+      final report = QualityGate.evaluatePackage(
+        'test', 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+      );
+      final hookCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
+      expect(hookCheck.verdict, GateVerdict.unknown);
+    });
+  });
 }

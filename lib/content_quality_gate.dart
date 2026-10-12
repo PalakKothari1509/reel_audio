@@ -509,6 +509,66 @@ class OpenLoop {
       );
 }
 
+// ============================================================================
+// REEL CHECK DATA — structured input for Reel-specific quality checks
+// ============================================================================
+
+/// Data needed to evaluate Reel-specific quality gates.
+///
+/// This carries the creative artifacts that exist after a package has been
+/// generated — scenes, overlay text, script — so the gate can check
+/// hook clarity, sound-off readability, and character consistency.
+class ReelCheckData {
+  /// The hook text: the premise stated within the first 2 seconds.
+  final String? hook;
+
+  /// Overlay text from each scene, in scene order.
+  /// Used to evaluate sound-off readability.
+  final List<String>? sceneOverlayTexts;
+
+  /// Duration of the first scene in seconds.
+  /// Used to evaluate whether the hook lands within the first 2 seconds.
+  final int? firstSceneDurationSeconds;
+
+  /// The full script, used for character consistency checking.
+  final String? script;
+
+  /// Narration text, used for character consistency and sound-off checks.
+  final String? narration;
+
+  /// Dialogue text, used for character consistency checking.
+  final String? dialogue;
+
+  /// Caption text, used for sound-off readability.
+  final String? caption;
+
+  /// Whether voice mode is `none` (no voiceover) — determines sound-off priority.
+  final VoiceMode? voiceMode;
+
+  /// Whether this idea/package is a Reel (9:16 vertical video).
+  final bool isReel;
+
+  /// Character names that should be referenced consistently in the script.
+  /// Defaults to the known character names from CharacterLibrary.
+  final List<String>? expectedCharacterNames;
+
+  const ReelCheckData({
+    this.hook,
+    this.sceneOverlayTexts,
+    this.firstSceneDurationSeconds,
+    this.script,
+    this.narration,
+    this.dialogue,
+    this.caption,
+    this.voiceMode,
+    this.isReel = false,
+    this.expectedCharacterNames,
+  });
+
+  /// The known character names for consistency checking.
+  static const List<String> defaultCharacterNames = ['Ria', 'Rio', 'Cuty'];
+}
+
 /// The three honest answers to a gate check.
 enum GateVerdict {
   pass('PASS', 'The gate is satisfied.'),
@@ -1003,7 +1063,7 @@ class QualityGate {
   /// of each axis. Axes that are OPEN (null state) produce UNKNOWN checks.
   /// Axes that are `suggested` or `needsReview` produce UNKNOWN checks —
   /// only `approved` values are treated as decided.
-  static GateReport evaluateIdea({
+   static GateReport evaluateIdea({
     required String ideaId,
     required String title,
     required ClassificationSnapshot classification,
@@ -1014,6 +1074,7 @@ class QualityGate {
     int testCount = 0,
     bool isArchived = false,
     bool isBlocked = false,
+    ReelCheckData? reelData,
   }) {
     final checks = <GateCheckResult>[];
 
@@ -1021,7 +1082,7 @@ class QualityGate {
     checks.addAll(_strategyChecks(classification));
 
     // ── CREATIVE dimension ──────────────────────────────────────────────
-    checks.addAll(_creativeChecks(classification, shareTrigger, voiceMode, openLoop));
+    checks.addAll(_creativeChecks(classification, shareTrigger, voiceMode, openLoop, reelData));
 
     // ── PRODUCTION dimension ────────────────────────────────────────────
     checks.addAll(_productionChecks(classification, voiceMode));
@@ -1067,22 +1128,26 @@ class QualityGate {
     OpenLoop? openLoop,
     int testCount = 0,
     bool isArchived = false,
+    ReelCheckData? reelData,
   }) {
     final checks = <GateCheckResult>[];
 
     // Packages have already passed strategy/creative, but we check production
     // and performance, plus verify creative elements still hold.
-    checks.addAll(_productionChecks(classification, null));
-    checks.addAll(_creativeChecks(classification, shareTrigger, null, openLoop));
+    final effectiveVoiceMode = reelData?.voiceMode ??
+        VoiceMode.infer(
+          classification.narrativeFormatName != null
+              ? validateNarrativeFormat(classification.narrativeFormatName!)
+              : null,
+          classification.contentType,
+        );
+    checks.addAll(_productionChecks(classification, effectiveVoiceMode));
+    checks.addAll(_creativeChecks(
+      classification, shareTrigger, effectiveVoiceMode, openLoop, reelData));
     checks.addAll(_performanceChecks(
       testCount,
       classification.narrativeFormatName,
     ));
-
-    final inferredVoice = VoiceMode.infer(
-      null,
-      classification.contentType,
-    );
 
     return GateReport(
       ideaId: ideaId,
@@ -1090,7 +1155,7 @@ class QualityGate {
       classification: classification,
       checks: checks,
       shareTrigger: shareTrigger,
-      voiceMode: inferredVoice,
+      voiceMode: effectiveVoiceMode,
       isArchived: isArchived,
       checkedAt: DateTime.now(),
     );
@@ -1607,6 +1672,7 @@ class QualityGate {
     ShareTrigger? shareTrigger,
     VoiceMode? voiceMode,
     OpenLoop? openLoop,
+    ReelCheckData? reelData,
   ) {
     final results = <GateCheckResult>[];
 
@@ -1692,6 +1758,11 @@ class QualityGate {
       }
     }
 
+    // ── Reel-specific checks ──────────────────────────────────────
+     results.add(_checkHookClarity(reelData, c.contentType));
+    results.add(_checkSoundOffReadability(reelData, c.contentType));
+    results.add(_checkCharacterConsistency(reelData, c.contentType));
+
     return results;
   }
 
@@ -1708,6 +1779,305 @@ class QualityGate {
       case OpenLoopVerdict.notRequired:
         return GateVerdict.pass;
     }
+  }
+
+  // ── Reel-Specific Checks ──────────────────────────────────────────────
+
+  /// Checks that the hook establishes the premise within the first 2 seconds.
+  ///
+  /// For Reels, the hook must communicate what the viewer will learn/feel in
+  /// the first 2 seconds. A clear hook + a short first scene = PASS.
+  /// A generic hook = FAIL. No hook data = UNKNOWN.
+  static GateCheckResult _checkHookClarity(ReelCheckData? data, ContentType? contentType) {
+    final isReel = data?.isReel == true && contentType == ContentType.reel;
+    if (data == null || !isReel) {
+      return GateCheckResult(
+        id: 'creative.reel.hook_clarity',
+        name: 'Hook is clear within first 2 seconds',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Not a Reel — hook clarity check applies to Reels only.',
+      );
+    }
+
+    final hook = data.hook;
+    if (hook == null || hook.trim().isEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.hook_clarity',
+        name: 'Hook is clear within first 2 seconds',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'No hook text provided. Cannot evaluate hook clarity.',
+      );
+    }
+
+    if (_isGenericHook(hook)) {
+      return GateCheckResult(
+        id: 'creative.reel.hook_clarity',
+        name: 'Hook is clear within first 2 seconds',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Hook is generic: "$hook". Name the specific premise or payoff.',
+      );
+    }
+
+    final duration = data.firstSceneDurationSeconds;
+    if (duration != null && duration > 3) {
+      return GateCheckResult(
+        id: 'creative.reel.hook_clarity',
+        name: 'Hook is clear within first 2 seconds',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Hook text is specific, but first scene is ${duration}s — '
+            'premise may not land within the first 2 seconds.',
+      );
+    }
+
+    if (duration != null && duration <= 3) {
+      return GateCheckResult(
+        id: 'creative.reel.hook_clarity',
+        name: 'Hook is clear within first 2 seconds',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.pass,
+        reason: 'Hook is specific and first scene is ${duration}s — '
+            'premise lands quickly.',
+      );
+    }
+
+    return GateCheckResult(
+      id: 'creative.reel.hook_clarity',
+      name: 'Hook is clear within first 2 seconds',
+      dimension: QualityDimension.creative,
+      verdict: GateVerdict.pass,
+      reason: 'Hook is specific and non-generic.',
+    );
+  }
+
+  /// Checks that the Reel is understandable with the sound off.
+  ///
+  /// When [VoiceMode] is `none` or `optional`, on-screen text (overlay text,
+  /// caption) must carry the message. A Reel with voice but no text is fine;
+  /// a Reel with no voice and no text FAILS.
+  static GateCheckResult _checkSoundOffReadability(ReelCheckData? data, ContentType? contentType) {
+    final isReel = data?.isReel == true && contentType == ContentType.reel;
+    if (data == null || !isReel) {
+      return GateCheckResult(
+        id: 'creative.reel.sound_off_readability',
+        name: 'Sound-off readable (on-screen text present)',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Not a Reel — sound-off check applies to Reels only.',
+      );
+    }
+
+    final vm = data.voiceMode ?? VoiceMode.optional;
+    final hasOverlayTexts = (data.sceneOverlayTexts?.isNotEmpty ?? false);
+    final hasCaption = data.caption != null && data.caption!.trim().isNotEmpty;
+    final hasTextContent = hasOverlayTexts || hasCaption;
+
+    if (vm == VoiceMode.none) {
+      if (hasTextContent) {
+        final detail = hasOverlayTexts ? 'overlay text' : 'caption';
+        return GateCheckResult(
+          id: 'creative.reel.sound_off_readability',
+          name: 'Sound-off readable (on-screen text present)',
+          dimension: QualityDimension.creative,
+          verdict: GateVerdict.pass,
+          reason: 'Voice mode is "none" and on-screen text ($detail) '
+              'communicates the message without audio.',
+        );
+      }
+      return GateCheckResult(
+        id: 'creative.reel.sound_off_readability',
+        name: 'Sound-off readable (on-screen text present)',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Voice mode is "none" but there is no overlay text or caption. '
+            'The Reel is incomprehensible with sound off.',
+      );
+    }
+
+    if (vm == VoiceMode.optional) {
+      if (hasTextContent) {
+        return GateCheckResult(
+          id: 'creative.reel.sound_off_readability',
+          name: 'Sound-off readable (on-screen text present)',
+          dimension: QualityDimension.creative,
+          verdict: GateVerdict.pass,
+          reason: 'Voice mode is "optional" and on-screen text is present '
+              'as a fallback when sound is off.',
+        );
+      }
+      return GateCheckResult(
+        id: 'creative.reel.sound_off_readability',
+        name: 'Sound-off readable (on-screen text present)',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Voice mode is "optional" and no on-screen text was found. '
+            'Add overlay text or caption for sound-off readability.',
+      );
+    }
+
+    return GateCheckResult(
+      id: 'creative.reel.sound_off_readability',
+      name: 'Sound-off readable (on-screen text present)',
+      dimension: QualityDimension.creative,
+      verdict: GateVerdict.pass,
+      reason: 'Voice mode is "required" — the message depends on audio. '
+          'Sound-off readability is not applicable.',
+    );
+  }
+
+  /// Checks character name consistency throughout the script.
+  ///
+  /// The brand characters are Ria, Rio, and Cuty. If the script or dialogue
+  /// mentions a character, it must use the correct name. Typos, nicknames, or
+  /// generic references ("the girl", "the kid") FAIL.
+  static GateCheckResult _checkCharacterConsistency(ReelCheckData? data, ContentType? contentType) {
+    final isReel = data?.isReel == true && contentType == ContentType.reel;
+    if (data == null || !isReel) {
+      return GateCheckResult(
+        id: 'creative.reel.character_consistency',
+        name: 'Character names are consistent',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Not a Reel — character consistency check applies to Reels only.',
+      );
+    }
+
+    final names = data.expectedCharacterNames ?? ReelCheckData.defaultCharacterNames;
+    final script = data.script;
+    final narration = data.narration;
+    final dialogue = data.dialogue;
+    final combinedText = [script, narration, dialogue]
+        .where((t) => t != null && t.trim().isNotEmpty)
+        .join('\n');
+
+    if (combinedText.trim().isEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.character_consistency',
+        name: 'Character names are consistent',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'No script, narration, or dialogue text provided. '
+            'Cannot verify character consistency.',
+      );
+    }
+
+    // Build a regex that finds misspellings or near-misses of character names.
+    // We look for character name prefixes with extra letters, or common
+    // generic references.
+    final foundNames = <String>[];
+    final issues = <String>[];
+
+    for (final name in names) {
+      final pattern = RegExp(r'\b' + RegExp.escape(name) + r'\b', caseSensitive: false);
+      if (pattern.hasMatch(combinedText)) {
+        foundNames.add(name);
+      }
+    }
+
+    // Check for common misspellings / nicknames
+    final genericRefs = [
+      r'\bthe girl\b',
+      r'\bthe boy\b',
+      r'\bthe kid\b',
+      r'\bthe child\b',
+      r'\bthe bunny\b',
+      r'\bmommy\b',
+      r'\bdaddy\b',
+    ];
+    for (final ref in genericRefs) {
+      if (RegExp(ref, caseSensitive: false).hasMatch(combinedText)) {
+        issues.add(ref.replaceAll(r'\b', '').replaceAll(r'\\b', ''));
+      }
+    }
+
+    // Check for character name typos (extra/missing characters within the name)
+    for (final name in names) {
+      // Look for "Riaa", "Rio ", "Cutie", etc. — a name with 1-2 extra chars
+      final typoPattern = RegExp(
+        r'\b' + RegExp.escape(name) + r'[a-z]{1,3}\b',
+        caseSensitive: false,
+      );
+      final matches = typoPattern.allMatches(combinedText);
+      for (final m in matches) {
+        final matched = m.group(0)!;
+        if (!foundNames.contains(matched) && matched.toLowerCase() != name.toLowerCase()) {
+          issues.add('"$matched" — likely a misspelling of "$name"');
+        }
+      }
+
+      // Check for truncated names (e.g., "Ri" instead of "Ria")
+      if (name.length >= 3) {
+        final shortPattern = RegExp(
+          r'\b' + name.substring(0, name.length - 1) + r'\b',
+          caseSensitive: false,
+        );
+        for (final m in shortPattern.allMatches(combinedText)) {
+          final matched = m.group(0)!;
+          if (!foundNames.contains(matched)) {
+            issues.add('"$matched" — truncated reference to "$name"');
+          }
+        }
+      }
+    }
+
+    if (issues.isNotEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.character_consistency',
+        name: 'Character names are consistent',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Character name issues found: ${issues.join('; ')}. '
+            'Expected names: ${names.join(', ')}.',
+      );
+    }
+
+    if (foundNames.isNotEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.character_consistency',
+        name: 'Character names are consistent',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.pass,
+        reason: 'Characters referenced: ${foundNames.join(', ')}. '
+            'No inconsistency found.',
+      );
+    }
+
+    // No character names found in text — not necessarily a failure if the
+    // format doesn't involve characters, but worth flagging as unknown.
+    return GateCheckResult(
+      id: 'creative.reel.character_consistency',
+      name: 'Character names are consistent',
+      dimension: QualityDimension.creative,
+      verdict: GateVerdict.unknown,
+      reason: 'No character names found in script. '
+          'Either no characters are in this scene, or text is missing.',
+    );
+  }
+
+  static bool _isGenericHook(String hook) {
+    final lower = hook.toLowerCase().trim();
+    if (lower.isEmpty) return true;
+    final genericPatterns = [
+      'you wont believe',
+      'this is crazy',
+      'omg',
+      'wait till you see',
+      'mind blown',
+      'what happens next',
+      'the secret is',
+      'heres the thing',
+      'here\'s the thing',
+      'so basically',
+      'literally just',
+      'i couldnt believe',
+      'this changed everything',
+      'the hack is',
+      'the trick is',
+    ];
+    return genericPatterns.any(lower.contains);
   }
 
   // ── Dimension: Production ────────────────────────────────────────────

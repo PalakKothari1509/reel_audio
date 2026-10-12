@@ -39,10 +39,42 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - `StoryReelBuilder` class: takes `AIProvider`, generates `ContentPackageV2` with 2 × 10s scenes
 - Reel-specific prompt with hook → struggle → solution → takeaway structure
 - Uses existing pipeline: `AIProvider.generate(IdeaInput)` → `ContentPackage` → `ContentPackageV2`
-- `StoryReelInput` injected via `extraContext` for provider-specific prompt override
 - 12 tests in `test/story_reel_builder_test.dart`, all passing
 
-### Step 3: Performance tracking in PackageStore
+### Step 3: Unified Content Service ✅ Complete
+- **File**: `lib/content_service.dart`
+- Bridges `IdeaInboxStore` → `ContentLibraryStore` so adding ideas to the vault also writes to the canonical library
+- Methods: `saveIdea`, `syncInboxItem`, `syncAllInboxItems`, `updateStatus`, `recordMetrics`, `findDuplicates`, `deleteItem`, `getStatusCounts`, `getBucketCounts`
+- Idempotent sync: prevents duplicate library entries from inbox items
+- Duplicate detection via title match or topic similarity (Jaccard > 0.8)
+- 18 tests in `test/content_service_test.dart`, all passing
+
+### Step 4: Home screen navigation hub ✅ Complete
+- **File**: `lib/home_screen.dart` (`ContentStudioHome`)
+- Replaces `CreatorHomeScreen` as the app entry point in `main.dart`
+- Navigation: Home | Idea Vault | Create | My Content | Insights | Settings
+- Shows pipeline overview (Ideas, In Progress, Approved, Published, Awaiting Metrics)
+- Contextual reminders (pending ideas, items awaiting metrics)
+- 5 tests in `test/home_screen_test.dart`, all passing
+
+### Step 5: My Content screen ✅ Complete
+- **File**: `lib/my_content_screen.dart` (`MyContentScreen`)
+- Shows all items from the canonical Content Library, grouped by `IdeaStatus`
+- Displays bucket, format, posting date, and metric tags per item
+- Empty state with helpful guidance
+- Wired into navigation from `ContentStudioHome` (replaces the earlier `IdeaInboxScreen` placeholder)
+- 1 test in `test/my_content_screen_test.dart`
+
+### Step 6: Insights screen ✅ Complete
+- **File**: `lib/insights_screen.dart` (`InsightsScreen`)
+- Shows all-time metric totals (reach, impressions, saves, shares)
+- Bucket breakdown with item counts and reach per bucket
+- Per-item metrics grid for published content
+- Empty state for when no content is published
+- Wired into navigation from `ContentStudioHome` (replaces the earlier `SavedStoriesScreen` placeholder)
+- 1 test in `test/insights_screen_test.dart`
+
+### Step 7: Performance tracking in PackageStore
 - **File**: `lib/package_store.dart` (extend `PackageMetadata`)
 - Add `metrics` field: reach, nonFollowerReach, plays, watchTimeSeconds, shares, saves, profileVisits, followsAttributed
 - Add `experimentCount`, `reviewNotes` fields
