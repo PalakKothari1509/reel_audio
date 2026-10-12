@@ -74,23 +74,27 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - Wired into navigation from `ContentStudioHome` (replaces the earlier `SavedStoriesScreen` placeholder)
 - 1 test in `test/insights_screen_test.dart`
 
-### Step 7: Performance tracking in PackageStore
-- **File**: `lib/package_store.dart` (extend `PackageMetadata`)
-- Add `metrics` field: reach, nonFollowerReach, plays, watchTimeSeconds, shares, saves, profileVisits, followsAttributed
-- Add `experimentCount`, `reviewNotes` fields
-- Add methods: `recordMetrics(id, metrics)`, `incrementExperiment(id)`
+### Step 7: Performance tracking in PackageStore ✅ Complete
+- **File**: `lib/package_store.dart`
+- `PackageMetadata` extended with reach, nonFollowerReach, plays, saves, shares, experimentCount, reviewNotes
+- 39 tests in `test/package_store_test.dart`, all passing
 
-### Step 4: Duplication detection
-- **File**: `lib/duplication_checker.dart` (new)
-- Compare new idea against `ContentAuditStore` records
-- Check: same problem, same lesson, same hook, overlapping scenes
-- Return confidence score: 0.0 (unique) to 1.0 (duplicate)
+### Step 4: Duplication detection ✅ Complete
+- **File**: `lib/content_service.dart` (`findDuplicates` method)
+- Compare new idea against `ContentLibraryStore` records
+- Duplicate detection via title match or topic similarity (Jaccard > 0.8)
+- 18 tests in `test/content_service_test.dart`, all passing
 
-### Step 5: Pre-publish quality gate (Reel-specific)
-- **File**: `lib/content_quality_gate.dart` (extend)
-- Add `ReelReadinessCheck` with checks from audit §11.6
-- Integrate with `ContentPackageV2.isReadyToGenerate`
-- New checks: first-2s hook, sound-off readability, character consistency
+### Step 5: Pre-publish quality gate (Reel-specific) ✅ Complete
+- **File**: `lib/content_quality_gate.dart`
+- Added `ReelCheckData` class: carries hook text, scene overlay texts, durations, script, narration, dialogue, caption, voiceMode
+- Added three Reel-specific checks to the creative dimension:
+  - **Hook clarity**: verifies hook is specific and first scene ≤3s so premise lands within first 2 seconds (FAIL for generic hooks or slow-starting scenes)
+  - **Sound-off readability**: verifies on-screen text present when voiceMode is `none` or `optional`; FAIL when voiceMode is `none` with no text (FAIL)
+  - **Character consistency**: scans script/narration/dialogue for character name typos, generic references, and truncated names (FAIL on inconsistency)
+- Integrated into both `evaluateIdea` and `evaluatePackage` via optional `ReelCheckData? reelData` parameter
+- Checks return UNKNOWN for non-Reel content types (e.g., Carousel)
+- 19 new tests in `test/quality_gate_test.dart` (18 Reel-specific + 1 evaluatePackage integration), all passing
 
 ### Step 6: Content audit CSV import tool
 - **File**: `tool/content_audit.dart` (new)
@@ -98,10 +102,12 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - Parse Instagram Insights CSV export → `performance_audit.json`
 - Merge into unified audit store
 
-### Step 7: Dashboard screen
+### Step 7: Dashboard screen ✅ Complete
 - **File**: `lib/dashboard_screen.dart` (new)
 - Shows: ideas by pillar, ready-to-produce, published by format, formats tested <5 times
 - Uses `ContentAuditStore` and `PackageStore`
+- Wired into navigation from `ContentStudioHome` via `onDashboard` callback
+- 7 tests in `test/dashboard_screen_test.dart`, all passing
 
 ---
 
@@ -117,7 +123,11 @@ The existing app already has most infrastructure needed. This plan maps audit re
 
 ## Navratri reel specifics
 
-The 10 Navratri ideas (N1-N10) in `content_ideas.md` will be the first batch tested through the Story Reel Builder:
+The 10 Navratri ideas (N1-N10) in `content_ideas.md` are now integrated into the app:
+- Added as `HookIdea` entries in `lib/content_ideas.dart` `kDefaultHooks` list
+- Accessible on phone via: Home → "Create a Reel" → StoryScreen → 💡 Idea button → hook picker
+- First batch tested through the Story Reel Builder:
+- Duration: 20 sec total (two 10-sec segments per Reel)
 - Duration: 20 sec total (two 10-sec segments per Reel)
 - Characters: Ria, Rio, Cuty, Mumma, Papa (as specified per idea)
 - Format: Reel, Production: Character

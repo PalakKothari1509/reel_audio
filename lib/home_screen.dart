@@ -31,6 +31,7 @@ class ContentStudioHome extends StatefulWidget {
   final NavCallback onInsights;
   final NavCallback onSettings;
   final NavCallback onIdeaVault;
+  final NavCallback onDashboard;
 
   const ContentStudioHome({
     super.key,
@@ -40,6 +41,7 @@ class ContentStudioHome extends StatefulWidget {
     required this.onInsights,
     required this.onSettings,
     required this.onIdeaVault,
+    required this.onDashboard,
   });
 
   @override
@@ -212,6 +214,13 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         title: 'Insights',
         subtitle: 'Understand results and plan next tests',
         onTap: widget.onInsights,
+      ),
+      _NavCard(
+        icon: Icons.dashboard_outlined,
+        iconColor: AppColors.warning,
+        title: 'Dashboard',
+        subtitle: 'Content health, readiness, and format testing',
+        onTap: widget.onDashboard,
       ),
     ];
 

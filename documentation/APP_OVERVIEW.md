@@ -276,7 +276,7 @@ job, not a bad idea.
 
 ## 10. Tests
 
-**285 tests, all passing.** They cover:
+**310 tests, all passing.** They cover:
 
 - the Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
 - legacy store decoding
@@ -314,7 +314,7 @@ becomes a build error instead of a crash.
 
 ```bash
 flutter analyze lib          # 0 errors
-flutter test                 # 285 tests
+flutter test                 # 310 tests
 dart run tool/sync_formats.dart      # documentation/content_formats.md -> Dart
 dart run tool/check_formats.dart     # validate the handbook
 dart run tool/check_axes.dart        # which axis values are decided

@@ -59,8 +59,8 @@ abstract class JsonFileStore<T> {
   /// entry does not lose the whole file.
   Future<List<dynamic>> _readRaw() async {
     final file = await _file();
-    if (!await file.exists()) return [];
-    final content = await file.readAsString();
+    if (!file.existsSync()) return [];
+    final content = file.readAsStringSync();
     if (content.trim().isEmpty) return [];
     final raw = jsonDecode(content);
     if (raw is! List) return [];

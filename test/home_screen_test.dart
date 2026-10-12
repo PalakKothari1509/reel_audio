@@ -36,6 +36,7 @@ void main() {
             onInsights: () {},
             onSettings: () => settingsTapped = true,
             onIdeaVault: () {},
+            onDashboard: () {},
           ),
         ),
       );
@@ -69,6 +70,7 @@ void main() {
             onInsights: () {},
             onSettings: () {},
             onIdeaVault: () {},
+            onDashboard: () {},
           ),
         ),
       );
@@ -91,6 +93,7 @@ void main() {
             onInsights: () {},
             onSettings: () {},
             onIdeaVault: () => vaultTapped = true,
+            onDashboard: () {},
           ),
         ),
       );
@@ -114,6 +117,7 @@ void main() {
             onInsights: () {},
             onSettings: () {},
             onIdeaVault: () {},
+            onDashboard: () {},
           ),
         ),
       );
@@ -133,6 +137,7 @@ void main() {
             onInsights: () {},
             onSettings: () => settingsTapped = true,
             onIdeaVault: () {},
+            onDashboard: () {},
           ),
         ),
       );
