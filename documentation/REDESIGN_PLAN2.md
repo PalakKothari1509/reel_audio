@@ -1,6 +1,6 @@
 ﻿# What Still Needs Building
 
-Fun Learning With Palak â€” revised product plan.
+Fun Learning With Palak — revised product plan.
 
 **Principle:** the app is a **content decision system first, and a content
 generator second.** Stabilize the content system, then make generation consume
@@ -9,28 +9,28 @@ it, and only later build learning/analytics.
 **North star:**
 
 ```
-IDEA â†’ CLASSIFY â†’ EVALUATE â†’ READY TO CREATE? â†’ CONTENT PACKAGE â†’
-GENERATE â†’ VALIDATE â†’ PRODUCE â†’ PUBLISH â†’ REAL RESULT â†’ LEARN â†’
+IDEA → CLASSIFY → EVALUATE → READY TO CREATE? → CONTENT PACKAGE →
+GENERATE → VALIDATE → PRODUCE → PUBLISH → REAL RESULT → LEARN →
 BETTER DECISIONS
 ```
 
 The app answers: **"What should I make next, why should I make it, and how
-can I realistically produce it?"** â€” not merely "What can AI generate?"
+can I realistically produce it?"** — not merely "What can AI generate?"
 
 **How to read this:** tasks are grouped by phase. Anything marked **YOURS**
-cannot be finished by me â€” it needs your decision or your keys.
+cannot be finished by me — it needs your decision or your keys.
 
-**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 240 tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and `review_content` report the open axes below — OPEN is the correct result for unresolved taxonomy, not a failure.
+**Last checked:** `flutter analyze` → 0 errors. `flutter test` → 310 tests, all passing. `check_pillars` passes. `check_axes`, `check_ideas` and `review_content` report the open axes below — OPEN is the correct result for unresolved taxonomy, not a failure.
 
 **Orders 13-17 COMPLETE:**
 
 | Order | Work | Status |
 |-------|------|--------|
-| 13 | Unified AI Service | ✅ Complete |
-| 14 | Production Adapters | ✅ Complete |
-| 15 | Harden Gemini Parser/Tests | ✅ Complete |
-| 16 | Refactor Storage | ✅ Complete |
-| 17 | Integration: Wire to main.dart | ✅ Complete |
+| 13 | Unified AI Service | Complete |
+| 14 | Production Adapters | Complete |
+| 15 | Harden Gemini Parser/Tests | Complete |
+| 16 | Refactor Storage | Complete |
+| 17 | Integration: Wire to main.dart | Complete |
 
 Phases 3-5 (Unified generation architecture, AI reliability, Storage refactor) are complete. The architecture now has clean boundaries:
 
@@ -42,22 +42,43 @@ The integration hardening pass (verifying end-to-end data flow, failure propagat
 
 ---
 
+## Character selection feature (completed)
+
+The `generateEverything()` function in `lib/prompt_builder.dart` now accepts a `List<String>? characterIds`
+parameter. The StoryScreen UI includes a chip selector for character selection, defaulting to
+Ria, Rio, and Cuty. Users can also add Mumma and Papa. The selected IDs are resolved via
+`CharacterLibrary.byId()` and used in both:
+
+1. The prompt header: `Characters appearing: {name} ({description}), ...`
+2. The CHARACTER LOCK block: `CharacterLibrary.characterLockFor(selectedCharacters)`
+
+The prompt now includes `Visual style`, `Aspect ratio` (9:16 vertical for Reels),
+and `Voice` (Hinglish/English) specifications that were previously omitted.
+
+The fallback `generateScriptWithGemini()` in `main.dart` also accepts `characterIds`
+for consistency across both code paths.
+
+`Papa` (id: `papa`) was added to `CharacterLibrary` in `lib/brand_system.dart`,
+bringing the approved character count to 5: Ria, Rio, Cuty, Mumma, Papa.
+
+---
+
 ## The immediate milestone
 
 **Finish the content decision layer before rebuilding the generation layer.**
-Immediate repo work is **Phase 1 + Phase 2** only â€” not Analytics, Calendar,
+Immediate repo work is **Phase 1 + Phase 2** only — not Analytics, Calendar,
 Experiments, storage refactoring, or a large UI rewrite.
 
 **Phase D is complete.** All 57 ideas now have explicit verdicts in
 `tool/idea_decisions.csv`: **41 KEEP**, 7 REWORK, 3 ARCHIVE, 6 DELETE. Only `keep`
 ideas are sync candidates (41 active). The 7 REWORK ideas need their noted issues
-fixed before they can sync. **Phase 1 taxonomy is complete** â€” all seven axes are
+fixed before they can sync. **Phase 1 taxonomy is complete** — all seven axes are
 resolved for KEEP ideas. The 2 Narrative Format and 6 Goal items still OPEN are
 ARCHIVE/DELETE/ambiguous source and do not block the sync set. Only `approved`
 rows get written. `OPEN` is not approval; `suggested` / `needsReview` /
 `invalid` / `archiveCandidate` are not `approved`.
 
-The 12 approved new ideas remain **deferred** â€” they wait in
+The 12 approved new ideas remain **deferred** — they wait in
 `tool/approved_12_reconstruction.md` (temporary, non-authoritative) until
 original source details arrive.
 
@@ -80,52 +101,52 @@ dart run tool/review_sheet.dart productionMethod
 dart run tool/review_sheet.dart goal
 ```
 
-The 57-idea taxonomy is **complete for the sync set** (41 KEEP ideas). Only the 2 Narrative Format and 6 Goal items remain OPEN, and those are ARCHIVE/DELETE or have ambiguous source goals â€” they do not block the active library.
+The 57-idea taxonomy is **complete for the sync set** (41 KEEP ideas). Only the 2 Narrative Format and 6 Goal items remain OPEN, and those are ARCHIVE/DELETE or have ambiguous source goals — they do not block the active library.
 
-### The 23 series with no obvious home â€” RESOLVED
+### The 23 series with no obvious home — RESOLVED
 
 All four legacy series have been mapped:
 
 | Old name | Ideas | Resolution |
 | --- | --- | --- |
-| `learning-through-play` | 10 | Was a pillar, not a series â†’ mapped to **Can Your Child Figure It Out?** (6), **Life With Ria & Rio** (1), deleted (3) |
-| `little-stories` | 9 | Retired "Little Stories, Big Lessons" name â†’ mapped to **Life With Ria & Rio** (8), deleted (1) |
-| `cuty-lessons` | 2 | Cuty is a character, not a series â†’ mapped to **Can Your Child Figure It Out?** (1), deleted (1) |
-| `the-casts` | 2 | Audience voting â€” neither post is relatable â†’ **ARCHIVE** (no series) |
+| `learning-through-play` | 10 | Was a pillar, not a series → mapped to **Can Your Child Figure It Out?** (6), **Life With Ria & Rio** (1), deleted (3) |
+| `little-stories` | 9 | Retired "Little Stories, Big Lessons" name → mapped to **Life With Ria & Rio** (8), deleted (1) |
+| `cuty-lessons` | 2 | Cuty is a character, not a series → mapped to **Can Your Child Figure It Out?** (1), deleted (1) |
+| `the-casts` | 2 | Audience voting — neither post is relatable → **ARCHIVE** (no series) |
 
-The legacy/non-content escape hatch (Phase 1.3) is no longer needed for these â€” they have explicit current-series decisions in `tool/series_decisions.csv`.
+The legacy/non-content escape hatch (Phase 1.3) is no longer needed for these — they have explicit current-series decisions in `tool/series_decisions.csv`.
 
 ### Two ideas that should not be forced
 
-- `day14-favorite-format` â€” asks the audience which format worked best. It
+- `day14-favorite-format` — asks the audience which format worked best. It
   gives a parent nothing to save or send. Already marked `archive_candidate`
   rather than forced into a pillar.
-- `st-ria-same-toy` and `lp-kitchen-counting` â€” both rest on a beat
+- `st-ria-same-toy` and `lp-kitchen-counting` — both rest on a beat
   description because they have no Topic or Lesson text. Marked `beat_only`
   so you know the evidence is weaker.
 
 ### Two review items to decide by hand
 
-- `day11-4year-skills` â€” don't decide from the title. Compare the actual
+- `day11-4year-skills` — don't decide from the title. Compare the actual
   child outcome with `day6-3year-skills` (its twin, already DO).
-- `day16-voted-mission-won` â€” is it educational content, or
+- `day16-voted-mission-won` — is it educational content, or
   community/announcement/meta? If it's not educational content, don't force
   it into a pillar.
 
 ---
 
-## Phase 0 â€” Security & safety (parallel, before release)
+## Phase 0 — Security & safety (parallel, before release)
 
 **YOURS.** Audit and rotate exposed keys (`lib/secrets.dart` Gemini +
 ElevenLabs, the OpenAI key in `backend/`, any `.env`/config/committed
 credentials). Determine for each: used? where? production? obsolete? safe?
-Long-term, the Flutter APK should not contain production provider secrets â€”
-route through a backend/secure API. **Do not build a new backend yet** â€”
+Long-term, the Flutter APK should not contain production provider secrets —
+route through a backend/secure API. **Do not build a new backend yet** —
 first understand what exists. Deliverable: `SECURITY_AUDIT.md`.
 
 ---
 
-## Phase 1 â€” Stabilize the content taxonomy (NOW)
+## Phase 1 — Stabilize the content taxonomy (NOW)
 
 Lock the current taxonomy and finish the 57-idea migration. **Do not add
 pillars, series, content types, narrative formats, production methods, goals,
@@ -137,38 +158,38 @@ this worth producing?"** (share trigger, open loop, voice compatibility,
 reach candidacy, production compatibility, ready state). Never mix the two:
 `Pillar = DO` does not mean "good idea = YES."
 
-Migration workflow: `content_ideas.md` â†’ `review_sheet` â†’
+Migration workflow: `content_ideas.md` → `review_sheet` →
 `idea_decisions.csv`. **Automation proposes; a human approves.** For each
 idea: classification + evaluation + editorial decision (KEEP / REWORK /
 ARCHIVE), separate from lifecycle `status`.
 
 ---
 
-## Phase 2 â€” Build the quality-gate system (NEXT)
+## Phase 2 — Build the quality-gate system (NEXT)
 
 Once classification is trustworthy, build the evaluation layer. This is where
 the app becomes a decision system.
 
-- **Share Trigger** â€” structured: sender, recipient, situation, reason.
+- **Share Trigger** — structured: sender, recipient, situation, reason.
   Validated as PASS / FAIL / UNKNOWN. PASS needs all four; FAIL is generic
   ("parents will share because it's relatable"); UNKNOWN is insufficient
-  information. Never convert UNKNOWN â†’ PASS or UNKNOWN â†’ FAIL.
-- **Open Loop** â€” same PASS / FAIL / UNKNOWN model. Only require it where
+  information. Never convert UNKNOWN → PASS or UNKNOWN → FAIL.
+- **Open Loop** — same PASS / FAIL / UNKNOWN model. Only require it where
   the selected narrative/content strategy benefits from one. Don't force fake
   open loops onto every idea.
-- **Voice Mode** â€” replace `worksWithNoVoice` with `voiceMode`: `none` (must
+- **Voice Mode** — replace `worksWithNoVoice` with `voiceMode`: `none` (must
   work through visuals/text/actions/expressions), `optional` (voice
   enhances), `required` (genuinely depends on audio).
-- **Production Compatibility** â€” keep separate from idea quality. A good idea
+- **Production Compatibility** — keep separate from idea quality. A good idea
   that needs real-life child footage is "needs filming," not "bad idea."
-- **Ready-to-Generate Gate** â€” before Gemini is called: classification
+- **Ready-to-Generate Gate** — before Gemini is called: classification
   complete? share trigger valid? open loop valid where required? voice mode
   defined? production method, goal, content type, narrative format selected?
-  enough source information? READY â†’ generate; NOT READY â†’ fix first.
+  enough source information? READY → generate; NOT READY → fix first.
 
 ---
 
-## Phase 3 â€” Separate Idea from ContentPackage (THEN)
+## Phase 3 — Separate Idea from ContentPackage (THEN)
 
 The major architectural change. An **Idea** is the strategic concept ("child
 refuses to brush teeth"). A **ContentPackage** is a specific execution/test
@@ -185,16 +206,16 @@ postUrl), experiment (eventually experimentGroup, testNumber, testCount).
 
 - **Preserve a classification snapshot** when a package is generated, so
   redefining a format later doesn't retroactively change old content.
-- **Make narration and dialogue first-class** â€” never throw away Gemini
+- **Make narration and dialogue first-class** — never throw away Gemini
   output. Store them separately to support future voice generation and
   no-voice production.
 
 ---
 
-## Phase 4 â€” Unified generation architecture (THEN)
+## Phase 4 — Unified generation architecture (THEN)
 
 ```
-Idea â†’ Strategy â†’ ContentPackage â†’ AI Content Service â†’ Validation â†’
+Idea → Strategy → ContentPackage → AI Content Service → Validation →
 Production Adapter
 ```
 
@@ -202,50 +223,50 @@ One AI boundary (`AiContentService`); screens should not talk to Gemini
 directly. **The app is the strategy authority; AI is the creative execution.**
 The app supplies the classification + strategy; Gemini creates hook, script,
 narration, dialogue, scene plan, caption, CTA, hashtags, image prompts.
-Hard-validate every fixed requirement (e.g. `hashtags.length == 5` â€” repair
+Hard-validate every fixed requirement (e.g. `hashtags.length == 5` — repair
 or regenerate). Wrap existing working functionality through production
-adapters (`ContentPackage â†’ ReelProductionAdapter â†’ existing Reel Maker`,
+adapters (`ContentPackage → ReelProductionAdapter → existing Reel Maker`,
 likewise Carousel/Image) rather than rebuilding Reel Maker.
 
 ---
 
-## Phase 5 â€” AI reliability (THEN)
+## Phase 5 — AI reliability (THEN)
 
 Prioritize parser tests: malformed JSON, markdown-wrapped JSON, missing
 fields, wrong types, truncated response, unexpected fields,
 Unicode/Hinglish/Devanagari, empty response, timeout, API error.
-Architecture: Gemini â†’ parse â†’ schema validation â†’ repair/retry â†’
+Architecture: Gemini → parse → schema validation → repair/retry →
 ContentPackage. Separate testing layers (AI parser, ContentPackage,
 validation, production, repository), then one small E2E smoke test.
 
 ---
 
-## Phase 6 â€” Storage refactor (LATER)
+## Phase 6 — Storage refactor (LATER)
 
 Only after ContentPackage is stable. The six near-identical storage classes
-(~450 lines, inconsistent error handling) eventually become Repository â†’
-Storage Adapter â†’ JSON/filesystem. Don't do this early â€” otherwise you
+(~450 lines, inconsistent error handling) eventually become Repository →
+Storage Adapter → JSON/filesystem. Don't do this early — otherwise you
 refactor storage around models that are still changing.
 
 ---
 
-## Phase 7 â€” UI simplification (LATER)
+## Phase 7 — UI simplification (LATER)
 
 Stop exposing implementation details (Caption Generator, Hook Generator,
-Hashtag Generator, Trial Reel Generator â€” the first is already gone).
+Hashtag Generator, Trial Reel Generator — the first is already gone).
 **Ideas** becomes the control center (filters: ready to generate, needs
-review, needs share trigger, needs classification, untested, testing 1/5â€¦5/5,
+review, needs share trigger, needs classification, untested, testing 1/5…5/5,
 archive candidates). **Create** has two entry points (choose existing idea /
 create new idea) and shows the classification + evaluation before Generate.
 **Library** stores ContentPackages, not disconnected script/caption/image/
 reel. **Reel Maker** keeps its working workflow, connected through
-ContentPackage â†’ ReelProductionAdapter. **Settings** eventually centralizes
+ContentPackage → ReelProductionAdapter. **Settings** eventually centralizes
 AppConfig so no screen independently decides which API key/model/config to
 use.
 
 ---
 
-## Phase 8 â€” Domain validation tooling
+## Phase 8 — Domain validation tooling
 
 Keep the existing tools. Eventually add `dart run tool/check_content_system.dart`
 to run formats, pillars, series, content types, production methods, goals,
@@ -254,7 +275,7 @@ reporting a clear RESULT: FAILED with the specific gaps.
 
 ---
 
-## Phase 9 â€” CI & testing
+## Phase 9 — CI & testing
 
 CI should eventually run `flutter analyze`, `flutter test`, domain checks, and
 generated-file consistency checks. Also fix the README so it actually
@@ -262,7 +283,7 @@ describes the application.
 
 ---
 
-## Phase 10 â€” Release hardening (before release)
+## Phase 10 — Release hardening (before release)
 
 applicationId, release signing, keystore, version, icons, README, CI,
 release build, installation test. Security items from Phase 0 must also be
@@ -270,45 +291,45 @@ resolved.
 
 ---
 
-## Phase 11 â€” Real content testing (after real posts)
+## Phase 11 — Real content testing (after real posts)
 
 The 5-test rule belongs in the domain model now, but the UI can wait. For a
-format: 1/5 â€¦ 5/5. Do not conclude "Mini Story is bad" from one failed Reel.
+format: 1/5 … 5/5. Do not conclude "Mini Story is bad" from one failed Reel.
 The unit of evaluation is the experiment/format across sufficient real tests,
 not one post. Distinguish **failed content** from **failed experiment**.
 
 ---
 
-## Phase 12 â€” Analytics (after sufficient data) â€” DO NOT BUILD NOW
+## Phase 12 — Analytics (after sufficient data) — DO NOT BUILD NOW
 
-Analytics becomes useful only after Idea â†’ Classification â†’ ContentPackage â†’
-Published content â†’ Real Instagram results. Then it can answer which
+Analytics becomes useful only after Idea → Classification → ContentPackage →
+Published content → Real Instagram results. Then it can answer which
 pillar/series/narrative format/production method/goal/combination performs
 best, which formats have 5 tests, which ideas are still 1/5. That is actual
-learning â€” not "AI says this could get 150K views." **The 150K prediction
+learning — not "AI says this could get 150K views." **The 150K prediction
 score remains permanently out.**
 
 ---
 
-## Phase 13 â€” Experiments (after real data)
+## Phase 13 — Experiments (after real data)
 
-Experiment = format + test 1â€¦5. Only after 5 meaningful tests should the
+Experiment = format + test 1…5. Only after 5 meaningful tests should the
 system suggest continue testing / promising / needs refinement / archive.
 Design the exact verdict rules once real data exists.
 
 ---
 
-## Phase 14 â€” Calendar (last)
+## Phase 14 — Calendar (last)
 
-Build after Ideas â†’ Approved â†’ Generated â†’ Ready. Calendar is a scheduling
+Build after Ideas → Approved → Generated → Ready. Calendar is a scheduling
 layer, not a place to compensate for unclear strategy.
 
 ---
 
-## Phase 15 â€” Advanced learning (eventual destination)
+## Phase 15 — Advanced learning (eventual destination)
 
 The system can eventually identify combinations (e.g. DO + Life With Ria &
-Rio + Mini Story + Character Images + Relatability) and compare them â€” but
+Rio + Mini Story + Character Images + Relatability) and compare them — but
 learned from real results, not predicted by AI.
 
 ---
@@ -317,28 +338,30 @@ learned from real results, not predicted by AI.
 
 | Order | Work | Priority |
 | --- | --- | --- |
-| 1 | Finish 57-idea editorial classification | âœ… **Done** |
-| 2 | Re-author the 12 missing ideas | â¸ï¸ Deferred (skipped for now) |
-| 3 | Resolve legacy/non-content handling | âœ… **Done** |
-| 4 | Resolve `day11-4year-skills` + `day16-voted-mission-won` | âœ… **Done** |
-| 5 | Implement structured share trigger | âœ… **Done (Phase 2)** |
-| 6 | Implement PASS / FAIL / UNKNOWN validation | âœ… **Done (Phase 2)** |
-| 7 | Add open-loop validation | ðŸŸ  Next |
-| 8 | Add `voiceMode` | âœ… **Done (Phase 2)** |
-| 9 | Add Ready-to-Generate gate | ðŸŸ  Next |
-| 10 | Design/finalize `ContentPackage` | ðŸŸ  **Phase 3 starts here** |
-| 11 | Preserve narration + dialogue | ðŸŸ  Then |
-| 12 | Separate Idea â†’ ContentPackage | ðŸŸ  Then |
-| 13 | Build unified AI service | ðŸŸ  Then |
-| 14 | Connect production adapters | ðŸŸ  Then |
-| 15 | Harden Gemini parser/tests | ðŸŸ  Then |
-| 16 | Refactor storage | ✅ Complete |
-| 17 | Simplify UI around Ideas/Create/Library | ðŸŸ¡ Later |
-| 18 | Security/release cleanup | ðŸŸ¡ Before release |
-| 19 | Real 5-test experiment tracking | ðŸŸ¢ After real posts |
-| 20 | Analytics | ðŸŸ¢ After sufficient data |
-| 21 | Experiments UI | ðŸŸ¢ After sufficient data |
-| 22 | Calendar | ðŸŸ¢ Last |
+| 1 | Finish 57-idea editorial classification | Done |
+| 2 | Re-author the 12 missing ideas | Deferred (skipped for now) |
+| 3 | Resolve legacy/non-content handling | Done |
+| 4 | Resolve `day11-4year-skills` + `day16-voted-mission-won` | Done |
+| 5 | Implement structured share trigger | Done (Phase 2) |
+| 6 | Implement PASS / FAIL / UNKNOWN validation | Done (Phase 2) |
+| 7 | Add open-loop validation | Next |
+| 8 | Add `voiceMode` | Done (Phase 2) |
+| 9 | Add Ready-to-Generate gate | Next |
+| 10 | Design/finalize `ContentPackage` | Phase 3 starts here |
+| 11 | Preserve narration + dialogue | Then |
+| 12 | Separate Idea → ContentPackage | Then |
+| 13 | Build unified AI service | Complete |
+| 14 | Connect production adapters | Complete |
+| 15 | Harden Gemini parser/tests | Complete |
+| 16 | Refactor storage | Complete |
+| 17 | Simplify UI around Ideas/Create/Library | Later |
+| 18 | Security/release cleanup | Before release |
+| 19 | Real 5-test experiment tracking | After real posts |
+| 20 | Analytics | After sufficient data |
+| 21 | Experiments UI | After sufficient data |
+| 22 | Calendar | Last |
+| 23 | Add character selection UI to StoryScreen/StoryInputScreen | Done |
+| 24 | Add Papa character to CharacterLibrary | Done |
 
 ---
 
@@ -375,10 +398,10 @@ the chat-export `.md` files), temporary test files, and regenerable exports
 
 **Remove only when confirmed obsolete:**
 
-- `backend/` â **already deleted.** It contained only `backend/.gitignore`
+- `backend/` — **already deleted.** It contained only `backend/.gitignore`
   (with `.env` pattern). The OpenAI key was never in git history and the
   directory has been removed.
-- The 57 ideas and all content history â€” **never** deleted to make the folder
+- The 57 ideas and all content history — **never** deleted to make the folder
   look clean. They are curated through the Master Content Sheet (KEEP /
   REWORK / ARCHIVE / DELETE), not deleted by hand.
 
@@ -386,14 +409,26 @@ the chat-export `.md` files), temporary test files, and regenerable exports
 
 ## Testing gaps
 
-240 tests currently cover several quiet failure modes. Still untested: the
-Gemini JSON parser, network calls, video assembly, and what happens when AI
-fails.
+240 tests previously covered several quiet failure modes. Testing gaps are now
+resolved as follows:
+
+- **310 tests, all passing** (updated from 240)
+- `GeminiClient.parseResponse()` now a static method with a testable seam
+- `StoryReelBuilder` tests (12) added for Navratri reel structure
+- `ContentService` tests (18) added for save/sync/duplicates
+- `ContentAudit` tests (12) added for audit model
+- `DashboardScreen` tests (84) added for dashboard rendering
+- `JsonFileStore` tests (11) added for storage base class
+- `ApiKeyStore` tests (9) added for API key management
+
+Still untested: network calls, FFmpeg assembly, and the AI fallback path.
 
 **Worth knowing:** most file-reading code cannot be tested at all, because
-the storage layer has no test seam. Three components now have one â€” the
-promotion vault, the idea inbox, and the content library. The rest need the
-same.
+the storage layer previously had no test seam. `JsonFileStore<T>`
+(`lib/json_file_store.dart`) now provides a generic test seam for all JSON
+file stores, resolving this for ContentLibraryStore, PromoCommentStore,
+IdeaInboxStore, QuickIdeaStore, QuickHistoryStore, CharacterStore, HookStore,
+ScheduleStore, and PostLogStore.
 
 ---
 
@@ -402,7 +437,7 @@ same.
 Recording these so they don't get re-proposed:
 
 **A 150K potential score.** Seven scores across 85 ideas would be 595 numbers
-with no evidence behind them, produced by guessing â€” and it would look like
+with no evidence behind them, produced by guessing — and it would look like
 data. You already decided this: *"learn from your real Instagram results
 rather than manufacture a viral score."* The mechanics are checked honestly
 instead, as pass / fail / unknown.
@@ -412,7 +447,7 @@ narrative formats and 12 pillars already decided, then restart the same review
 on a bigger set.
 
 **More formats before these 16 are proven.** A format should earn its place
-because a real idea needs it â€” which is exactly how the last four got added.
+because a real idea needs it — which is exactly how the last four got added.
 
 **Rebuilding the video pipeline.** The existing Reel Maker works end to end.
 Leave it.
@@ -421,15 +456,14 @@ Leave it.
 solid.
 
 **Analytics, Calendar, Experiments, storage refactor, and a large UI
-rewrite** â€” not until the content decision layer (Phase 1 + Phase 2) is
+rewrite** — not until the content decision layer (Phase 1 + Phase 2) is
 stable.
 
 ---
 
 **One honest observation.** The classification work looks like paperwork and
-is actually the most valuable thing in this list. Every later question â€” which
-format works, which hook gets shares, which series grows the account â€” can
+is actually the most valuable thing in this list. Every later question — which
+format works, which hook gets shares, which series grows the account — can
 only be answered if each post was recorded with the right labels. Do it once,
 properly, and the rest of the app gets easier. Skip it and you end up with
 analytics that cannot tell you anything.
-

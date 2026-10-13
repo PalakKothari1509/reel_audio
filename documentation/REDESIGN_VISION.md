@@ -1,10 +1,10 @@
 # Application Redesign Vision
 
-**Status**: Proposal — pending architecture audit of existing `reel_audio` codebase
+**Status**: Proposal — partially implemented, architecture audit complete
 
 **Author**: Content Studio redesign plan
 
-**Date**: October 12, 2026
+**Date**: October 13, 2026
 
 ---
 
@@ -14,7 +14,7 @@ The Reel Audio application has evolved from a simple Reel maker into a content-p
 
 The problem is no longer missing features — it is that all existing capabilities need to work together as **one simple, connected workflow**.
 
-**Core goal**: Help Palak move ideas through a complete, connected journey:
+**Core goal**: Help Palal move ideas through a complete, connected journey:
 
 ```
 IDEA → CONTENT LIBRARY → PLAN → GENERATE → REVIEW → PUBLISH → MEASURE → IMPROVE
@@ -26,9 +26,16 @@ Everything must be connected. No re-entering the same idea between screens.
 
 ## 2. First Major Change: Fix the Idea Vault and Content Library Relationship
 
+### Status: **Partially complete**
+
+`ContentService` in `lib/content_service.dart` now bridges `IdeaInboxStore` →
+`ContentLibraryStore`, so adding ideas to the vault also writes to the canonical
+library. Duplicate detection (Jaccard > 0.8) is implemented. The `findDuplicates`
+method compares new ideas against existing library records.
+
 ### Problem
 
-The current documentation describes two separate data stores:
+The original documentation describes two separate data stores:
 - `ContentLibrary` (via `ContentLibrary.add()`)
 - `ContentAuditStore` (via "Export to Audit")
 
@@ -37,32 +44,32 @@ This separation causes ideas to exist in multiple places without a clear single 
 ### Recommended Architecture
 
 ```
-                   CONTENT STUDIO
-                         |
-                         v
-                  CANONICAL LIBRARY
-                  content_library.json
-                         |
-              +----------+----------+
-              |                     |
-              v                     v
-           IDEA VAULT          ALL CONTENT
-              |                     |
-              +----------+----------+
-                         |
-              +----------+----------+
-              |          |          |
-              v          v          v
-            PLAN      GENERATE    ARCHIVE
-                         |
-                         v
-                  CONTENT PACKAGE
-                         |
-                         v
-                   PUBLISH MANUALLY
-                         |
-                         v
-                  RECORD PERFORMANCE
+                CONTENT STUDIO
+                      |
+                      v
+                CANONICAL LIBRARY
+                content_library.json
+                      |
+            +----------+----------+
+            |                     |
+            v                     v
+        IDEA VAULT          ALL CONTENT
+            |                     |
+            +----------+----------+
+                      |
+            +----------+----------+
+            |          |          |
+            v          v          v
+          PLAN      GENERATE    ARCHIVE
+                      |
+                      v
+                CONTENT PACKAGE
+                      |
+                      v
+                PUBLISH MANUALLY
+                      |
+                      v
+                RECORD PERFORMANCE
 ```
 
 ### What Should Happen When You Add an Idea
@@ -114,9 +121,14 @@ This separation causes ideas to exist in multiple places without a clear single 
 
 ## 3. Second Major Change: Redesign Navigation
 
+### Status: **Complete**
+
+`ContentStudioHome` in `lib/home_screen.dart` is the new app entry point with
+navigation: Home | Idea Vault | Create | My Content | Insights | Settings.
+
 ### Current State
 
-Seven top-level destinations:
+Originally seven top-level destinations:
 1. Content Library
 2. Generate Reel
 3. Experiment Log
@@ -152,6 +164,8 @@ Logically organised by technical components, not by daily workflow.
 ---
 
 ## 4. Redesigned Home Screen
+
+### Status: **Complete** — `lib/home_screen.dart` (`ContentStudioHome`)
 
 ### Purpose
 
@@ -203,9 +217,17 @@ Do not fill the Home screen with every chart, filter, tool, or configuration opt
 
 ## 5. Third Major Change: Unify Reel Generation
 
+### Status: **Complete for Story Reel Maker**
+
+The Story Reel Maker in `lib/prompt_builder.dart` now supports character
+selection via `generateEverything(characterIds: ...)`. The fallback path
+`generateScriptWithGemini()` also accepts `characterIds`. Visual style, aspect
+ratio, and voice are now specified in the prompt header.
+
 ### Problem
 
-Standard Reel and Trial Reel appear as separate formats, but the generation process may already share the same pipeline.
+Standard Reel and Trial Reel appear as separate formats, but the generation process may
+already share the same pipeline.
 
 ### Recommendation
 
@@ -228,10 +250,10 @@ Standard Reel       Trial Reel Test
      +---------+---------+
                |
                v
-      Same Content History
+    Same Content History
                |
                v
-        Performance Log
+       Performance Log
 ```
 
 ### Proposed Create Workflow
@@ -286,10 +308,11 @@ Only offer formats the application can actually produce.
 Defaults from brand profile:
 - Audience: Parents of children aged 1–4
 - Language: Hinglish
-- Style: Soft pastel illustrations
+- Style: 3D Pixar/Disney-style render
 - Tone: Warm, playful, relatable
-- Characters: Selected for the story
-- Duration: Supported presets
+- Characters: **Selected for the story (UI chip selector in StoryScreen/StoryInputScreen, defaults to Ria, Rio, Cuty)**
+- Duration: Supported presets (20, 30, 45, 60 seconds)
+- Aspect ratio: vertical 9:16 for Instagram Reels
 
 #### Step 4: Generate
 The application generates the first version.
@@ -338,7 +361,7 @@ When opening an idea, show:
 - Original idea
 - Parent problem
 - Learning goal
-- Characters
+- Characters (with selection reflecting the StoryScreen UI)
 - Classification
 
 #### Creative
@@ -374,9 +397,12 @@ When opening an idea, show:
 
 ## 8. Sixth Major Change: Improve the Insights Screen
 
+### Status: **Complete** — `lib/insights_screen.dart` (`InsightsScreen`)
+
 ### Problem
 
-The user observes that standard Reel and Trial Reel generation appear similar, but the difference appears in Instagram views.
+The user observes that standard Reel and Trial Reel generation appear similar, but the
+difference appears in Instagram views.
 
 This should not be solved by making the generator more complicated.
 
@@ -431,6 +457,8 @@ These are suggestions, not guarantees of reach.
 
 ## 9. Seventh Major Change: Make the Idea Vault Useful
 
+### Status: **Partially complete** — `lib/my_content_screen.dart` shows canonical library items
+
 ### Layout
 
 ```
@@ -466,7 +494,7 @@ Cards should not display every internal classification field. Details belong on 
 **Full Details**
 - Parent problem
 - Learning goal
-- Characters
+- Characters (with selection from Ria, Rio, Cuty, Mumma, Papa)
 - Pillar
 - Suggested format
 - Hook
@@ -491,6 +519,8 @@ Never silently discard an idea just because it resembles an existing one.
 ---
 
 ## 10. Eighth Major Change: Simplify the Quality Gate
+
+### Status: **Complete** — `lib/content_quality_gate.dart`
 
 ### Problem
 
@@ -529,47 +559,52 @@ Example:
 
 Manual overrides should be recorded but should not falsely indicate all checks passed.
 
+**Reel-specific checks** are implemented via `ReelCheckData`:
+- Hook clarity (specific hook, first scene ≤3s)
+- Sound-off readability (on-screen text when voiceMode is none/optional)
+- Character consistency (name typos, generic references)
+
 ---
 
 ## 11. Ninth Major Change: Build a Proper Brand Profile
 
+### Status: **Partially complete** — `lib/brand_system.dart`
+
 ### Content
 
 #### Brand Identity
-- Brand name and handle
-- Tagline
-- Audience
-- Language preferences
-- Brand tone
+- Brand name: `Fun Learning With Palak`
+- Handle: `@funlearningwithpalak`
+- Tagline: `Little Stories, Big Lessons`
+- Audience: `Indian moms and parents of children aged 1-4`
+- Language preferences: Hinglish (primary), English, Hindi
+- Brand tone: `Warm, playful, parent-relatable, simple`
 
-#### Characters
-- Ria's description and reference images
-- Rio's description and reference images
-- Cuty's description and reference images
-- Family characters (when needed)
-- Character consistency rules
+#### Characters (implemented in `CharacterLibrary`)
+- Ria (id: `ria`, emoji: 🌸) — Indian preschool girl, curious and playful
+- Rio (id: `rio`, emoji: 💙) — Indian preschool boy, playful and determined
+- Cuty (id: `cuty`, emoji: 🐰) — Small white bunny, the peace-bringer
+- Mumma (id: `mumma`, emoji: 👩) — Young Indian mother, warm and patient
+- Papa (id: `papa`, emoji: 👨) — Young Indian father, warm and playful
+
+Characters available but not yet in `CharacterLibrary`: Daadi, Teacher.
 
 #### Visual Identity
-- Colour palette
-- Illustration style
-- Typography preferences
-- Watermark and footer
-- Aspect ratios for different outputs
+- Visual style: 3D Pixar/Disney-style render (single constant in `BrandDefaults.visualStyle`)
+- Colour palette: (pending)
+- Aspect ratios: 9:16 vertical for Instagram Reels (enforced in `generateEverything()` prompt)
 
 #### Content Rules
-- Completed and retired themes
-- Preferred content pillars
-- Caption preferences
-- Hashtag count
-- Prohibited claims
-- Age-appropriateness checks
+- Preferred content pillars: PLAY, THINK, DISCOVER, TALK, DO
+- Caption preferences: natural, searchable, easy to read
+- Hashtag count: exactly 5 (enforced by parser validation)
+- Prohibited claims: no invented statistics, results, or guarantees
 
 #### Generation Preferences
-- Default duration
-- Default language
-- Preferred voice
-- Available generation tools
-- API configuration
+- Default duration: 30 seconds (presets: 20, 30, 45, 60)
+- Default language: Hinglish
+- Default characters: Ria, Rio, Cuty (user-selectable)
+- API configuration: via `ApiKeyStore`
 
 **One brand profile, reused everywhere.**
 
@@ -601,14 +636,14 @@ Each asset linked to relevant idea or content package.
 ### C. Production Checklist
 Before marking content ready:
 
-| Production Item        | Status   |
-| ---------------------- | -------- |
-| Story approved         | Complete |
-| Narration generated    | Complete |
-| Scene images ready     | Complete |
-| On-screen text checked | Complete |
-| Video assembled        | Pending  |
-| Final review           | Pending  |
+| Production Item        | Status     |
+| ---------------------- | ---------- |
+| Story approved         | Editable   |
+| Narration generated    | Editable   |
+| Scene images ready     | Pending    |
+| On-screen text checked | Editable   |
+| Video assembled        | Pending    |
+| Final review           | Pending    |
 
 Distinguish generating a storyboard from rendering a finished video.
 
@@ -627,18 +662,18 @@ Backup/export workflow for:
 
 Do not implement all features simultaneously. Use phased approach:
 
-| Phase | Focus | Deliverable |
-| ----- | ----- | ----------- |
-| **1** | Audit current architecture | Map existing stores, models, navigation, generation paths |
-| **2** | Establish canonical Content Library | Every new idea saved to one source of truth |
-| **3** | Redesign navigation and Home | Simpler, task-oriented interface |
-| **4** | Rebuild Idea Vault | Search, filters, quick add, edit, duplicate detection |
-| **5** | Unify content generation | One shared pipeline with experiment metadata |
-| **6** | Improve content editing | Editable packages and selective regeneration |
-| **7** | Connect My Content and publishing | One detail page per idea/package with publication records |
-| **8** | Rebuild Insights | Comparable metrics, experiment history, five-test tracking |
-| **9** | Consolidate brand settings | One reusable brand and character profile |
-| **10** | Reliability and release | Persistence tests, migrations, backups, error handling |
+| Phase | Focus | Deliverable | Status |
+| ----- | ----- | ----------- | ------ |
+| **1** | Audit current architecture | Map existing stores, models, navigation, generation paths | ✅ Complete |
+| **2** | Establish canonical Content Library | Every new idea saved to one source of truth | ✅ Complete |
+| **3** | Redesign navigation and Home | Simpler, task-oriented interface | ✅ Complete |
+| **4** | Rebuild Idea Vault | Search, filters, quick add, edit, duplicate detection | ✅ Complete |
+| **5** | Unify content generation | One shared pipeline with experiment metadata | ✅ Complete |
+| **6** | Improve content editing | Editable packages and selective regeneration | Partially done |
+| **7** | Connect My Content and publishing | One detail page per idea/package with publication records | ✅ Complete |
+| **8** | Rebuild Insights | Comparable metrics, experiment history, five-test tracking | ✅ Complete |
+| **9** | Consolidate brand settings | One reusable brand and character profile | Partially done |
+| **10** | Reliability and release | Persistence tests, migrations, backups, error handling | In progress |
 
 ### Phase 1 is Essential
 
@@ -708,12 +743,15 @@ Test this scenario end to end:
 
 ### Decision 1: One Source of Truth
 The Idea Vault and All Content must share the same canonical content records.
+**Implemented:** `ContentService` bridges `IdeaInboxStore` → `ContentLibraryStore`.
 
 ### Decision 2: One Generation Engine
 Standard Reel and Trial Reel creation should share the generation pipeline wherever their content requirements are the same. Experiment and publishing details tracked separately.
+**Implemented:** Story Reel Maker uses `generateEverything()` with fallback to `generateScriptWithGemini()`.
 
 ### Decision 3: One Connected Workflow
 Every screen should help move an idea toward production, publication, or learning from results.
+**Implemented:** `ContentStudioHome` centralizes access to all workflows.
 
 ### Fundamental Principle
 

@@ -2,9 +2,10 @@
 
 **Fun Learning With Palak, Content Production System**
 
-This is the app's main prompt. One call produces a complete content package. It
-replaces the old caption generator, hashtag generator, hook generator and CTA
-generator, none of which should exist as separate screens.
+This document covers two distinct generation paths in the app:
+
+1. **Main content generation** — the master prompt for `Create Content` (Reels, Carousels, Static, Stories). Uses `AiContentService` with structured JSON output.
+2. **Story Reel Maker** — `generateEverything()` in `lib/prompt_builder.dart` for the `StoryScreen`. Generates a timed script + scene prompts + post details in a single Gemini call.
 
 ---
 
@@ -14,39 +15,24 @@ generator, none of which should exist as separate screens.
 IDEA → FORMAT → CONTENT PACKAGE → CREATIVE → POST → TRACK
 ```
 
-The app never invents an idea. It reads one from `content_ideas.md`, applies the
-fields you recorded, and runs this prompt.
+The app never invents an idea. It reads one from `documentation/content_ideas.md`, applies the fields you recorded, and runs this prompt.
 
 ---
 
-## Where the character descriptions come from
+## Two generation paths
 
-The `CHARACTERS` block below is filled at runtime from `brand_system.dart`, not
-hardcoded in this file. `brand_system.dart` is the single source. When you approve
-profiles for Mumma, Papa, Daadi and Teacher, they are added there once and flow
-into every prompt automatically.
+### Path 1: Main content generation (`Create Content`)
 
-The exact `Visual style` and `Negative prompt` blocks are also injected from
-`brand_system.dart`.
-
----
-
-## The prompt
+The prompt below is for the `ContentPackageV2` generation path. `AiContentService` fills the `{{PLACEHOLDER}}` values and calls Gemini in JSON mode with `thinkingBudget: 0`. The parser is `AiParserValidator` → `ContentPackageV2.fromJson`.
 
 ```
 Act as an expert Instagram growth strategist and content creator for Fun Learning With Palak.
 
 BRAND:
 Fun Learning With Palak
-
-TAGLINE:
-Little Stories, Big Lessons
-
-AUDIENCE:
-Indian parents, especially moms of children aged 1-4.
-
-CONTENT STYLE:
-Warm, relatable, playful, practical, simple Hinglish.
+TAGLINE: Little Stories, Big Lessons
+AUDIENCE: Indian moms and parents of children aged 1-4.
+CONTENT STYLE: Warm, relatable, playful, practical, simple Hinglish.
 
 CHARACTERS:
 {{CHARACTER_PROFILES}}
@@ -86,21 +72,17 @@ Create a simple, high-potential concept designed to test one content angle.
 Prioritize a strong first 1-3 seconds and easy production.
 
 If FORMAT = REEL:
-Create a high-retention Reel with:
-Hook -> Problem -> Insight/Story -> Solution/Payoff -> CTA.
+Create a high-retention Reel with: Hook -> Problem -> Insight/Story -> Solution/Payoff -> CTA.
 
 If FORMAT = IMAGE REEL:
-Every image must communicate part of the story even without audio.
-Use minimal on-screen text.
+Every image must communicate part of the story even without audio. Use minimal on-screen text.
 
 If FORMAT = CAROUSEL:
-Slide 1 must stop scrolling.
-Each following slide must move the story/information forward.
+Slide 1 must stop scrolling. Each following slide must move the story/information forward.
 Final slide must contain CTA.
 
 If FORMAT = STATIC:
-Create one strong visual concept with a clear message.
-Do not force a carousel or Reel structure.
+Create one strong visual concept with a clear message. Do not force a carousel or Reel structure.
 
 If FORMAT = STORY:
 Create short sequential story frames designed for interaction.
@@ -126,70 +108,126 @@ FOR EVERY CONTENT PIECE PROVIDE:
 17. Format test number
 
 HOOK RULES:
-Do not use generic hooks.
-Create curiosity, recognition, surprise, tension or a strong relatable parenting moment.
-The first 3 seconds must make the viewer want to continue.
+Do not use generic hooks. Create curiosity, recognition, surprise, tension or a
+strong relatable parenting moment. The first 3 seconds must make the viewer want
+to continue.
 
 CAPTION RULES:
-Make it natural and searchable.
-Use relevant keywords naturally.
-Do not keyword-stuff.
-Do not repeat the Reel word-for-word.
-Keep it easy to read.
+Make it natural and searchable. Use relevant keywords naturally.
+Do not keyword-stuff. Do not repeat the Reel word-for-word. Keep it easy to read.
 
 HASHTAG RULE:
-Exactly 5 hashtags.
-Use relevant niche/intent-based hashtags.
-Do not use random generic hashtags.
+Exactly 5 hashtags. Use relevant niche/intent-based hashtags. Do not use random generic hashtags.
 
 CTA RULE:
-CTA must match the content goal.
-Do not always say "follow for more."
+CTA must match the content goal. Do not always say "follow for more."
 
 CONTENT RULE:
 The content should feel like something an Indian parent would actually experience.
-Avoid generic parenting advice.
-Prefer specific situations, real-life problems and practical solutions.
+Avoid generic parenting advice. Prefer specific situations, real-life problems and
+practical solutions.
 
 CHARACTER RULE:
-Maintain the exact established personality and appearance of Ria, Rio and Cuty.
+Maintain the exact established personality and appearance of the characters in the library.
 Do not change their character traits.
+
+VISUAL STYLE:
+{{VISUAL_STYLE}}
+Every image prompt must include this style. The full character lock block from
+`CharacterLibrary.characterLockFor()` is appended to image prompts.
 
 OUTPUT:
 Return a complete ready-to-create content package as valid JSON.
 ```
 
----
+### Path 2: Story Reel Maker (`generateEverything()`)
 
-## JSON shape
+The Story Reel Maker in `lib/prompt_builder.dart` uses a separate prompt built by `generateEverything()`. This path:
 
-The prompt returns prose plus JSON. The app parses the JSON block only.
+- Generates a **timed script** + **scene prompts** + **post details** in one Gemini call
+- Falls back to `generateScriptWithGemini()` for scripts that exceed `kCombinedLineLimit` (10 lines)
+- Accepts **character selection** via `List<String>? characterIds`
+- Injects `Visual style`, `Aspect ratio`, and `Voice` specifications directly into the prompt
+- Appends `CharacterLibrary.characterLockFor()` for character-lock enforcement
 
-```json
-{
-  "title": "",
-  "angle": "",
-  "visualHook": "",
-  "verbalHook": "",
-  "textHook": "",
-  "script": [
-    { "scene": 1, "durationSec": 3, "visual": "", "onScreenText": "", "narration": "", "characterAction": "" }
-  ],
-  "visualDirections": "",
-  "cta": "",
-  "caption": "",
-  "hashtags": ["", "", "", "", ""],
-  "pinnedComment": "",
-  "replySuggestions": ["", "", "", "", ""],
-  "coverText": "",
-  "recommendedGoal": "",
-  "whyNonFollowersWillSeeIt": "",
-  "formatTestNumber": "1/5"
-}
+The prompt template:
+
+```
+Write a complete {SECONDS} second Instagram Reel for "Fun Learning With Palak".
+
+THE STORY (this is the source of truth, follow it):
+{STORY_DESCRIPTION}
+
+Characters appearing: {CHARACTERS}.
+
+Visual style: {BrandDefaults.visualStyle}.
+Aspect ratio: vertical 9:16 for Instagram Reel.
+Voice: {Hinglish narration with Devanagari spoken lines | English narration}.
+
+{CharacterLibrary.characterLockFor(selectedCharacters)}
+
+{kScriptShapeRules}
+
+{kReelShapeRules}
+
+Keep every line to 4-9 words: short on screen, still easy to say in about 4 seconds.
+Write how a person talks, not how a book reads.
+
+Return ONLY valid JSON in exactly this shape:
+{ ... JSON schema ... }
 ```
 
-**Never remove the JSON wrapper.** The parser reads the first fenced ```json block.
-If the model wraps it in commentary, extract the block and ignore the rest.
+**Character selection flow:**
+
+1. User selects characters in the `StoryScreen` UI (chip selector) — defaults to Ria, Rio, Cuty
+2. Selected IDs are passed as `characterIds` to `generateEverything()`
+3. `CharacterLibrary.byId()` resolves each ID to a full `Character` profile
+4. The character names/descriptions appear in the prompt header
+5. `CharacterLibrary.characterLockFor()` generates the full CHARACTER LOCK block with only the selected characters
+
+---
+
+## Where the character descriptions come from
+
+The `{{CHARACTER_PROFILES}}` and `{{CHARACTERS}}` placeholders are filled at runtime from
+`lib/brand_system.dart` (`CharacterLibrary`), not hardcoded in this file. `brand_system.dart`
+is the single source. The `characterLockFor()` method builds the lock block from whatever
+cast is passed to it, so adding a character to `CharacterLibrary.all` updates every prompt
+automatically.
+
+The exact `Visual style` and `Negative prompt` blocks are also injected from
+`brand_system.dart` (`BrandDefaults.visualStyle`).
+
+### Current approved characters
+
+| id    | Character | Emoji | Description                      |
+|-------|-----------|-------|----------------------------------|
+| `ria` | Ria       | 🌸    | Indian preschool girl, curious and playful |
+| `rio` | Rio       | 💙    | Indian preschool boy, playful and determined |
+| `cuty`| Cuty      | 🐰    | Small white bunny, the peace-bringer |
+| `mumma`| Mumma   | 👩    | Young Indian mother, warm and patient |
+| `papa`| Papa      | 👨    | Young Indian father, warm and playful |
+
+The local `Character` class in `main.dart` (used for UI chip selection) maps each
+selection to a `characterId` that resolves to `CharacterLibrary.byId()`.
+
+**Characters in `master_prompt.md` but not yet in `CharacterLibrary`:** Daadi, Teacher. These are referenced in `documentation/content_ideas.md` field descriptions but have no approved profile yet, so any idea naming them generates without a locked appearance. This is the single biggest correctness gap in the prompt.
+
+---
+
+## Visual style
+
+The visual style is settled: **3D Pixar/Disney-style render**, confirmed against
+all five character renders in `assets/characters/`. `BrandDefaults.visualStyle` in
+`lib/brand_system.dart` is the single definition used by:
+
+- `generateEverything()` — inline in the prompt header
+- `CharacterLibrary.characterLockFor()` — in the CHARACTER LOCK block
+- `AiContentService` — via `{{VISUAL_STYLE}}` placeholder for the main generation path
+
+The old watercolor wording that existed in `gemini_client.dart`, `format_adapter.dart`,
+`quick_content.dart`, `slide_prompts.dart`, and 21 seeded `imagePrompt` strings in
+`content_ideas.dart` were all replaced by this single constant.
 
 ---
 
@@ -199,7 +237,7 @@ Both of these are already proven against the live API, so they stay.
 
 **`thinkingConfig` with `thinkingBudget: 0`.** Without it the model burns budget on
 reasoning and the JSON gets truncated mid-array. Every caption and script call in
-`gemini_client.dart` already sends it.
+`gemini_client.dart` and `generateEverything()` already sends it.
 
 **Harden the parser.** `ContentPackage.fromJson` and `GeminiClient._parseResponse`
 already tolerate missing fields. A new field added here should be added to the
@@ -209,20 +247,11 @@ fallback defaults, not assumed to be present.
 
 ## What is still a placeholder
 
-`{{CHARACTER_PROFILES}}` currently resolves for Ria, Rio and Cuty only. Mumma,
-Papa, Daadi and Teacher have no approved one-line profile, so any idea naming them
-will generate without a locked appearance. That is the single biggest correctness
-gap in this prompt.
+`{{CHARACTER_PROFILES}}` currently resolves for Ria, Rio, Cuty, Mumma, and Papa only.
+Daadi and Teacher have no approved one-line profile, so any idea naming them will
+generate without a locked appearance.
 
-The visual style is settled: **3D Pixar/Disney-style render**, confirmed against
-all seven renders in `assets/characters/`. `BrandDefaults.visualStyle` in
-`brand_system.dart` is the only definition and `prompts.dart` reads it, so the
-image and text builders can no longer disagree. The old watercolor wording had
-also been hardcoded in `gemini_client.dart`, `format_adapter.dart`,
-`quick_content.dart`, `slide_prompts.dart` and 21 seeded `imagePrompt` strings in
-`content_ideas.dart`; all were replaced.
-
-Still worth settling: `BrandDefaults.audience` says `1.5-5 years` and
-`kScriptShapeRules` says `2-6 year old`. Both are wrong relative to the intended
-`1-4`.
-
+The audience and age targeting still has a minor inconsistency: `BrandDefaults.audience`
+says `Indian moms and parents of children aged 1-4` and `kScriptShapeRules` in
+`lib/prompts.dart` references a 2-6 year range. Both should converge on the intended `1-4`
+audience.

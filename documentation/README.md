@@ -11,16 +11,18 @@ Pipeline: **IDEA → FORMAT → CONTENT PACKAGE → CREATIVE → POST → TRACK*
 
 - **Idea Vault** — 57 ideas in `content_ideas.md`, each classified on
   seven axes: pillar, series, content type, narrative format, production
-  method, goal, status.
+  method, goal, status. 10 Navratri Reel ideas (N1–N10) recently added.
 - **Create** — one `Create Content` action. A finished post is one
   package: hook, script, narration, per-scene dialogue, caption, CTA,
   hashtags.
 - **Reel Maker** — the existing end-to-end video pipeline (FFmpeg).
-  Works; left as is.
+  Works; left as is. StoryScreen includes character selection (chip
+  selector, defaults to Ria/Rio/Cuty) passed to `generateEverything()`.
 - **Promotion Comments** — a vault of saved comment lines.
-- **Brand** — character lock (Ria, Rio, Cuty, Mumma, Papa, Daadi,
-  Teacher) and the 3D Pixar/Disney visual style, injected into every
-  prompt so a character looks the same in every scene.
+- **Brand** — character lock for Ria, Rio, Cuty, Mumma, and Papa, with
+  the 3D Pixar/Disney visual style injected into every prompt so a
+  character looks the same in every scene. Daadi and Teacher are
+  referenced in ideas but have no approved profiles yet.
 
 Not built yet, deliberately: Calendar, Analytics, Experiments. They
 answer questions the data cannot yet support — see
@@ -75,7 +77,7 @@ cp lib/secrets.example.dart lib/secrets.dart   # then fill in real keys
 ## Development
 
 ```bash
-flutter test                 # 225 tests
+flutter test                 # 310 tests
 flutter analyze              # lib/ is clean; tool/ has known warnings
 dart run tool/check_formats.dart
 dart run tool/check_axes.dart
@@ -96,3 +98,23 @@ flutter build apk --release
 
 Release signing and the application id (`com.example.reel_audio`) are
 not yet configured — the app is not distributable until they are.
+
+## Documentation
+
+All project documentation lives in `documentation/`:
+
+| File | Purpose |
+|---|---|
+| `README.md` | This file |
+| `APP_OVERVIEW.md` | Full app overview, architecture, test inventory |
+| `master_prompt.md` | Master generation prompt (main + Story Reel Maker paths) |
+| `REDESIGN_VISION.md` | Redesign vision and roadmap |
+| `REDESIGN_PLAN2.md` | Active product plan with phased development order |
+| `INSTAGRAM_STRATEGY_PLAN.md` | Instagram strategy → implementation mapping |
+| `CONTENT_MODEL.md` | Content model specification |
+| `content_formats.md` | Source of truth for narrative formats |
+| `content_ideas.md` | Source of truth for the 57 content ideas |
+| `DASHBOARD_GUIDE.md` | Dashboard usage guide |
+| `POSTS_REVIEW.md` | Post review history |
+| `SECURITY_AUDIT.md` | Security audit report |
+| `instagram_audit.md` | Instagram presence audit |

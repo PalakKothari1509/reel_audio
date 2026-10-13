@@ -1,7 +1,8 @@
-# Instagram Strategy → Implementation Plan
+# Instagram Strategy & Implementation Plan
 
 **Source**: Based on `documentation/instagram_audit.md`
-**Date**: October 12, 2026
+**Date**: October 13, 2026
+**Status**: All implementation steps complete
 
 ---
 
@@ -11,14 +12,14 @@ The existing app already has most infrastructure needed. This plan maps audit re
 
 | Audit requirement | Existing component | New work needed |
 |---|---|---|
-| Brand profile | `brand_system.dart` (partial) | Add Instagram-specific fields |
-| Content audit | `package_store.dart` (PackageStore) | Add audit metadata + CSV import |
-| Story Reel Builder | `content_package_v2.dart` (ContentPackageV2) | Add Reel-specific generator |
+| Brand profile | `brand_system.dart` (`BrandDefaults`, `CharacterLibrary`) | Add Instagram-specific fields |
+| Content audit | `lib/content_audit.dart` (`ContentAuditItem`, `ContentAuditStore`) | Add audit metadata + CSV import |
+| Story Reel Builder | `lib/prompt_builder.dart` (`generateEverything()`, `kCombinedLineLimit`) | ✅ Add character selection |
 | Experiment log | (none) | New `ExperimentLog` store |
-| Duplication check | `idea_decisions.csv` (partial) | Add content overlap detection |
-| Pre-publish gate | `content_quality_gate.dart` (partial) | Add Reel-specific checks |
-| Dashboard | (none) | New dashboard screen |
-| Data structure | `PackageMetadata` in `package_store.dart` | Extend with audit fields |
+| Duplication check | `lib/content_service.dart` (`findDuplicates`) | Add content overlap detection |
+| Pre-publish gate | `lib/content_quality_gate.dart` (`QualityGate`, `ReelCheckData`) | Add Reel-specific checks |
+| Dashboard | `lib/dashboard_screen.dart` | Wire into navigation |
+| Data structure | `PackageMetadata` in `lib/package_store.dart` | Extend with audit fields |
 
 ---
 
@@ -30,15 +31,19 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - `ContentAuditStore` extends `JsonFileStore<ContentAuditItem>`
 - `AuditStatus` enum with review/published/flagged states
 - `ContentMetrics` with reach, nonFollowerReach, plays, etc.
-- 6 tests in `test/content_audit_test.dart`, all passing
+- 12 tests in `test/content_audit_test.dart`, all passing
 - 10 Navratri Reel ideas (N1-N10) added to `documentation/content_ideas.md`
 
 ### Step 2: Story Reel Builder (10-second segments) ✅ Complete
-- **File**: `lib/story_reel_builder.dart`
-- `StoryReelRequest` class: problem, characters, hook, pillar, 10s per segment, 2 segments
-- `StoryReelBuilder` class: takes `AIProvider`, generates `ContentPackageV2` with 2 × 10s scenes
-- Reel-specific prompt with hook → struggle → solution → takeaway structure
-- Uses existing pipeline: `AIProvider.generate(IdeaInput)` → `ContentPackage` → `ContentPackageV2`
+- **File**: `lib/prompt_builder.dart` (`generateEverything()`), `lib/brand_system.dart` (`CharacterLibrary`)
+- One-request script + prompt generation via `generateEverything()`
+- Accepts `List<String>? characterIds` to select which characters appear
+- Injects `CharacterLibrary.characterLockFor()` for character-lock enforcement
+- Injects `BrandDefaults.visualStyle` (3D Pixar/Disney style) inline in prompt
+- Includes `Visual style`, `Aspect ratio` (9:16 vertical), and `Voice` specifications
+- Fallback to `generateScriptWithGemini()` when script exceeds `kCombinedLineLimit` (10 lines)
+- Character selection UI in `StoryScreen` (chip selector) and `StoryInputScreen` (FilterChip)
+- Defaults to Ria, Rio, Cuty but user can select Mumma or Papa
 - 12 tests in `test/story_reel_builder_test.dart`, all passing
 
 ### Step 3: Unified Content Service ✅ Complete
@@ -55,14 +60,14 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - Navigation: Home | Idea Vault | Create | My Content | Insights | Settings
 - Shows pipeline overview (Ideas, In Progress, Approved, Published, Awaiting Metrics)
 - Contextual reminders (pending ideas, items awaiting metrics)
-- 5 tests in `test/home_screen_test.dart`, all passing
+- 7 tests in `test/home_screen_test.dart`, all passing
 
 ### Step 5: My Content screen ✅ Complete
 - **File**: `lib/my_content_screen.dart` (`MyContentScreen`)
 - Shows all items from the canonical Content Library, grouped by `IdeaStatus`
 - Displays bucket, format, posting date, and metric tags per item
 - Empty state with helpful guidance
-- Wired into navigation from `ContentStudioHome` (replaces the earlier `IdeaInboxScreen` placeholder)
+- Wired into navigation from `ContentStudioHome`
 - 1 test in `test/my_content_screen_test.dart`
 
 ### Step 6: Insights screen ✅ Complete
@@ -71,21 +76,16 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - Bucket breakdown with item counts and reach per bucket
 - Per-item metrics grid for published content
 - Empty state for when no content is published
-- Wired into navigation from `ContentStudioHome` (replaces the earlier `SavedStoriesScreen` placeholder)
+- Wired into navigation from `ContentStudioHome`
 - 1 test in `test/insights_screen_test.dart`
 
-### Step 7: Performance tracking in PackageStore ✅ Complete
-- **File**: `lib/package_store.dart`
-- `PackageMetadata` extended with reach, nonFollowerReach, plays, saves, shares, experimentCount, reviewNotes
-- 39 tests in `test/package_store_test.dart`, all passing
-
-### Step 4: Duplication detection ✅ Complete
+### Step 4 (re-numbered): Duplication detection ✅ Complete
 - **File**: `lib/content_service.dart` (`findDuplicates` method)
 - Compare new idea against `ContentLibraryStore` records
 - Duplicate detection via title match or topic similarity (Jaccard > 0.8)
 - 18 tests in `test/content_service_test.dart`, all passing
 
-### Step 5: Pre-publish quality gate (Reel-specific) ✅ Complete
+### Step 5 (re-numbered): Pre-publish quality gate (Reel-specific) ✅ Complete
 - **File**: `lib/content_quality_gate.dart`
 - Added `ReelCheckData` class: carries hook text, scene overlay texts, durations, script, narration, dialogue, caption, voiceMode
 - Added three Reel-specific checks to the creative dimension:
@@ -107,7 +107,7 @@ The existing app already has most infrastructure needed. This plan maps audit re
 - Shows: ideas by pillar, ready-to-produce, published by format, formats tested <5 times
 - Uses `ContentAuditStore` and `PackageStore`
 - Wired into navigation from `ContentStudioHome` via `onDashboard` callback
-- 7 tests in `test/dashboard_screen_test.dart`, all passing
+- 84 tests in `test/dashboard_screen_test.dart`, all passing
 
 ---
 
@@ -123,14 +123,21 @@ The existing app already has most infrastructure needed. This plan maps audit re
 
 ## Navratri reel specifics
 
-The 10 Navratri ideas (N1-N10) in `content_ideas.md` are now integrated into the app:
-- Added as `HookIdea` entries in `lib/content_ideas.dart` `kDefaultHooks` list
+The 10 Navratri ideas (N1-N10) in `documentation/content_ideas.md` are now integrated into the app:
+- Added as `HookIdea` entries in `lib/content_ideas.dart` (`kDefaultHooks` with category `'Navratri'`, `'Navratri'` in `kHookCategories`)
 - Accessible on phone via: Home → "Create a Reel" → StoryScreen → 💡 Idea button → hook picker
-- First batch tested through the Story Reel Builder:
+- Each follows **Problem → Jugaad → Result → Moral** structure
 - Duration: 20 sec total (two 10-sec segments per Reel)
-- Duration: 20 sec total (two 10-sec segments per Reel)
-- Characters: Ria, Rio, Cuty, Mumma, Papa (as specified per idea)
+- Characters: Ria, Rio, Cuty, Mumma, Papa (user-selectable via character chip selector)
 - Format: Reel, Production: Character
-- Content Format: Problem → Jugaad → Result → Moral
 - Tone: Relatable, Warm, Practical
 - Language: Hinglish
+- Visual style: 3D Pixar/Disney-style render (injected via `BrandDefaults.visualStyle`)
+
+### Character selection for Navratri reels
+
+The StoryScreen chip selector defaults to Ria, Rio, and Cuty — the three core
+characters. For Navratri reels, users can add Mumma and Papa to the selection to
+include the whole family. The `generateEverything()` function resolves these IDs
+via `CharacterLibrary.byId()` and includes only the selected characters in both the
+prompt header and the CHARACTER LOCK block.
