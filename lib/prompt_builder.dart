@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'brand_system.dart';
 import 'gemini_call.dart';
 import 'prompts.dart';
 import 'secrets.dart';
@@ -87,6 +88,7 @@ Future<StoryPackage> generateEverything({
   required String style,
   required int seconds,
   required int expectedLines,
+  List<String>? characterIds,
   String? apiKey,
   void Function(String message)? onWait,
 }) async {
@@ -98,13 +100,24 @@ Future<StoryPackage> generateEverything({
         'written in Devanagari — that half is what gets spoken aloud, so it must match.'
       : '"text" is the line. Leave "speak" as an empty string.';
 
+  var selectedCharacters = (characterIds == null || characterIds.isEmpty)
+      ? CharacterLibrary.all
+      : characterIds.map((id) => CharacterLibrary.byId(id)).whereType<Character>().toList();
+  if (selectedCharacters.isEmpty) selectedCharacters = CharacterLibrary.all;
+
   final prompt = '''
-Write a complete $seconds second preschool reel for "Fun Learning With Palak".
+Write a complete $seconds second Instagram Reel for "Fun Learning With Palak".
 
 THE STORY (this is the source of truth, follow it):
 $storyDescription
 
-Characters: Ria (toddler girl), Rio (toddler boy), Cuty (white bunny), Mumma, Papa.
+Characters appearing: ${selectedCharacters.map((c) => '${c.name} (${c.description})').join(', ')}.
+
+Visual style: ${BrandDefaults.visualStyle}.
+Aspect ratio: vertical 9:16 for Instagram Reel.
+Voice: ${isHinglish ? 'Hinglish narration with Devanagari spoken lines' : 'English narration'}.
+
+${CharacterLibrary.characterLockFor(selectedCharacters)}
 
 $kScriptShapeRules
 

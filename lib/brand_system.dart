@@ -159,7 +159,23 @@ class CharacterLibrary {
         '"arre mera bachha" and "dekho toh". Never scolding, never impatient.',
   );
 
-  static const List<Character> all = [ria, rio, cuty, mumma];
+  static const Character papa = Character(
+    id: 'papa',
+    name: 'Papa',
+    emoji: '👨',
+    description: 'Young Indian father in his early 30s, warm and playful',
+    appearance: 'Young Indian father, early 30s, warm brown eyes, soft smile, '
+        'dark hair neatly styled with a light stubble. Wearing a half-sleeve '
+        'linen shirt in earthy tones, slim-fit jeans, casual brown shoes. '
+        'Stylized 3D Pixar/Disney character design, soft rim lighting.',
+    personality: 'Warm, patient and playful. Joins in the children\'s games rather '
+        'than directing, adds silly voices and sound effects, defuses tension '
+        'with a joke. The calm in the chaos, always ready with a low-cost '
+        'household hack.',
+    role: 'The calm problem-solver, the parent who joins the fun',
+  );
+
+  static const List<Character> all = [ria, rio, cuty, mumma, papa];
 
   static Character? byId(String id) {
     for (final c in all) {

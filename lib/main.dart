@@ -115,6 +115,7 @@ Future<List<ScriptLine>> generateScriptWithGemini({
   required String language,
   required String style,
   required double videoDuration,
+  List<String>? characterIds,
   void Function(String message)? onWait,
 }) async {
   final langNote = language == 'Hinglish'
@@ -133,9 +134,14 @@ Future<List<ScriptLine>> generateScriptWithGemini({
       ? 'Focus on problem solving.'
       : 'Make it warm and heartwarming.';
 
+  var selectedChars = (characterIds == null || characterIds.isEmpty)
+      ? kCharacters.map((c) => c.name).toList()
+      : kCharacters.where((c) => characterIds.contains(c.characterId)).map((c) => c.name).toList();
+  if (selectedChars.isEmpty) selectedChars = kCharacters.map((c) => c.name).toList();
+
   final storyNote = videoDescription.isNotEmpty
       ? 'The video is about: $videoDescription'
-      : 'Write a general fun preschool story with Ria and Rio.';
+      : 'Write a general fun preschool story with the characters listed below.';
   final expectedLines = (videoDuration / 4).floor().clamp(4, 20);
   final totalSecs = videoDuration.round();
 
@@ -170,7 +176,7 @@ Future<List<ScriptLine>> generateScriptWithGemini({
       '''
 Write a voiceover script for a $totalSecs second preschool video for "Fun Learning With Palak" Instagram Reels.
 
-Characters: Ria (girl), Rio (boy), Cuty (rabbit), Mum, Dad
+Characters: ${selectedChars.join(', ')}
 $storyNote
 $langNote
 $styleNote
@@ -429,16 +435,17 @@ List<ScriptLine> parseScript(String raw) {
 class Character {
   final String name;
   final String emoji;
+  final String characterId;
   bool selected;
-  Character({required this.name, required this.emoji, this.selected = false});
+  Character({required this.name, required this.emoji, required this.characterId, this.selected = false});
 }
 
 final List<Character> kCharacters = [
-  Character(name: 'Ria', emoji: '👧', selected: true),
-  Character(name: 'Rio', emoji: '👦'),
-  Character(name: 'Cuty', emoji: '🐰'),
-  Character(name: 'Mum', emoji: '👩'),
-  Character(name: 'Dad', emoji: '👨'),
+  Character(name: 'Ria', emoji: '👧', characterId: 'ria', selected: true),
+  Character(name: 'Rio', emoji: '👦', characterId: 'rio'),
+  Character(name: 'Cuty', emoji: '🐰', characterId: 'cuty'),
+  Character(name: 'Mum', emoji: '👩', characterId: 'mumma'),
+  Character(name: 'Dad', emoji: '👨', characterId: 'papa'),
 ];
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -668,6 +675,9 @@ class _StoryScreenState extends State<StoryScreen> {
   int _seconds = 30;
   bool _isGenerating = false;
   String _status = '';
+
+  /// Characters selected for this reel, mapped to CharacterLibrary IDs.
+  final List<String> _selectedCharacterIds = ['ria', 'rio', 'cuty'];
 
   /// The story being written, saved to the phone as it is typed.
   Project? _project;
@@ -1355,6 +1365,7 @@ class _StoryScreenState extends State<StoryScreen> {
             style: _style,
             seconds: _seconds,
             expectedLines: expectedLines,
+            characterIds: _selectedCharacterIds,
             apiKey: _keyStore?.getGeminiApiKey(),
             onWait: (message) {
               if (mounted) setState(() => _status = message);
@@ -1386,6 +1397,7 @@ class _StoryScreenState extends State<StoryScreen> {
         language: _language,
         style: _style,
         videoDuration: _seconds.toDouble(),
+        characterIds: _selectedCharacterIds,
         onWait: (message) {
           if (mounted) setState(() => _status = message);
         },
@@ -1547,16 +1559,37 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
                 Gap.l,
 
-                const SectionTitle('Language'),
-                _chips(
-                  _languages.map(
-                    (l) => _Choice(
-                      l,
-                      _language == l,
-                      () => setState(() => _language = l),
-                    ),
-                  ),
-                ),
+                 const SectionTitle('Language'),
+                 _chips(
+                   _languages.map(
+                     (l) => _Choice(
+                       l,
+                       _language == l,
+                       () => setState(() => _language = l),
+                     ),
+                   ),
+                 ),
+                 Gap.l,
+
+                 const SectionTitle('Characters'),
+                 _chips(
+                   kCharacters.map(
+                     (c) => _Choice(
+                       c.name,
+                       _selectedCharacterIds.contains(c.characterId),
+                       () {
+                         setState(() {
+                           if (_selectedCharacterIds.contains(c.characterId)) {
+                             _selectedCharacterIds.remove(c.characterId);
+                           } else {
+                             _selectedCharacterIds.add(c.characterId);
+                           }
+                         });
+                       },
+                       emoji: c.emoji,
+                     ),
+                   ),
+                 ),
               ],
             ),
           ),
@@ -1646,13 +1679,19 @@ class _StoryScreenState extends State<StoryScreen> {
                   color: c.selected ? AppColors.primary : AppColors.border,
                 ),
               ),
-              child: Text(
-                c.label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: c.selected ? FontWeight.w700 : FontWeight.w500,
-                  color: c.selected ? Colors.white : AppColors.text,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (c.emoji.isNotEmpty) ...[Text(c.emoji), const SizedBox(width: 4)],
+                  Text(
+                    c.label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: c.selected ? FontWeight.w700 : FontWeight.w500,
+                      color: c.selected ? Colors.white : AppColors.text,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1729,7 +1768,8 @@ class _Choice {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _Choice(this.label, this.selected, this.onTap);
+  final String emoji;
+  const _Choice(this.label, this.selected, this.onTap, {this.emoji = ''});
 }
 
 // ── Story Input Screen ────────────────────────────────────────────────────────
@@ -1753,6 +1793,7 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
   bool _isGenerating = false;
   String _genStatus = '';
   final _descCtrl = TextEditingController();
+  final List<String> _selectedCharacterIds = ['ria', 'rio', 'cuty'];
 
   @override
   void dispose() {
@@ -1771,6 +1812,7 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
         language: _language,
         style: _style,
         videoDuration: widget.videoDuration,
+        characterIds: _selectedCharacterIds,
         onWait: (message) {
           if (mounted) setState(() => _genStatus = message);
         },
@@ -1847,29 +1889,55 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
                     onChanged: (v) => setState(() => _language = v!),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Video Description (for AI)',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _descCtrl,
-                    maxLines: 3,
-                    style: const TextStyle(fontSize: 13),
-                    decoration: InputDecoration(
-                      hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai aur sab khush ho jaate hain',
-                      hintStyle: const TextStyle(
-                        color: AppColors.textFaint,
-                        fontSize: 12,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.all(10),
-                    ),
-                  ),
+                   const Text(
+                     'Video Description (for AI)',
+                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                   ),
+                   const SizedBox(height: 8),
+                   TextField(
+                     controller: _descCtrl,
+                     maxLines: 3,
+                     style: const TextStyle(fontSize: 13),
+                     decoration: InputDecoration(
+                       hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai aur sab khush ho jaate hain',
+                       hintStyle: const TextStyle(
+                         color: AppColors.textFaint,
+                         fontSize: 12,
+                       ),
+                       filled: true,
+                       fillColor: AppColors.surface,
+                       border: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(8),
+                       ),
+                       contentPadding: const EdgeInsets.all(10),
+                     ),
+                   ),
+                   const SizedBox(height: 16),
+                   const Text(
+                     'Characters',
+                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                   ),
+                   const SizedBox(height: 8),
+                   Wrap(
+                     spacing: 8,
+                     children: kCharacters.map((c) {
+                       final selected = _selectedCharacterIds.contains(c.characterId);
+                       return FilterChip(
+                         avatar: Text(c.emoji),
+                         label: Text(c.name),
+                         selected: selected,
+                         onSelected: (_) {
+                           setState(() {
+                             if (selected) {
+                               _selectedCharacterIds.remove(c.characterId);
+                             } else {
+                               _selectedCharacterIds.add(c.characterId);
+                             }
+                           });
+                         },
+                       );
+                     }).toList(),
+                   ),
                   if (_genStatus.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Container(
