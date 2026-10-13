@@ -199,6 +199,25 @@ class PostDetails {
       hashtags.isEmpty ? caption : '$caption\n\n${hashtags.join(' ')}';
 }
 
+/// One 10-second clip prompt produced by Stage 2.
+///
+/// Each prompt is self-contained: STYLE, SIZE, CHARACTERS, setting, camera,
+/// timed action (0-4s / 4-8s / 8-10s), AUDIO, and AVOID. Parts 2+ include a
+/// CONTINUITY line telling Gemini to match the previous frame.
+class VideoClipPrompt {
+  final int partNumber;
+  final int totalParts;
+  final String promptText;
+
+  const VideoClipPrompt({
+    required this.partNumber,
+    required this.totalParts,
+    required this.promptText,
+  });
+
+  String get title => 'Part $partNumber of $totalParts';
+}
+
 /// Said next to any suggested posting time.
 ///
 /// Nobody outside Instagram knows how the ranking works, and the best time depends on

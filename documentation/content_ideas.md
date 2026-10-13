@@ -1,4 +1,4 @@
-# Fun Learning With Palak, Content Idea Library
+﻿# Fun Learning With Palak, Content Idea Library
 
 **This file is the source of truth for content ideas.** The app does not invent ideas,
 it reads them from here. You edit this file as we go, and I sync it into the app.
@@ -49,11 +49,7 @@ worth knowing they are not fully independent axes.
 
 **Same idea, two executions:**
 
-```
-jugaadu-mummy + toddler wants phone at lunch
-  Format: Reel        Production: Character  Goal: Reach     Content Format: Problem → Jugaad → Result → Moral
-  Format: Carousel    Production: Static     Goal: Saves    Content Format: Do This Not That
-```
+
 
 **Test Number matters more than it looks.** A format is not judged after one post.
 The app shows `2/5 tests` so a single weak result does not kill a format that
@@ -1160,14 +1156,390 @@ Series: `parenting-relatability`. Format: Reel. Production: Character. Goal: Rea
 
 ---
 
+## Pressure-Test Scripts (3 ready-to-build character reels)
+
+These three ideas passed the 9-point pressure test. Full lean scripts below each.
+
+### 4. Ria Calls Papa to Settle the Toys
+
+- **id:** `life-ria-calls-papa`
+- **Series:** Life With Ria & Rio
+- **Title:** Ria Ne Papa Ko Bulaya! 📣
+- **Topic:** Ria wants to play but the toys are a mess; she calls Papa to settle it
+- **Audience Problem:** "Ria har baar se maze nahi aate toh Papa ko bulati hai!"
+- **Characters:** Ria + Mumma + Papa + Rio | **Age:** 1-4
+- **Format:** Reel | **Production:** Character | **Goal:** Engagement
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Ready | **Priority:** High
+- **Duration:** 20 sec (five 4-second scenes)
+
+**HOOK:** "Toys clean karne se bachne ka sabse bada jugaad 😂"
+
+**WHO:** Ria, Mumma, Papa, Rio
+
+**WHERE:** Living room
+
+**WHAT STARTS IT:** Mumma says "Ria, toys uthao." Ria says "Nahi." Mumma says "Please?" Ria says "Nahi."
+
+**WHAT GOES WRONG:** Ria suddenly shouts "PAPAAAA!" Papa comes running.
+
+**HOW IT GETS WORSE:** Ria points at the toys. "Papa, Mumma ko samjhao." Papa looks at Mumma. Mumma looks at Papa.
+
+**HOW IT IS SOLVED:** Rio quietly starts cleaning the toys, and everyone laughs.
+
+**ENDING LINE:** "Ghar mein toddler nahi, poori negotiation team hai!"
+
+**CLOSING CTA:** "Share this with a parent who has a tiny negotiator!"
+
+**HOOK OVERLAY TEXT:** "Toys clean karne se bachne ka sabse bada jugaad 😂"
+
+**COVER TITLE:** "Toys = Game"
+
+**SCENES (5 × 4 seconds):**
+
+*Scene 1 (0:00-0:04): Hook*
+Ria sitting in a toy mess. Mumma pointing. Text: "Ria, toys uthao!" Ria shaking her head. Visual: 3D Pixar style, warm afternoon light through window, toys everywhere, Ria with pink bow ponytails, no glasses.
+
+*Scene 2 (0:04-0:08): What goes wrong*
+Ria pointing dramatically at Papa. Text: "PAPAAAA!" Papa at the door, mid-step. Visual: same style, Ria's expression of pure determination, Papa's eyebrows shooting up.
+
+*Scene 3 (0:08-0:12): Getting worse*
+Papa and Mumma facing each other, both looking confused. Ria between them, hands on hips. Text: "Papa, Mumma ko samjhao." Visual: wide shot, the three adults in a silent standoff.
+
+*Scene 4 (0:12-0:16): Solution*
+Rio quietly starts picking up blocks. Papa and Mumma exchange glances, then smile. Text: "Game banaya! ❤️" Visual: Rio in the foreground, Ria and adults in the background softening.
+
+*Scene 5 (0:16-0:20): Ending + CTA*
+All four of them cleaning together, laughing. Text: "Ghar mein toddler nahi, poori negotiation team hai!" Visual: warm golden light, everyone smiling, toys now in a basket.
+
+**CAPTION:** "Ria ne Papa ko bulaya... toh poora ghar negotiation mode mein! 😂 Kya aapke bachche bhi aise hi kuchh kehte hain?"
+**HASHTAGS:** #ToddlerLife #ParentingHacks #IndianParents #ToddlerMoments #FunLearningWithPalak
+
+---
+
+### 16. Mumma Said "Don't Touch" (wordless)
+
+- **id:** `life-dont-touch-wordless`
+- **Series:** Parent-Relatable
+- **Title:** Mumma Ne Kaha Haath Mat Lagana! 👀
+- **Topic:** A universal toddler moment — hands reach for the forbidden thing
+- **Audience Problem:** "Har ghar mein ek aisa hi scene hota hai!"
+- **Characters:** Ria + Mumma | **Age:** 1-4
+- **Format:** Reel | **Production:** Character | **Goal:** Saves
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Relatable
+- **Status:** Ready | **Priority:** High
+- **Duration:** 20 sec (five 4-second scenes)
+- **Notes:** Entirely visual — no dialogue. Works mute with text overlays.
+
+**HOOK:** "Mumma ne kaha mat touch karna... 😇"
+
+**WHO:** Ria, Mumma
+
+**WHERE:** Kitchen counter. Jar of sweets on the edge.
+
+**WHAT STARTS IT:** Mumma says "Ria, ye mat touch karna."
+
+**WHAT GOES WRONG:** Ria looks at the object, then at Mumma, then at the object again.
+
+**HOW IT GETS WORSE:** One tiny finger reaches out slowly. Mumma says "RIA!"
+
+**HOW IT IS SOLVED:** Ria pulls her hand back with an innocent smile.
+
+**ENDING LINE:** "Instruction suna, follow nahi kiya!"
+
+**CLOSING CTA:** "Save this for the next 'don't touch' moment!"
+
+**HOOK OVERLAY TEXT:** "Mumma ne kaha... don't touch!"
+
+**COVER TITLE:** "The Pause"
+
+**SCENES (5 × 4 seconds):**
+
+*Scene 1 (0:00-0:04): Hook*
+Ria spotting the jar of sweets on the counter while Mumma is on a phone call. Visual: 3D Pixar style, soft morning kitchen light, Ria's eyes wide with curiosity.
+
+*Scene 2 (0:04-0:08): What goes wrong*
+Ria looking at the jar, then at Mumma, then back at the jar. Her eyes darting back and forth. Visual: close-up on Ria's face, the sweet pull of temptation visible.
+
+*Scene 3 (0:08-0:12): Getting worse*
+One tiny finger slowly reaching out toward the jar. Mumma's eyes flicking from phone to counter. Text: "RIA!" in bold. Visual: tension in every frame.
+
+*Scene 4 (0:12-0:16): Solution*
+Ria pulling her hand back with an innocent smile. Mumma finishing her call, walking over. Visual: the classic toddler pivot from mischief to angelic.
+
+*Scene 5 (0:16-0:20): Ending + CTA*
+Mumma kneeling, opening the jar, offering one sweet. "One. Not the whole jar." Text: "Ek baar, do baar — rules bhi pyaar se samajhao." Visual: warm golden light, both smiling.
+
+**CAPTION:** "Mumma ne kaha tha... haath mat lagana! Par yaar, ek minute ka tension kitna hota hai 😭 Koi aur aisa moment hai?"
+**HASHTAGS:** #DontTouch #ToddlerMoments #IndianMoms #ParentingWin #FunLearningWithPalak
+
+---
+
+### 17. Toddler Customer Care
+
+- **id:** `life-toddler-customer-care`
+- **Series:** Life With Ria & Rio
+- **Title:** Toddler Customer Care 📞
+- **Topic:** Ria keeps asking "why" until Mumma gives a satisfying answer
+- **Audience Problem:** "Bachcha sirf ek sawal puchhta hai, toh mujhe uska jawab dena padta hai!"
+- **Characters:** Ria + Mumma | **Age:** 1-4
+- **Format:** Reel | **Production:** Character | **Goal:** Engagement
+- **Content Format:** Problem → Jugaad → Result → Moral
+- **Hook Angle:** Struggle first
+- **Status:** Ready | **Priority:** High
+- **Duration:** 20 sec (five 4-second scenes)
+
+**HOOK:** "Toddler se 'kyun' ka jawab dene ki koshish? 😭"
+
+**WHO:** Ria, Mumma
+
+**WHERE:** Kitchen
+
+**WHAT STARTS IT:** Ria asks for a biscuit. Mumma says "Abhi nahi."
+
+**WHAT GOES WRONG:** Ria asks "WHY?" Mumma explains. Ria asks "BUT WHY?"
+
+**HOW IT GETS WORSE:** This repeats three times, and Mumma's face gets more tired each time.
+
+**HOW IT IS SOLVED:** Mumma answers like a helpline: "Aapka call important hai. Please hold." Ria giggles.
+
+**ENDING LINE:** "Toddler ke sawal ka koi end nahi hota!"
+
+**CLOSING CTA:** "Share this with a parent stuck in the 'why' loop!"
+
+**HOOK OVERLAY TEXT:** "WHY? WHY? WHY?"
+
+**COVER TITLE:** "The Why Loop"
+
+**SCENES (5 × 4 seconds):**
+
+*Scene 1 (0:00-0:04): Hook*
+Ria holding out her hands. Mumma shaking head. Text: "Biscuit nahi milega." Visual: 3D Pixar style, cozy kitchen, Ria's bottom lip starting to wobble.
+
+*Scene 2 (0:04-0:08): What goes wrong*
+Ria: "WHY?" Mumma explaining. Text: "Because breakfast time." Visual: Mumma's patient smile, Ria's head tilting.
+
+*Scene 3 (0:08-0:12): Getting worse*
+"Ria: BUT WHY?" Mumma's smile fading. Text: "WHY? WHY? WHY?" Visual: Mumma's face cycling through expressions, hands gesturing faster.
+
+*Scene 4 (0:12-0:16): Solution*
+Mumma putting a finger to her lips like a phone operator. Text: "Aapka call important hai. Please hold." Ria's eyes lighting up. Visual: Mumma in full helpline mode, Ria's confusion turning to delight.
+
+*Scene 5 (0:16-0:20): Ending + CTA*
+Ria giggling, clapping. Text: "Toddler ke sawal ka koi end nahi hota!" Visual: warm golden light, both laughing, Ria holding the biscuit Mumma just handed her.
+
+**CAPTION:** "Toddler Customer Care 📞 Ria ne poocha 'why'... phir se 'why'... phir se 'why'! Kab tak jawab milega? 😭 Kya aapke bachche bhi ye loop chalte hain?"
+**HASHTAGS:** #WhyWhyWhy #ToddlerQuestions #IndianMoms #ParentingHumor #FunLearningWithPalak
+
+---
+
+## Reel Ideas (Stage 1: Base ideas in beat format)
+
+These 7 reels are stored in Stage 1 format (**beats, not seconds**). Clip prompts
+(Stage 2) are generated on demand — tell me the idea and the length, and I'll
+produce the N 10-second prompts. See `clip_prompts.md` for the prompt template
+and length-mapping table.
+
+### R1. Ria Ne Papa Ko Bulaya 📣
+
+- **id:** `life-ria-calls-papa`
+- **Series:** Life With Ria & Rio | **Goal:** Engagement
+- **Characters:** Ria, Mumma, Papa, Rio | **Age:** 1-4
+- **Where:** Living room | **Props:** scattered toys
+
+**HOOK:** "Toys clean karne se bachne ka sabse bada jugaad 😂"
+
+**BEAT 1, Setup:** Mumma asks Ria to pick up toys. Ria refuses.
+
+**BEAT 2, Problem:** Ria suddenly shouts "PAPAAAA!" and runs to the doorway.
+
+**BEAT 3, Escalation:** Ria points at the toys and at Mumma, demanding Papa settle it. Papa and Mumma face each other in silent bewilderment.
+
+**BEAT 4, Turn:** Rio quietly starts cleaning up while everyone else stands there.
+
+**BEAT 5, Payoff:** All four of them end up cleaning together, laughing.
+
+**STRETCH BEAT:** Papa tries to negotiate and Ria bargains back ("5 more minutes Mama!").
+
+**Ending line:** "Ghar mein toddler nahi, poori negotiation team hai!"
+**Closing CTA:** "Share this with a parent who has a tiny negotiator!"
+**Best length:** 20s or 30s
+
+---
+
+### R2. Mujhe Nahi Aata 👟
+
+- **id:** `life-mujhe-nahi-aata`
+- **Series:** Life With Ria & Rio | **Goal:** Engagement
+- **Characters:** Ria, Mumma | **Age:** 1-4
+- **Where:** Home entrance | **Props:** shoe rack, one shoe
+
+**HOOK:** "Mumma ne kaha ne seekhna padega... par Ria kehti hai 'Nahi!' 😤"
+
+**BEAT 1, Setup:** Ria tries to put on her shoe but can't. Mumma says "try karo."
+
+**BEAT 2, Problem:** Ria shoves the shoe away, lip trembling, arms crossed.
+
+**BEAT 3, Escalation:** Mumma offers to help, Ria pushes her away harder. "Mujhe nahi aata!"
+
+**BEAT 4, Turn:** Mumma sits down at Ria's level, speaks softly, and offers her hand.
+
+**BEAT 5, Payoff:** They try together, hand over hand. The shoe goes on. Ria beams.
+
+**STRETCH BEAT:** Ria tries once alone, fails, and gets frustrated before accepting help.
+
+**Ending line:** "Kabhi kabhi saath dikhane se seekh jaati hai. ❤️"
+**Closing CTA:** "Tag the parent whose toddler says 'I can do it myself!' 🤚"
+**Best length:** 20s or 30s
+
+---
+
+### R3. Kaunsa Dhakkan Fit Hoga 🔍
+
+- **id:** `life-kaunsa-dhakkan-fit-hoga`
+- **Series:** Life With Ria & Rio | **Goal:** Saves
+- **Characters:** Ria, Rio | **Age:** 1-4
+- **Where:** Kitchen floor | **Props:** one bowl, three lids (red, yellow, blue)
+
+**HOOK:** "Teen dhakkan... ek bowl... kaunsa fit hoga? 😂"
+
+**BEAT 1, Setup:** Ria and Rio stare at the bowl and three lids. Ria thinks hard.
+
+**BEAT 2, Problem:** Ria picks the yellow lid. It slides off. Her face drops.
+
+**BEAT 3, Escalation:** Ria stomps and declares "break!" Rio tries to help, gets pushed away.
+
+**BEAT 4, Turn:** Rio silently slides the blue lid toward her.
+
+**BEAT 5, Payoff:** The blue lid clicks into place. Ria cheers, Rio claps.
+
+**STRETCH BEAT:** Ria also tries the red lid, which is too small, before settling on blue.
+
+**Ending line:** "Badi mehboob... chhote bhi seekh jaate hain! ❤️"
+**Closing CTA:** "Save this for bath time when they test every cup! 🛁"
+**Best length:** 20s (tight joke — don't stretch)
+
+---
+
+### R4. Jugaad Fail, Box Win 📦
+
+- **id:** `life-jugaad-fail-box-win`
+- **Series:** Life With Ria & Rio | **Goal:** Engagement
+- **Characters:** Ria, Mumma, Rio, Cuty | **Age:** 1-4
+- **Where:** Living room | **Props:** cardboard box, bowl-and-clips sorting game
+
+**HOOK:** "Itni si taiyari... cardboard box ne sabse tez jeet li! 😂"
+
+**BEAT 1, Setup:** Mumma sets up a colourful bowl sorting game. Ria ignores it completely.
+
+**BEAT 2, Problem:** Mumma tries funny faces and shaking bowls. Still ignored.
+
+**BEAT 3, Escalation:** Ria walks away. Mumma's smile fades — effort nobody sees.
+
+**BEAT 4, Turn:** Ria spots the empty cardboard box and climbs inside. Rio adds a spoon handle as a door. Cuty curls up and sleeps.
+
+**BEAT 5, Payoff:** Mumma watches and laughs as the box becomes the star.
+
+**STRETCH BEAT:** Mumma tries a third jugaad: a silly song. Ria ignores that too.
+
+**Ending line:** "Simple ideas, bade maza! ❤️"
+**Closing CTA:** "Tag a parent whose toddler prefers the box over the toy! 📦"
+**Best length:** 30s (needs the stretch beat for Part 2)
+
+---
+
+### R5. Mumma Ne Kaha Haath Mat Lagana 👀
+
+- **id:** `life-dont-touch-wordless`
+- **Series:** Parent-Relatable | **Goal:** Saves
+- **Characters:** Ria, Mumma | **Age:** 1-4
+- **Where:** Living room | **Props:** decorative vase on low table
+
+**HOOK:** "Mumma ne kaha mat touch karna... 😇"
+
+**BEAT 1, Setup:** Mumma warns Ria not to touch the vase, then turns away.
+
+**BEAT 2, Problem:** Ria looks at the vase, then at Mumma, then back at the vase. One finger reaches out.
+
+**BEAT 3, Escalation:** Mumma spins around: "Ria!" The finger pauses mid-air.
+
+**BEAT 4, Turn:** Ria pulls her hand back with an innocent smile.
+
+**BEAT 5, Payoff:** Mumma offers a high-five. Both smiling.
+
+**STRETCH BEAT:** Ria tries again, this time with a different finger, testing the boundary.
+
+**Ending line:** "Instruction suna, follow nahi kiya!"
+**Closing CTA:** "Save this for the next 'don't touch' moment!"
+**Best length:** 20s (tight — don't stretch)
+
+---
+
+### R6. Toddler Customer Care 📞
+
+- **id:** `life-toddler-customer-care`
+- **Series:** Life With Ria & Rio | **Goal:** Engagement
+- **Characters:** Ria, Mumma | **Age:** 1-4
+- **Where:** Kitchen | **Props:** biscuit jar, toy phone
+
+**HOOK:** "Toddler se 'kyun' ka jawab dene ki koshish? 😭"
+
+**BEAT 1, Setup:** Ria asks for a biscuit. Mumma says "abhi nahi."
+
+**BEAT 2, Problem:** "WHY?" Ria's eyes are wide. Mumma explains patiently.
+
+**BEAT 3, Escalation:** "BUT WHY?" again, and again. Mumma's smile fades. "WHY? WHY? WHY?"
+
+**BEAT 4, Turn:** Mumma picks up the toy phone, puts a finger to her lips, and answers like a helpline.
+
+**BEAT 5, Payoff:** Ria giggles. The tension dissolves.
+
+**STRETCH BEAT:** A fourth "but why" after Mumma has explained.
+
+**Ending line:** "Toddler ke sawal ka koi end nahi hota!"
+**Closing CTA:** "Share this with a parent stuck in the 'why' loop!"
+**Best length:** 30s (needs the stretch beat for Part 2)
+
+---
+
+### R7. 2 Minute Ka Bath 🛁
+
+- **id:** `life-2-minute-ka-bath`
+- **Series:** Life With Ria & Rio | **Goal:** Reach
+- **Characters:** Ria, Mumma | **Age:** 1-4
+- **Where:** Bathroom | **Props:** small tub, 3 cups, 1 bucket, 2 floating toys
+- **Notes:** Keep Ria covered in bubbles and water, shoulders and above only.
+
+**HOOK:** "2 minute ka bath... 20 minute ka swimming! 🏊‍♀️"
+
+**BEAT 1, Setup:** Mumma holds up two fingers: "2 minutes only." Ria nods happily.
+
+**BEAT 2, Problem:** Two minutes later, the tub is a full water park — cups, bucket, toys everywhere.
+
+**BEAT 3, Escalation:** Ria spreads her arms wide: "Swimming pool!" Mumma stands in the doorway, deadpan exhausted.
+
+**BEAT 4, Turn:** Mumma sighs, then joins in — pouring water with her.
+
+**BEAT 5, Payoff:** Both laughing, playing together in the bath.
+
+**STRETCH BEAT:** Ria builds a bubble beard and shows it off to Mumma.
+
+**Ending line:** "Bath time = play time, full stop! ❤️"
+**Closing CTA:** "Save this for when your toddler says 'just 2 minutes'! ⏰"
+**Best length:** 20s or 30s
+
+---
+
 ## Template for a new idea
 
 Copy this block, paste it at the bottom of the Ideas section, fill in what you know.
 
 ```
-### <Title>
+### 
 
-- **id:** `<series-short>-<short-slug>`
+- **id:** `-`
 - **Series:** 
 - **Topic:** 
 - **Problem:** 
@@ -1183,14 +1555,8 @@ Copy this block, paste it at the bottom of the Ideas section, fill in what you k
 - **Status:** Idea
 - **Priority:** 
 - **Notes:** 
-```
 
-## Versions
-
-When you try the same idea in a second format, do not overwrite it. Add it here.
-
-```
-### <Title>, version 2
+### , version 2
 
 - **Format:** 
 - **Content Type:** 
@@ -1213,3 +1579,5 @@ When you try the same idea in a second format, do not overwrite it. Add it here.
 | today | Added 33 new ideas: 14 Jugaadu Mummy, 9 character stories, 10 learning activities |
 | today | Added the format recommendation table with one-line reasoning per rule |
 | Oct 2026 | Added 10 Navratri Reel Ideas (N1–N10) under parenting-relatability |
+
+

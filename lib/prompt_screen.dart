@@ -9,6 +9,8 @@ import 'posting_kit.dart';
 import 'prompt_builder.dart';
 import 'projects.dart';
 import 'prompts.dart';
+import 'story_ideas.dart';
+import 'story_reel_builder.dart';
 import 'theme.dart';
 
 // ── Prompts screen ────────────────────────────────────────────────────────────
@@ -53,6 +55,8 @@ class _PromptScreenState extends State<PromptScreen> {
   /// True when these came off the phone rather than from a fresh request. Worth
   /// saying, so nobody wonders why the wording is identical to yesterday's.
   bool _fromSaved = false;
+  /// Stage 1 beat sheet for generating video prompts (set when idea is loaded).
+  BeatSheet? _beatSheet;
   /// Your own wording, by field. Read at the top of every card, so what you typed is
   /// what you see and what you copy.
   Map<String, String> _edits = {};
@@ -162,11 +166,76 @@ class _PromptScreenState extends State<PromptScreen> {
     if (mounted) setState(() {});
   }
 
-  void _copy(String text, String what) {
+   void _copy(String text, String what) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('$what copied'), duration: const Duration(seconds: 2)),
     );
+  }
+
+  void _openVideoPrompts() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Video Prompt Length'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Choose reel length (each part is 10 seconds):'),
+            const SizedBox(height: 12),
+            ...[20, 30, 40, 60].map((sec) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _generateAndShowVideoPrompts(sec);
+                },
+                child: Text('$sec seconds (${sec ~/ 10} parts)'),
+              ),
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _generateAndShowVideoPrompts(int seconds) async {
+    if (_beatSheet == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No story selected for video prompts')),
+      );
+      return;
+    }
+
+    setState(() { _loading = true; _waiting = 'Generating video prompts...'; });
+    try {
+      final prompts = buildVideoPrompts(
+        beats: _beatSheet!,
+        seconds: seconds,
+      );
+      if (!mounted) return;
+
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => VideoPromptScreen(
+          prompts: List.generate(
+            prompts.length,
+            (i) => VideoClipPrompt(
+              partNumber: i + 1,
+              totalParts: prompts.length,
+              promptText: prompts[i],
+            ),
+          ),
+          beatSheet: _beatSheet!,
+        ),
+      ));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() { _loading = false; _waiting = ''; });
+    }
   }
 
   @override
@@ -175,22 +244,30 @@ class _PromptScreenState extends State<PromptScreen> {
       appBar: AppBar(
         title: const Text('AI Prompts'),
         actions: [
-          if (_prompts != null)
+          if (_prompts != null) ...[
+            if (_beatSheet != null)
+              IconButton(
+                tooltip: 'Generate video prompts (Stage 2)',
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                onPressed: () => _openVideoPrompts(),
+              ),
+            const SizedBox(width: 8),
             IconButton(
               tooltip: 'Copy every image prompt',
               icon: const Icon(Icons.copy_all),
               onPressed: () => _copy(_allImagePrompts(),
                 'All ${_prompts!.scenes.length} image prompts'),
             ),
-          // Only offered once there is something to replace, and it says plainly that
-          // it spends a request — otherwise the cheap path and the expensive one look
-          // identical and people tap the expensive one out of habit.
-          if (_prompts != null)
-            IconButton(
-              tooltip: 'Write new prompts (uses a Gemini request)',
-              icon: const Icon(Icons.refresh),
-              onPressed: _loading ? null : _askGemini,
-            ),
+            // Only offered once there is something to replace, and it says plainly that
+            // it spends a request — otherwise the cheap path and the expensive one look
+            // identical and people tap the expensive one out of habit.
+            if (_prompts != null)
+              IconButton(
+                tooltip: 'Write new prompts (uses a Gemini request)',
+                icon: const Icon(Icons.refresh),
+                onPressed: _loading ? null : _askGemini,
+              ),
+          ],
         ],
       ),
       body: _loading
@@ -726,10 +803,89 @@ class _PromptScreenState extends State<PromptScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: AppColors.surfaceAlt, borderRadius: BorderRadius.circular(6)),
-            child: SelectableText(body,
+             child: SelectableText(body,
               style: const TextStyle(fontSize: 11, height: 1.35, fontFamily: 'monospace')),
+            ),
+          ]),
+        ),
+    );
+  }
+}
+
+// ── Video prompts screen ────────────────────────────────────────────────────────
+
+class VideoPromptScreen extends StatelessWidget {
+  final List<VideoClipPrompt> prompts;
+  final BeatSheet beatSheet;
+
+  const VideoPromptScreen({
+    super.key,
+    required this.prompts,
+    required this.beatSheet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Video Prompts'),
+        actions: [
+          IconButton(
+            tooltip: 'Copy all video prompts',
+            icon: const Icon(Icons.copy_all),
+            onPressed: () {
+              final all = prompts.map((p) => p.promptText).join('\n---\n');
+              Clipboard.setData(ClipboardData(text: all));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('All ${prompts.length} prompts copied')),
+              );
+            },
           ),
-        ]),
+        ],
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: prompts.length,
+        itemBuilder: (context, index) {
+          final p = prompts[index];
+          return Card(
+            color: AppColors.surface,
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Expanded(child: Text(
+                    p.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  )),
+                  IconButton(
+                    icon: const Icon(Icons.copy, size: 18),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: p.promptText));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Part ${p.partNumber} copied')),
+                      );
+                    },
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceAlt,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: SelectableText(
+                    p.promptText,
+                    style: const TextStyle(fontSize: 11, height: 1.35, fontFamily: 'monospace'),
+                  ),
+                ),
+              ]),
+            ),
+          );
+        },
       ),
     );
   }

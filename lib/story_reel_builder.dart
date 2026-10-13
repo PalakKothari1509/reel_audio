@@ -11,6 +11,7 @@ import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_package_v2.dart';
 import 'content_quality_gate.dart';
+import 'story_ideas.dart';
 
 /// Input parameters for a Story Reel generation request.
 class StoryReelRequest {
@@ -289,5 +290,138 @@ OUTPUT JSON SCHEMA:
   "replyComments": ["relatable parent response", "non-parent response", "emoji reaction", "validation", "CTA"],
   "script": "Full narration for both scenes, timed to ${totalDuration}s total"
 }
+''';
+}
+
+// ── Stage 2: Length calculator ─────────────────────────────────────────────────
+//
+// Converts a BeatSheet (Stage 1, no timing) into N 10-second parts by spreading
+// the beats across the parts based on the chosen length.
+
+/// Returns the number of 10-second parts for a given total length.
+/// 20 → 2, 30 → 3, 40 → 4, 60 → 6.
+int partsForLength(int seconds) => (seconds / 10).round();
+
+/// How beats map to parts for each supported length.
+///
+/// Beat indices: 0=setup, 1=problem, 2=escalation, 3=turn, 4=payoff
+/// Sentinel values:
+/// -1 = stretch beat if present, otherwise skipped
+/// -2 = extra escalation or reaction beat
+/// -3 = payoff buffer
+///
+/// - 20s (2 parts): [0,1,2] → Part 1, [3,4] → Part 2
+/// - 30s (3 parts): [0,1] → Part 1, [2,-1] → Part 2 (escalation + stretch),
+///   [3,4] → Part 3
+/// - 40s (4 parts): [0,1] → Part 1, [2,-1] → Part 2, [-2,3] → Part 3,
+///   [4,-3] → Part 4
+class PartBeatMapping {
+  final List<List<int>> partToBeatIndices;
+  const PartBeatMapping(this.partToBeatIndices);
+}
+
+PartBeatMapping beatIndicesForParts(int seconds) {
+  final parts = partsForLength(seconds);
+  switch (parts) {
+    case 2:
+      return const PartBeatMapping([
+        [0, 1, 2],
+        [3, 4],
+      ]);
+    case 3:
+      return const PartBeatMapping([
+        [0, 1],
+        [2, -1],
+        [3, 4],
+      ]);
+    case 4:
+      return const PartBeatMapping([
+        [0, 1],
+        [2, -1],
+        [-2, 3],
+        [4, -3],
+      ]);
+    default:
+      return const PartBeatMapping([
+        [0, 1],
+        [2, -1],
+        [3, 4],
+      ]);
+  }
+}
+
+/// Builds N self-contained 10-second video prompts from a BeatSheet + length.
+///
+/// Each prompt is standalone: style, size, characters, camera, timed action,
+/// and a continuity line for Parts 2+.
+List<String> buildVideoPrompts({
+  required BeatSheet beats,
+  required int seconds,
+}) {
+  final parts = partsForLength(seconds);
+  final mapping = beatIndicesForParts(seconds);
+  final prompts = <String>[];
+
+  for (int i = 0; i < parts; i++) {
+    final isFirst = i == 0;
+    final beatIndices = mapping.partToBeatIndices[i];
+    final prompt = _buildPartPrompt(
+      beats: beats,
+      partNumber: i + 1,
+      totalParts: parts,
+      beatIndices: beatIndices,
+      isFirstPart: isFirst,
+    );
+    prompts.add(prompt);
+  }
+
+  return prompts;
+}
+
+String _buildPartPrompt({
+  required BeatSheet beats,
+  required int partNumber,
+  required int totalParts,
+  required List<int> beatIndices,
+  required bool isFirstPart,
+}) {
+  final chars = beats.characters.map((id) => CharacterLibrary.byId(id)?.name ?? id).join(', ');
+
+  final beatTexts = <String>[];
+  for (final idx in beatIndices) {
+    if (idx == -1) {
+      if (beats.hasStretchBeat) {
+        beatTexts.add(beats.stretchBeat!);
+      }
+    } else if (idx == -2) {
+      beatTexts.add('${beats.beat3Escalation} — reaction');
+    } else if (idx == -3) {
+      beatTexts.add(beats.beat5Payoff);
+    } else if (idx >= 0 && idx < beats.beats.length) {
+      beatTexts.add(beats.beats[idx]);
+    }
+  }
+
+  final continuity = isFirstPart
+      ? ''
+      : 'CONTINUITY: The first frame must match the attached image (same room, lighting, positions and outfits).';
+
+  final action04 = beatTexts.isNotEmpty ? beatTexts[0] : beats.beat3Escalation;
+  final action48 = beatTexts.length > 1 ? '4-8s: ${beatTexts[1]}\n' : '';
+
+  return '''
+Create a 10-second vertical 9:16 animated video clip.
+
+STYLE: ${BrandDefaults.visualStyle}
+CHARACTERS: Use the attached reference images for $chars. Match faces, hair and outfits exactly.
+No glasses on anyone.
+$continuity
+SETTING: ${beats.where}
+CAMERA: Fixed medium shot at child eye level. Keep characters centred, bottom 20% clear.
+ACTION:
+0-4s: $action04
+${action48}8-10s: transition to next part
+AUDIO: Natural room sound only. No music, no speech, no on-screen text.
+AVOID: Distorted hands, changing outfits, text, logos.
 ''';
 }

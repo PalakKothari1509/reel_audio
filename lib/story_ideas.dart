@@ -96,7 +96,7 @@ class StoryIdea {
   /// Every field the blank template has, in the same order. It used to fill five of
   /// them and leave the rest out, so an idea and a hand-written story arrived at the
   /// script generator in two different shapes and the idea always had less to work on.
-  String get asStoryText => 'Hook: $hook\n'
+   String get asStoryText => 'Hook: $hook\n'
       'Who: $who\n'
       'Where: $where\n'
       'What starts it: $problem\n'
@@ -104,7 +104,7 @@ class StoryIdea {
       'How it gets worse: $worse\n'
       'How it is solved: $solution\n'
       'Ending line: $endingLine\n'
-      'Moral: $moral';
+       'Moral: $moral';
 }
 
 // ── Checking a story before it costs anything ─────────────────────────────────
@@ -553,4 +553,238 @@ Return ONLY valid JSON:
     replies,
     (json['note'] as String?)?.trim() ?? '',
   );
+}
+
+// ── Stage 1: BeatSheet — idea with beats, no timing ────────────────────────────
+//
+// A BeatSheet is what gets stored in content_ideas.md under "Stage 1: Base Idea".
+// It has the five core story beats plus an optional stretch beat. No timestamps,
+// no scene numbers — that comes in Stage 2 when you pick a length.
+
+/// One beat in a BeatSheet, identified by index.
+enum BeatIndex {
+  setup(0),
+  problem(1),
+  escalation(2),
+  stretch(3),
+  turn(4),
+  payoff(5);
+
+  final int value;
+  const BeatIndex(this.value);
+}
+
+/// The five core beats of a reel idea, plus an optional stretch beat.
+///
+/// Stage 1 model — no timing. Length is decided later in Stage 2.
+class BeatSheet {
+  final String id;
+  final String title;
+  final List<String> characters;
+  final String where;
+  final String hook;
+  final String beat1Setup;        // what's normal at the start
+  final String beat2Problem;       // what goes wrong
+  final String beat3Escalation;   // how it gets worse
+  final String beat4Turn;          // the moment things change
+  final String beat5Payoff;        // the funny or warm ending
+  final String? stretchBeat;       // optional extra between 2 and 4
+  final String endingLine;
+  final String closingCta;
+  final String? caption;
+  final List<String> hashtags;     // exactly 5
+  final int? bestLength;           // 20, 30, or null (flexible)
+
+  const BeatSheet({
+    required this.id,
+    required this.title,
+    required this.characters,
+    required this.where,
+    required this.hook,
+    required this.beat1Setup,
+    required this.beat2Problem,
+    required this.beat3Escalation,
+    required this.beat4Turn,
+    required this.beat5Payoff,
+    this.stretchBeat,
+    required this.endingLine,
+    required this.closingCta,
+    this.caption,
+    this.hashtags = const [],
+    this.bestLength,
+  });
+
+  /// Whether a stretch beat is available — determines if 30s works well.
+  bool get hasStretchBeat => stretchBeat != null && stretchBeat!.trim().isNotEmpty;
+
+  /// The five required beats as a list (index 0 = setup, 4 = payoff).
+  List<String> get beats => [
+    beat1Setup,
+    beat2Problem,
+    beat3Escalation,
+    beat4Turn,
+    beat5Payoff,
+  ];
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'characters': characters,
+    'where': where,
+    'hook': hook,
+    'beat1_setup': beat1Setup,
+    'beat2_problem': beat2Problem,
+    'beat3_escalation': beat3Escalation,
+    'beat4_turn': beat4Turn,
+    'beat5_payoff': beat5Payoff,
+    'stretch_beat': stretchBeat,
+    'ending_line': endingLine,
+    'closing_cta': closingCta,
+    'caption': caption,
+    'hashtags': hashtags,
+    'best_length': bestLength,
+  };
+
+  factory BeatSheet.fromJson(Map<String, dynamic> json) {
+    String read(String key, String fallback) {
+      final value = json[key];
+      return (value is String && value.trim().isNotEmpty) ? value.trim() : fallback;
+    }
+
+    return BeatSheet(
+      id: read('id', ''),
+      title: read('title', ''),
+      characters: ((json['characters'] as List?)?.cast<String>() ?? [])
+          .where((s) => s.trim().isNotEmpty).toList(),
+      where: read('where', ''),
+      hook: read('hook', ''),
+      beat1Setup: read('beat1_setup', ''),
+      beat2Problem: read('beat2_problem', ''),
+      beat3Escalation: read('beat3_escalation', ''),
+      beat4Turn: read('beat4_turn', ''),
+      beat5Payoff: read('beat5_payoff', ''),
+      stretchBeat: json['stretch_beat'] as String?,
+      endingLine: read('ending_line', ''),
+      closingCta: read('closing_cta', ''),
+      caption: json['caption'] as String?,
+      hashtags: ((json['hashtags'] as List?)?.cast<String>() ?? [])
+          .where((s) => s.trim().isNotEmpty).toList(),
+      bestLength: json['best_length'] as int?,
+    );
+  }
+
+  BeatSheet copyWith({
+    String? id,
+    String? title,
+    List<String>? characters,
+    String? where,
+    String? hook,
+    String? beat1Setup,
+    String? beat2Problem,
+    String? beat3Escalation,
+    String? beat4Turn,
+    String? beat5Payoff,
+    String? stretchBeat,
+    String? endingLine,
+    String? closingCta,
+    String? caption,
+    List<String>? hashtags,
+    int? bestLength,
+  }) {
+    return BeatSheet(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      characters: characters ?? this.characters,
+      where: where ?? this.where,
+      hook: hook ?? this.hook,
+      beat1Setup: beat1Setup ?? this.beat1Setup,
+      beat2Problem: beat2Problem ?? this.beat2Problem,
+      beat3Escalation: beat3Escalation ?? this.beat3Escalation,
+      beat4Turn: beat4Turn ?? this.beat4Turn,
+      beat5Payoff: beat5Payoff ?? this.beat5Payoff,
+      stretchBeat: stretchBeat ?? this.stretchBeat,
+      endingLine: endingLine ?? this.endingLine,
+      closingCta: closingCta ?? this.closingCta,
+      caption: caption ?? this.caption,
+      hashtags: hashtags ?? this.hashtags,
+      bestLength: bestLength ?? this.bestLength,
+    );
+  }
+}
+
+/// Asks Gemini for a Stage 1 base idea — beats only, no timing.
+Future<BeatSheet> generateBeatSheet({
+  required String ideaDescription,
+  required String id,
+  String? apiKey,
+  void Function(String message)? onWait,
+}) async {
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  final prompt = '''
+Think of one short story for an Instagram reel for Indian parents of preschoolers.
+
+THE IDEA: $ideaDescription
+
+Characters: Ria, Rio, Cuty, Mumma, Papa. Use only the ones the story needs.
+
+Do NOT decide the length. Write beats, not timed scenes. Return ONLY valid JSON:
+
+{
+  "title": "short Hinglish title with emoji",
+  "characters": ["ria", "mumma"],
+  "where": "setting in 2-3 words",
+  "hook": "one-line hook",
+  "beat1_setup": "what's normal at the start",
+  "beat2_problem": "what goes wrong",
+  "beat3_escalation": "how it gets worse",
+  "beat4_turn": "the moment things change",
+  "beat5_payoff": "the funny or warm ending",
+  "stretch_beat": "an extra moment between problem and turn, or null if none",
+  "ending_line": "one short warm line in Hinglish",
+  "closing_cta": "a short follow line",
+  "caption": "2-3 lines for Instagram",
+  "hashtags": ["exactly", "five", "relevant", "tags", "here"],
+  "best_length": 20 or 30 or null
+}
+
+Every value should be under 25 words. The child should work it out or be shown,
+not told off. Be specific to an Indian household.
+''';
+
+  final response = await geminiPost(
+    model: _lightModel,
+    fallbackModel: _fullModel,
+    apiKey: key,
+    timeout: _timeout,
+    onWait: onWait,
+    body: jsonEncode({
+      'contents': [{'parts': [{'text': prompt}]}],
+      'generationConfig': {
+        'temperature': 1.0,
+        'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode, response.body)
+        : 'Gemini error ${response.statusCode}: ${response.body}');
+  }
+
+  final body = jsonDecode(response.body);
+  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  if (text.trim().isEmpty) throw Exception('Gemini returned no beat sheet.');
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(text.trim()) as Map<String, dynamic>;
+  } catch (_) {
+    throw Exception('Gemini did not return usable JSON.\n$text');
+  }
+
+  return BeatSheet.fromJson(json).copyWith(id: id);
 }

@@ -106,22 +106,34 @@ Future<StoryPackage> generateEverything({
   if (selectedCharacters.isEmpty) selectedCharacters = CharacterLibrary.all;
 
   final prompt = '''
-Write a complete $seconds second Instagram Reel for "Fun Learning With Palak".
+Act as a video content creator for "Fun Learning With Palak", an Indian kids' education Instagram page.
 
 THE STORY (this is the source of truth, follow it):
 $storyDescription
 
-Characters appearing: ${selectedCharacters.map((c) => '${c.name} (${c.description})').join(', ')}.
+Characters appearing: ${selectedCharacters.map((c) => c.name).join(', ')}.
+Use the attached reference images for exact face/hair/outfit matching.
 
-Visual style: ${BrandDefaults.visualStyle}.
+Visual style: ${BrandDefaults.visualStyle}
 Aspect ratio: vertical 9:16 for Instagram Reel.
 Voice: ${isHinglish ? 'Hinglish narration with Devanagari spoken lines' : 'English narration'}.
 
 ${CharacterLibrary.characterLockFor(selectedCharacters)}
 
+SCENE STRUCTURE:
+Write exactly $expectedLines scenes, one per script line, in order.
+Scene 1 is the hook (0:00-0:04s). Each subsequent scene is 4 seconds.
+For each scene, provide a time range and describe the visual in detail
+including character expressions, camera angle, and key objects.
+
 $kScriptShapeRules
 
 $kReelShapeRules
+
+AUDIO DIRECTIONS:
+- Background: soft instrumental appropriate to the scene (builds energy for hook, gentle for takeaway)
+- Dialogue: spoken in ${isHinglish ? 'Hinglish (with Devanagari text on screen)' : 'English'}, max 2 lines per scene
+- Voice: warm, conversational, kid-friendly
 
 Keep every line to 4-9 words: short on screen, still easy to say in about 4 seconds.
 Write how a person talks, not how a book reads.
@@ -155,10 +167,10 @@ Return ONLY valid JSON in exactly this shape:
   "end_question": "one question on the last screen a parent can answer in four words, about their own child",
   "caption": "2 or 3 lines for Instagram, warm, speaking to parents, ending in something they will want to answer",
   "hashtags": ["#exactly", "#five", "#relevant", "#tags", "#here"],
-  "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs. Something answerable in a few words, never yes or no",
-  "pin_comment_options": ["five DIFFERENT pinned first comments in natural Hinglish that start a genuine conversation between parents, e.g. Aapke little one ne bhi kabhi aisa kiya hai? ❤️ — never comment YES, type 1, tag friends, or follow"],
-  "ending_options": ["five DIFFERENT one-line endings for the closing card under Little Stories, Big Lessons ❤️, e.g. Would your little one do this too? ❤️ / Save this little lesson for later. / Know a parent who needs this reminder? Share it ❤️ / Which part felt familiar at your home? 🥹 — short, warm, no bait"],
-  "reply_question": "what to reply to a comment with. Warm, Hinglish, and it ends in a question of its own so the conversation carries on — a reply that only says thank you ends it",
+  "pin_comment": "the first comment, pinned. Say one true thing about this situation in a parent's own house, then ask them about theirs.",
+  "pin_comment_options": ["five DIFFERENT pinned first comments in natural Hinglish"],
+  "ending_options": ["five DIFFERENT one-line endings for the closing card under Little Stories, Big Lessons"],
+  "reply_question": "what to reply to a comment with. Warm, Hinglish ending in a question",
   "best_time": "a posting window for Indian parents of small children, e.g. Weekdays 8-9 pm IST",
   "scenes": [
     {"scene": "what the picture shows, one sentence, name the characters in it",
@@ -172,10 +184,10 @@ Return ONLY valid JSON in exactly this shape:
 
 Rules:
 - "script" must have exactly $expectedLines entries.
-- "at" is the second that line starts, counting from 0, roughly 4 seconds apart.
+- "at" is the second that line starts, counting from 0, 4 seconds apart.
 - $scriptShape
 - "scenes" must have exactly $expectedLines entries, one per script line, in order.
-- "cover_hook_options", "pin_comment_options" and "ending_options" each have 5 entries that are genuinely different from each other, not rewordings of one idea.
+- "cover_hook_options", "pin_comment_options" and "ending_options" each have 5 entries that are genuinely different from each other.
 - Scene 1 is the hook and must be the most eye-catching picture of the set.
 - Describe pictures, not camera equipment. No text or writing inside the pictures.
 - Keep it all compact. Short sentences everywhere.
@@ -481,5 +493,5 @@ String _stripFence(String text) {
   final firstBreak = trimmed.indexOf('\n');
   final end = trimmed.lastIndexOf('```');
   if (firstBreak < 0 || end <= firstBreak) return trimmed;
-  return trimmed.substring(firstBreak + 1, end).trim();
+   return trimmed.substring(firstBreak + 1, end).trim();
 }

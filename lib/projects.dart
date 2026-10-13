@@ -52,6 +52,10 @@ class Project {
   /// means running out. Kept here, reopening it costs nothing.
   final String promptsJson;
 
+  /// The Stage 1 BeatSheet for this story, saved as JSON text. Lets the prompts
+  /// screen generate Stage 2 video prompts without calling Gemini again.
+  final String beatSheetJson;
+
   /// The script those prompts were written for. Prompts describe one picture per
   /// line, so if the script has changed they no longer match it and are worth
   /// asking for again; if it has not, they are as good as the day they arrived.

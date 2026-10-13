@@ -184,26 +184,33 @@ class CharacterLibrary {
     return null;
   }
 
-  /// Built from [characters], defaulting to the whole library, rather than naming
-  /// characters by hand. It used to list Ria, Rio and Cuty by hand, which meant
-  /// Mumma could be added to [all] and still never reach a prompt.
+  /// Lean character lock — just names and the core rules. Facial details are
+  /// locked by reference images uploaded to Gemini, so the prompt only needs
+  /// to enforce style, size, and the no-glasses rule.
   ///
-  /// Takes the cast it should describe so that a post featuring only Mumma does not
-  /// also carry Ria, Rio and Cuty into the prompt and invite the generator to put
-  /// them in the frame.
+  /// Takes the cast it should describe so that a post featuring only Mumma
+  /// does not carry Ria, Rio and Cuty into the frame.
   static String characterLockFor([List<Character>? characters]) {
     final cast = (characters == null || characters.isEmpty) ? all : characters;
     return '''
-CHARACTER LOCK — Use these exact descriptions in EVERY prompt. Do not vary.
+CHARACTER LOCK — Use the attached reference images for exact face/hair/outfit matching.
 
-${cast.map((c) => c.fullProfile).join('\n\n')}
+${cast.map((c) => c.name).join(', ')}
 
 RULES:
 - Ria and Rio NEVER wear glasses.
 - Cuty is ALWAYS a small white bunny with a pink bow.
 - Only the characters listed above may appear in this post.
 - Outfits may change per scene but hair/eyes/face stay consistent.
-- Visual style: ${BrandDefaults.visualStyle}
+
+VISUAL STYLE:
+${BrandDefaults.visualStyle}
+
+SIZE:
+- Vertical 9:16 (1080x1920) for Reels and Stories.
+- Portrait 4:5 (1080x1350) for Carousels and Static posts.
+- Keep key characters and text inside the centre safe area.
+- Leave bottom 20% clear for Instagram buttons.
 ''';
   }
 
