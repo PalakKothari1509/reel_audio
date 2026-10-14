@@ -23,35 +23,28 @@ void main() {
     });
 
     testWidgets('renders welcome section and navigation, responds to taps', (tester) async {
-      var addIdeaTapped = false;
       var createReelTapped = false;
       var settingsTapped = false;
 
       await tester.pumpWidget(
         MaterialApp(
           home: ContentStudioHome(
-            onAddIdea: (_) => addIdeaTapped = true,
             onCreateReel: (_) => createReelTapped = true,
             onMyContent: () {},
-            onInsights: () {},
             onSettings: () => settingsTapped = true,
             onIdeaVault: () {},
-            onDashboard: () {},
+            onImagePrompt: () {},
+            onCarouselPrompts: () {},
+            onGeminiVideo: () {},
           ),
         ),
       );
       await tester.pump();
 
       expect(find.text('Good morning, Palak!'), findsOneWidget);
-      expect(find.text('+ Add Idea'), findsOneWidget);
       expect(find.text('Create a Reel'), findsOneWidget);
-      expect(find.text('View Content'), findsOneWidget);
-      expect(find.text('Idea Vault'), findsWidgets);
-      expect(find.text('My Content'), findsWidgets);
-      expect(find.text('Insights'), findsWidgets);
-
-      await tester.tap(find.text('+ Add Idea').first);
-      expect(addIdeaTapped, isTrue);
+      expect(find.text('Idea Vault'), findsOneWidget);
+      expect(find.text('My Content'), findsOneWidget);
 
       await tester.tap(find.text('Create a Reel').first);
       expect(createReelTapped, isTrue);
@@ -60,91 +53,24 @@ void main() {
       expect(settingsTapped, isTrue);
     });
 
-    testWidgets('pipeline overview shows status headers', (tester) async {
+    testWidgets('has no duplicate Create button', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: ContentStudioHome(
-            onAddIdea: (_) {},
-            onCreateReel: (_) {},
+            onCreateReel: (_) => {},
             onMyContent: () {},
-            onInsights: () {},
             onSettings: () {},
             onIdeaVault: () {},
-            onDashboard: () {},
+            onImagePrompt: () {},
+            onCarouselPrompts: () {},
+            onGeminiVideo: () {},
           ),
         ),
       );
       await tester.pump();
 
-      expect(find.text('Your content pipeline'), findsOneWidget);
-      expect(find.text('Ideas'), findsOneWidget);
-      expect(find.text('In Progress'), findsOneWidget);
-      expect(find.text('Published'), findsOneWidget);
-    });
-
-    testWidgets('Idea Vault nav card navigates on tap', (tester) async {
-      var vaultTapped = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ContentStudioHome(
-            onAddIdea: (_) {},
-            onCreateReel: (_) {},
-            onMyContent: () {},
-            onInsights: () {},
-            onSettings: () {},
-            onIdeaVault: () => vaultTapped = true,
-            onDashboard: () {},
-          ),
-        ),
-      );
-      await tester.pump();
-
-      final card = find.ancestor(
-        of: find.text('Capture, browse, organise, and develop ideas'),
-        matching: find.byType(InkWell),
-      );
-      await tester.tap(card);
-      expect(vaultTapped, isTrue);
-    });
-
-    testWidgets('reminders section is hidden when no pending items', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ContentStudioHome(
-            onAddIdea: (_) {},
-            onCreateReel: (_) {},
-            onMyContent: () {},
-            onInsights: () {},
-            onSettings: () {},
-            onIdeaVault: () {},
-            onDashboard: () {},
-          ),
-        ),
-      );
-      await tester.pump();
-
-      expect(find.text('Reminders'), findsNothing);
-    });
-
-    testWidgets('settings icon in AppBar navigates', (tester) async {
-      var settingsTapped = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ContentStudioHome(
-            onAddIdea: (_) {},
-            onCreateReel: (_) {},
-            onMyContent: () {},
-            onInsights: () {},
-            onSettings: () => settingsTapped = true,
-            onIdeaVault: () {},
-            onDashboard: () {},
-          ),
-        ),
-      );
-      await tester.pump();
-
-      await tester.tap(find.byTooltip('Settings'));
-      expect(settingsTapped, isTrue);
+      // Exactly one primary Create action, not two competing buttons.
+      expect(find.text('Create a Reel'), findsOneWidget);
     });
   });
 }

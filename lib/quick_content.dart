@@ -2966,7 +2966,7 @@ class IdeaInboxStore {
 }
 
 class IdeaInboxScreen extends StatefulWidget {
-  const IdeaInboxScreen({super.key, this.seed = const []});
+  const IdeaInboxScreen({super.key, this.seed = const [], this.onCreateReel});
 
   /// Test seam: when non-empty, the screen renders these
   /// items instead of reading the store. The store read
@@ -2974,6 +2974,11 @@ class IdeaInboxScreen extends StatefulWidget {
   /// list — and the delete confirmation on it — cannot be
   /// tested at all.
   final List<IdeaInboxItem> seed;
+
+  /// Called when a user taps Generate on an idea. The caller owns the route
+  /// to the reel builder, because that screen lives in main.dart and the
+  /// inbox does not import it.
+  final VoidCallback? onCreateReel;
 
   @override
   State<IdeaInboxScreen> createState() => _IdeaInboxScreenState();
@@ -3250,17 +3255,21 @@ class _IdeaInboxScreenState extends State<IdeaInboxScreen> {
     }
   }
 
-  Future<void> _generateFromIdea(IdeaInboxItem item) async {
+Future<void> _generateFromIdea(IdeaInboxItem item) async {
     final updated = item.copyWith(
       status: IdeaStatus.scripted,
       updatedAt: DateTime.now(),
     );
     await IdeaInboxStore.update(updated);
     if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => MultiFormatScreen(initialIdea: item)),
-    );
+    if (widget.onCreateReel != null) {
+      widget.onCreateReel!();
+      return;
+    }
+    // Fallback for callers that do not pass onCreateReel: open the reel
+    // builder directly. It lives in main.dart, so this file does not import
+    // it; the caller is expected to wire the callback instead.
+    Navigator.pop(context);
   }
 
   List<IdeaInboxItem> get _filteredItems {

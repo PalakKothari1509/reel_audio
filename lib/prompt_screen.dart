@@ -217,14 +217,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => VideoPromptScreen(
-          prompts: List.generate(
-            prompts.length,
-            (i) => VideoClipPrompt(
-              partNumber: i + 1,
-              totalParts: prompts.length,
-              promptText: prompts[i],
-            ),
-          ),
+          prompts: prompts,
           beatSheet: _beatSheet!,
         ),
       ));

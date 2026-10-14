@@ -118,6 +118,7 @@ class Project {
     this.seconds = 30,
     this.images = const [],
     this.promptsJson = '',
+    this.beatSheetJson = '',
     this.promptsScript = const [],
     this.edits = const {},
     this.scriptStoryKey = '',
@@ -165,6 +166,7 @@ class Project {
         'seconds': seconds,
         'images': images,
         'promptsJson': promptsJson,
+        'beatSheetJson': beatSheetJson,
         'promptsScript': promptsScript,
         'edits': edits,
         'scriptStoryKey': scriptStoryKey,
@@ -191,6 +193,7 @@ class Project {
         seconds: (json['seconds'] as num?)?.toInt() ?? 30,
         images: ((json['images'] as List?) ?? const []).whereType<String>().toList(),
         promptsJson: json['promptsJson'] as String? ?? '',
+        beatSheetJson: json['beatSheetJson'] as String? ?? '',
         promptsScript: ((json['promptsScript'] as List?) ?? const []).whereType<String>().toList(),
         edits: ((json['edits'] as Map?) ?? const {})
             .map((k, v) => MapEntry('$k', '$v')),

@@ -11,6 +11,7 @@ import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_package_v2.dart';
 import 'content_quality_gate.dart';
+import 'prompts.dart';
 import 'story_ideas.dart';
 
 /// Input parameters for a Story Reel generation request.
@@ -308,13 +309,16 @@ int partsForLength(int seconds) => (seconds / 10).round();
 /// Sentinel values:
 /// -1 = stretch beat if present, otherwise skipped
 /// -2 = extra escalation or reaction beat
-/// -3 = payoff buffer
+/// -3 = payoff buffer / ending
 ///
 /// - 20s (2 parts): [0,1,2] → Part 1, [3,4] → Part 2
 /// - 30s (3 parts): [0,1] → Part 1, [2,-1] → Part 2 (escalation + stretch),
 ///   [3,4] → Part 3
 /// - 40s (4 parts): [0,1] → Part 1, [2,-1] → Part 2, [-2,3] → Part 3,
 ///   [4,-3] → Part 4
+/// - 60s (6 parts): the 30s structure spread across six parts. Adjacent
+///   parts share a beat at the cut point, so the turn and the payoff each
+///   span two clips instead of being squeezed into one.
 class PartBeatMapping {
   final List<List<int>> partToBeatIndices;
   const PartBeatMapping(this.partToBeatIndices);
@@ -341,26 +345,38 @@ PartBeatMapping beatIndicesForParts(int seconds) {
         [-2, 3],
         [4, -3],
       ]);
-    default:
+    case 6:
+      // The 30s structure expanded across six parts. Adjacent parts share a
+      // beat at the cut point, so a beat that needs more than 10 seconds to
+      // land (the turn and the payoff) spans two clips instead of being
+      // squeezed into one or dropped.
       return const PartBeatMapping([
         [0, 1],
         [2, -1],
+        [-2, 3],
         [3, 4],
+        [4, -3],
+        [-3, 4],
       ]);
+    default:
+      throw ArgumentError(
+          'Unsupported reel length: $seconds seconds. Use 20, 30, 40 or 60.');
   }
 }
 
 /// Builds N self-contained 10-second video prompts from a BeatSheet + length.
 ///
 /// Each prompt is standalone: style, size, characters, camera, timed action,
-/// and a continuity line for Parts 2+.
-List<String> buildVideoPrompts({
+/// and a continuity line for Parts 2+. Returns the canonical
+/// [VideoClipPrompt] model defined in `prompts.dart` so there is one output
+/// type for the whole two-stage workflow.
+List<VideoClipPrompt> buildVideoPrompts({
   required BeatSheet beats,
   required int seconds,
 }) {
   final parts = partsForLength(seconds);
   final mapping = beatIndicesForParts(seconds);
-  final prompts = <String>[];
+  final prompts = <VideoClipPrompt>[];
 
   for (int i = 0; i < parts; i++) {
     final isFirst = i == 0;
@@ -372,7 +388,11 @@ List<String> buildVideoPrompts({
       beatIndices: beatIndices,
       isFirstPart: isFirst,
     );
-    prompts.add(prompt);
+    prompts.add(VideoClipPrompt(
+      partNumber: i + 1,
+      totalParts: parts,
+      promptText: prompt,
+    ));
   }
 
   return prompts;
@@ -385,7 +405,10 @@ String _buildPartPrompt({
   required List<int> beatIndices,
   required bool isFirstPart,
 }) {
-  final chars = beats.characters.map((id) => CharacterLibrary.byId(id)?.name ?? id).join(', ');
+  final cast = beats.characters
+      .map((id) => CharacterLibrary.byId(id))
+      .whereType<Character>()
+      .toList();
 
   final beatTexts = <String>[];
   for (final idx in beatIndices) {
@@ -394,7 +417,7 @@ String _buildPartPrompt({
         beatTexts.add(beats.stretchBeat!);
       }
     } else if (idx == -2) {
-      beatTexts.add('${beats.beat3Escalation} — reaction');
+      beatTexts.add(beats.beat3Escalation);
     } else if (idx == -3) {
       beatTexts.add(beats.beat5Payoff);
     } else if (idx >= 0 && idx < beats.beats.length) {
@@ -402,26 +425,82 @@ String _buildPartPrompt({
     }
   }
 
+  // Every 10-second part must carry meaningful action in all three intervals.
+  // A part that only has one beat would otherwise leave 4-10s empty, and the
+  // last part must not be written off as a "transition to next part". When a
+  // part has fewer beats than intervals, the beat is developed along the
+  // story's natural order rather than repeated verbatim.
+  final action04 = beatTexts.isNotEmpty
+      ? beatTexts[0]
+      : beats.beat3Escalation;
+  final action48 = beatTexts.length > 1
+      ? beatTexts[1]
+      : _nextBeat(beatTexts, beats, skip: 1);
+  final action810 = beatTexts.length > 2
+      ? beatTexts[2]
+      : _nextBeat(beatTexts, beats, skip: 2);
+
   final continuity = isFirstPart
       ? ''
-      : 'CONTINUITY: The first frame must match the attached image (same room, lighting, positions and outfits).';
-
-  final action04 = beatTexts.isNotEmpty ? beatTexts[0] : beats.beat3Escalation;
-  final action48 = beatTexts.length > 1 ? '4-8s: ${beatTexts[1]}\n' : '';
+      : 'CONTINUITY: This is Part $partNumber of $totalParts. The first frame must '
+          'match the previous clip exactly — same room, same lighting, same '
+          'character positions and same outfits. Do not restart the story; '
+          'continue from where the previous clip ended.';
 
   return '''
 Create a 10-second vertical 9:16 animated video clip.
 
 STYLE: ${BrandDefaults.visualStyle}
-CHARACTERS: Use the attached reference images for $chars. Match faces, hair and outfits exactly.
-No glasses on anyone.
-$continuity
+SIZE: Vertical 9:16 (1080x1920). Keep characters centred and leave the bottom
+20% clear for Instagram's overlay buttons.
+
+${CharacterLibrary.characterLockFor(cast)}
+
+Only the characters named above may appear. Do not introduce background
+characters, bystanders, extras or mascots. Ria and Rio must never wear glasses.
+
 SETTING: ${beats.where}
-CAMERA: Fixed medium shot at child eye level. Keep characters centred, bottom 20% clear.
+
+CAMERA: Fixed medium shot at child eye level. Keep the characters centred in
+the frame; the bottom 20% must stay clear.
+
 ACTION:
 0-4s: $action04
-${action48}8-10s: transition to next part
-AUDIO: Natural room sound only. No music, no speech, no on-screen text.
-AVOID: Distorted hands, changing outfits, text, logos.
+4-8s: $action48
+8-10s: $action810
+
+AUDIO: Hinglish narration describing the action above, plus matching natural
+sound effects. No background music.
+
+AVOID: Distorted hands, changing outfits between clips, on-screen text, logos,
+and any visual inconsistency with the reference images.
+$continuity
 ''';
+}
+
+/// The next beat in the story after the ones this part already uses.
+///
+/// When a part has fewer beats than action intervals, the remaining intervals
+/// follow the story forward instead of repeating the same sentence. Beats are
+/// consumed in the story's own order: setup, problem, escalation, stretch,
+/// turn, payoff, ending line. A beat that already appears in this part counts
+/// as used once for every time it appears, so a part carrying the payoff beat
+/// twice does not loop back to the setup.
+String _nextBeat(List<String> used, BeatSheet beats, {required int skip}) {
+  final ordered = <String>[
+    beats.beat1Setup,
+    beats.beat2Problem,
+    beats.beat3Escalation,
+    if (beats.hasStretchBeat) beats.stretchBeat!,
+    beats.beat4Turn,
+    beats.beat5Payoff,
+    beats.endingLine,
+  ];
+  for (final beat in ordered) {
+    if (used.where((b) => b == beat).length <= skip) continue;
+    return beat;
+  }
+  // Everything in the story has already been used by this part; fall back to
+  // the ending line rather than repeating the first beat a third time.
+  return beats.endingLine;
 }

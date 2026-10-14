@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -44,9 +44,8 @@ import 'production_adapter.dart';
 import 'production_adapter_impl.dart';
 import 'settings_screen.dart';
 import 'content_ideas.dart';
-import 'insights_screen.dart';
 import 'my_content_screen.dart';
-import 'dashboard_screen.dart';
+import 'content_studio_screens.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -473,44 +472,53 @@ Future<void> main() async {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       home: ContentStudioHome(
-            onAddIdea: (ideaId) => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(builder: (_) => const qc.IdeaInboxScreen()),
-            ),
-            onCreateReel: (ideaId) => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(builder: (_) => const StoryScreen()),
-            ),
-            onIdeaVault: () => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(builder: (_) => const qc.IdeaInboxScreen()),
-            ),
-            onMyContent: () => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(builder: (_) => const MyContentScreen()),
-            ),
-             onInsights: () => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(builder: (_) => const InsightsScreen()),
-            ),
-            onDashboard: () => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(
-                builder: (_) => DashboardScreen(
-                  packageStore: _packageStore,
-                ),
+        onCreateReel: (ideaId) => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => const StoryScreen()),
+        ),
+        onIdeaVault: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => MaterialApp(
+            home: qc.IdeaInboxScreen(
+              onCreateReel: () => Navigator.push(
+                _appNavigatorKey.currentContext!,
+                MaterialPageRoute(builder: (_) => const StoryScreen()),
               ),
             ),
-            onSettings: () => Navigator.push(
-              _appNavigatorKey.currentContext!,
-              MaterialPageRoute(
-                builder: (_) => SettingsScreen(
-                  initialProvider: aiProvider,
-                  onProviderChanged: (provider) => aiProvider = provider,
-                ),
-              ),
+          )),
+        ),
+        onMyContent: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => const MyContentScreen()),
+        ),
+        onSettings: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => SettingsScreen(
+              initialProvider: aiProvider,
+              onProviderChanged: (provider) => aiProvider = provider,
             ),
           ),
+        ),
+        onImagePrompt: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => ImagePromptScreen(keyStore: _keyStore!),
+          ),
+        ),
+        onCarouselPrompts: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => CarouselPromptsScreen(keyStore: _keyStore!),
+          ),
+        ),
+        onGeminiVideo: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => GeminiVideoScreen(keyStore: _keyStore!),
+          ),
+        ),
+      ),
     ),
   );
 }
