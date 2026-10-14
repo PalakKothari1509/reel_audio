@@ -1,32 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'ai_provider.dart';
-import 'gemini_client.dart';
 import 'brand_system.dart';
 import 'theme.dart';
 
 class SettingsScreen extends StatefulWidget {
-  final AIProvider? initialProvider;
-  final ValueChanged<AIProvider?>? onProviderChanged;
-
-  const SettingsScreen({
-    super.key,
-    this.initialProvider,
-    this.onProviderChanged,
-  });
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _apiKeyController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  
-  AIProvider? _currentProvider;
-  bool _testing = false;
-  String? _testResult;
   bool _loaded = false;
 
   // Default settings
@@ -44,15 +30,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    final apiKey = prefs.getString('gemini_api_key') ?? '';
-    _apiKeyController.text = apiKey;
-    
-    if (apiKey.isNotEmpty) {
-      _currentProvider = GeminiClient(apiKey: apiKey);
-    } else if (widget.initialProvider != null) {
-      _currentProvider = widget.initialProvider;
-    }
 
     _defaultBucket = BucketLibrary.all
         .firstWhere(
@@ -78,21 +55,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    await prefs.setString('gemini_api_key', _apiKeyController.text.trim());
+
     if (_defaultBucket != null) await prefs.setString('default_bucket', _defaultBucket!.id);
     if (_defaultFormat != null) await prefs.setString('default_format', _defaultFormat!.name);
     await prefs.setBool('auto_save_history', _autoSaveHistory);
     await prefs.setBool('include_brand_in_prompts', _includeBrandInPrompts);
     await prefs.setInt('default_slide_count', _defaultSlideCount);
-
-    if (_apiKeyController.text.trim().isNotEmpty) {
-      _currentProvider = GeminiClient(apiKey: _apiKeyController.text.trim());
-    } else {
-      _currentProvider = null;
-    }
-
-    widget.onProviderChanged?.call(_currentProvider);
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -100,30 +68,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _testConnection() async {
-    if (_currentProvider == null || _currentProvider is! GeminiClient) {
-      setState(() => _testResult = 'No API key configured');
-      return;
-    }
-
-    setState(() {
-      _testing = true;
-      _testResult = null;
-    });
-
-    try {
-      await _currentProvider!.testConnection();
-      setState(() => _testResult = '✅ Connection successful!');
-    } catch (e) {
-      setState(() => _testResult = '❌ Failed: $e');
-    } finally {
-      if (mounted) setState(() => _testing = false);
-    }
-  }
-
   @override
   void dispose() {
-    _apiKeyController.dispose();
     super.dispose();
   }
 
@@ -142,10 +88,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitle('🤖 AI Provider (Gemini)'),
-              Gap.s,
-              _aiProviderCard(),
-              Gap.l,
               _sectionTitle('🎯 Default Content Settings'),
               Gap.s,
               _defaultsCard(),
@@ -170,108 +112,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _sectionTitle(String title) => Text(title, style: AppText.section);
-
-  Widget _aiProviderCard() => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Gemini API Key', style: AppText.subtitle),
-              Gap.s,
-              Text(
-                'Enter your Google AI Studio API key to enable AI-powered content generation. '
-                'Get a free key at https://aistudio.google.com/apikey',
-                style: AppText.hint,
-              ),
-              Gap.m,
-              TextFormField(
-                controller: _apiKeyController,
-                decoration: InputDecoration(
-                  labelText: 'API Key',
-                  hintText: 'AIzaSy...',
-                  prefixIcon: const Icon(Icons.vpn_key_outlined),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: _currentProvider?.isAvailable == true
-                      ? Icon(Icons.check_circle, color: Colors.green)
-                      : null,
-                ),
-                obscureText: true,
-                validator: (v) {
-                  if (v != null && v.trim().isNotEmpty && !v.trim().startsWith('AIza')) {
-                    return 'Gemini API keys typically start with "AIza"';
-                  }
-                  return null;
-                },
-              ),
-              Gap.m,
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: _testing ? null : _testConnection,
-                      icon: _testing 
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                          : const Icon(Icons.wifi_find),
-                      label: Text(_testing ? 'Testing...' : 'Test Connection'),
-                    ),
-                  ),
-                  if (_testResult != null) ...[
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(_testResult!, style: AppText.body)),
-                  ],
-                ],
-              ),
-              if (_testResult?.contains('successful') == true) ...[
-                Gap.m,
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.green.shade200),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green.shade700),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'AI generation enabled! Quick Content Studio will now use Gemini for new content.',
-                          style: TextStyle(color: Colors.green.shade700),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              if (_currentProvider?.isAvailable != true && _apiKeyController.text.trim().isEmpty) ...[
-                Gap.m,
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.shade200),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.orange.shade700),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'No API key set. Content generation will use local templates only.',
-                          style: TextStyle(color: Colors.orange.shade700),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      );
 
   Widget _defaultsCard() => Card(
         child: Padding(
@@ -481,8 +321,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       setState(() {
-        _apiKeyController.clear();
-        _currentProvider = null;
         _defaultBucket = null;
         _defaultFormat = null;
       });

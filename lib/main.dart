@@ -461,9 +461,6 @@ Future<void> main() async {
   // that reads API keys is accessed.
   _keyStore = await ApiKeyStore.fromSharedPreferences();
   final geminiKey = _keyStore!.getGeminiApiKey();
-  AIProvider? aiProvider = geminiKey.isEmpty
-      ? null
-      : GeminiClient(apiKey: geminiKey);
 
   runApp(
     MaterialApp(
@@ -494,10 +491,7 @@ Future<void> main() async {
         onSettings: () => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(
-            builder: (_) => SettingsScreen(
-              initialProvider: aiProvider,
-              onProviderChanged: (provider) => aiProvider = provider,
-            ),
+            builder: (_) => const SettingsScreen(),
           ),
         ),
         onImagePrompt: () => Navigator.push(

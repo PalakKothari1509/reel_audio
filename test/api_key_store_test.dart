@@ -5,59 +5,21 @@ import 'package:reel_audio/secrets.dart' as secrets;
 
 void main() {
   group('ApiKeyStore', () {
-    test('getGeminiApiKey falls back to default when no Settings key', () {
+    test('getGeminiApiKey returns key from secrets', () {
       final store = ApiKeyStore();
       expect(store.getGeminiApiKey(), secrets.geminiApiKey);
     });
 
-    test('getGeminiApiKey returns Settings key when configured', () {
-      final store = ApiKeyStore(
-        readSettingsGeminiKey: () => 'custom-key-from-settings',
-      );
-      expect(store.getGeminiApiKey(), 'custom-key-from-settings');
-    });
-
-    test('getGeminiApiKey ignores whitespace-only Settings key', () {
-      final store = ApiKeyStore(
-        readSettingsGeminiKey: () => '   ',
-      );
-      expect(store.getGeminiApiKey(), secrets.geminiApiKey);
-    });
-
-    test('getGeminiApiKey trims Settings key', () {
-      final store = ApiKeyStore(
-        readSettingsGeminiKey: () => '  custom-key  ',
-      );
-      expect(store.getGeminiApiKey(), 'custom-key');
-    });
-
-    test('hasCustomGeminiKey is false when no key', () {
-      final store = ApiKeyStore();
-      expect(store.hasCustomGeminiKey(), isFalse);
-    });
-
-    test('hasCustomGeminiKey is true when key is set', () {
-      final store = ApiKeyStore(
-        readSettingsGeminiKey: () => 'my-key',
-      );
-      expect(store.hasCustomGeminiKey(), isTrue);
-    });
-
-    test('hasCustomGeminiKey is false for whitespace-only key', () {
-      final store = ApiKeyStore(
-        readSettingsGeminiKey: () => '  ',
-      );
-      expect(store.hasCustomGeminiKey(), isFalse);
+    test('hasCustomGeminiKey is always false', () {
+      expect(ApiKeyStore().hasCustomGeminiKey(), isFalse);
     });
 
     test('getElevenLabsApiKey returns default', () {
-      final store = ApiKeyStore();
-      expect(store.getElevenLabsApiKey(), secrets.elevenLabsApiKey);
+      expect(ApiKeyStore().getElevenLabsApiKey(), secrets.elevenLabsApiKey);
     });
 
     test('getElevenVoiceId returns default', () {
-      final store = ApiKeyStore();
-      expect(store.getElevenVoiceId(), secrets.elevenVoiceId);
+      expect(ApiKeyStore().getElevenVoiceId(), secrets.elevenVoiceId);
     });
   });
 }

@@ -252,7 +252,8 @@ class _LibraryPickerState extends State<_LibraryPicker> {
             _filter.isEmpty ||
             h.cover.toLowerCase().contains(_filter) ||
             h.opening.toLowerCase().contains(_filter) ||
-            h.problem.toLowerCase().contains(_filter))
+            h.problem.toLowerCase().contains(_filter) ||
+            h.category.toLowerCase().contains(_filter))
         .toList();
 
     return DraggableScrollableSheet(
