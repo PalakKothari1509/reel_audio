@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:google_generative_ai/google_generative_ai.dart';
+
 import 'brand_system.dart';
 import 'characters.dart';
-import 'gemini_call.dart';
 import 'secrets.dart';
 
 // ── Shared brand-aware prompt generation service ──────────────────────────────
@@ -12,9 +13,19 @@ import 'secrets.dart';
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
 
-const _model = 'gemini-3.5-flash-lite';
-const _lightModel = 'gemini-3.5-flash-lite';
+const _model = 'gemini-2.0-flash';
 const _timeout = Duration(seconds: 90);
+
+GenerativeModel _makeModel(String? apiKey, {int maxTokens = 8192}) =>
+    GenerativeModel(
+      model: _model,
+      apiKey: (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey,
+      generationConfig: GenerationConfig(
+        temperature: 0.7,
+        maxOutputTokens: maxTokens,
+        responseMimeType: 'application/json',
+      ),
+    );
 
 // ── Character block builder ───────────────────────────────────────────────────
 
@@ -51,7 +62,6 @@ Future<ImagePromptResult> generateImagePrompt({
   String? apiKey,
   void Function(String)? onWait,
 }) async {
-  final key = _key(apiKey);
   final charBlock = _characterBlock(characters);
 
   final prompt = '''
@@ -95,31 +105,10 @@ It must include: style, characters with exact descriptions, scene, action, expre
 Do NOT generate captions, hashtags, or Reel scripts.
 ''';
 
-  final response = await geminiPost(
-    model: _lightModel,
-    fallbackModel: _model,
-    apiKey: key,
-    timeout: _timeout,
-    onWait: onWait,
-    body: jsonEncode({
-      'contents': [{'parts': [{'text': prompt}]}],
-      'generationConfig': {
-        'temperature': 0.7,
-        'maxOutputTokens': 4096,
-        'thinkingConfig': {'thinkingBudget': 0},
-        'responseMimeType': 'application/json',
-      },
-    }),
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode, response.body)
-        : 'Gemini error ${response.statusCode}');
-  }
-
-  final body = jsonDecode(response.body);
-  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final sdkResponse = await _makeModel(apiKey, maxTokens: 4096)
+      .generateContent([Content.text(prompt)])
+      .timeout(_timeout);
+  final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
   final Map<String, dynamic> json;
@@ -165,7 +154,6 @@ Future<CarouselPromptsResult> generateCarouselPrompts({
   String? apiKey,
   void Function(String)? onWait,
 }) async {
-  final key = _key(apiKey);
   final charBlock = _characterBlock(characters);
   final count = slideCount.clamp(3, 12);
 
@@ -226,30 +214,10 @@ RULES:
 - Never generate only an outline. Every slide must have a complete, copy-paste-ready prompt.
 ''';
 
-  final response = await geminiPost(
-    model: _model,
-    apiKey: key,
-    timeout: _timeout,
-    onWait: onWait,
-    body: jsonEncode({
-      'contents': [{'parts': [{'text': prompt}]}],
-      'generationConfig': {
-        'temperature': 0.7,
-        'maxOutputTokens': 8192,
-        'thinkingConfig': {'thinkingBudget': 0},
-        'responseMimeType': 'application/json',
-      },
-    }),
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode, response.body)
-        : 'Gemini error ${response.statusCode}');
-  }
-
-  final body = jsonDecode(response.body);
-  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final sdkResponse = await _makeModel(apiKey)
+      .generateContent([Content.text(prompt)])
+      .timeout(_timeout);
+  final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
   final Map<String, dynamic> json;
@@ -307,7 +275,6 @@ Future<GeminiVideoResult> generateGeminiVideoPrompts({
   String? apiKey,
   void Function(String)? onWait,
 }) async {
-  final key = _key(apiKey);
   final parts = (totalSeconds / 10).round().clamp(2, 6);
   final charBlock = _characterBlock(characters);
 
@@ -384,30 +351,10 @@ Each "full_prompt" must be completely self-contained and include:
 Return exactly $parts parts.
 ''';
 
-  final response = await geminiPost(
-    model: _model,
-    apiKey: key,
-    timeout: _timeout,
-    onWait: onWait,
-    body: jsonEncode({
-      'contents': [{'parts': [{'text': prompt}]}],
-      'generationConfig': {
-        'temperature': 0.7,
-        'maxOutputTokens': 8192,
-        'thinkingConfig': {'thinkingBudget': 0},
-        'responseMimeType': 'application/json',
-      },
-    }),
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode, response.body)
-        : 'Gemini error ${response.statusCode}');
-  }
-
-  final body = jsonDecode(response.body);
-  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final sdkResponse = await _makeModel(apiKey)
+      .generateContent([Content.text(prompt)])
+      .timeout(_timeout);
+  final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
   final Map<String, dynamic> json;
@@ -449,7 +396,6 @@ Future<VideoPartPrompt> regenerateSingleVideoPart({
   String? apiKey,
   void Function(String)? onWait,
 }) async {
-  final key = _key(apiKey);
   final charBlock = _characterBlock(characters);
 
   final prompt = '''
@@ -482,30 +428,10 @@ Return ONLY valid JSON for this single part:
 }
 ''';
 
-  final response = await geminiPost(
-    model: _model,
-    apiKey: key,
-    timeout: _timeout,
-    onWait: onWait,
-    body: jsonEncode({
-      'contents': [{'parts': [{'text': prompt}]}],
-      'generationConfig': {
-        'temperature': 0.8,
-        'maxOutputTokens': 4096,
-        'thinkingConfig': {'thinkingBudget': 0},
-        'responseMimeType': 'application/json',
-      },
-    }),
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode, response.body)
-        : 'Gemini error ${response.statusCode}');
-  }
-
-  final body = jsonDecode(response.body);
-  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final sdkResponse = await _makeModel(apiKey, maxTokens: 4096)
+      .generateContent([Content.text(prompt)])
+      .timeout(_timeout);
+  final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
   final Map<String, dynamic> json;
@@ -525,7 +451,4 @@ Return ONLY valid JSON for this single part:
   );
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
-String _key(String? apiKey) =>
-    (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
