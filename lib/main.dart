@@ -65,7 +65,7 @@ const _elevenVoiceId = elevenVoiceId;
 // can't use fails in a way that looks like a bug in the app. To see what your key is
 // allowed to call:
 //   https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY
-const _geminiModel = 'gemini-3.6-flash';
+const _geminiModel = 'gemini-3.5-flash-lite';
 
 /// Long enough for a slow first call. Thirty seconds was not: Gemini regularly takes
 /// longer than that to answer the first request of a session, and the old timeout

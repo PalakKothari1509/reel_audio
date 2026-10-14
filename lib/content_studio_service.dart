@@ -12,7 +12,7 @@ import 'secrets.dart';
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
 
-const _model = 'gemini-3.6-flash';
+const _model = 'gemini-3.5-flash-lite';
 const _lightModel = 'gemini-3.5-flash-lite';
 const _timeout = Duration(seconds: 90);
 

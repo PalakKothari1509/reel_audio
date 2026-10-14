@@ -14,7 +14,7 @@ class GeminiClient implements AIProvider {
   // 404 handling. The name therefore has to be one this key can actually serve.
   // It was 'gemini-1.5-flash', which no longer resolves; the rest of the app
   // already uses the name below, so both paths now ask for the same model.
-  static const String _modelName = 'gemini-3.6-flash';
+  static const String _modelName = 'gemini-3.5-flash-lite';
   static const int _maxOutputTokens = 8192;
   static const double _temperature = 0.7;
   static const Duration _timeout = Duration(seconds: 45);

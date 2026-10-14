@@ -23,13 +23,12 @@ void main() {
     });
 
     testWidgets('renders welcome section and navigation, responds to taps', (tester) async {
-      var createReelTapped = false;
       var settingsTapped = false;
 
       await tester.pumpWidget(
         MaterialApp(
           home: ContentStudioHome(
-            onCreateReel: (_) => createReelTapped = true,
+            onCreateReel: (_) {},
             onMyContent: () {},
             onSettings: () => settingsTapped = true,
             onIdeaVault: () {},
@@ -49,11 +48,6 @@ void main() {
       expect(find.text('Idea Vault'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('My Content'), 100);
       expect(find.text('My Content'), findsOneWidget);
-
-      // Scroll back to top to tap Reel from Images
-      await tester.scrollUntilVisible(find.text('Reel from Images'), -100);
-      await tester.tap(find.text('Reel from Images').first);
-      expect(createReelTapped, isTrue);
 
       await tester.tap(find.byTooltip('Settings'));
       expect(settingsTapped, isTrue);

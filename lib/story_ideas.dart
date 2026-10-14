@@ -60,7 +60,7 @@ const kStoryProblems = [
 // silently ran on the full model from then on. The quota separation described above
 // did not exist at all while that was true.
 const _lightModel = 'gemini-3.5-flash-lite';
-const _fullModel = 'gemini-3.6-flash';
+const _fullModel = 'gemini-3.5-flash-lite';
 const _timeout = Duration(seconds: 60);
 
 class StoryIdea {
