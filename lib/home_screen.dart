@@ -66,12 +66,34 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
           ),
           const SizedBox(height: 24),
 
+          const Text('Create', style: AppText.section),
+          const SizedBox(height: 12),
           _PrimaryAction(
             icon: Icons.movie_creation_outlined,
-            title: 'Create a Reel',
-            subtitle:
-                'Story -> script -> pictures -> voice -> video, in one flow',
+            title: 'Reel from Images',
+            subtitle: 'Story → script → pictures → voice → video',
             onTap: () => widget.onCreateReel(null),
+          ),
+          const SizedBox(height: 10),
+          _PrimaryAction(
+            icon: Icons.image_outlined,
+            title: 'Image Generation Prompt',
+            subtitle: 'One detailed prompt ready to paste into an image generator',
+            onTap: widget.onImagePrompt,
+          ),
+          const SizedBox(height: 10),
+          _PrimaryAction(
+            icon: Icons.view_carousel_outlined,
+            title: 'Carousel Generation',
+            subtitle: 'Full set of slide prompts for a carousel post',
+            onTap: widget.onCarouselPrompts,
+          ),
+          const SizedBox(height: 10),
+          _PrimaryAction(
+            icon: Icons.smart_display_outlined,
+            title: 'Gemini Story Video',
+            subtitle: 'Connected 10-second video prompts with continuity lock',
+            onTap: widget.onGeminiVideo,
           ),
           const SizedBox(height: 24),
 

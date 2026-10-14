@@ -42,11 +42,17 @@ void main() {
       await tester.pump();
 
       expect(find.text('Good morning, Palak!'), findsOneWidget);
-      expect(find.text('Create a Reel'), findsOneWidget);
+      expect(find.text('Reel from Images'), findsOneWidget);
+      expect(find.text('Gemini Story Video'), findsOneWidget);
+
+      await tester.scrollUntilVisible(find.text('Idea Vault'), 100);
       expect(find.text('Idea Vault'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('My Content'), 100);
       expect(find.text('My Content'), findsOneWidget);
 
-      await tester.tap(find.text('Create a Reel').first);
+      // Scroll back to top to tap Reel from Images
+      await tester.scrollUntilVisible(find.text('Reel from Images'), -100);
+      await tester.tap(find.text('Reel from Images').first);
       expect(createReelTapped, isTrue);
 
       await tester.tap(find.byTooltip('Settings'));
@@ -69,8 +75,8 @@ void main() {
       );
       await tester.pump();
 
-      // Exactly one primary Create action, not two competing buttons.
-      expect(find.text('Create a Reel'), findsOneWidget);
+      // Exactly one Reel from Images card, not duplicated.
+      expect(find.text('Reel from Images'), findsOneWidget);
     });
   });
 }
