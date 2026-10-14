@@ -349,6 +349,8 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   String _status = '';
   GeminiVideoResult? _result;
   int _totalSeconds = 30;
+  String _lastIdea = '';
+  List<String> _lastCharacters = [];
 
   static const _durations = [
     (20, '20s — 2 parts'),
@@ -381,6 +383,8 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       if (!mounted) return;
       setState(() {
         _result = result;
+        _lastIdea = idea;
+        _lastCharacters = List.from(characters);
         _status = '';
         _loading = false;
       });
@@ -402,28 +406,29 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
           _status = '';
         }),
         onRegeneratePart: (partIndex) async {
-          // Regenerate a single part while preserving the others
           final current = _result!;
           setState(() {
             _loading = true;
             _status = 'Regenerating Part ${partIndex + 1}...';
           });
           try {
-            final fresh = await generateGeminiVideoPrompts(
-              idea: current.storyFoundation,
-              totalSeconds: _totalSeconds,
-              characters: [],
+            final newPart = await regenerateSingleVideoPart(
+              idea: _lastIdea,
+              storyFoundation: current.storyFoundation,
+              partNumber: partIndex + 1,
+              totalParts: current.parts.length,
+              characters: _lastCharacters,
+              previousEndingState: partIndex > 0
+                  ? current.parts[partIndex - 1].promptText
+                  : '',
               apiKey: widget.keyStore.getGeminiApiKey(),
               onWait: (msg) {
                 if (mounted) setState(() => _status = msg);
               },
             );
             if (!mounted) return;
-            // Replace only the requested part
             final updatedParts = List<VideoPartPrompt>.from(current.parts);
-            if (partIndex < fresh.parts.length) {
-              updatedParts[partIndex] = fresh.parts[partIndex];
-            }
+            updatedParts[partIndex] = newPart;
             setState(() {
               _result = GeminiVideoResult(
                 storyTitle: current.storyTitle,

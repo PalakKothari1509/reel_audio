@@ -437,6 +437,94 @@ Return exactly $parts parts.
   );
 }
 
+// ── Feature 4b: Regenerate a single video part ───────────────────────────────
+
+Future<VideoPartPrompt> regenerateSingleVideoPart({
+  required String idea,
+  required String storyFoundation,
+  required int partNumber,
+  required int totalParts,
+  required List<String> characters,
+  String previousEndingState = '',
+  String? apiKey,
+  void Function(String)? onWait,
+}) async {
+  final key = _key(apiKey);
+  final charBlock = _characterBlock(characters);
+
+  final prompt = '''
+You are a video content creator for "${BrandDefaults.name}", an Indian kids' education Instagram page.
+
+Regenerate ONLY Part $partNumber of $totalParts for this story. Keep the same story, same characters, same continuity — just produce a fresh version of this one part.
+
+ORIGINAL IDEA: $idea
+STORY FOUNDATION: $storyFoundation
+PART TO REGENERATE: Part $partNumber of $totalParts
+${previousEndingState.trim().isEmpty ? '' : 'PREVIOUS PART ENDED WITH: $previousEndingState'}
+
+${_brandStyleBlock()}
+
+CHARACTERS:
+$charBlock
+
+CHARACTER CONSISTENCY RULES:
+- Use the exact descriptions above. Do not paraphrase.
+- Ria and Rio NEVER wear glasses.
+- Cuty is ALWAYS a small white bunny with a pink bow.
+- Only the listed characters may appear.
+
+Return ONLY valid JSON for this single part:
+
+{
+  "part_number": $partNumber,
+  "purpose": "What story beat this part communicates",
+  "full_prompt": "Complete copy-paste-ready video generation prompt for this part, self-contained with TITLE, PART $partNumber of $totalParts, DURATION 10 seconds, FORMAT vertical 9:16, STORY CONTEXT, CHARACTER LOCK, SCENE, STARTING STATE, CAMERA, ACTION TIMELINE 0-4s/4-8s/8-10s, DIALOGUE, CONTINUITY FROM/INTO, VISUAL STYLE, NEGATIVE INSTRUCTIONS"
+}
+''';
+
+  final response = await geminiPost(
+    model: _model,
+    apiKey: key,
+    timeout: _timeout,
+    onWait: onWait,
+    body: jsonEncode({
+      'contents': [{'parts': [{'text': prompt}]}],
+      'generationConfig': {
+        'temperature': 0.8,
+        'maxOutputTokens': 4096,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(response.statusCode == 503 || response.statusCode == 429
+        ? geminiBusyMessage(response.statusCode, response.body)
+        : 'Gemini error ${response.statusCode}');
+  }
+
+  final body = jsonDecode(response.body);
+  final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(text.trim()) as Map<String, dynamic>;
+  } catch (_) {
+    throw Exception('Gemini did not return usable JSON.');
+  }
+
+  final promptText = (json['full_prompt'] as String?)?.trim() ?? '';
+  if (promptText.isEmpty) throw Exception('Gemini returned an empty prompt.');
+
+  return VideoPartPrompt(
+    partNumber: partNumber,
+    totalParts: totalParts,
+    promptText: promptText,
+  );
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 String _key(String? apiKey) =>
