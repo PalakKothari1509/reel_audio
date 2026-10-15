@@ -12,7 +12,7 @@ import 'secrets.dart';
 // dozen more fields to it made the whole thing fail when any one part came back wrong.
 // Kept separate, a bad prompt run costs you the prompts and leaves the script alone.
 
-const _model = 'gemini-3.5-flash-lite';
+const _model = 'gemini-3.5-flash';
 const _timeout = Duration(seconds: 90);
 
 class PromptSet {

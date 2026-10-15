@@ -14,22 +14,20 @@ import 'story_ideas.dart';
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
 
-const _model = 'gemini-3.5-flash-lite';
-// Lite models have a separate 500/day quota from the premium flash models,
-// so routing routine work (ideas, hooks, captions) through lite keeps the
-// premium budget available for the heaviest call. See the quota table in
-// documentation/app_overview.md.
+const _model = 'gemini-3.8-flash';
+// Gemini 3.8 Flash supports thinkingConfig.thinkingBudget (lite models do not),
+// and its 20/day quota gives the app headroom before hitting free-tier limits.
+// See the quota table in documentation/app_overview.md.
 //
 // Fallback chain for 429: each model has its own 20/day quota, so trying the
 // next one on a rate limit gives the app roughly an hour of headroom before
 // every flash-class model is also exhausted. Never retry on 429 — switch
 // models instead, because each retry still counts against the same quota.
 const _fallbackModels = [
-  'gemini-3.8-flash',
   'gemini-3.7-flash',
   'gemini-3.6-flash',
-  'gemini-3.5-flash-lite',
-  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash',
 ];
 const _timeout = Duration(seconds: 180);
 
@@ -92,16 +90,24 @@ Future<String> _geminiText(
       continue;
     }
 
+    // 400 = model rejected the request (e.g. thinkingConfig unsupported).
+    // Try the next model — a different one may accept it.
+    if (response.statusCode == 400) {
+      onWait?.call('Model rejected request — switching...');
+      continue;
+    }
+
     // 404 = model does not exist for this key. Try the next model.
     if (response.statusCode == 404) {
       onWait?.call('Switching to next model...');
       continue;
     }
 
-    // 503 = model overload — geminiPost already retried internally. Show
-    // the friendly message rather than raw JSON.
+    // 503 = model overload — geminiPost already retried internally.
+    // Try the next model in the chain — a different model may have capacity.
     if (response.statusCode == 503) {
-      throw Exception(geminiBusyMessage(503, response.body));
+      onWait?.call('Model overloaded — switching...');
+      continue;
     }
 
     // Any other error (400, 401, etc.) is a real problem — surface it.

@@ -24,10 +24,10 @@ import 'secrets.dart';
 import 'api_key_store.dart';
 import 'theme.dart';
 
-/// Google's Lite tier is 3.5. There is no 3.6 Lite: this was `3.6-flash-lite`, which
-/// 404'd and then silently fell back to the full model on every call.
-const _lightModel = 'gemini-3.5-flash-lite';
-const _fullModel = 'gemini-3.5-flash-lite';
+/// Uses gemini-3.5-flash (not lite) because the lite variant rejects thinkingConfig
+/// with a 400 INVALID_ARGUMENT error.
+const _lightModel = 'gemini-3.5-flash';
+const _fullModel = 'gemini-3.8-flash';
 const _timeout = Duration(seconds: 60);
 
 // ── The house caption format ──────────────────────────────────────────────────
