@@ -159,6 +159,20 @@ class StoryCheck {
   /// Worked out here from the score rather than trusted from the model, so a 7 always
   /// means the same thing. Below 7 is not worth an evening of making pictures for.
   String get band => score >= 9 ? 'Ready' : score >= 7 ? 'Improve' : 'Rewrite';
+
+  /// Derives the primary content purpose from the check results.
+  ///
+  /// Maps the passing checks to one of the five purposes:
+  /// RELATE, LEARN, FEEL, LAUGH, or SHARE.
+  String get contentPurpose {
+    final passes = rows.where((r) => r.pass).map((r) => r.name.toLowerCase()).toSet();
+    if (passes.contains('real-life problem')) return 'RELATE';
+    if (passes.contains('child learns naturally')) return 'LEARN';
+    if (passes.contains('emotion')) return 'FEEL';
+    if (passes.contains('hook') && passes.contains('curiosity')) return 'LAUGH';
+    if (passes.contains('share value')) return 'SHARE';
+    return 'RELATE';
+  }
 }
 
 /// Reads a story and says whether it will make a reel worth watching.

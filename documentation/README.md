@@ -73,7 +73,7 @@ cp lib/secrets.example.dart lib/secrets.dart   # then fill in real keys
 ## Development
 
 ```bash
-flutter test                 # 378 tests
+flutter test                 # 412 tests
 flutter analyze              # lib/ is clean; tool/ has known warnings
 dart run tool/check_formats.dart
 dart run tool/check_axes.dart

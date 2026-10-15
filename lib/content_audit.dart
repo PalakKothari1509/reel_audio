@@ -345,3 +345,146 @@ ContentPillar _pillarFromString(String raw) {
   }
   return ContentPillar.play;
 }
+
+// ── Performance Learning (P1) ─────────────────────────────────────────────────
+//
+// After publishing, the creator records actual results. This class connects those
+// results to the creative decisions (hook type, content purpose, format) so the
+// creator can see patterns and test more deliberately.
+
+/// A single creative decision linked to its performance.
+class CreativeDecision {
+  final String hookType;
+  final String contentPurpose;
+  final String format;
+  final int score;
+
+  /// Non-negative performance index: shares + saves + (comments * 2).
+  /// Weighted because saves and shares are the actions that extend reach.
+  final int strength;
+
+  /// Whether the post cleared the five-test minimum for this combination.
+  final bool meetsFiveTestRule;
+
+  const CreativeDecision({
+    required this.hookType,
+    required this.contentPurpose,
+    required this.format,
+    required this.score,
+    required this.strength,
+    required this.meetsFiveTestRule,
+  });
+}
+
+/// Analyzes published content results to inform future creative decisions.
+///
+/// Connects actual Instagram metrics to the hook type, content purpose, and
+/// format used, then surfaces patterns without making viral claims.
+class PerformanceLearn {
+  final List<CreativeDecision> decisions;
+
+  const PerformanceLearn(this.decisions);
+
+  /// Groups decisions by hook type and returns average strength per hook.
+  ///
+  /// Only includes hook types with at least [minSamples] entries, respecting
+  /// the five-test principle.
+  Map<String, double> averageStrengthByHook({int minSamples = 5}) {
+    final sums = <String, int>{};
+    final counts = <String, int>{};
+    for (final d in decisions) {
+      final key = d.hookType;
+      sums.update(key, (v) => v + d.strength, ifAbsent: () => d.strength);
+      counts.update(key, (v) => v + 1, ifAbsent: () => 1);
+    }
+    final result = <String, double>{};
+    for (final key in sums.keys) {
+      if (counts[key]! >= minSamples) {
+        result[key] = sums[key]! / counts[key]!;
+      }
+    }
+    return result;
+  }
+
+  /// Groups decisions by content purpose and returns average strength per purpose.
+  Map<String, double> averageStrengthByPurpose({int minSamples = 5}) {
+    final sums = <String, int>{};
+    final counts = <String, int>{};
+    for (final d in decisions) {
+      final key = d.contentPurpose;
+      sums.update(key, (v) => v + d.strength, ifAbsent: () => d.strength);
+      counts.update(key, (v) => v + 1, ifAbsent: () => 1);
+    }
+    final result = <String, double>{};
+    for (final key in sums.keys) {
+      if (counts[key]! >= minSamples) {
+        result[key] = sums[key]! / counts[key]!;
+      }
+    }
+    return result;
+  }
+
+  /// Identifies recently used hooks to avoid repetition.
+  ///
+  /// Returns the most common hook types in the last [recentWindow] decisions.
+  List<String> recentlyUsedHooks({int recentWindow = 10}) {
+    final recent = decisions.take(recentWindow);
+    final counts = <String, int>{};
+    for (final d in recent) {
+      counts.update(d.hookType, (v) => v + 1, ifAbsent: () => 1);
+    }
+    final sorted = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.map((e) => e.key).toList();
+  }
+
+  /// Returns a list of potential patterns to test next.
+  ///
+  /// Looks for hook types that have performed well but haven't been tested
+  /// five times yet, and purposes that are under-represented.
+  List<String> recommendedTests({int minSamples = 5}) {
+    final recs = <String>[];
+    final hookCounts = <String, int>{};
+    final hookStrengths = <String, List<int>>{};
+    for (final d in decisions) {
+      hookCounts.update(d.hookType, (v) => v + 1, ifAbsent: () => 1);
+      hookStrengths.putIfAbsent(d.hookType, () => []).add(d.strength);
+    }
+    for (final entry in hookCounts.entries) {
+      if (entry.value < minSamples) {
+        final strengths = hookStrengths[entry.key]!;
+        final avg = strengths.isEmpty ? 0.0 : strengths.reduce((a, b) => a + b) / strengths.length;
+        if (avg > 0) {
+          recs.add('Test ${entry.key} hook (${entry.value} tries so far, avg strength ${avg.round()})');
+        }
+      }
+    }
+    return recs;
+  }
+}
+
+/// Builds a [CreativeDecision] from a published [ContentAuditItem] and its
+/// recorded metrics.
+CreativeDecision buildCreativeDecision(ContentAuditItem item) {
+  final metrics = item.metrics;
+  final strength = (metrics.shares ?? 0) +
+      (metrics.saves ?? 0) +
+      ((metrics.plays ?? 0) > 0 ? (metrics.plays! / 100).round() : 0);
+  return CreativeDecision(
+    hookType: item.hook.isNotEmpty ? item.hook : 'unknown',
+    contentPurpose: item.learningGoal.isNotEmpty
+        ? item.learningGoal
+        : 'unknown',
+    format: item.format,
+    score: _scoreFromStatus(item),
+    strength: strength,
+    meetsFiveTestRule: item.experimentCount >= 5,
+  );
+}
+
+int _scoreFromStatus(ContentAuditItem item) {
+  if (item.metrics.shares != null && item.metrics.shares! > 10) return 9;
+  if (item.metrics.saves != null && item.metrics.saves! > 5) return 7;
+  if (item.metrics.reach != null && item.metrics.reach! > 100) return 6;
+  return 3;
+}

@@ -23,6 +23,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
   bool _isGenerating = false;
   String _status = '';
   String _result = '';
+  EngagementPackage? _engagement;
   IdeaEvaluation? _evaluation;
   String _ideaText = '';
   List<String> _ideaChars = [];
@@ -78,8 +79,19 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
         },
       );
       if (!mounted) return;
+      final engagement = await generateEngagementPackage(
+        idea: _ideaText,
+        selectedHook: hook,
+        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
       setState(() {
         _result = result.prompt;
+        _engagement = engagement;
         _evaluation = null;
         _status = '';
       });
@@ -112,8 +124,10 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       return _ResultScreen(
         title: '🖼️ Image Generation Prompt',
         result: _result,
+        engagement: _engagement,
         onBack: () => setState(() {
           _result = '';
+          _engagement = null;
           _status = '';
         }),
       );
@@ -162,6 +176,7 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
   bool _isGenerating = false;
   String _status = '';
   CarouselPromptsResult? _result;
+  EngagementPackage? _engagement;
   IdeaEvaluation? _evaluation;
   String _ideaText = '';
   List<String> _ideaChars = [];
@@ -221,8 +236,19 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
         },
       );
       if (!mounted) return;
+      final engagement = await generateEngagementPackage(
+        idea: _ideaText,
+        selectedHook: hook,
+        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
       setState(() {
         _result = result;
+        _engagement = engagement;
         _evaluation = null;
         _status = '';
       });
@@ -254,8 +280,10 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
     if (_result != null) {
       return _CarouselResultScreen(
         result: _result!,
+        engagement: _engagement,
         onBack: () => setState(() {
           _result = null;
+          _engagement = null;
           _status = '';
         }),
       );
@@ -329,8 +357,13 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
 
 class _CarouselResultScreen extends StatelessWidget {
   final CarouselPromptsResult result;
+  final EngagementPackage? engagement;
   final VoidCallback onBack;
-  const _CarouselResultScreen({required this.result, required this.onBack});
+  const _CarouselResultScreen({
+    required this.result,
+    required this.onBack,
+    this.engagement,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -360,13 +393,18 @@ class _CarouselResultScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView.builder(
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        itemCount: result.slides.length,
-        itemBuilder: (ctx, i) {
-          final slide = result.slides[i];
-          return _SlideCard(slide: slide);
-        },
+        children: [
+          ...result.slides.asMap().entries.map((entry) {
+            final slide = entry.value;
+            return _SlideCard(slide: slide);
+          }),
+          if (engagement != null) ...[
+            const SizedBox(height: 16),
+            _EngagementCard(engagement: engagement!),
+          ],
+        ],
       ),
     );
   }
@@ -477,6 +515,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   bool _isGenerating = false;
   String _status = '';
   GeminiVideoResult? _result;
+  EngagementPackage? _engagement;
   IdeaEvaluation? _evaluation;
   String _ideaText = '';
   List<String> _ideaChars = [];
@@ -543,8 +582,19 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
         },
       );
       if (!mounted) return;
+      final engagement = await generateEngagementPackage(
+        idea: _ideaText,
+        selectedHook: hook,
+        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
       setState(() {
         _result = result;
+        _engagement = engagement;
         _lastIdea = idea;
         _lastCharacters = List.from(_ideaChars);
         _evaluation = null;
@@ -578,8 +628,10 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
     if (_result != null) {
       return _VideoResultScreen(
         result: _result!,
+        engagement: _engagement,
         onBack: () => setState(() {
           _result = null;
+          _engagement = null;
           _status = '';
         }),
         onRegeneratePart: (partIndex) async {
@@ -696,6 +748,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
 
 class _VideoResultScreen extends StatelessWidget {
   final GeminiVideoResult result;
+  final EngagementPackage? engagement;
   final VoidCallback onBack;
   final void Function(int partIndex) onRegeneratePart;
 
@@ -703,6 +756,7 @@ class _VideoResultScreen extends StatelessWidget {
     required this.result,
     required this.onBack,
     required this.onRegeneratePart,
+    this.engagement,
   });
 
   @override
@@ -770,6 +824,10 @@ class _VideoResultScreen extends StatelessWidget {
               onRegenerate: () => onRegeneratePart(i),
             );
           }),
+          if (engagement != null) ...[
+            const SizedBox(height: 16),
+            _EngagementCard(engagement: engagement!),
+          ],
         ],
       ),
     );
@@ -857,11 +915,13 @@ class _VideoPartCard extends StatelessWidget {
 class _ResultScreen extends StatelessWidget {
   final String title;
   final String result;
+  final EngagementPackage? engagement;
   final VoidCallback onBack;
   const _ResultScreen({
     required this.title,
     required this.result,
     required this.onBack,
+    this.engagement,
   });
 
   @override
@@ -909,6 +969,8 @@ class _ResultScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+            if (engagement != null) _EngagementCard(engagement: engagement!),
+            if (engagement != null) const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -1012,6 +1074,122 @@ class _StatusCard extends StatelessWidget {
             icon: const Icon(Icons.content_copy, size: 18),
             color: isError ? AppColors.danger : AppColors.textSoft,
             onPressed: () => _copyToClipboard(context),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Shared engagement package card ─────────────────────────────────────────────
+
+class _EngagementCard extends StatelessWidget {
+  final EngagementPackage engagement;
+  const _EngagementCard({required this.engagement});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      colour: AppColors.surfaceAlt,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Caption', style: AppText.section),
+          Gap.s,
+          Text(engagement.caption, style: AppText.body),
+          Gap.s,
+
+          // Hashtags
+          Wrap(
+            spacing: 6,
+            children: EngagementPackage(
+              caption: engagement.caption,
+              hashtags: engagement.hashtags,
+              pinnedComment: engagement.pinnedComment,
+              suggestedReplies: engagement.suggestedReplies,
+              followReason: engagement.followReason,
+            ).hashtags.map((tag) {
+              return Chip(
+                label: Text(tag, style: const TextStyle(fontSize: 12)),
+                backgroundColor: AppColors.accentSoft,
+                padding: EdgeInsets.zero,
+              );
+            }).toList(),
+          ),
+          Gap.s,
+
+          // Pinned comment
+          const Text('Pinned Comment', style: AppText.section),
+          Gap.s,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.accentSoft,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.push_pin, size: 16, color: AppColors.accent),
+                const SizedBox(width: 6),
+                Expanded(child: Text(engagement.pinnedComment, style: AppText.body)),
+              ],
+            ),
+          ),
+          Gap.s,
+
+          // Follow reason
+          const Text('Why follow?', style: AppText.section),
+          Gap.s,
+          Text(engagement.followReason, style: AppText.body),
+          Gap.s,
+
+          // Suggested replies
+          const Text('Suggested Replies', style: AppText.section),
+          Gap.s,
+          ...engagement.suggestedReplies.map((reply) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(reply.situation,
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSoft)),
+                  Gap.xs,
+                  Text(reply.text, style: AppText.body),
+                  Gap.s,
+                ],
+              )),
+
+          // Copy all button
+          SizedBox(
+            width: double.infinity,
+            child: SecondaryButton(
+              label: 'Copy Engagement Package',
+              icon: Icons.copy,
+              onPressed: () {
+                final buffer = StringBuffer();
+                buffer.writeln('CAPTION:');
+                buffer.writeln(engagement.caption);
+                buffer.writeln();
+                buffer.writeln('HASHTAGS:');
+                buffer.writeln(engagement.hashtags.join(' '));
+                buffer.writeln();
+                buffer.writeln('PINNED COMMENT:');
+                buffer.writeln(engagement.pinnedComment);
+                buffer.writeln();
+                buffer.writeln('FOLLOW REASON:');
+                buffer.writeln(engagement.followReason);
+                buffer.writeln();
+                buffer.writeln('SUGGESTED REPLIES:');
+                for (final r in engagement.suggestedReplies) {
+                  buffer.writeln('${r.situation}: ${r.text}');
+                  buffer.writeln();
+                }
+                Clipboard.setData(ClipboardData(text: buffer.toString()));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Engagement package copied')),
+                );
+              },
+            ),
           ),
         ],
       ),

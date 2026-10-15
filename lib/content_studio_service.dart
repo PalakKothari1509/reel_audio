@@ -736,4 +736,192 @@ Future<IdeaEvaluation> evaluateIdea({
   );
 }
 
+// ── Engagement Package ────────────────────────────────────────────────────────
+//
+// Every content package now includes the full engagement toolkit: caption,
+// hashtags, pinned comment, and suggested comment replies. This is shared
+// across all four content features so every post can publish-ready.
+
+/// One suggested reply for a specific comment situation.
+class SuggestedReply {
+  /// The situation this reply is for, e.g. "similar experience",
+  /// "tip shared", "question asked", "disagreement",
+  /// "emotional share", "compliment".
+  final String situation;
+
+  /// The reply text — always ends with a question.
+  final String text;
+
+  const SuggestedReply(this.situation, this.text);
+}
+
+/// The complete engagement package: caption, hashtags, pinned comment,
+/// suggested comment replies, and a follow reason.
+///
+/// Generated alongside the main content so every post is publish-ready.
+class EngagementPackage {
+  /// The caption text (without hashtags — those are separate).
+  final String caption;
+
+  /// Exactly five relevant hashtags.
+  final List<String> hashtags;
+
+  /// One recommended pinned comment ending with a question.
+  final String pinnedComment;
+
+  /// Six suggested replies for common comment situations, each ending
+  /// with a relevant question.
+  final List<SuggestedReply> suggestedReplies;
+
+  /// One genuine reason a viewer would want to follow the brand.
+  final String followReason;
+
+  const EngagementPackage({
+    required this.caption,
+    required this.hashtags,
+    required this.pinnedComment,
+    required this.suggestedReplies,
+    required this.followReason,
+  });
+
+  /// Caption plus hashtags as one block for pasting into Instagram.
+  String get forInstagram =>
+      hashtags.isEmpty ? caption : '$caption\n\n${hashtags.join(' ')}';
+
+  Map<String, dynamic> toJson() => {
+        'caption': caption,
+        'hashtags': hashtags,
+        'pinnedComment': pinnedComment,
+        'suggestedReplies':
+            suggestedReplies.map((r) => {'situation': r.situation, 'text': r.text}).toList(),
+        'followReason': followReason,
+      };
+
+  factory EngagementPackage.fromJson(Map<String, dynamic> json) {
+    final rawReplies = (json['suggestedReplies'] as List?) ?? [];
+    final replies = rawReplies.whereType<Map<String, dynamic>>().map((r) {
+      return SuggestedReply(
+        (r['situation'] as String?)?.trim() ?? '',
+        (r['text'] as String?)?.trim() ?? '',
+      );
+    }).toList();
+
+    return EngagementPackage(
+      caption: (json['caption'] as String?)?.trim() ?? '',
+      hashtags: ((json['hashtags'] as List?) ?? [])
+          .whereType<String>()
+          .map((h) => h.trim())
+          .where((h) => h.isNotEmpty)
+          .toList(),
+      pinnedComment: (json['pinnedComment'] as String?)?.trim() ?? '',
+      suggestedReplies: replies,
+      followReason: (json['followReason'] as String?)?.trim() ?? '',
+    );
+  }
+}
+
+/// The six situations for which we generate suggested replies.
+const kReplySituations = [
+  'similar experience',
+  'tip shared',
+  'question asked',
+  'disagreement',
+  'emotional share',
+  'compliment',
+];
+
+/// Generates the complete engagement package for a content idea.
+///
+/// Includes caption, exactly 5 hashtags, pinned comment with a question,
+/// six suggested comment replies (each ending with a question), and
+/// a follow reason.
+Future<EngagementPackage> generateEngagementPackage({
+  required String idea,
+  required HookChoice? selectedHook,
+  required String contentPurpose,
+  String? apiKey,
+  void Function(String)? onWait,
+}) async {
+  final hookText = selectedHook?.text ?? '';
+  final trimmed = idea.trim();
+  if (trimmed.length < 10) {
+    throw Exception('Write a bit more of the story first.');
+  }
+
+  onWait?.call('Writing caption and hashtags...');
+
+  final prompt = '''
+You are the caption writer and engagement assistant for
+"${BrandDefaults.name}", an Indian kids' education Instagram page.
+
+IDEA: $idea
+
+SELECTED HOOK: ${hookText.isEmpty ? 'none' : hookText}
+
+CONTENT PURPOSE: $contentPurpose
+
+Your audience is Indian parents and caregivers of children aged 1-4.
+
+Write the complete engagement package in exactly this JSON shape:
+
+{
+  "caption": "A caption that complements the content, not a summary of it. Use the brand voice: warm, playful, parent-relatable. Include one natural CTA if appropriate. Keep it short enough for Instagram (2-3 short paragraphs max).",
+  "hashtags": ["#funlearningwithpalak", "#noscreenactivities", "#playbasedlearning", "#toddleractivities", "#indianmoms"],
+  "pinnedComment": "One natural conversation-starter ending with a question, not 'Comment below!' or a repeat of the caption.",
+  "suggestedReplies": [
+    {"situation": "similar experience", "text": "Acknowledges + ends with a question."},
+    {"situation": "tip shared", "text": "Acknowledges + ends with a question."},
+    {"situation": "question asked", "text": "Answers the question first, then asks a relevant follow-up."},
+    {"situation": "disagreement", "text": "Acknowledges respectfully + ends with a question."},
+    {"situation": "emotional share", "text": "Acknowledges the emotion + ends with a question."},
+    {"situation": "compliment", "text": "Thanks + ends with a question."}
+  ],
+  "followReason": "One genuine sentence for why a viewer interested in this content would want to follow the brand."
+}
+
+RULES:
+- Exactly 5 hashtags. No more, no less. Always include #funlearningwithpalak.
+- Every suggested reply must end with a question mark.
+- The pinned comment must end with a question mark.
+- Do not repeat the caption verbatim in the pinned comment.
+- Do not invent statistics or performance claims.
+- Match the brand voice: warm, playful, parent-relatable, simple.
+- Keep the caption specific to this actual content, not generic.
+''';
+
+  final sdkResponse = await _withRetry(
+        () => _makeModel(apiKey, maxTokens: 4096, temperature: 0.7)
+            .generateContent([Content.text(prompt)]),
+        onWait: onWait,
+      );
+  final text = sdkResponse.text ?? '';
+  if (text.trim().isEmpty) {
+    throw Exception('Gemini returned no engagement package.');
+  }
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(text.trim()) as Map<String, dynamic>;
+  } catch (_) {
+    throw Exception('Gemini did not return usable JSON for engagement package.');
+  }
+
+  final result = EngagementPackage.fromJson(json);
+
+  if (result.hashtags.length != 5) {
+    throw Exception(
+        'Engagement package must include exactly 5 hashtags, got ${result.hashtags.length}.');
+  }
+  if (!result.pinnedComment.endsWith('?')) {
+    throw Exception('Pinned comment must end with a question mark.');
+  }
+  for (final reply in result.suggestedReplies) {
+    if (!reply.text.endsWith('?')) {
+      throw Exception(
+          'Suggested reply for "${reply.situation}" must end with a question mark.');
+    }
+  }
+
+  return result;
+}
 
