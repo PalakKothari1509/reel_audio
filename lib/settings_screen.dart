@@ -22,6 +22,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _includeBrandInPrompts = true;
   int _defaultSlideCount = 7;
 
+  // Custom API keys (loaded from SharedPreferences via ApiKeyStore)
+  final _geminiKeyCtrl = TextEditingController();
+  final _elevenLabsKeyCtrl = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +52,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _includeBrandInPrompts = prefs.getBool('include_brand_in_prompts') ?? true;
     _defaultSlideCount = prefs.getInt('default_slide_count') ?? 7;
 
+    // Load saved API keys
+    _geminiKeyCtrl.text = prefs.getString('custom_gemini_api_key') ?? '';
+    _elevenLabsKeyCtrl.text = prefs.getString('custom_elevenlabs_api_key') ?? '';
+
     setState(() {
       _loaded = true;
     });
@@ -62,6 +70,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setBool('include_brand_in_prompts', _includeBrandInPrompts);
     await prefs.setInt('default_slide_count', _defaultSlideCount);
 
+    // Save custom API keys
+    final geminiKey = _geminiKeyCtrl.text.trim();
+    if (geminiKey.isNotEmpty) {
+      await prefs.setString('custom_gemini_api_key', geminiKey);
+    } else {
+      await prefs.remove('custom_gemini_api_key');
+    }
+    final elevenLabsKey = _elevenLabsKeyCtrl.text.trim();
+    if (elevenLabsKey.isNotEmpty) {
+      await prefs.setString('custom_elevenlabs_api_key', elevenLabsKey);
+    } else {
+      await prefs.remove('custom_elevenlabs_api_key');
+    }
+
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Settings saved'), duration: Duration(seconds: 1)),
@@ -70,6 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _geminiKeyCtrl.dispose();
+    _elevenLabsKeyCtrl.dispose();
     super.dispose();
   }
 
@@ -92,9 +116,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Gap.s,
               _defaultsCard(),
               Gap.l,
-              _sectionTitle('⚙️ App Behavior'),
+               _sectionTitle('⚙️ App Behavior'),
               Gap.s,
               _behaviorCard(),
+              Gap.l,
+              _sectionTitle('🔑 API Keys'),
+              Gap.s,
+              _apiKeysCard(),
               Gap.l,
               _sectionTitle('📊 Data & Storage'),
               Gap.s,
@@ -207,6 +235,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: _includeBrandInPrompts,
                 onChanged: (v) => setState(() => _includeBrandInPrompts = v),
                 secondary: const Icon(Icons.auto_awesome_outlined),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _apiKeysCard() => Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your free-tier Gemini key is shared and limited to 20 requests/day.',
+                style: AppText.hint,
+              ),
+              Gap.s,
+              Text(
+                'Paste your own Google Cloud API key to use your personal quota.',
+                style: AppText.hint,
+              ),
+              Gap.m,
+              TextFormField(
+                controller: _geminiKeyCtrl,
+                decoration: InputDecoration(
+                  labelText: 'Gemini API Key',
+                  hintText: 'Enter your Google Cloud API key',
+                  prefixIcon: const Icon(Icons.key_outlined),
+                  border: const OutlineInputBorder(),
+                ),
+                obscureText: true,
+                keyboardType: TextInputType.visiblePassword,
+              ),
+              Gap.m,
+              TextFormField(
+                controller: _elevenLabsKeyCtrl,
+                decoration: InputDecoration(
+                  labelText: 'ElevenLabs API Key (optional)',
+                  hintText: 'Enter your ElevenLabs key for better voices',
+                  prefixIcon: const Icon(Icons.key_outlined),
+                  border: const OutlineInputBorder(),
+                ),
+                obscureText: true,
+                keyboardType: TextInputType.visiblePassword,
+              ),
+              Gap.s,
+              Text(
+                'Get a key from https://aistudio.google.com/ (enable billing for '
+                'higher quotas). Keys are stored on-device only.',
+                style: AppText.hint,
               ),
             ],
           ),

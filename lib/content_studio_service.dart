@@ -6,6 +6,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'brand_system.dart';
 import 'characters.dart';
+import 'gemini_call.dart';
 import 'secrets.dart';
 
 // ── Shared brand-aware prompt generation service ──────────────────────────────
@@ -28,15 +29,21 @@ const _maxRetries = 3;
 /// Runs [fn] with retry. Each retry waits longer, because the thing that caused
 /// the first failure is usually still loading or the network is still flaky.
 ///
-/// Retries on timeouts (model warm-up, queue) and on connection drops
-/// ("Software caused connection abort" — common on the wireless phone link).
-/// A 4xx from a bad key or a bad model name is NOT retried: it will not get
-/// better by waiting.
+/// Retries on timeouts (model warm-up, queue), connection drops, 503 model
+/// overload, and 429 rate limits. A 429 that is a daily free-tier limit does NOT
+/// retry — waiting it out wastes requests and tells the user nothing new.
+/// A 4xx auth error will not contain any of these markers and is rethrown.
+///
+/// [onWait] is called with a human-readable status line between attempts so the
+/// user sees motion instead of a blank screen.
 ///
 /// The per-attempt timeout escalates rather than staying at the full 180s:
 /// waiting 180s on a dead link four times is twelve minutes of nothing. A short
 /// first attempt fails fast, and only the final attempt gets the full budget.
-Future<T> _withRetry<T>(Future<T> Function() fn) async {
+Future<T> _withRetry<T>(
+  Future<T> Function() fn, {
+  void Function(String message)? onWait,
+}) async {
   for (var attempt = 0; attempt <= _maxRetries; attempt++) {
     final isFinal = attempt == _maxRetries;
     final attemptTimeout = isFinal
@@ -46,20 +53,50 @@ Future<T> _withRetry<T>(Future<T> Function() fn) async {
       return await fn().timeout(attemptTimeout);
     } on TimeoutException catch (_) {
       if (isFinal) rethrow;
-      await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
+      for (var left = 4 * (1 << attempt); left > 0; left--) {
+        onWait?.call('Gemini is warming up — trying again in ${left}s...');
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
     } on SocketException catch (_) {
       // A dropped connection is almost always transient, especially over the
       // wireless ADB link the phone runs on. Retry rather than surfacing it.
       if (isFinal) rethrow;
       await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
     } on Exception catch (e) {
-      // Gemini 503 "UNAVAILABLE" means the model is overloaded. The message
-      // says the spike is usually temporary, so retrying is the right reaction.
-      // A 4xx auth error will not contain these markers and is rethrown.
       final msg = e.toString();
-      if (msg.contains('503') || msg.contains('UNAVAILABLE')) {
-        if (isFinal) rethrow;
+      // 503 = model overloaded (temporary spike at Google's end).
+      // 429 / RESOURCE_EXHAUSTED / quota = rate limited or out of free requests.
+      final isOverloaded = msg.contains('503') || msg.contains('UNAVAILABLE');
+      final isRateLimited = msg.contains('429') ||
+          msg.contains('RESOURCE_EXHAUSTED') ||
+          msg.contains('Quota exceeded') ||
+          msg.contains('quota exceeded');
+
+      if (isOverloaded) {
+        if (isFinal) {
+          // Still busy after every retry — give the friendly message, not the raw JSON.
+          throw Exception(geminiBusyMessage(503, msg));
+        }
+        onWait?.call('Gemini is overloaded — trying again shortly...');
         await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
+        continue;
+      }
+      if (isRateLimited) {
+        // Daily quota exhausted: stop here. The wait is 7+ hours — retrying
+        // would just spend more requests learning nothing new.
+        if (isDailyLimit(msg)) {
+          throw Exception(geminiBusyMessage(429, msg));
+        }
+        if (isFinal) {
+          throw Exception(geminiBusyMessage(429, msg));
+        }
+        // Per-minute limit: Google said how long to wait. Fall back to our
+        // own backoff when it did not.
+        final wait = googlesRetryDelay(msg) ?? Duration(seconds: 4 * (1 << attempt));
+        for (var left = wait.inSeconds; left > 0; left--) {
+          onWait?.call('Gemini is rate limiting this key — trying again in ${left}s...');
+          await Future<void>.delayed(const Duration(seconds: 1));
+        }
         continue;
       }
       rethrow;
@@ -160,7 +197,8 @@ Do NOT generate captions, hashtags, or Reel scripts.
 
 final sdkResponse = await _withRetry(
         () => _makeModel(apiKey, maxTokens: 4096)
-            .generateContent([Content.text(prompt)]));
+            .generateContent([Content.text(prompt)]),
+        onWait: onWait);
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -268,7 +306,8 @@ RULES:
 ''';
 
 final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey).generateContent([Content.text(prompt)]));
+        () => _makeModel(apiKey).generateContent([Content.text(prompt)]),
+        onWait: onWait);
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -404,7 +443,8 @@ Return exactly $parts parts.
 ''';
 
   final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey).generateContent([Content.text(prompt)]));
+        () => _makeModel(apiKey).generateContent([Content.text(prompt)]),
+        onWait: onWait);
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -481,7 +521,8 @@ Return ONLY valid JSON for this single part:
 
   final sdkResponse = await _withRetry(
         () => _makeModel(apiKey, maxTokens: 4096)
-            .generateContent([Content.text(prompt)]));
+            .generateContent([Content.text(prompt)]),
+        onWait: onWait);
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 

@@ -32,26 +32,55 @@ const _backoff = [
   Duration(seconds: 30),
 ];
 
-/// How long Google asked us to wait, from the retryDelay in the body ("19s").
+/// How long Google asked us to wait, from either of its two delay formats:
+///
+/// 1. JSON API format: `"retryDelay": "19s"` (from raw HTTP response bodies)
+/// 2. SDK error text: `Please retry in 7h27.190066812s` (from Google
+///    Generative AI SDK exceptions, which wrap the body in a message)
 ///
 /// Worth reading rather than guessing: on a 429 Google says exactly when the quota
 /// frees up, and waiting our own made-up interval either gives up too early or sits
 /// there longer than it had to. A second is added because retrying on the exact
 /// boundary tends to come back 429 again.
-Duration? _googlesOwnDelay(String body) {
-  final match = RegExp(r'"retryDelay"\s*:\s*"(\d+)').firstMatch(body);
-  final seconds = int.tryParse(match?.group(1) ?? '');
-  if (seconds == null) return null;
-  return Duration(seconds: seconds.clamp(1, 60) + 1);
+Duration? googlesRetryDelay(String body) {
+  // Format 1: JSON "retryDelay": "19s"
+  final jsonMatch = RegExp(r'"retryDelay"\s*:\s*"(\d+)').firstMatch(body);
+  final jsonSeconds = int.tryParse(jsonMatch?.group(1) ?? '');
+  if (jsonSeconds != null) {
+    return Duration(seconds: jsonSeconds.clamp(1, 60) + 1);
+  }
+
+  // Format 2: "Please retry in 7h27.190066812s" or "Please retry in 19s"
+  final textMatch = RegExp(r'Please retry in\s+(\d+)h(\d+)(?:\.\d+)?s').firstMatch(body);
+  if (textMatch != null) {
+    final hours = int.parse(textMatch.group(1)!);
+    final minutes = int.parse(textMatch.group(2)!);
+    return Duration(hours: hours, minutes: minutes);
+  }
+
+  final secMatch = RegExp(r'Please retry in\s+(\d+(?:\.\d+)?)s').firstMatch(body);
+  if (secMatch != null) {
+    final seconds = double.parse(secMatch.group(1)!);
+    return Duration(milliseconds: (seconds * 1000).round());
+  }
+
+  return null;
 }
 
 /// True when a 429 is the DAILY free allowance running out, not the per-minute one.
 ///
-/// Google says which in the error: the quota's name has "PerDay" or "PerMinute" in it.
-/// A per-minute limit is worth waiting out — a minute later it works. A per-day one is
-/// not, and every retry against it is another request thrown at a wall, spending the
-/// wait for nothing and telling you nothing new.
-bool isDailyLimit(String body) => body.contains('PerDay');
+/// Google signals this two ways:
+/// 1. The quota name contains "PerDay" (standard JSON error body).
+/// 2. The message says "free_tier_requests" and Google's own retry delay exceeds
+///    5 minutes — a wait that is effectively "reset tomorrow."
+bool isDailyLimit(String body) {
+  if (body.contains('PerDay')) return true;
+  if (body.contains('free_tier')) {
+    final delay = googlesRetryDelay(body);
+    if (delay != null && delay > const Duration(minutes: 5)) return true;
+  }
+  return false;
+}
 
 /// Models this key has answered 404 for, kept on the phone with the day they failed.
 ///
@@ -142,7 +171,7 @@ Future<http.Response> geminiPost({
     if (response.statusCode == 429 && isDailyLimit(response.body)) return response;
 
     // Google's own number wins when it gives one.
-    final wait = _googlesOwnDelay(response.body) ?? fallback;
+    final wait = googlesRetryDelay(response.body) ?? fallback;
     final why = response.statusCode == 429
         ? 'Gemini is rate limiting this key'
         : 'Gemini is busy';
