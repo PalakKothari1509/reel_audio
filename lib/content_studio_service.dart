@@ -8,6 +8,8 @@ import 'brand_system.dart';
 import 'characters.dart';
 import 'gemini_call.dart';
 import 'secrets.dart';
+import 'prompts.dart';
+import 'story_ideas.dart';
 
 // ── Shared brand-aware prompt generation service ──────────────────────────────
 //
@@ -106,12 +108,13 @@ Future<T> _withRetry<T>(
   throw StateError('retry loop exited');
 }
 
-GenerativeModel _makeModel(String? apiKey, {int maxTokens = 8192}) =>
+GenerativeModel _makeModel(String? apiKey,
+        {int maxTokens = 8192, double temperature = 0.7}) =>
     GenerativeModel(
       model: _model,
       apiKey: (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey,
       generationConfig: GenerationConfig(
-        temperature: 0.7,
+        temperature: temperature,
         maxOutputTokens: maxTokens,
         responseMimeType: 'application/json',
       ),
@@ -540,6 +543,196 @@ Return ONLY valid JSON for this single part:
     partNumber: partNumber,
     totalParts: totalParts,
     promptText: promptText,
+  );
+}
+
+// ── Idea Evaluation ─────────────────────────────────────────────────────────────
+//
+// Before any generation happens, the idea is checked for story quality and for
+// shareability. This is the gate that decides whether the idea is worth spending
+// an API request on, and which hook to use.
+
+/// The result of analyzing why a parent would send this idea to another parent.
+class ShareabilityAnalysis {
+  /// The specific parent archetype who would send it.
+  /// e.g. "Mumma of a 3-year-old who refuses vegetables at dinner"
+  final String sender;
+
+  /// Who they would send it to.
+  /// e.g. "a parent whose child also pushes food away"
+  final String recipient;
+
+  /// Why they would send it — one specific, actionable sentence.
+  final String reason;
+
+  /// How confident the analysis is: "high", "medium", or "low".
+  final String confidence;
+
+  /// A practical tip to strengthen the shareability, or empty.
+  final String note;
+
+  const ShareabilityAnalysis({
+    required this.sender,
+    required this.recipient,
+    required this.reason,
+    required this.confidence,
+    this.note = '',
+  });
+
+  bool get isHighConfidence =>
+      confidence.toLowerCase().trim() == 'high';
+
+  Map<String, dynamic> toJson() => {
+        'sender': sender,
+        'recipient': recipient,
+        'reason': reason,
+        'confidence': confidence,
+        'note': note,
+      };
+
+  factory ShareabilityAnalysis.fromJson(Map<String, dynamic> json) {
+    return ShareabilityAnalysis(
+      sender: (json['sender'] as String?)?.trim() ?? '',
+      recipient: (json['recipient'] as String?)?.trim() ?? '',
+      reason: (json['reason'] as String?)?.trim() ?? '',
+      confidence: (json['confidence'] as String?)?.trim() ?? '',
+      note: (json['note'] as String?)?.trim() ?? '',
+    );
+  }
+}
+
+/// The combined result of evaluating an idea before production.
+///
+/// Holds the story quality check (10 criteria + 5 hooks) and the shareability
+/// analysis (who shares, to whom, why). The approval flow on
+/// [IdeaReviewScreen] fills in [selectedHook] and [isApproved] as the user
+/// works through it.
+class IdeaEvaluation {
+  final StoryCheck check;
+  final ShareabilityAnalysis shareability;
+  final HookChoice? selectedHook;
+  final bool isApproved;
+
+  const IdeaEvaluation({
+    required this.check,
+    required this.shareability,
+    this.selectedHook,
+    this.isApproved = false,
+  });
+
+  IdeaEvaluation copyWith({
+    StoryCheck? check,
+    ShareabilityAnalysis? shareability,
+    HookChoice? selectedHook,
+    bool? isApproved,
+  }) {
+    return IdeaEvaluation(
+      check: check ?? this.check,
+      shareability: shareability ?? this.shareability,
+      selectedHook: selectedHook ?? this.selectedHook,
+      isApproved: isApproved ?? this.isApproved,
+    );
+  }
+}
+
+/// Asks Gemini to identify who would share this idea, to whom, and why.
+///
+/// Done before production: if no specific sender and recipient can be named,
+/// the idea is not share-worthy and should be reworked first.
+Future<ShareabilityAnalysis> analyzeShareability({
+  required String idea,
+  String? apiKey,
+  void Function(String)? onWait,
+}) async {
+  final prompt = '''
+You are analyzing content for "${BrandDefaults.name}", an Indian kids' education
+Instagram page. The audience is Indian moms and parents of children aged 1-4.
+
+Analyze the shareability of this story idea:
+
+IDEA: $idea
+
+Answer these exact questions in JSON:
+1. SENDER — which specific parent archetype would send this?
+   e.g. "Mumma of a 3-year-old who refuses vegetables"
+2. RECIPIENT — who would they send it to?
+   e.g. "a parent whose child also pushes food away"
+3. REASON — why would they send it? One specific, actionable sentence.
+4. CONFIDENCE — how confident are you this will be shared?
+   (high, medium, or low)
+5. NOTE — one practical tip to strengthen the shareability, or empty string.
+
+Return ONLY valid JSON:
+{
+  "sender": "specific parent who would send this",
+  "recipient": "who they would send it to",
+  "reason": "why they would send it — specific and actionable",
+  "confidence": "high",
+  "note": "practical tip or empty string"
+}
+
+Be honest: a share is worth more than a view, and a post that cannot name a
+specific sender and recipient is not ready.
+''';
+
+  final sdkResponse = await _withRetry(
+    () => _makeModel(apiKey, maxTokens: 2048, temperature: 0.3)
+        .generateContent([Content.text(prompt)]),
+    onWait: onWait,
+  );
+  final text = sdkResponse.text ?? '';
+  if (text.trim().isEmpty) {
+    throw Exception('Gemini returned no shareability analysis.');
+  }
+
+  final Map<String, dynamic> json;
+  try {
+    json = jsonDecode(text.trim()) as Map<String, dynamic>;
+  } catch (_) {
+    throw Exception('Gemini did not return usable JSON for shareability.');
+  }
+
+  if ((json['sender'] as String? ?? '').trim().isEmpty &&
+      (json['recipient'] as String? ?? '').trim().isEmpty) {
+    throw Exception(
+        'Shareability analysis was empty — try rewording the idea.');
+  }
+
+  return ShareabilityAnalysis.fromJson(json);
+}
+
+/// Evaluates an idea before production: quality check + shareability analysis.
+///
+/// Reuses [checkStory] for the 10-criteria story quality score and hooks, then
+/// runs [analyzeShareability] for the share trigger. Returns a combined
+/// [IdeaEvaluation] that the review screen presents to the user.
+Future<IdeaEvaluation> evaluateIdea({
+  required String idea,
+  String? apiKey,
+  void Function(String)? onWait,
+}) async {
+  final trimmed = idea.trim();
+  if (trimmed.length < 15) {
+    throw Exception('Write a bit more of the story first.');
+  }
+
+  onWait?.call('Checking story quality...');
+  final check = await checkStory(
+    idea,
+    apiKey: apiKey,
+    onWait: onWait,
+  );
+
+  onWait?.call('Analyzing shareability...');
+  final shareability = await analyzeShareability(
+    idea: idea,
+    apiKey: apiKey,
+    onWait: onWait,
+  );
+
+  return IdeaEvaluation(
+    check: check,
+    shareability: shareability,
   );
 }
 

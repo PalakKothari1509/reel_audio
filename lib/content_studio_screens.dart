@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'api_key_store.dart';
 import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
+import 'idea_review_screen.dart';
+import 'prompts.dart';
 import 'theme.dart';
 
 // ── Feature 2: Image Generation Prompt ───────────────────────────────────────
@@ -18,24 +20,58 @@ class ImagePromptScreen extends StatefulWidget {
 
 class _ImagePromptScreenState extends State<ImagePromptScreen> {
   bool _loading = false;
+  bool _isGenerating = false;
   String _status = '';
   String _result = '';
+  IdeaEvaluation? _evaluation;
+  String _ideaText = '';
+  List<String> _ideaChars = [];
+  String _ideaInstructions = '';
 
-  Future<void> _generate({
+  Future<void> _evaluate({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
   }) async {
+    _ideaText = idea;
+    _ideaChars = List.from(characters);
+    _ideaInstructions = additionalInstructions;
+
     setState(() {
       _loading = true;
-      _status = 'Generating image prompt...';
-      _result = '';
+      _status = 'Evaluating idea...';
+      _evaluation = null;
     });
     try {
+      final evaluation = await evaluateIdea(
+        idea: idea,
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
+      setState(() => _evaluation = evaluation);
+    } catch (e) {
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleApproval(HookChoice? hook) async {
+    setState(() {
+      _isGenerating = true;
+      _status = 'Generating image prompt...';
+    });
+    try {
+      final idea = hook != null
+          ? 'Cover hook: ${hook.text}\n\n$_ideaText'
+          : _ideaText;
       final result = await generateImagePrompt(
         idea: idea,
-        characters: characters,
-        additionalInstructions: additionalInstructions,
+        characters: _ideaChars,
+        additionalInstructions: _ideaInstructions,
         apiKey: widget.keyStore.getGeminiApiKey(),
         onWait: (msg) {
           if (mounted) setState(() => _status = msg);
@@ -44,15 +80,30 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       if (!mounted) return;
       setState(() {
         _result = result.prompt;
+        _evaluation = null;
         _status = '';
-        _loading = false;
       });
     } catch (e) {
-      if (mounted) setState(() {
-        _status = '❌ $e';
-        _loading = false;
-      });
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
     }
+  }
+
+  Future<void> _handleRegenerate() async {
+    await _evaluate(
+      idea: _ideaText,
+      characters: _ideaChars,
+      additionalInstructions: _ideaInstructions,
+    );
+  }
+
+  void _handleBack() {
+    setState(() {
+      _evaluation = null;
+      _isGenerating = false;
+      _status = '';
+    });
   }
 
   @override
@@ -68,16 +119,30 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       );
     }
 
+    if (_evaluation != null) {
+      return IdeaReviewScreen(
+        evaluation: _evaluation!,
+        originalIdea: _ideaText,
+        isRegenerating: _loading,
+        isGenerating: _isGenerating,
+        status: _status,
+        onApprove: _handleApproval,
+        onRegenerate: _handleRegenerate,
+        onBack: _handleBack,
+      );
+    }
+
     return IdeaInputScreen(
       feature: ContentFeature.imagePrompt,
+      initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions}) {}
-          : _generate,
+          : _evaluate,
       extraControls: _loading
           ? _LoadingCard(message: _status)
           : _status.isNotEmpty
-              ? _StatusCard(message: _status)
-              : null,
+                ? _StatusCard(message: _status)
+                : null,
     );
   }
 }
@@ -94,28 +159,62 @@ class CarouselPromptsScreen extends StatefulWidget {
 
 class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
   bool _loading = false;
+  bool _isGenerating = false;
   String _status = '';
   CarouselPromptsResult? _result;
+  IdeaEvaluation? _evaluation;
+  String _ideaText = '';
+  List<String> _ideaChars = [];
+  String _ideaInstructions = '';
   int _slideCount = 7;
 
   static const _slideCounts = [5, 6, 7, 8, 10];
 
-  Future<void> _generate({
+  Future<void> _evaluate({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
   }) async {
+    _ideaText = idea;
+    _ideaChars = List.from(characters);
+    _ideaInstructions = additionalInstructions;
+
     setState(() {
       _loading = true;
-      _status = 'Generating carousel prompts...';
-      _result = null;
+      _status = 'Evaluating idea...';
+      _evaluation = null;
     });
     try {
+      final evaluation = await evaluateIdea(
+        idea: idea,
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
+      setState(() => _evaluation = evaluation);
+    } catch (e) {
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleApproval(HookChoice? hook) async {
+    setState(() {
+      _isGenerating = true;
+      _status = 'Generating carousel prompts...';
+    });
+    try {
+      final idea = hook != null
+          ? 'Cover hook: ${hook.text}\n\n$_ideaText'
+          : _ideaText;
       final result = await generateCarouselPrompts(
         idea: idea,
         slideCount: _slideCount,
-        characters: characters,
-        additionalInstructions: additionalInstructions,
+        characters: _ideaChars,
+        additionalInstructions: _ideaInstructions,
         apiKey: widget.keyStore.getGeminiApiKey(),
         onWait: (msg) {
           if (mounted) setState(() => _status = msg);
@@ -124,15 +223,30 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       if (!mounted) return;
       setState(() {
         _result = result;
+        _evaluation = null;
         _status = '';
-        _loading = false;
       });
     } catch (e) {
-      if (mounted) setState(() {
-        _status = '❌ $e';
-        _loading = false;
-      });
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
     }
+  }
+
+  Future<void> _handleRegenerate() async {
+    await _evaluate(
+      idea: _ideaText,
+      characters: _ideaChars,
+      additionalInstructions: _ideaInstructions,
+    );
+  }
+
+  void _handleBack() {
+    setState(() {
+      _evaluation = null;
+      _isGenerating = false;
+      _status = '';
+    });
   }
 
   @override
@@ -147,11 +261,25 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       );
     }
 
+    if (_evaluation != null) {
+      return IdeaReviewScreen(
+        evaluation: _evaluation!,
+        originalIdea: _ideaText,
+        isRegenerating: _loading,
+        isGenerating: _isGenerating,
+        status: _status,
+        onApprove: _handleApproval,
+        onRegenerate: _handleRegenerate,
+        onBack: _handleBack,
+      );
+    }
+
     return IdeaInputScreen(
       feature: ContentFeature.carouselPrompts,
+      initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions}) {}
-          : _generate,
+          : _evaluate,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -346,8 +474,13 @@ class GeminiVideoScreen extends StatefulWidget {
 
 class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   bool _loading = false;
+  bool _isGenerating = false;
   String _status = '';
   GeminiVideoResult? _result;
+  IdeaEvaluation? _evaluation;
+  String _ideaText = '';
+  List<String> _ideaChars = [];
+  String _ideaInstructions = '';
   int _totalSeconds = 30;
   String _lastIdea = '';
   List<String> _lastCharacters = [];
@@ -359,22 +492,51 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
     (60, '60s — 6 parts'),
   ];
 
-  Future<void> _generate({
+  Future<void> _evaluate({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
   }) async {
+    _ideaText = idea;
+    _ideaChars = List.from(characters);
+    _ideaInstructions = additionalInstructions;
+
     setState(() {
       _loading = true;
-      _status = 'Generating video prompts...';
-      _result = null;
+      _status = 'Evaluating idea...';
+      _evaluation = null;
     });
     try {
+      final evaluation = await evaluateIdea(
+        idea: idea,
+        apiKey: widget.keyStore.getGeminiApiKey(),
+        onWait: (msg) {
+          if (mounted) setState(() => _status = msg);
+        },
+      );
+      if (!mounted) return;
+      setState(() => _evaluation = evaluation);
+    } catch (e) {
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleApproval(HookChoice? hook) async {
+    setState(() {
+      _isGenerating = true;
+      _status = 'Generating video prompts...';
+    });
+    try {
+      final idea = hook != null
+          ? 'Cover hook: ${hook.text}\n\n$_ideaText'
+          : _ideaText;
       final result = await generateGeminiVideoPrompts(
         idea: idea,
         totalSeconds: _totalSeconds,
-        characters: characters,
-        additionalInstructions: additionalInstructions,
+        characters: _ideaChars,
+        additionalInstructions: _ideaInstructions,
         apiKey: widget.keyStore.getGeminiApiKey(),
         onWait: (msg) {
           if (mounted) setState(() => _status = msg);
@@ -384,16 +546,31 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       setState(() {
         _result = result;
         _lastIdea = idea;
-        _lastCharacters = List.from(characters);
+        _lastCharacters = List.from(_ideaChars);
+        _evaluation = null;
         _status = '';
-        _loading = false;
       });
     } catch (e) {
-      if (mounted) setState(() {
-        _status = '❌ $e';
-        _loading = false;
-      });
+      if (mounted) setState(() => _status = '❌ $e');
+    } finally {
+      if (mounted) setState(() => _isGenerating = false);
     }
+  }
+
+  Future<void> _handleRegenerate() async {
+    await _evaluate(
+      idea: _ideaText,
+      characters: _ideaChars,
+      additionalInstructions: _ideaInstructions,
+    );
+  }
+
+  void _handleBack() {
+    setState(() {
+      _evaluation = null;
+      _isGenerating = false;
+      _status = '';
+    });
   }
 
   @override
@@ -439,20 +616,36 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
               _loading = false;
             });
           } catch (e) {
-            if (mounted) setState(() {
-              _status = '❌ $e';
-              _loading = false;
-            });
+            if (mounted) {
+              setState(() {
+                _status = '❌ $e';
+                _loading = false;
+              });
+            }
           }
         },
       );
     }
 
+    if (_evaluation != null) {
+      return IdeaReviewScreen(
+        evaluation: _evaluation!,
+        originalIdea: _ideaText,
+        isRegenerating: _loading,
+        isGenerating: _isGenerating,
+        status: _status,
+        onApprove: _handleApproval,
+        onRegenerate: _handleRegenerate,
+        onBack: _handleBack,
+      );
+    }
+
     return IdeaInputScreen(
       feature: ContentFeature.geminiVideo,
+      initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions}) {}
-          : _generate,
+          : _evaluate,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'brand_system.dart';
-import 'characters.dart';
 import 'content_ideas.dart';
 import 'theme.dart';
 
@@ -35,11 +33,15 @@ class IdeaInputScreen extends StatefulWidget {
   /// Extra controls specific to the feature (e.g. slide count, duration).
   final Widget? extraControls;
 
+  /// Pre-fills the idea field. Used when returning from the review screen.
+  final String? initialText;
+
   const IdeaInputScreen({
     super.key,
     required this.feature,
     required this.onGenerate,
     this.extraControls,
+    this.initialText,
   });
 
   @override
@@ -58,6 +60,12 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
     ('mumma', 'Mumma', '👩'),
     ('papa', 'Papa', '👨'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialText != null) _ideaCtrl.text = widget.initialText!;
+  }
 
   @override
   void dispose() {
