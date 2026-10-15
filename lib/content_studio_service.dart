@@ -1,8 +1,4 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
-import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'brand_system.dart';
 import 'characters.dart';
@@ -18,107 +14,102 @@ import 'story_ideas.dart';
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
 
-const _model = 'gemini-3.8-flash';
-// Gemini 3.8 Flash is fast on paper, but the first call of a session warms the
-// model and a large brand-aware prompt can take a while. 90s was not enough:
-// the call simply never came back and the UI was left hanging. 180s gives the
-// slow path room without making the user wait forever on a genuinely dead key.
+const _model = 'gemini-3.5-flash-lite';
+// Lite models have a separate 500/day quota from the premium flash models,
+// so routing routine work (ideas, hooks, captions) through lite keeps the
+// premium budget available for the heaviest call. See the quota table in
+// documentation/app_overview.md.
+//
+// Fallback chain for 429: each model has its own 20/day quota, so trying the
+// next one on a rate limit gives the app roughly an hour of headroom before
+// every flash-class model is also exhausted. Never retry on 429 — switch
+// models instead, because each retry still counts against the same quota.
+const _fallbackModels = [
+  'gemini-3.8-flash',
+  'gemini-3.7-flash',
+  'gemini-3.6-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+];
 const _timeout = Duration(seconds: 180);
-// How many times to retry. A timeout or connection drop is usually transient —
-// a warming model or a flaky wireless link — so retrying is the right reaction.
-const _maxRetries = 3;
 
-/// Runs [fn] with retry. Each retry waits longer, because the thing that caused
-/// the first failure is usually still loading or the network is still flaky.
+/// Calls Gemini via the shared HTTP path and returns the text response.
 ///
-/// Retries on timeouts (model warm-up, queue), connection drops, 503 model
-/// overload, and 429 rate limits. A 429 that is a daily free-tier limit does NOT
-/// retry — waiting it out wastes requests and tells the user nothing new.
-/// A 4xx auth error will not contain any of these markers and is rethrown.
+/// Uses the same retry, fallback, and daily-limit logic as every other Gemini
+/// call in the app (see [geminiPost]). This avoids the parallel SDK code path
+/// that was sending requests the key could not authenticate.
 ///
-/// [onWait] is called with a human-readable status line between attempts so the
-/// user sees motion instead of a blank screen.
-///
-/// The per-attempt timeout escalates rather than staying at the full 180s:
-/// waiting 180s on a dead link four times is twelve minutes of nothing. A short
-/// first attempt fails fast, and only the final attempt gets the full budget.
-Future<T> _withRetry<T>(
-  Future<T> Function() fn, {
+/// [temperature] and [maxTokens] are forwarded to generationConfig.
+Future<String> _geminiText(
+  String prompt, {
+  String? apiKey,
+  double temperature = 0.7,
+  int maxTokens = 8192,
   void Function(String message)? onWait,
 }) async {
-  for (var attempt = 0; attempt <= _maxRetries; attempt++) {
-    final isFinal = attempt == _maxRetries;
-    final attemptTimeout = isFinal
-        ? _timeout
-        : Duration(seconds: 30 * (attempt + 1)); // 30s, 60s, then 180s
-    try {
-      return await fn().timeout(attemptTimeout);
-    } on TimeoutException catch (_) {
-      if (isFinal) rethrow;
-      for (var left = 4 * (1 << attempt); left > 0; left--) {
-        onWait?.call('Gemini is warming up — trying again in ${left}s...');
-        await Future<void>.delayed(const Duration(seconds: 1));
-      }
-    } on SocketException catch (_) {
-      // A dropped connection is almost always transient, especially over the
-      // wireless ADB link the phone runs on. Retry rather than surfacing it.
-      if (isFinal) rethrow;
-      await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
-    } on Exception catch (e) {
-      final msg = e.toString();
-      // 503 = model overloaded (temporary spike at Google's end).
-      // 429 / RESOURCE_EXHAUSTED / quota = rate limited or out of free requests.
-      final isOverloaded = msg.contains('503') || msg.contains('UNAVAILABLE');
-      final isRateLimited = msg.contains('429') ||
-          msg.contains('RESOURCE_EXHAUSTED') ||
-          msg.contains('Quota exceeded') ||
-          msg.contains('quota exceeded');
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+  final body = jsonEncode({
+    'contents': [{'parts': [{'text': prompt}]}],
+    'generationConfig': {
+      'temperature': temperature,
+      'maxOutputTokens': maxTokens,
+      // The model spends thinking tokens out of the same budget, and a reply
+      // cut off mid-JSON will not parse. Measured on this key: with thinking
+      // on, a 1024 budget went 981 tokens to thinking and returned
+      // MAX_TOKENS with a truncated body.
+      'thinkingConfig': {'thinkingBudget': 0},
+      'responseMimeType': 'application/json',
+    },
+  });
 
-      if (isOverloaded) {
-        if (isFinal) {
-          // Still busy after every retry — give the friendly message, not the raw JSON.
-          throw Exception(geminiBusyMessage(503, msg));
-        }
-        onWait?.call('Gemini is overloaded — trying again shortly...');
-        await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
-        continue;
-      }
-      if (isRateLimited) {
-        // Daily quota exhausted: stop here. The wait is 7+ hours — retrying
-        // would just spend more requests learning nothing new.
-        if (isDailyLimit(msg)) {
-          throw Exception(geminiBusyMessage(429, msg));
-        }
-        if (isFinal) {
-          throw Exception(geminiBusyMessage(429, msg));
-        }
-        // Per-minute limit: Google said how long to wait. Fall back to our
-        // own backoff when it did not.
-        final wait = googlesRetryDelay(msg) ?? Duration(seconds: 4 * (1 << attempt));
-        for (var left = wait.inSeconds; left > 0; left--) {
-          onWait?.call('Gemini is rate limiting this key — trying again in ${left}s...');
-          await Future<void>.delayed(const Duration(seconds: 1));
-        }
-        continue;
-      }
-      rethrow;
-    }
-  }
-  // Unreachable, but keeps the compiler happy about a return type.
-  throw StateError('retry loop exited');
-}
-
-GenerativeModel _makeModel(String? apiKey,
-        {int maxTokens = 8192, double temperature = 0.7}) =>
-    GenerativeModel(
-      model: _model,
-      apiKey: (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey,
-      generationConfig: GenerationConfig(
-        temperature: temperature,
-        maxOutputTokens: maxTokens,
-        responseMimeType: 'application/json',
-      ),
+  // Try the primary model first, then each fallback on 429. Each model has
+  // its own daily quota, so switching models extends the usable window.
+  final models = [_model, ..._fallbackModels.where((m) => m != _model)];
+  for (final model in models) {
+    final response = await geminiPost(
+      model: model,
+      apiKey: key,
+      timeout: _timeout,
+      onWait: onWait,
+      body: body,
     );
+
+    if (response.statusCode == 200) {
+      final jsonBody = jsonDecode(response.body);
+      final text = jsonBody['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+      if (text.trim().isNotEmpty) return text;
+      throw Exception('Gemini returned nothing.');
+    }
+
+    // On a daily limit (429 with daily marker), stop — switching models
+    // will not help if the key itself is exhausted.
+    if (response.statusCode == 429) {
+      if (isDailyLimit(response.body)) {
+        throw Exception(geminiBusyMessage(429, response.body));
+      }
+      // Per-minute 429: try the next model in the chain immediately.
+      onWait?.call('Rate limited — switching to next model...');
+      continue;
+    }
+
+    // 404 = model does not exist for this key. Try the next model.
+    if (response.statusCode == 404) {
+      onWait?.call('Switching to next model...');
+      continue;
+    }
+
+    // 503 = model overload — geminiPost already retried internally. Show
+    // the friendly message rather than raw JSON.
+    if (response.statusCode == 503) {
+      throw Exception(geminiBusyMessage(503, response.body));
+    }
+
+    // Any other error (400, 401, etc.) is a real problem — surface it.
+    throw Exception('Gemini error ${response.statusCode}: ${response.body}');
+  }
+
+  throw StateError('All models in the fallback chain were exhausted.');
+}
 
 // ── Character block builder ───────────────────────────────────────────────────
 
@@ -198,12 +189,7 @@ It must include: style, characters with exact descriptions, scene, action, expre
 Do NOT generate captions, hashtags, or Reel scripts.
 ''';
 
-final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey, maxTokens: 4096)
-            .generateContent([Content.text(prompt)]),
-        onWait: onWait);
-  final text = sdkResponse.text ?? '';
-  if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
+  final text = await _geminiText(prompt, apiKey: apiKey, maxTokens: 4096, onWait: onWait);
 
   final Map<String, dynamic> json;
   try {
@@ -308,11 +294,7 @@ RULES:
 - Never generate only an outline. Every slide must have a complete, copy-paste-ready prompt.
 ''';
 
-final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey).generateContent([Content.text(prompt)]),
-        onWait: onWait);
-  final text = sdkResponse.text ?? '';
-  if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
+  final text = await _geminiText(prompt, apiKey: apiKey, onWait: onWait);
 
   final Map<String, dynamic> json;
   try {
@@ -445,11 +427,7 @@ Each "full_prompt" must be completely self-contained and include:
 Return exactly $parts parts.
 ''';
 
-  final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey).generateContent([Content.text(prompt)]),
-        onWait: onWait);
-  final text = sdkResponse.text ?? '';
-  if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
+   final text = await _geminiText(prompt, apiKey: apiKey, onWait: onWait);
 
   final Map<String, dynamic> json;
   try {
@@ -522,12 +500,8 @@ Return ONLY valid JSON for this single part:
 }
 ''';
 
-  final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey, maxTokens: 4096)
-            .generateContent([Content.text(prompt)]),
-        onWait: onWait);
-  final text = sdkResponse.text ?? '';
-  if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
+   final text = await _geminiText(
+    prompt, apiKey: apiKey, maxTokens: 4096, onWait: onWait);
 
   final Map<String, dynamic> json;
   try {
@@ -675,12 +649,8 @@ Be honest: a share is worth more than a view, and a post that cannot name a
 specific sender and recipient is not ready.
 ''';
 
-  final sdkResponse = await _withRetry(
-    () => _makeModel(apiKey, maxTokens: 2048, temperature: 0.3)
-        .generateContent([Content.text(prompt)]),
-    onWait: onWait,
-  );
-  final text = sdkResponse.text ?? '';
+  final text = await _geminiText(
+    prompt, apiKey: apiKey, maxTokens: 2048, temperature: 0.3, onWait: onWait);
   if (text.trim().isEmpty) {
     throw Exception('Gemini returned no shareability analysis.');
   }
@@ -889,12 +859,8 @@ RULES:
 - Keep the caption specific to this actual content, not generic.
 ''';
 
-  final sdkResponse = await _withRetry(
-        () => _makeModel(apiKey, maxTokens: 4096, temperature: 0.7)
-            .generateContent([Content.text(prompt)]),
-        onWait: onWait,
-      );
-  final text = sdkResponse.text ?? '';
+  final text = await _geminiText(
+    prompt, apiKey: apiKey, maxTokens: 4096, temperature: 0.7, onWait: onWait);
   if (text.trim().isEmpty) {
     throw Exception('Gemini returned no engagement package.');
   }
