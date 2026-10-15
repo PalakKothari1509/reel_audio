@@ -779,6 +779,21 @@ class _StatusCard extends StatelessWidget {
   final String message;
   const _StatusCard({required this.message});
 
+  Future<void> _copyToClipboard(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: message));
+    if (context.mounted) {
+      showBottomSheet(
+        context: context,
+        builder: (_) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          color: AppColors.surface,
+          child: const Text('Error copied to clipboard',
+              style: AppText.body),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isError = message.startsWith('❌');
@@ -790,10 +805,23 @@ class _StatusCard extends StatelessWidget {
         border: Border.all(
             color: isError ? AppColors.danger : AppColors.border),
       ),
-      child: Text(message,
-          style: TextStyle(
-              fontSize: 13,
-              color: isError ? AppColors.danger : AppColors.textSoft)),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(message,
+                style: TextStyle(
+                    fontSize: 13,
+                    color: isError ? AppColors.danger : AppColors.textSoft)),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: 'Copy message',
+            icon: const Icon(Icons.content_copy, size: 18),
+            color: isError ? AppColors.danger : AppColors.textSoft,
+            onPressed: () => _copyToClipboard(context),
+          ),
+        ],
+      ),
     );
   }
 }

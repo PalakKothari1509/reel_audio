@@ -1,223 +1,265 @@
-# Fun Learning With Palak — Brand Sheet
+# Brand Sheet
 
-**Status:** Finalized. Single source of truth for brand identity.
-**Date:** October 13, 2026
+The single source of truth for how this brand looks, sounds, and stays consistent
+across every generated image, video, and caption. The code in `lib/brand_system.dart`
+and `lib/characters.dart` is the authority; this document explains it in plain English.
 
 ---
 
 ## 1. Brand Identity
 
-| Field | Value |
+| Field | Value | Source |
+|---|---|---|
+| **Name** | Fun Learning With Palak | `BrandDefaults.name` |
+| **Handle** | @funlearningwithpalak | `BrandDefaults.handle` |
+| **Banner line** | Little Stories • Big Lessons | `kBrandTagline` in `lib/prompts.dart` |
+| **Audience** | Indian moms and parents of children aged 1–4 | `BrandDefaults.audience` |
+| **Tone** | Warm, playful, parent-relatable, simple | `BrandDefaults.tone` |
+
+### CTA rules (hard constraints)
+
+- The app rotates through `ctaOptions` in `BrandDefaults` (`Save this for later`,
+  `Share with another parent`, etc.).
+- **"Follow for more"** and **"follow for daily play ideas" are banned.** `buildBrandContext()`
+  in `brand_system.dart` injects an explicit instruction against them into every prompt.
+- CTAs must be one call to action chosen for what **this** post asks for — never generic.
+
+### Hashtag rules
+
+`BrandDefaults.hashtagPool` provides 12 candidate tags, but:
+
+- Every post takes **exactly 5** (`hashtagCount`), never fewer, never more.
+- Brand tags (`#FunLearningWithPalak`, `#LittleStoriesBigLessons`) are available if
+  they fit, but the rest must be topic-specific to THIS post — never the same set
+  twice in a row.
+- Never pad to reach five; trim when nothing else fits.
+
+---
+
+## 2. Visual Style
+
+> **Soft 3D Pixar/Disney-style render, warm natural lighting, semi-realistic quality.
+> NOT flat 2D, NOT watercolor, NOT kawaii-chibi.**
+
+This is `BrandDefaults.visualStyle` in `brand_system.dart`. It is the single
+definition of the look. Every image and video prompt reads this one constant.
+
+**Why "NOT watercolor" is spelled out:** An earlier version of this file said
+"Soft pastel watercolor storybook" while `prompts.dart` carried a private
+"3D Pixar" const. Both instructions reached the model on the same generation cycle,
+so every render came out confused. The character reference images in
+`assets/characters/` are all 3D Pixar, so the style now matches them, and the
+negative prompt is explicit.
+
+### Canvas sizes
+
+| Format | Dimensions | Safe zone | Bottom margin | Use |
+|---|---|---|---|---|
+| **Reel** | 1080×1920 (9:16) | Top 250, Bottom 450 | 20% clear | Stories, reels |
+| **Trial Reel** | 1080×1920 (9:16) | Top 250, Bottom 450 | 20% clear | Fast-cut testing |
+| **Carousel** | 1080×1440 (3:4) | Top 180, Bottom 180 | N/A | Multi-slide |
+| **Single Image** | 1080×1080 (1:1) | Top 100, Bottom 100 | N/A | Static posts |
+
+Key text and characters must stay inside the safe zone. The bottom 20% of reels
+must stay clear for Instagram's overlay buttons.
+
+Source: `ContentFormat` enum in `brand_system.dart`, `FormatExt.safeZoneSpec`.
+
+---
+
+## 3. Characters
+
+Five core characters are defined in `CharacterLibrary` (`brand_system.dart`). Three
+appear in `kDefaultCast` (`lib/characters.dart`) with bundled reference images.
+Two more (Daadi, Teacher) have descriptions but no approved visual profiles yet.
+
+### Ria
+
+| | |
 |---|---|
-| **Brand Name** | Fun Learning With Palak |
-| **Handle** | @funlearningwithpalak |
-| **Tagline** | Little Stories, Big Lessons |
-| **Primary Audience** | Indian parents of children aged 1–4 |
-| **Tone** | Warm, playful, parent-relatable, simple |
-| **Language** | Hinglish (primary), English (secondary), Hindi (support) |
+| **ID** | `ria` |
+| **Emoji** | 🌸 |
+| **Description** | Indian preschool girl, curious and playful |
+| **Appearance** | Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, **no glasses**, preschool age (3-4). Toofani: round chubby cheeks and a soft plump build, not thin |
+| **Personality** | Curious and expressive, energetic and playful, asks questions and leads activities, sometimes stubborn, a little harmless chaos |
+| **Role** | Protagonist / explorer |
+| **Asset** | `assets/characters/Ria.jpg` |
 
----
+### Rio
 
-## 2. Content Pillars (5 confirmed)
-
-| Pillar | What it is | Example |
-|---|---|---|
-| **PLAY** | Activities that keep a toddler busy | Spoon transfer, water pouring |
-| **THINK** | Simple problem-solving | "Which one doesn't belong?" |
-| **DISCOVER** | Learning through everyday objects | Colours, textures, sounds |
-| **TALK** | Language and parent-child conversation | What to say instead of "NO" |
-| **DO** | Practical independence | Brushing, shoes, eating |
-
----
-
-## 3. Series (7 canonical)
-
-| Series | Description |
+| | |
 |---|---|
-| **Jugaadu Mummy** | Low-cost Indian parenting hacks |
-| **Life With Ria & Rio** | Everyday preschool situations |
-| **Can Your Child Figure It Out?** | Interactive problem-solving content |
-| **Talk With Your Child** | Conversation starters |
-| **Try This At Home** | Practical parent activities |
-| **Parent-Relatable** | Funny preschool-parent moments |
-| **Age-Based Skills** | Useful reference content |
+| **ID** | `rio` |
+| **Emoji** | 💙 |
+| **Description** | Indian preschool boy, playful and determined |
+| **Appearance** | Dark brown hair, blue outfit, brown eyes, **no glasses**, preschool age (3-4) |
+| **Personality** | Energetic and playful, naturally stubborn and determined, says "no" before thinking, follows then leads, deep focus when interested |
+| **Role** | Co-protagonist / problem solver |
+| **Asset** | `assets/characters/Rio.jpg` |
+
+### Cuty
+
+| | |
+|---|---|
+| **ID** | `cuty` |
+| **Emoji** | 🐰 |
+| **Description** | Small white bunny, the peace-bringer |
+| **Appearance** | Small white bunny, pink bow, soft friendly expression, unchanged always |
+| **Personality** | Gentle, quiet observer, calm and sleepy, unbothered, subtle comic relief and warmth, the emotional anchor, never the one who lectures |
+| **Role** | Mascot / observer |
+| **Asset** | `assets/characters/Cuty.jpg` |
+
+### Mumma
+
+| | |
+|---|---|
+| **ID** | `mumma` |
+| **Emoji** | 👩 |
+| **Description** | Young Indian mother in her early 30s, warm and patient |
+| **Appearance** | Young Indian mother, early 30s, warm brown eyes, gentle radiant smile, hair in a soft high bun with loose face-framing strands, small red bindi, gold jhumka earrings, mustard yellow kurti with white chikankari embroidery, blue jeans, brown flat slide sandals |
+| **Personality** | Warm, patient and observant. Playfully redirects tantrums rather than scolding, never lectures. Master of low-cost screen-free household hacks. Solutions come from noticing what's already in the kitchen, not from buying anything. |
+| **Speech** | Calm Hinglish, encouraging, warm. Soft terms of endearment such as "arre mera bachha" and "dekho toh". Never scolding, never impatient. |
+| **Role** | Warm problem-solver, the parent the viewer identifies with |
+| **Asset** | `assets/characters/Mumma.jpg` |
+
+### Papa
+
+| | |
+|---|---|
+| **ID** | `papa` |
+| **Emoji** | 👨 |
+| **Description** | Young Indian father in his early 30s, warm and playful |
+| **Appearance** | Young Indian father, early 30s, warm brown eyes, soft smile, dark hair neatly styled with light stubble. Light blue full-sleeve linen shirt, slim-fit jeans, brown embroidered juttis |
+| **Personality** | Warm, patient and playful. Joins in the children's games rather than directing, adds silly voices and sound effects, defuses tension with a joke. The calm in the chaos. |
+| **Role** | The calm problem-solver, the parent who joins the fun |
+| **Asset** | `assets/characters/Papa.jpg` |
+
+### Not yet approved
+
+| **Daadi** | Referenced in ideas but no approved profile. Asset exists at `assets/characters/Daadi.jpg` |
+|---|---|
+| **Teacher** | Referenced in ideas but no approved profile. Asset exists at `assets/characters/Teacher.jpg` |
+
+### Hard character rules
+
+From `characterLockFor()` in `brand_system.dart`:
+
+1. **Ria and Rio NEVER wear glasses.** This is enforced in every prompt.
+2. **Cuty is ALWAYS a small white bunny with a pink bow.** Never human, never changes.
+3. **Only the characters in the current cast may appear.** No background characters, bystanders, extras, or mascots.
+4. **Outfits may change per scene but hair/eyes/face stay consistent.**
+5. Use **attached reference images** for exact face/hair/outfit matching. Facial details are locked by images uploaded to Gemini — the prompt only enforces style, size, and the no-glasses rule.
 
 ---
 
-## 4. Characters (5 approved)
+## 4. Content Buckets
 
-| ID | Character | Emoji | Age | Description | Key Rules |
-|---|---|---|---|---|---|
-| `ria` | Ria | 🌸 | 3-4 | Indian preschool girl, curious and playful | Never wears glasses. Round chubby cheeks, soft plump build |
-| `rio` | Rio | 💙 | 3-4 | Indian preschool boy, playful and determined | Never wears glasses. Naturally stubborn, says "no" first |
-| `cuty` | Cuty | 🐰 | — | Small white bunny, the peace-bringer | Always small white bunny with pink bow. Never changes |
-| `mumma` | Mumma | 👩 | ~30 | Young Indian mother, warm and patient | Warm, patient, never scolds. Uses "arre mera bachha" |
-| `papa` | Papa | 👨 | ~30 | Young Indian father, warm and playful | Joins the fun, adds silly voices. The calm in the chaos |
+Six buckets define what each post IS about. Each has its own generation prompt,
+slide templates, and example hooks. Source: `BucketLibrary` in `brand_system.dart`.
 
-**Characters NOT yet in the library:** Daadi, Teacher. Any story using them will generate without a locked appearance until profiles are written.
+| ID | Name | Emoji | Description | Key hooks |
+|---|---|---|---|---|
+| `challenge` | Challenge | 🔎 | Observation games, pattern challenges, puzzles | `WHICH ONE DOESN'T BELONG?`, `FIND THE HIDDEN CUTY!` |
+| `conversation` | Conversation | 🗣️ | Bedtime questions, dinner talks, imagination starters | `ASK YOUR CHILD THIS TONIGHT`, `3 QUESTIONS FOR THIS WEEK` |
+| `activity` | Activity | 🏠 | Try this at home — household items only | `5-MINUTE KITCHEN CHALLENGE`, `THE SOCK HUNT` |
+| `humor` | Humor | 😂 | Parent-relatable moments, toddler logic | `MUMMA SAYS THIS 100x A DAY`, `TODDLER MATHEMATICS` |
+| `age_practice` | Age Practice | 📚 | Gentle milestone checklists | `CAN YOUR 3-YEAR-OLD DO THESE?` |
+| `community` | Community | 💬 | Polls, votes, favourites, week wrap ups | `WHICH ONE SHOULD WE DO NEXT?`, `TELL US YOUR FAVOURITE` |
 
-**Glasses:** Ria and Rio NEVER wear glasses. This is locked in `CharacterLibrary.characterLockFor()`.
+### Slide templates (by bucket)
 
----
+**Challenge** — Cover → Challenge → Options → Think → Reveal → Why it works → CTA
 
-## 5. Visual Style (1 confirmed)
+**Conversation** — Cover → Question 1 → Question 2 → Question 3 → Why → Variation → CTA
 
-**Soft 3D Pixar/Disney-style render, warm natural lighting, semi-realistic quality.**
+**Activity** — Cover → What You Need → Step 1 → Step 2 → Step 3 → What They Learn → CTA
 
-- NOT flat 2D
-- NOT watercolor
-- NOT kawaii-chibi
+**Humor** — Cover → Scene 1 → Scene 2 → Scene 3 → Punchline → Tagline → CTA
 
-This is defined in `BrandDefaults.visualStyle` in `lib/brand_system.dart` and injected into every prompt via:
-- `generateEverything()` in `lib/prompt_builder.dart`
-- `CharacterLibrary.characterLockFor()` in `lib/brand_system.dart`
-- `AiContentService` via `{{VISUAL_STYLE}}` placeholder
+**Age Practice** — Cover → Skill 1 → Skill 2 → Skill 3 → Skill 4 → Skill 5 → CTA
 
-All character renders in `assets/characters/` use this style. Watercolour/ pastel posts from the old grid are **legacy** and should be archived or redone.
-
-**Aspect ratio:** Vertical 9:16 for Instagram Reels.
+**Community** — Cover → Options → Each option → Why → CTA
 
 ---
 
-## 6. Lean Prompt Block (for every Gemini image/video prompt)
+## 5. Content Formats
 
-Reference images uploaded to Gemini handle facial locking. The prompt only needs
-to enforce **style** and **size**.
+Source: `ContentFormat` enum in `brand_system.dart`. Format decides the **shape**
+of the package; Production method decides the **visual direction**.
 
-```
-STYLE (compulsory): Soft 3D Pixar/Disney-style render, warm natural
-lighting, bright cozy colours. NOT flat 2D, NOT chibi, NOT watercolour.
-Use the attached reference images for all characters. Match their faces,
-hair and outfits exactly.
-
-SIZE (compulsory):
-- Reel / video / story frame: vertical 9:16 (1080x1920)
-- Carousel / static post: 4:5 portrait (1080x1350)
-Keep key characters and text inside the centre safe area. Leave the
-bottom 20% and right edge clear for Instagram buttons.
-
-NO GLASSES on any character.
-
-SCENE: [describe the scene]
-EXPRESSION: [emotion]
-TEXT OVERLAY (if any): bold rounded font in a white banner with a
-black border at the top.
-```
-
-> **Note:** Reference images lock faces and outfits well. They do not lock
-> pose, scene or style on their own. If a result looks flat or 2D, repeat the
-> style line in every scene prompt (the block above already does this).
+| Format | Emoji | Description | Slides | Canvas |
+|---|---|---|---|---|
+| Reel | 🎬 | 15-20 sec vertical video | 5 (4-8) | 1080×1920 |
+| Trial Reel | 🧪 | 60-sec fast-cut for reach | 8 (7-10) | 1080×1920 |
+| Carousel | 📚 | Swipeable multi-slide post | 7 (5-10) | 1080×1440 |
+| Single Image | 🖼️ | One image + full caption pack | 1 | 1080×1080 |
 
 ---
 
-## 7. Character Lock (lean version)
+## 6. Share Trigger (mandatory)
 
-`CharacterLibrary.characterLockFor()` now outputs only names + the no-glasses rule
-plus a pointer to reference images:
+Before writing any caption, the prompt asks:
 
-```
-CHARACTER LOCK — Use the attached reference images for exact face/hair/outfit matching.
+> **"Why would one parent send this to another parent?"**
 
-Ria, Rio, Cuty, Mumma, Papa
+The answer must name a **specific** parent and situation:
 
-RULES:
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
-- Only the characters listed above may appear in this post.
-- Outfits may change per scene but hair/eyes/face stay consistent.
+> *Send this to the mom whose toddler says "I don't like vegetables" before even tasting them.*
 
-VISUAL STYLE:
-Soft 3D Pixar/Disney-style render, warm natural lighting, semi-realistic quality.
+Not "share with your friends." A share is worth more than a view, so this is not
+optional decoration. If no specific person can be named, the post is not ready —
+prefer an open loop or a surprising payoff that creates the send.
 
-SIZE:
-- Vertical 9:16 (1080x1920) for Reels and Stories.
-- Portrait 4:5 (1080x1350) for Carousels and Static posts.
-- Keep key characters and text inside the centre safe area.
-- Leave bottom 20% clear for Instagram buttons.
-```
+Source: `buildBrandContext()` in `brand_system.dart`.
 
-## 8. Two-Stage Content Workflow
+---
 
-**Stage 1 — Base Idea** (stored in `content_ideas.md`): Beats only, no timing.
-Defines Setup, Problem, Escalation, Turn, Payoff, Stretch Beat, Ending line,
-CLOSING CTA, and best length. No timestamps or camera notes at this stage.
+## 7. Story Reel Workflow (Two-Stage)
 
-**Stage 2 — Clip Prompts** (generated on demand, see `clip_prompts.md`):
-You pick an idea + length. I produce N self-contained 10-second prompts.
-Each Part includes style, size, characters, camera, timed action, and a
-continuity line for Parts 2+. For Part 2+, attach the previous Part's last frame.
+The Story Reel builder in `lib/story_reel_builder.dart` uses a two-stage workflow.
+Full details are in `clip_prompts.md`, summarized here:
 
-| Length | Parts | Beats |
+- **Stage 1 — BeatSheet:** A base idea with five beats (setup, problem, escalation,
+  turn, payoff) plus an optional stretch beat. Stored in `content_ideas.md`. No timing.
+  This is the `BeatSheet` class in `lib/story_ideas.dart`.
+
+- **Stage 2 — VideoClipPrompt:** You pick an idea + length (20/30/40/60 sec). The app
+  produces N self-contained 10-second prompts, one per Part. Each Part is a
+  standalone `VideoClipPrompt` (defined in `lib/prompts.dart:207`) with style, size,
+  characters, camera, timed action (0-4s / 4-8s / 8-10s), audio, avoid rules, and a
+  continuity line for Parts 2+.
+
+  - `partsForLength()` → 20→2, 30→3, 40→4, 60→6 parts.
+  - `beatIndicesForParts()` → maps beats to parts for each length.
+  - `buildVideoPrompts()` → assembles the final `List<VideoClipPrompt>`.
+  - `_buildPartPrompt()` → builds each Part's prompt text via `characterLockFor()`.
+
+---
+
+## 8. End Card & Closing
+
+Every reel ends with the same screen so the channel is recognisable:
+
+| Element | Value | Source |
 |---|---|---|
-| 20s | 2 | Setup+Problem+Escalation / Turn+Payoff |
-| 30s | 3 | Setup+Problem / Escalation+Stretch / Turn+Payoff |
-| 40s | 4 | Same as 30s + extra escalation or reaction |
-| 60s | 6 | Rarely recommended — drift risk |
+| **Header** | ❤️ Little Stories, Big Lessons | `kEndCardHeader` in `prompts.dart` |
+| **CTA line** | 💾 Save this for later / ↗️ Share with a parent who needs it | `kDefaultCtaLine` in `prompts.dart` |
 
-## 9. Content Generation Defaults
+The last screen carries a **question** to keep comments alive:
+> *Comments are what keep a reel alive after the first hour, and people answer a
+> question far more readily than they volunteer an opinion.*
 
-| Parameter | Default | Presets |
-|---|---|---|
-| Duration | 30 sec | 20, 30, 45, 60 sec |
-| Language | Hinglish | Hinglish, English, Hindi |
-| Tone | Warm, playful, relatable | Heartwarming, Funny, Educational, Adventure, Problem-Solving |
-| Characters | Ria, Rio, Cuty | All 5 selectable via chip UI |
-| Hashtags | Exactly 5 | Auto-generated per post |
-| Voice | Optional | ElevenLabs (Settings override pending) |
+No engagement bait anywhere — no "comment YES", "tag 10 friends", "like this",
+"follow for more". Invite genuine conversation between parents instead.
 
 ---
 
-## 10. Reach Mechanics
+## 9. Security Notes
 
-No viral scores. Every idea is checked mechanically with pass/fail/unknown:
-
-- **Share trigger** — who sends this to whom, and why (sender, recipient, situation, reason)
-- **Open loop** — does the post invite a response?
-- **Voice mode** — `none` (visuals/text only), `optional` (voice enhances), `required`
-- **Production compatibility** — can this be made with available tools?
-- **Five-test rule** — a format needs 5 tests before judgment. Never conclude from one post.
-
----
-
-## 11. Post Structure (per reel)
-
-Each reel output includes:
-1. Hook text overlay (first 3 seconds)
-2. Script with 4-second-timed lines (Hinglish on screen + Devanagari spoken)
-3. Scene descriptions (visual + expression + beat + shot + key objects)
-4. Caption (2-3 lines, warm, ends with engagement prompt)
-5. 5 niche-relevant hashtags
-6. Pinned comment (conversation starter)
-7. Cover title (3-5 words, big and curious)
-8. Moral line (second-to-last screen)
-9. End question (last screen, answer in 4 words)
-
----
-
-## 12. Security
-
-- All API keys (Gemini, ElevenLabs) centralized in `ApiKeyStore` (`lib/api_key_store.dart`)
-- Settings-first fallback: user key checked before default
-- Keys stored in `lib/secrets.dart` (git-ignored)
-- `backend/` directory deleted (OpenAI key was never in git)
-- **Action required:** Rotate both keys before release (compiled into APK)
-- **Action required:** Add ElevenLabs Settings override
-
----
-
-## 13. Test Status
-
-**310 tests, all passing.** Coverage includes:
-- Gemini script parser (timestamps, bullets, Hinglish/Devanagari)
-- Content quality gate (ShareTrigger, VoiceMode, SaveValue, ClassificationSnapshot)
-- AI content service (generation, validation, failure handling)
-- AI parser validator (JSON schema validation, malformed/truncated, markdown extraction)
-- Content library (save path, metadata round trip, all four formats)
-- Content service (save/sync/duplicates)
-- Story reel builder (12 tests, Navratri structure)
-- Dashboard (84 tests)
-- API key store (9 tests)
-- JsonFileStore (11 tests)
-- Content audit (12 tests)
-
-Run: `flutter test`
+- All API keys (Gemini, ElevenLabs) are centralized in `ApiKeyStore`
+  (`lib/api_key_store.dart`), which honors the user-configured key in Settings
+  before falling back to defaults.
+- Keys are stored in `lib/secrets.dart` (git-ignored). Keys inside an APK can be
+  extracted — **rotate before release**.
+- Reference images are attached per generation call; no keys are embedded in prompts.
+- See `SECURITY_AUDIT.md` for the full audit.

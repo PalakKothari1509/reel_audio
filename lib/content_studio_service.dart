@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -13,8 +15,59 @@ import 'secrets.dart';
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
 
-const _model = 'gemini-2.0-flash';
-const _timeout = Duration(seconds: 90);
+const _model = 'gemini-3.8-flash';
+// Gemini 3.8 Flash is fast on paper, but the first call of a session warms the
+// model and a large brand-aware prompt can take a while. 90s was not enough:
+// the call simply never came back and the UI was left hanging. 180s gives the
+// slow path room without making the user wait forever on a genuinely dead key.
+const _timeout = Duration(seconds: 180);
+// How many times to retry. A timeout or connection drop is usually transient —
+// a warming model or a flaky wireless link — so retrying is the right reaction.
+const _maxRetries = 3;
+
+/// Runs [fn] with retry. Each retry waits longer, because the thing that caused
+/// the first failure is usually still loading or the network is still flaky.
+///
+/// Retries on timeouts (model warm-up, queue) and on connection drops
+/// ("Software caused connection abort" — common on the wireless phone link).
+/// A 4xx from a bad key or a bad model name is NOT retried: it will not get
+/// better by waiting.
+///
+/// The per-attempt timeout escalates rather than staying at the full 180s:
+/// waiting 180s on a dead link four times is twelve minutes of nothing. A short
+/// first attempt fails fast, and only the final attempt gets the full budget.
+Future<T> _withRetry<T>(Future<T> Function() fn) async {
+  for (var attempt = 0; attempt <= _maxRetries; attempt++) {
+    final isFinal = attempt == _maxRetries;
+    final attemptTimeout = isFinal
+        ? _timeout
+        : Duration(seconds: 30 * (attempt + 1)); // 30s, 60s, then 180s
+    try {
+      return await fn().timeout(attemptTimeout);
+    } on TimeoutException catch (_) {
+      if (isFinal) rethrow;
+      await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
+    } on SocketException catch (_) {
+      // A dropped connection is almost always transient, especially over the
+      // wireless ADB link the phone runs on. Retry rather than surfacing it.
+      if (isFinal) rethrow;
+      await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
+    } on Exception catch (e) {
+      // Gemini 503 "UNAVAILABLE" means the model is overloaded. The message
+      // says the spike is usually temporary, so retrying is the right reaction.
+      // A 4xx auth error will not contain these markers and is rethrown.
+      final msg = e.toString();
+      if (msg.contains('503') || msg.contains('UNAVAILABLE')) {
+        if (isFinal) rethrow;
+        await Future.delayed(Duration(seconds: 4 * (1 << attempt)));
+        continue;
+      }
+      rethrow;
+    }
+  }
+  // Unreachable, but keeps the compiler happy about a return type.
+  throw StateError('retry loop exited');
+}
 
 GenerativeModel _makeModel(String? apiKey, {int maxTokens = 8192}) =>
     GenerativeModel(
@@ -105,9 +158,9 @@ It must include: style, characters with exact descriptions, scene, action, expre
 Do NOT generate captions, hashtags, or Reel scripts.
 ''';
 
-  final sdkResponse = await _makeModel(apiKey, maxTokens: 4096)
-      .generateContent([Content.text(prompt)])
-      .timeout(_timeout);
+final sdkResponse = await _withRetry(
+        () => _makeModel(apiKey, maxTokens: 4096)
+            .generateContent([Content.text(prompt)]));
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -214,9 +267,8 @@ RULES:
 - Never generate only an outline. Every slide must have a complete, copy-paste-ready prompt.
 ''';
 
-  final sdkResponse = await _makeModel(apiKey)
-      .generateContent([Content.text(prompt)])
-      .timeout(_timeout);
+final sdkResponse = await _withRetry(
+        () => _makeModel(apiKey).generateContent([Content.text(prompt)]));
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -351,9 +403,8 @@ Each "full_prompt" must be completely self-contained and include:
 Return exactly $parts parts.
 ''';
 
-  final sdkResponse = await _makeModel(apiKey)
-      .generateContent([Content.text(prompt)])
-      .timeout(_timeout);
+  final sdkResponse = await _withRetry(
+        () => _makeModel(apiKey).generateContent([Content.text(prompt)]));
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
@@ -428,9 +479,9 @@ Return ONLY valid JSON for this single part:
 }
 ''';
 
-  final sdkResponse = await _makeModel(apiKey, maxTokens: 4096)
-      .generateContent([Content.text(prompt)])
-      .timeout(_timeout);
+  final sdkResponse = await _withRetry(
+        () => _makeModel(apiKey, maxTokens: 4096)
+            .generateContent([Content.text(prompt)]));
   final text = sdkResponse.text ?? '';
   if (text.trim().isEmpty) throw Exception('Gemini returned nothing.');
 
