@@ -52,6 +52,33 @@ class GeneratedStory {
     required this.hookOptions,
   });
 
+  GeneratedStory copyWith({
+    String? title,
+    String? hook,
+    String? who,
+    String? where,
+    String? problem,
+    String? twist,
+    String? worse,
+    String? solution,
+    String? endingLine,
+    String? moral,
+    List<Map<String, String>>? hookOptions,
+  }) =>
+      GeneratedStory(
+        title: title ?? this.title,
+        hook: hook ?? this.hook,
+        who: who ?? this.who,
+        where: where ?? this.where,
+        problem: problem ?? this.problem,
+        twist: twist ?? this.twist,
+        worse: worse ?? this.worse,
+        solution: solution ?? this.solution,
+        endingLine: endingLine ?? this.endingLine,
+        moral: moral ?? this.moral,
+        hookOptions: hookOptions ?? this.hookOptions,
+      );
+
   Map<String, dynamic> toJson() => {
     'title': title,
     'hook': hook,

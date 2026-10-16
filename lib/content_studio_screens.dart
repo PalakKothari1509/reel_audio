@@ -53,8 +53,16 @@ IdeaEvaluation _buildOfflineEvaluation(String idea) {
 
 GeminiVideoResult _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) {
   final story = StoryGenerator().generate();
+  final mergedStory = story.copyWith(
+    title: _storyTitleFromIdea(idea),
+    hook: idea,
+    problem: idea,
+    solution: 'Together they figured it out with teamwork.',
+    endingLine: 'Theek hai na Mama?',
+    moral: 'Working together makes everything better.',
+  );
   final offlineResult = OfflineVideoPromptGenerator().generateFromStory(
-    story,
+    mergedStory,
     totalSeconds: totalSeconds,
     characters: chars,
   );

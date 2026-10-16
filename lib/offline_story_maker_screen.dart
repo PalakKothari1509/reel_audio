@@ -100,19 +100,52 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
   }
 
   GeneratedStory _storyFromHook(HookIdea hook) {
+    final problem = hook.problem;
+    final lesson = hook.lesson;
+    final cover = hook.cover;
+
+    // Derive twist by introducing a complicating factor
+    final twist = _deriveTwist(problem, lesson);
+    final worse = _deriveWorse(problem, lesson);
+    final endingLine = _deriveEndingLine(lesson, cover);
+
     return GeneratedStory(
-      title: hook.cover,
-      hook: hook.cover,
+      title: cover,
+      hook: cover,
       who: _selectedChars.join(', '),
-      where: 'at home',
-      problem: hook.problem,
-      twist: 'But then something unexpected happened.',
-      worse: 'It seemed like nothing could fix it.',
-      solution: hook.lesson,
-      endingLine: 'Now everyone knows what to do!',
-      moral: hook.lesson,
+      where: _deriveWhere(problem),
+      problem: problem,
+      twist: twist,
+      worse: worse,
+      solution: lesson,
+      endingLine: endingLine,
+      moral: lesson,
       hookOptions: [],
     );
+  }
+
+  String _deriveTwist(String problem, String lesson) {
+    final firstWord = problem.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
+    return "But then $firstWord didn't go as planned, making things even harder.";
+  }
+
+  String _deriveWorse(String problem, String lesson) {
+    return "Just when it seemed like it could work, everything fell apart at once.";
+  }
+
+  String _deriveEndingLine(String lesson, String cover) {
+    final key = lesson.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Everything');
+    return "$key — that's what made all the difference!";
+  }
+
+  String _deriveWhere(String problem) {
+    final lower = problem.toLowerCase();
+    if (lower.contains('kitchen') || lower.contains('food')) return 'in the kitchen';
+    if (lower.contains('playground') || lower.contains('park')) return 'at the playground';
+    if (lower.contains('bedroom') || lower.contains('sleep')) return 'in the bedroom';
+    if (lower.contains('garba') || lower.contains('dance') || lower.contains('festival')) return 'at home';
+    if (lower.contains('snack') || lower.contains('eat')) return 'in the dining area';
+    return 'at home';
   }
 
   Future<void> _regenerateStory() async {
