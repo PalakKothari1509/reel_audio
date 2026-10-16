@@ -12,12 +12,25 @@ HookIdea(
   opening: 'First line spoken',
   problem: 'The relatable preschool problem',
   lesson: 'What children learn from this',
+  postFormat: 'Reel',
+  strategy: 'Parent relatable hook',
   caption: 'Instagram caption',
   pinnedComment: 'Pinned comment text',
   forApp: true,
   usedOn: '',
 ),
 ```
+
+## HookIdea.copyWith()
+
+Every property of `HookIdea` can be safely copied and mutated:
+
+```dart
+final updated = hook.copyWith(usedOn: '2026-10-16');
+```
+
+Supported fields: `id`, `category`, `cover`, `opening`, `problem`, `lesson`,
+`postFormat`, `strategy`, `caption`, `pinnedComment`, `forApp`, `usedOn`.
 
 ## The flow from idea to output
 
