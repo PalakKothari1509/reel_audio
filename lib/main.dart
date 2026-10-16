@@ -46,6 +46,7 @@ import 'settings_screen.dart';
 import 'content_ideas.dart';
 import 'my_content_screen.dart';
 import 'content_studio_screens.dart';
+import 'offline_story_maker_screen.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -510,6 +511,12 @@ Future<void> main() async {
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(
             builder: (_) => GeminiVideoScreen(keyStore: _keyStore!),
+          ),
+        ),
+        onOfflineStory: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => OfflineStoryMakerScreen(),
           ),
         ),
       ),

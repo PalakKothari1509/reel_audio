@@ -18,6 +18,7 @@ class ContentStudioHome extends StatefulWidget {
   final NavCallback onImagePrompt;
   final NavCallback onCarouselPrompts;
   final NavCallback onGeminiVideo;
+  final NavCallback? onOfflineStory;
 
   const ContentStudioHome({
     super.key,
@@ -28,6 +29,7 @@ class ContentStudioHome extends StatefulWidget {
     required this.onImagePrompt,
     required this.onCarouselPrompts,
     required this.onGeminiVideo,
+    this.onOfflineStory,
   });
 
   @override
@@ -94,6 +96,14 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
             title: 'Gemini Story Video',
             subtitle: 'Connected 10-second video prompts with continuity lock',
             onTap: widget.onGeminiVideo,
+          ),
+          const SizedBox(height: 10),
+          _PrimaryAction(
+            icon: Icons.offline_bolt,
+            title: 'Offline Story Generator',
+            subtitle: 'Generate stories, video prompts, and captions without API',
+            onTap: widget.onOfflineStory ??
+                () {},
           ),
           const SizedBox(height: 24),
 
