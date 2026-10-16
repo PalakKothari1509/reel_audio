@@ -3,27 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class StoryTemplate {
-  final String title;
-  final String problem;
-  final String twist;
-  final String worse;
-  final String solution;
-  final String endingLine;
-  final String moral;
-  final String where;
-
-  const StoryTemplate({
-    required this.title,
-    required this.problem,
-    required this.twist,
-    required this.worse,
-    required this.solution,
-    required this.endingLine,
-    required this.moral,
-    required this.where,
-  });
-}
+import 'content_ideas.dart';
 
 class GeneratedStory {
   final String title;
@@ -107,138 +87,52 @@ class StoryGenerator {
     'Emotional',
   ];
 
-  static final List<StoryTemplate> _templates = [
-    StoryTemplate(
-      title: 'Plate Patana',
-      problem: 'Ria plate mein khana rakhti thi, par jab Mumma ne dekha toh plate zameen par gir gayi.',
-      twist: 'Rio ne bhi apni plate Rakhi ki, lekin uska bhi gir gaya.',
-      worse: 'Cuty ne bhi apni chinti maang ke khana khane ki koshish karni padi.',
-      solution: 'Teeno milke plate utha kar khud hi saaf kar liye — bina kisi ladai ke.',
-      endingLine: 'Phir se khaana khayenge saaf-majmoon plate par, haan kehte hue, "Theek hai na Mama?"',
-      moral: 'Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.',
-      where: 'Indian home kitchen, warm morning light',
-    ),
-    StoryTemplate(
-      title: 'Shoe Bandhani',
-      problem: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
-      twist: 'Ria ne bhi apni jooti pehnne ki koshish ki, lekin ek jooti kahaani thi.',
-      worse: 'Cuty ne bhi apni bunni chinti se koshish ki, aur woh bhi ek taraf gir gayi.',
-      solution: 'Mumma ne do minute mein teeno jooti jod di — ek joota hai, doosra doosre ke saath.',
-      endingLine: 'Jab sab milti bante jooti maang liye, Rio haanke maaf karte hue, "Mujhe jooti pehnna ata nahi!"',
-      moral: 'Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.',
-      where: 'Hallway near the shoe rack, afternoon sunlight',
-    ),
-    StoryTemplate(
-      title: 'Toy Sharing',
-      problem: 'Ria aur Rio dono ek hi toy car ko pakad kar khushboo mein latke the.',
-      twist: 'Jab Mumma ne ek ko diya toh doosre ne usse bhi pakad li.',
-      worse: 'Tension badh gayi jab dono sirhathon se lade aur car beech mein gir gayi.',
-      solution: 'Cuty ne car ko ghoont aake Ria ke saamne rakh di, phir Rio ke saamneh, phir dono ke beech.',
-      endingLine: 'Car khelne lagi jab Cuty ne usse beech mein rakh kar diya — "Ek do pal ke liye, dono ke liye!"',
-      moral: 'Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur hota hai.',
-      where: 'Living room floor, soft evening light through the window',
-    ),
-    StoryTemplate(
-      title: 'Vegetable Drama',
-      problem: 'Rio ne bhi kaha — "Gobhi nahi khaoongi!" — jab Mumma ne gobhi rakhi.',
-      twist: 'Ria ne bhi gobhi dekhi aur bhi keh li — "Yeh Mummy ke saath nahi khayenge!"',
-      worse: 'Cuty bhi gobhi ke saath baithi, jaise usse bhi pakad liya ho.',
-      solution: 'Mumma ne ek gobhi ko "Bachcha" ka naam rakha, ek ko "Rider" — dono hi khush ho gaye.',
-      endingLine: 'Jab gobhi khate samay Rio haanke poochha, "Bachcha aur Rider kya hote hain?"',
-      moral: 'Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.',
-      where: 'Dining table, warm afternoon light',
-    ),
-    StoryTemplate(
-      title: 'Brushing Battle',
-      problem: 'Ria ne brush pakda, par turant se poochh li — "Mujhe brush nahi karna!"',
-      twist: 'Rio ne dekha aur bhi maan li — "Main karenge, main toh badi bacchi hoon!"',
-      worse: 'Lekin Rio brush sirf paani mein hi ghoont kar raha tha, paste nahi laga.',
-      solution: 'Cuty ne apni chinti se brush utha kar dono ke beech lekar jaa kar dikhali — dono hi brush karni padhi.',
-      endingLine: 'Dono brush karne lagi jab Cuty ne dikhaya — "Daant bhi toh brush se saaf hoti hai!"',
-      moral: 'Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.',
-      where: 'Bathroom, soft morning light from window',
-    ),
-    StoryTemplate(
-      title: 'Park Se Nikalna',
-      problem: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab papa ne time khatam kaha.',
-      twist: 'Rio ne rona dala — "Mujhe bhi nahi jaana!" — dono bachche jameen par baith gaye.',
-      worse: 'Cuty bhi gir ke gir gaya, jaise sabse pehle hi haar maan liya ho.',
-      solution: 'Papa ne ek chhota sa game shuru kiya — "Jiska pehla step niklega, wohi jeeti ka countdown karega."',
-      endingLine: 'Jab dono ek saath park ke bahar nikal liye, Rio haanke kaha, "Next time, pehle maine kaha tha!"',
-      moral: 'Game toh game hota hai, lekin har game ek nayi baat sunane dega.',
-      where: 'Park entrance, golden hour light',
-    ),
-    StoryTemplate(
-      title: 'The Toy Car Share',
-      problem: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions on the living room rug.',
-      twist: 'When Mummy handed it to one, the other grabbed it too — and the car went flying.',
-      worse: 'Both children froze in shocked silence as the car rolled away toward the kitchen doorway.',
-      solution: 'They took a breath, looked at each other, and agreed to roll the car right down the middle together.',
-      endingLine: 'Ria beamed: "Ho gaya! Theek hai na Mama?"',
-      moral: 'Sharing something means twice the fun, not twice the fight.',
-      where: 'Indian living room, warm morning light',
-    ),
-    StoryTemplate(
-      title: 'The Block Tower',
-      problem: 'Rio carefully balanced the final wooden block on a tall colorful tower while afternoon sun streamed through the window.',
-      twist: 'Ria toddled over to get a better look, accidentally bumping the base of the tower with her shoe.',
-      worse: 'The blocks scattered across the carpet in a wooden thunder, and Cuty instinctively ducked.',
-      solution: 'Instead of crying, Rio started giggling — the fallen blocks could become a flat playhouse instead of a tall tower.',
-      endingLine: 'Ria clapped: "Mama, humne naya ghar banaya!"',
-      moral: 'A mistake is just a new game waiting to be named.',
-      where: 'Living room play corner, afternoon sunlight',
-    ),
-    StoryTemplate(
-      title: 'The Snack Reach',
-      problem: 'A bright snack box sat just out of reach on the low kitchen counter ledge, and Ria stretched on tiptoes trying to grab it.',
-      twist: 'No matter how hard she stretched, her tiptoes barely made it halfway to the box.',
-      worse: 'Rio watched from behind, wanting a snack too, but neither could reach alone.',
-      solution: 'Rio stepped up behind Ria, placing his hands firmly on her waist to steady her — together they grabbed the snack.',
-      endingLine: 'Ria said: "Ho gaya! Theek hai na Mama?"',
-      moral: 'When you lift each other up, even high shelves become easy.',
-      where: 'Indian kitchen, bright morning sunlight',
-    ),
-    StoryTemplate(
-      title: 'Night Before Annual Day',
-      problem: 'At 9:30 PM, Ria casually dropped the bombshell — tomorrow was Annual Day and she needed a yellow costume and cardboard sunflower prop.',
-      twist: 'While Papa frantically glued cardboard petals at midnight, Mummy forgot all the dance steps during rehearsal.',
-      worse: 'Rio tangled Mummy in the curtain trying to "help," and Cuty scattered yellow paint smudges everywhere.',
-      solution: 'By morning, the costume was perfect and the prop stood tall — and the kids took all the credit on stage.',
-      endingLine: 'Ria and Rio declared: "Dekho! Hum kitne cute lag rahe hain!"',
-      moral: 'Even the messiest all-nighter ends when everyone works as a team.',
-      where: 'Indian living room, nighttime warm lamps',
-    ),
-    StoryTemplate(
-      title: 'ASMR Cleaning Reel',
-      problem: 'Mummy found the living room in complete chaotic toddler disarray — crayons, blocks, cushions, and snack bowls scattered everywhere.',
-      twist: 'As Mummy rolled up her sleeves and began the satisfying deep clean, the soundscape filled with crisp latch clicks and block clatter.',
-      worse: 'Mummy sat back on the now-pristine sofa with her chai in pure bliss — only to push open the bedroom door to a brand-new storm.',
-      solution: 'Ria and Rio had built a pillow fort wearing saucepan hats, beaming as they announced: "Mumma dekho! Humne naya tent banaya!"',
-      endingLine: 'Mummy held her chai frozen: "Maine abhi toh poora ghar saaf kiya tha...!"',
-      moral: 'Ten minutes of peace and a lifetime of love — perfectly balanced.',
-      where: 'Indian living room and bedroom, soft morning daylight',
-    ),
-  ];
+  List<HookIdea> get _available =>
+      kDefaultHooks.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
+
+  static String _extractLine(String detail, String label) {
+    final lines = detail.split('\n');
+    for (final line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith(label)) {
+        return trimmed.substring(label.length).trim();
+      }
+    }
+    return '';
+  }
 
   GeneratedStory generate({String? customProblem, String? customAge}) {
-    final template = _templates[_rng.nextInt(_templates.length)];
+    final hooks = _available;
+    final h = hooks[_rng.nextInt(hooks.length)];
     final who = _selectCharacters();
-    final hookText = _buildHook(template, who);
-    final hookOptions = _buildHookOptions(template, hookText);
+    final problem = _extractLine(h.storyDetail, 'Story:');
+    final twist = _extractLine(h.storyDetail, 'Twist:');
+    final worse = _extractLine(h.storyDetail, 'Resolution:');
+    final hookText = _buildHook(h, who);
+    final hookOptions = _buildHookOptions(h, hookText);
 
     return GeneratedStory(
-      title: template.title,
+      title: h.cover,
       hook: hookText,
       who: who,
-      where: template.where,
-      problem: template.problem,
-      twist: template.twist,
-      worse: template.worse,
-      solution: template.solution,
-      endingLine: template.endingLine,
-      moral: template.moral,
+      where: 'at home',
+      problem: problem.isNotEmpty ? problem : h.problem,
+      twist: twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
+      worse: worse.isNotEmpty ? worse : _fallbackWorse(h.problem),
+      solution: h.lesson,
+      endingLine: _extractLine(h.storyDetail, 'Moral:'),
+      moral: h.lesson,
       hookOptions: hookOptions,
     );
+  }
+
+  String _fallbackTwist(String problem) {
+    final firstWord = problem.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
+    return "But then $firstWord didn't go as planned, making things even harder.";
+  }
+
+  String _fallbackWorse(String problem) {
+    return "Just when it seemed like it could work, everything fell apart at once.";
   }
 
   String _selectCharacters() {
@@ -247,27 +141,27 @@ class StoryGenerator {
     return shuffled.take(count).join(', ');
   }
 
-  String _buildHook(StoryTemplate t, String who) {
+  String _buildHook(HookIdea h, String who) {
     final hooks = [
-      '${t.title} Ne Kya Dekha?!',
-      'Mumma Ne Kaha — ${t.title}!',
-      '${t.worse.split(" ").first} — Phir Kya Hua?!',
-      '${who.split(", ").first} Ne ${t.problem.split(" ").first}!',
+      '${h.cover} Ne Kya Dekha?!',
+      'Mumma Ne Kaha — ${h.cover}!',
+      '${who.split(", ").first} Ne ${h.problem.split(" ").first}!',
+      '${h.cover} — Phir Kya Hua?!',
     ];
     return hooks[_rng.nextInt(hooks.length)];
   }
 
-  List<Map<String, String>> _buildHookOptions(StoryTemplate t, String hook) {
+  List<Map<String, String>> _buildHookOptions(HookIdea h, String hook) {
     final base = hook;
     final seen = <String>{};
     final options = <Map<String, String>>[];
 
     final candidates = [
-      {'type': 'Curiosity', 'text': '${t.title} Ne Kya Dekha?!'},
+      {'type': 'Curiosity', 'text': '${h.cover} Ne Kya Dekha?!'},
       {'type': 'Parent relatable', 'text': base},
-      {'type': 'Situation', 'text': '${t.worse.split(" ").first} Toh Problem Ho Gayi!'},
+      {'type': 'Situation', 'text': '${_firstWord(h.problem)} Toh Problem Ho Gayi!'},
       {'type': 'Mystery', 'text': 'Phir Kya Hua?!'},
-      {'type': 'Emotional', 'text': 'Dekhte Hi ${t.problem.split(" ").first}...!'},
+      {'type': 'Emotional', 'text': 'Dekhte Hi ${_firstWord(h.problem)}...!'},
     ];
 
     for (final c in candidates) {
@@ -286,6 +180,8 @@ class StoryGenerator {
 
     return options.take(5).toList();
   }
+
+  String _firstWord(String s) => s.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
 }
 
 class StoryGeneratorScreen extends StatefulWidget {

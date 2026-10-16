@@ -62,6 +62,10 @@ class HookIdea {
   /// so an update that adds new ones never fights with your changes.
   final bool custom;
 
+  /// Full 3-part video prompt detail for offline generation. Empty when the
+  /// offline generator should derive prompts from the story template fields.
+  final String storyDetail;
+
   const HookIdea({
     required this.id,
     required this.category,
@@ -76,6 +80,7 @@ class HookIdea {
     this.forApp = true,
     this.usedOn = '',
     this.custom = false,
+    this.storyDetail = '',
   });
 
   HookIdea copyWith({
@@ -92,6 +97,7 @@ class HookIdea {
     bool? forApp,
     String? usedOn,
     bool? custom,
+    String? storyDetail,
   }) =>
       HookIdea(
         id: id ?? this.id,
@@ -107,6 +113,7 @@ class HookIdea {
         forApp: forApp ?? this.forApp,
         usedOn: usedOn ?? this.usedOn,
         custom: custom ?? this.custom,
+        storyDetail: storyDetail ?? this.storyDetail,
       );
 
   Map<String, dynamic> toJson() => {
@@ -123,6 +130,7 @@ class HookIdea {
         'strategy': strategy,
         'caption': caption,
         'pinnedComment': pinnedComment,
+        'storyDetail': storyDetail,
       };
 
   factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
@@ -718,6 +726,236 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Navratri preparations mein bachche ko time nahi mil raha? Unhe helping hands banaiye! #MomLife #NavratriPrep #FunLearningWithPalak',
     pinnedComment: 'Tip: Decor items arrange karne ya phool ginne ka task dijiye—bachcha khush!',
+  ),
+  // ── New 30s Reel Stories ─────────────────────────────────────────────────────
+  /// Built-in offline story seeds. Each carries a full `storyDetail` with three
+  /// 10-second parts so the offline generator can break it into a video prompt
+  /// without any network call.
+  HookIdea(
+    id: 'plate-patana',
+    category: 'Relatable',
+    cover: 'Plate Patana',
+    opening: 'Ria plate mein khana rakhti thi, par jab Mumma ne dekha toh plate zameen par gir gayi.',
+    problem: 'Ria plate mein khana rakhti thi, par jab Mumma ne dekha toh plate zameen par gir gayi.',
+    lesson: 'Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Ria places her plate with care on the dining table, but as she steps back, her foot catches the edge of a rug. The plate tilts — then crashes to the floor in slow motion.
+Twist: Before Mumma can react, Rio rushes in and bumps the table reaching for the same plate.
+Resolution: Mumma kneels down calmly and says, "It's okay, beta. We clean it together."
+Moral: Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.
+''',
+  ),
+  HookIdea(
+    id: 'shoe-bandhani',
+    category: 'Relatable',
+    cover: 'Shoe Bandhani',
+    opening: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
+    problem: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
+    lesson: 'Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Rio squats by the shoe rack, holding one sneaker in each hand. They are tangled together — left and right, laces crossed. He tugs, they don't separate.
+Twist: Ria tries to help by grabbing the other end, but now both shoes are tangled around both their hands.
+Resolution: Mumma gently untangles them in two minutes — "Ek joota tumhara, doosra tumhara."
+Moral: Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.
+''',
+  ),
+  HookIdea(
+    id: 'toy-sharing',
+    category: 'Relatable',
+    cover: 'Toy Sharing',
+    opening: 'Ria aur Rio dono ek hi toy car ko pakad kar khushboo mein latke the.',
+    problem: 'Ria aur Rio dono ek hi toy car ko pakad kar khushboo mein latke the.',
+    lesson: 'Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur hota hai.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Ria and Rio both grab the same red-yellow toy car and tug in opposite directions on the living room rug. The car wobbles between them.
+Twist: When Mummy hands it to one, the other grabs it too — and the car goes flying across the room.
+Resolution: Cuty pushes the car down the middle between them — "Ek do pal ke liye, dono ke liye!"
+Moral: Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur hota hai.
+''',
+  ),
+  HookIdea(
+    id: 'vegetable-drama',
+    category: 'Relatable',
+    cover: 'Vegetable Drama',
+    opening: 'Rio ne bhi kaha — Gobhi nahi khaoongi! — jab Mumma ne gobhi rakhi.',
+    problem: 'Rio ne bhi kaha — "Gobhi nahi khaoongi!" — jab Mumma ne gobhi rakhi.',
+    lesson: 'Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Mumma places a plate of gobhi on the dining table. Rio pushes it away dramatically — "Gobhi nahi khaoongi!"
+Twist: Ria sees the protest and joins in — "Yeh Mummy ke saath nahi khayenge!" Cuty even backs away.
+Resolution: Mumma names the gobhi "Bachcha" and "Rider" — suddenly both want to try.
+Moral: Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.
+''',
+  ),
+  HookIdea(
+    id: 'brushing-battle',
+    category: 'Relatable',
+    cover: 'Brushing Battle',
+    opening: 'Ria ne brush pakda, par turant se poochh li — "Mujhe brush nahi karna!"',
+    problem: 'Ria ne brush pakda, par turant se poochh li — "Mujhe brush nahi karna!"',
+    lesson: 'Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Ria grabs her toothbrush but immediately protests — "Mujhe brush nahi karna!" She drops it in the sink.
+Twist: Rio says "Main karenge, main toh badi bacchi hoon!" but she just swirls the brush in water — no paste.
+Resolution: Cuty picks up the brush and trots between them — both girls start brushing, giggling.
+Moral: Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.
+''',
+  ),
+  HookIdea(
+    id: 'park-se-nikalna',
+    category: 'Relatable',
+    cover: 'Park Se Nikalna',
+    opening: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab papa ne time khatam kaha.',
+    problem: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab papa ne time khatam kaha.',
+    lesson: 'Game toh game hota hai, lekin har game ek nayi baat sunane dega.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Park time is over. Papa checks his watch — "Time to go." Ria plants her feet — "Main yahan nahi jaungi park se!"
+Twist: Rio joins the protest — "Mujhe bhi nahi jaana!" — both sit on the ground.
+Resolution: Papa turns it into a game — "Jiska pehla step niklega, wohi jeeti ka countdown karega."
+Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega.
+''',
+  ),
+  HookIdea(
+    id: 'the-toy-car-share',
+    category: 'Relatable',
+    cover: 'The Toy Car Share',
+    opening: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions.',
+    problem: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions on the living room rug.',
+    lesson: 'Sharing something means twice the fun, not twice the fight.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Ria and Rio both grab the same red-yellow toy car and tug in opposite directions on the living room rug. The car wobbles between them.
+Twist: When Mummy hands it to one, the other grabs it too — and the car goes flying toward the kitchen doorway.
+Resolution: They take a breath, look at each other, and agree to roll the car right down the middle together.
+Moral: Sharing something means twice the fun, not twice the fight.
+''',
+  ),
+  HookIdea(
+    id: 'the-block-tower',
+    category: 'Relatable',
+    cover: 'The Block Tower',
+    opening: 'Rio carefully balanced the final wooden block on a tall colorful tower.',
+    problem: 'Rio carefully balanced the final wooden block on a tall colorful tower while afternoon sun streamed through the window.',
+    lesson: 'A mistake is just a new game waiting to be named.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Rio balances the final wooden block on a tall tower, proud of his creation.
+Twist: Ria toddles over for a better look and accidentally bumps the base with her shoe.
+Resolution: Blocks scatter, but Rio giggles — "Now we can build a flat playhouse!"
+Moral: A mistake is just a new game waiting to be named.
+''',
+  ),
+  HookIdea(
+    id: 'the-snack-reach',
+    category: 'Relatable',
+    cover: 'The Snack Reach',
+    opening: 'A bright snack box sat just out of reach on the low kitchen counter ledge.',
+    problem: 'A bright snack box sat just out of reach on the low kitchen counter ledge, and Ria stretched on tiptoes trying to grab it.',
+    lesson: 'When you lift each other up, even high shelves become easy.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Ria stretches on tiptoes to grab a snack box on the low kitchen counter, but her tiptoes barely reach halfway.
+Twist: Rio watches from behind — he wants a snack too, but neither can reach alone.
+Resolution: Rio steps up behind Ria, placing his hands firmly on her waist to steady her — together they grab the snack.
+Moral: When you lift each other up, even high shelves become easy.
+''',
+  ),
+  HookIdea(
+    id: 'night-before-annual-day',
+    category: 'Relatable',
+    cover: 'Night Before Annual Day',
+    opening: 'At 9:30 PM, Ria dropped the bombshell — tomorrow was Annual Day!',
+    problem: 'At 9:30 PM, Ria casually dropped the bombshell — tomorrow was Annual Day and she needed a yellow costume and cardboard sunflower prop.',
+    lesson: 'Even the messiest all-nighter ends when everyone works as a team.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: At 9:30 PM, Ria drops the bombshell — Annual Day is tomorrow and she needs a costume.
+Twist: While Papa frantically glues cardboard petals at midnight, Mummy forgets all the dance steps during rehearsal.
+Resolution: By morning, the costume is perfect and the prop stands tall — and the kids take all the credit on stage.
+Moral: Even the messiest all-nighter ends when everyone works as a team.
+''',
+  ),
+  HookIdea(
+    id: 'asmr-cleaning-reel',
+    category: 'Relatable',
+    cover: 'ASMR Cleaning Reel',
+    opening: 'Mummy found the living room in complete chaotic toddler disarray.',
+    problem: 'Mummy found the living room in complete chaotic toddler disarray — crayons, blocks, cushions, and snack bowls scattered everywhere.',
+    lesson: 'Ten minutes of peace and a lifetime of love — perfectly balanced.',
+    usedOn: '',
+    storyDetail: '''
+PART 1: Mummy finds the living room in complete chaotic toddler disarray. She rolls up her sleeves and begins the satisfying deep clean.
+Twist: As she cleans, the soundscape fills with crisp latch clicks and block clatter — pure ASMR.
+Resolution: She sits back on the pristine sofa with her chai in pure bliss — then opens the bedroom door to a new storm.
+Moral: Ten minutes of peace and a lifetime of love — perfectly balanced.
+''',
+  ),
+  // ── New 30s Reel Stories ── (moved from story_generator_offline.dart duplicates)
+  HookIdea(
+    id: 'dangerous-silence',
+    category: 'Relatable',
+    cover: 'Ghar mein 2 minute ki shanti... DANGER!',
+    opening: 'Mummy heard two minutes of dead silence from the toddlers.',
+    problem: 'When toddlers are suddenly quiet for two minutes, disaster is unfolding.',
+    lesson: 'Check on quiet toddlers - creative chaos always follows.',
+    postFormat: 'Reel',
+    strategy: 'Suspense hook, then reveal',
+    caption: 'Ghar mein 2 minute ki shanti... DANGER! 😱 Jab bachche bilkul silent ho jaate hain, toh bura haal hota hai. Watched the full video to see what Cuty was up to! #toddlermeltdown #indianparents #funlearningwithpalak',
+    pinnedComment: 'Tip: The silence is always louder than the chaos that came before. Check on them! 🐰',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mummy heard two minutes of dead silence from the toddlers — a sound so suspicious it sent her tiptoeing toward the kitchen hallway on high alert.
+Twist: She found Ria and Rio sitting cross-legged in a massive cloud of spilled wheat flour, treating the floor like their own personal canvas.
+Resolution: Mummy crossed her arms, suppressing a smile, as Cuty hopped in with a tiny dustpan — "Theek hai na Mama?"
+Moral: The most suspicious silences always end with something creative to clean up.
+''',
+  ),
+  HookIdea(
+    id: 'missing-shoe-mystery',
+    category: 'Relatable',
+    cover: 'Ek Joota Gayab — 7:55 AM Panic!',
+    opening: 'School van honking downstairs, but one shoe has vanished.',
+    problem: 'At 7:55 AM school rush, one shoe disappears into another dimension.',
+    lesson: 'The things we lose are just having their own adventure.',
+    postFormat: 'Reel',
+    strategy: 'Morning rush comedy, relatable chaos',
+    caption: 'School van neeche aa gayi... aur ek joota gayab! 🚐 Joota kho gaya, par kahaan gaya? Full video dekho. #morningrush #toddlerlife #funlearningwithpalak #indianparents',
+    pinnedComment: 'Tip: Always check the balcony curtains — shoes love to hide there! 👟',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: School van was honking downstairs at 7:55 AM, but one shoe had vanished into another dimension.
+Twist: The house-wide search operation comically failed — Mummy checked the fridge crisper, Papa crawled under the sofa, and Cuty had curled up inside the shoe taking a peaceful nap.
+Resolution: With seconds to spare, Rio gently lifted Cuty out, slipped his foot into the shoe, and dashed toward the door as the bell rang.
+Moral: Sometimes the things we lose are just having their own adventure.
+''',
+  ),
+  HookIdea(
+    id: 'broken-biscuit-meltdown',
+    category: 'Relatable',
+    cover: 'Biscuit Toota — Duniya Khatam!',
+    opening: 'Mummy snaps a cookie in half to share, Ria acts like the world ended.',
+    problem: 'A snapped cookie causes dramatic toddler despair.',
+    lesson: 'A shared laugh turns every broken thing into something sweet.',
+    postFormat: 'Reel',
+    strategy: 'Exaggerated emotion, then sweet payoff',
+    caption: 'Biscuit toota matlab duniya khatam! 🍪😭 Doctor Rio ne banaya jugaad repair, par Cuty ne bhi ek nibble liya! #toddlerlogic #biscuitcrisis #funlearningwithpalak',
+    pinnedComment: 'When your toddler snaps a cookie and treats it like breaking the Mona Lisa! 😂',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mummy snapped a big round cookie in half to share, and Ria acted dramatic shock as if the world itself had shattered.
+Twist: Rio became "Doctor Rio," dipping his finger in warm milk to glue the broken halves back together, but Cuty took a nibble right on the seam.
+Resolution: Instead of tears, both kids burst into uncontrollable belly laughs — the broken biscuit became the funniest thing ever.
+Moral: A shared laugh turns every broken thing into something sweet.
+''',
   ),
 ];
 

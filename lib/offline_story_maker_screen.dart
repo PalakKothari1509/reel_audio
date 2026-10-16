@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -104,32 +106,74 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
     final lesson = hook.lesson;
     final cover = hook.cover;
 
-    // Derive twist by introducing a complicating factor
-    final twist = _deriveTwist(problem, lesson);
-    final worse = _deriveWorse(problem, lesson);
-    final endingLine = _deriveEndingLine(lesson, cover);
+    final storyLines = _parseStoryDetail(hook.storyDetail);
 
     return GeneratedStory(
       title: cover,
-      hook: cover,
+      hook: _buildHookText(hook, _selectedChars),
       who: _selectedChars.join(', '),
-      where: _deriveWhere(problem),
-      problem: problem,
-      twist: twist,
-      worse: worse,
-      solution: lesson,
-      endingLine: endingLine,
-      moral: lesson,
-      hookOptions: [],
+      where: storyLines['where'] ?? _deriveWhere(problem),
+      problem: storyLines['problem']?.isNotEmpty == true ? storyLines['problem']! : problem,
+      twist: storyLines['twist']?.isNotEmpty == true ? storyLines['twist']! : _deriveTwist(problem),
+      worse: storyLines['worse']?.isNotEmpty == true ? storyLines['worse']! : _deriveWorse(problem),
+      solution: storyLines['resolution']?.isNotEmpty == true ? storyLines['resolution']! : lesson,
+      endingLine: storyLines['ending']?.isNotEmpty == true ? storyLines['ending']! : _deriveEndingLine(lesson, cover),
+      moral: storyLines['moral']?.isNotEmpty == true ? storyLines['moral']! : lesson,
+      hookOptions: _buildHookOptions(hook, cover),
     );
   }
 
-  String _deriveTwist(String problem, String lesson) {
-    final firstWord = problem.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
-    return "But then $firstWord didn't go as planned, making things even harder.";
+  Map<String, String> _parseStoryDetail(String detail) {
+    final result = <String, String>{};
+    if (detail.trim().isEmpty) return result;
+    for (final line in detail.split('\n')) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('Story:')) {
+        result['problem'] = trimmed.substring('Story:'.length).trim();
+      } else if (trimmed.startsWith('Twist:')) {
+        result['twist'] = trimmed.substring('Twist:'.length).trim();
+      } else if (trimmed.startsWith('Resolution:')) {
+        result['resolution'] = trimmed.substring('Resolution:'.length).trim();
+        result['worse'] = result['resolution']!;
+      } else if (trimmed.startsWith('Moral:')) {
+        result['moral'] = trimmed.substring('Moral:'.length).trim();
+        result['ending'] = result['moral']!;
+      }
+    }
+    return result;
   }
 
-  String _deriveWorse(String problem, String lesson) {
+  String _buildHookText(HookIdea hook, List<String> chars) {
+    final hooks = [
+      '${hook.cover} Ne Kya Dekha?!',
+      'Mumma Ne Kaha — ${hook.cover}!',
+      '${chars.first} Ne ${hook.problem.split(" ").first}!',
+      '${hook.cover} — Phir Kya Hua?!',
+    ];
+    final rng = Random();
+    return hooks[rng.nextInt(hooks.length)];
+  }
+
+  List<Map<String, String>> _buildHookOptions(HookIdea hook, String cover) {
+    final firstWord = hook.problem.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
+    final candidates = [
+      {'type': 'Curiosity', 'text': '$cover Ne Kya Dekha?!'},
+      {'type': 'Parent relatable', 'text': cover},
+      {'type': 'Situation', 'text': '$firstWord Toh Problem Ho Gayi!'},
+      {'type': 'Mystery', 'text': 'Phir Kya Hua?!'},
+      {'type': 'Emotional', 'text': 'Dekhte Hi $firstWord...!'},
+    ];
+    return candidates.map((c) => Map<String, String>.from(c)).toList();
+  }
+
+  String _deriveTwist(String problem) {
+    final chars = ['Ria', 'Rio', 'Cuty', 'Mumma'];
+    final rng = Random();
+    final name = chars[rng.nextInt(chars.length)];
+    return "But then $name's reaction made it even harder.";
+  }
+
+  String _deriveWorse(String problem) {
     return "Just when it seemed like it could work, everything fell apart at once.";
   }
 
