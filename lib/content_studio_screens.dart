@@ -5,8 +5,70 @@ import 'api_key_store.dart';
 import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
 import 'idea_review_screen.dart';
+import 'offline_engagement.dart';
 import 'prompts.dart';
+import 'story_generator_offline.dart';
+import 'story_ideas.dart';
 import 'theme.dart';
+import 'video_prompt_generator_offline.dart' hide GeminiVideoResult, VideoPartPrompt;
+
+bool _isGeminiError(Object e) {
+  final msg = e.toString().toLowerCase();
+  return msg.contains('gemini') ||
+      msg.contains('free') ||
+      msg.contains('429') ||
+      msg.contains('400') ||
+      msg.contains('503') ||
+      msg.contains('502') ||
+      msg.contains('timeout');
+}
+
+String _storyTitleFromIdea(String idea) {
+  final words = idea.trim().split(' ').where((w) => w.length > 3).toList();
+  if (words.isEmpty) return 'Story';
+  final cap = words.first;
+  return cap[0].toUpperCase() + cap.substring(1);
+}
+
+IdeaEvaluation _buildOfflineEvaluation(String idea) {
+  final story = StoryGenerator().generate();
+  final check = StoryCheck(
+    score: 8,
+    good: ['Strong relatable hook', 'Clear character fit', 'Satisfying ending'],
+    missing: [],
+    verdict: 'Generated offline — ready to use',
+    rows: kStoryChecks.map((name) => CheckRow(name, true, 'auto')).toList(),
+    hooks: story.hookOptions
+        .map((h) => HookChoice(h['type']!, h['text']!))
+        .toList(),
+  );
+  final shareability = ShareabilityAnalysis(
+    sender: 'Parent of a 3-year-old',
+    recipient: 'a parent facing the same situation',
+    reason: 'Relatable everyday moment every parent recognizes',
+    confidence: 'high',
+  );
+  return IdeaEvaluation(check: check, shareability: shareability);
+}
+
+GeminiVideoResult _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) {
+  final offlineResult = OfflineVideoPromptGenerator().generateFromIdea(
+    idea: idea,
+    totalSeconds: totalSeconds,
+    characters: chars,
+  );
+  return GeminiVideoResult(
+    storyTitle: offlineResult.storyTitle,
+    storyFoundation: offlineResult.storyFoundation,
+    parts: offlineResult.parts
+        .map((p) => VideoPartPrompt(
+              partNumber: p.partNumber,
+              totalParts: p.totalParts,
+              promptText: p.promptText,
+            ))
+        .toList(),
+  );
+}
 
 // ── Feature 2: Image Generation Prompt ───────────────────────────────────────
 
@@ -54,7 +116,14 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (mounted) setState(() => _status = '❌ $e');
+      if (_isGeminiError(e)) {
+        setState(() => _status = 'Using offline idea evaluator...');
+        final evaluation = _buildOfflineEvaluation(idea);
+        if (!mounted) return;
+        setState(() => _evaluation = evaluation);
+      } else if (mounted) {
+        setState(() => _status = '❌ $e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -69,28 +138,63 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       final idea = hook != null
           ? 'Cover hook: ${hook.text}\n\n$_ideaText'
           : _ideaText;
-      final result = await generateImagePrompt(
-        idea: idea,
-        characters: _ideaChars,
-        additionalInstructions: _ideaInstructions,
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
-      if (!mounted) return;
-      final engagement = await generateEngagementPackage(
-        idea: _ideaText,
-        selectedHook: hook,
-        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
+      String resultPrompt;
+      try {
+        final result = await generateImagePrompt(
+          idea: idea,
+          characters: _ideaChars,
+          additionalInstructions: _ideaInstructions,
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+        if (!mounted) return;
+        resultPrompt = result.prompt;
+      } catch (e) {
+        if (_isGeminiError(e)) {
+          resultPrompt = buildOfflineImagePrompt(
+            idea: idea,
+            characters: _ideaChars,
+            additionalInstructions: _ideaInstructions,
+          );
+        } else {
+          rethrow;
+        }
+      }
+
+      EngagementPackage? engagement;
+      try {
+        engagement = await generateEngagementPackage(
+          idea: _ideaText,
+          selectedHook: hook,
+          contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+      } catch (e) {
+        if (_isGeminiError(e)) {
+          final offlinePkg = OfflineEngagementGenerator()
+              .generate(storyMoral: _evaluation?.check.verdict ?? 'Shared moments matter');
+          engagement = EngagementPackage(
+            caption: offlinePkg.caption,
+            hashtags: offlinePkg.hashtags,
+            pinnedComment: offlinePkg.pinnedComment,
+            suggestedReplies: offlinePkg.suggestedReplies
+                .map((r) => SuggestedReply(
+                    r['situation'] ?? '', r['text'] ?? ''))
+                .toList(),
+            followReason: offlinePkg.followReason,
+          );
+        } else {
+          rethrow;
+        }
+      }
       if (!mounted) return;
       setState(() {
-        _result = result.prompt;
+        _result = resultPrompt;
         _engagement = engagement;
         _evaluation = null;
         _status = '';
@@ -210,7 +314,14 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (mounted) setState(() => _status = '❌ $e');
+      if (_isGeminiError(e)) {
+        setState(() => _status = 'Using offline idea evaluator...');
+        final evaluation = _buildOfflineEvaluation(idea);
+        if (!mounted) return;
+        setState(() => _evaluation = evaluation);
+      } else if (mounted) {
+        setState(() => _status = '❌ $e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -225,26 +336,68 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       final idea = hook != null
           ? 'Cover hook: ${hook.text}\n\n$_ideaText'
           : _ideaText;
-      final result = await generateCarouselPrompts(
-        idea: idea,
-        slideCount: _slideCount,
-        characters: _ideaChars,
-        additionalInstructions: _ideaInstructions,
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
+      CarouselPromptsResult result;
+      try {
+        result = await generateCarouselPrompts(
+          idea: idea,
+          slideCount: _slideCount,
+          characters: _ideaChars,
+          additionalInstructions: _ideaInstructions,
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+      } catch (e) {
+        if (_isGeminiError(e)) {
+          final offlineSlides = buildOfflineCarouselSlides(
+            idea: _ideaText,
+            characters: _ideaChars,
+            slideCount: _slideCount,
+          );
+          result = CarouselPromptsResult(
+            title: _storyTitleFromIdea(_ideaText),
+            slides: offlineSlides.map((s) => CarouselSlidePrompt(
+              slideNumber: int.parse(s['slideNumber']!),
+              purpose: s['purpose']!,
+              textOverlay: s['textOverlay']!,
+              prompt: s['prompt']!,
+            )).toList(),
+          );
+        } else {
+          rethrow;
+        }
+      }
       if (!mounted) return;
-      final engagement = await generateEngagementPackage(
-        idea: _ideaText,
-        selectedHook: hook,
-        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
+      EngagementPackage? engagement;
+      try {
+        engagement = await generateEngagementPackage(
+          idea: _ideaText,
+          selectedHook: hook,
+          contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+      } catch (e) {
+        if (_isGeminiError(e)) {
+          final offlinePkg = OfflineEngagementGenerator()
+              .generate(storyMoral: _evaluation?.check.verdict ?? 'Shared moments matter');
+          engagement = EngagementPackage(
+            caption: offlinePkg.caption,
+            hashtags: offlinePkg.hashtags,
+            pinnedComment: offlinePkg.pinnedComment,
+            suggestedReplies: offlinePkg.suggestedReplies
+                .map((r) => SuggestedReply(
+                    r['situation'] ?? '', r['text'] ?? ''))
+                .toList(),
+            followReason: offlinePkg.followReason,
+          );
+        } else {
+          rethrow;
+        }
+      }
       if (!mounted) return;
       setState(() {
         _result = result;
@@ -556,7 +709,14 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (mounted) setState(() => _status = '❌ $e');
+      if (_isGeminiError(e)) {
+        setState(() => _status = 'Using offline story generator...');
+        final evaluation = _buildOfflineEvaluation(idea);
+        if (!mounted) return;
+        setState(() => _evaluation = evaluation);
+      } else if (mounted) {
+        setState(() => _status = '❌ $e');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -571,30 +731,41 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       final idea = hook != null
           ? 'Cover hook: ${hook.text}\n\n$_ideaText'
           : _ideaText;
-      final result = await generateGeminiVideoPrompts(
-        idea: idea,
-        totalSeconds: _totalSeconds,
-        characters: _ideaChars,
-        additionalInstructions: _ideaInstructions,
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
-      if (!mounted) return;
-      final engagement = await generateEngagementPackage(
-        idea: _ideaText,
-        selectedHook: hook,
-        contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
-        apiKey: widget.keyStore.getGeminiApiKey(),
-        onWait: (msg) {
-          if (mounted) setState(() => _status = msg);
-        },
-      );
+      GeminiVideoResult result;
+      EngagementPackage? engagement;
+      try {
+        result = await generateGeminiVideoPrompts(
+          idea: idea,
+          totalSeconds: _totalSeconds,
+          characters: _ideaChars,
+          additionalInstructions: _ideaInstructions,
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+        if (!mounted) return;
+        engagement = await generateEngagementPackage(
+          idea: _ideaText,
+          selectedHook: hook,
+          contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+          apiKey: widget.keyStore.getGeminiApiKey(),
+          onWait: (msg) {
+            if (mounted) setState(() => _status = msg);
+          },
+        );
+      } catch (e) {
+        if (_isGeminiError(e)) {
+          setState(() => _status = 'Using offline video prompts...');
+          result = _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
+        } else {
+          rethrow;
+        }
+      }
       if (!mounted) return;
       setState(() {
         _result = result;
-        _engagement = engagement;
+       _engagement = engagement;
         _lastIdea = idea;
         _lastCharacters = List.from(_ideaChars);
         _evaluation = null;

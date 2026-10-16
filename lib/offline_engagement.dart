@@ -31,6 +31,87 @@ class OfflineEngagementPackage {
   String get jsonString => jsonEncode(toJson());
 }
 
+String buildOfflineImagePrompt({
+  required String idea,
+  required List<String> characters,
+  String additionalInstructions = '',
+}) {
+  final buffer = StringBuffer();
+  buffer.writeln('Soft 3D Pixar/Disney-style render, warm natural lighting.');
+  buffer.writeln('Cream background, gentle textures.');
+  buffer.writeln('NOT flat 2D, NOT watercolor, NOT kawaii-chibi.');
+  buffer.writeln();
+  buffer.writeln('CHARACTERS:');
+  for (final name in characters) {
+    final desc = _characterAppearances[name] ?? 'preschool child character';
+    buffer.writeln('- $name: $desc');
+  }
+  buffer.writeln();
+  buffer.writeln('SCENE: $idea');
+  buffer.writeln('Indian home interior, warm natural lighting.');
+  if (additionalInstructions.trim().isNotEmpty) {
+    buffer.writeln('ADDITIONAL INSTRUCTIONS: $additionalInstructions');
+  }
+  buffer.writeln();
+  buffer.writeln('Character lock rules:');
+  buffer.writeln('- Ria and Rio NEVER wear glasses.');
+  buffer.writeln('- Cuty is ALWAYS a small white bunny with a pink bow.');
+  buffer.writeln('- Outfits may change per scene but face/hair stay consistent.');
+  return buffer.toString();
+}
+
+const Map<String, String> _characterAppearances = {
+  'Ria': 'toddler girl, light brown hair in two short pigtails with pink bows, '
+      'large round dark brown eyes, fair skin with rosy cheeks, pink dress, '
+      'no glasses, energetic and playful',
+  'Rio': 'toddler boy, tousled medium brown hair, large round amber-brown eyes, '
+      'fair skin with rosy cheeks, blue-grey t-shirt and shorts, '
+      'no glasses, determined and thoughtful',
+  'Cuty': 'small white bunny, long upright ears, coral-pink bow at neck, '
+      'large dark brown eyes, pink nose, calm and peaceful',
+  'Mumma': 'young Indian mother, medium brown hair in a bun, dark brown eyes, '
+      'small red bindi, gold jhumka earrings, mustard-yellow kurta, '
+      'warm and patient expression',
+  'Papa': 'young Indian father, short black hair, warm brown eyes, '
+      'light blue kurta, friendly smile, playful demeanor',
+};
+
+List<Map<String, String>> buildOfflineCarouselSlides({
+  required String idea,
+  required List<String> characters,
+  int slideCount = 5,
+}) {
+  final slides = <Map<String, String>>[];
+  final titles = [
+    'The Problem',
+    'What Goes Wrong',
+    'The Solution',
+    'Why It Works',
+    'Save This!'
+  ];
+  final captions = [
+    'Sound familiar?',
+    'Every parent knows this...',
+    'Here is the fix',
+    'Why it works',
+    'Save for later',
+  ];
+  final charList = characters.join(', ');
+
+  for (int i = 0; i < slideCount; i++) {
+    slides.add({
+      'slideNumber': (i + 1).toString(),
+      'purpose': titles[i % titles.length],
+      'textOverlay': '${captions[i % captions.length]}\n$idea',
+      'prompt': 'Slide ${i + 1}: $idea. '
+          '$charList in Soft 3D Pixar/Disney style, '
+          'cream background, warm lighting. '
+          'Visual storytelling, no text overlay needed.',
+    });
+  }
+  return slides;
+}
+
 class OfflineEngagementGenerator {
   final Random _rng = Random();
 
