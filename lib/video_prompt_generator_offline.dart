@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'content_ideas.dart';
+import 'story_generator_offline.dart';
+
 class VideoPartPrompt {
   final int partNumber;
   final int totalParts;
@@ -34,94 +37,123 @@ class OfflineVideoPromptGenerator {
   final Random _rng = Random();
 
   static const String _visualStyle =
-      'Soft 3D Pixar/Disney-style render, warm natural lighting, semi-realistic quality. '
-      'NOT flat 2D, NOT watercolor, NOT kawaii-chibi. Cream background.';
+      'Soft 3D Pixar-Disney animation style, vertical 9:16, '
+      'warm natural lighting, semi-realistic quality, cream background';
 
   static const String _negativeInstructions =
-      'No duplicate characters, no identity changes, no outfit changes, '
-      'no distorted anatomy, no random text, no floating objects.';
+      'No duplicate characters, no identity changes, no outfit changes throughout, '
+      'no distorted anatomy, no random text, no floating objects, '
+      'no glasses on Ria and Rio, Cuty always fluffy white bunny with coral-pink bow';
+
+  static const String _riaDesc =
+      "toddler girl, light brown hair in two short pigtails tied with pink bows, "
+      "soft fringe across the forehead, large round dark brown eyes with long lashes, "
+      "fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress "
+      "covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, "
+      "chubby toddler body proportions";
+
+  static const String _rioDesc =
+      "toddler boy, tousled medium brown hair, large round amber-brown eyes with "
+      "long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey "
+      "short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black "
+      "lace-up sneakers with white soles, chubby toddler body proportions, slightly "
+      "taller than Ria";
+
+  static const String _cutyDesc =
+      "fluffy white bunny, long upright ears with soft pink inner colouring, "
+      "coral-pink fabric bow tied at the neck, very large round dark brown eyes with "
+      "lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing "
+      "upright like a toddler";
+
+  static const String _mummaDesc =
+      "young Indian mother, medium brown hair in a high bun with a few loose strands, "
+      "fair-medium skin, large dark brown eyes, small red bindi, gold jhumka earrings, "
+      "mustard-yellow three-quarter-sleeve kurta with white chikankari floral embroidery, "
+      "blue jeans, comfortable smile";
+
+  static const String _papaDesc =
+      "young Indian father, short neat black hair, warm brown eyes, light stubble, "
+      "fair skin, light blue full-sleeve kurta with subtle embroidery, "
+      "matching pyjama trousers, brown juttis, friendly expression";
+
+  static const String _daadiDesc =
+      "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with soft "
+      "wrinkles, dark brown eyes behind round gold-rimmed glasses, small red bindi, "
+      "gold jhumka earrings, cream saree with gold border, warm affectionate smile";
+
+  static const String _teacherDesc =
+      "Indian school teacher, dark hair in a low bun with small white gajra, "
+      "warm tan skin, dark brown eyes, round gold-rimmed glasses, small red bindi, "
+      "blue three-quarter-sleeve kurta, holding a book, encouraging smile";
 
   static const Map<String, String> _characterDescriptions = {
-    'Ria': 'toddler girl, light brown hair in two short pigtails tied with pink bows, '
-        'soft fringe across the forehead, large round dark brown eyes with long lashes, '
-        'fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress '
-        'covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, '
-        'chubby toddler body proportions',
-    'Rio': 'toddler boy, tousled medium brown hair, large round amber-brown eyes with '
-        'long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey '
-        'short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black '
-        'lace-up sneakers with white soles, chubby toddler body proportions, slightly '
-        'taller than Ria',
-    'Cuty': 'fluffy white bunny, long upright ears with soft pink inner colouring, '
-        'coral-pink fabric bow tied at the neck, very large round dark brown eyes with '
-        'lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing '
-        'upright like a toddler',
-    'Mumma': 'young Indian mother, medium brown hair in a high rounded bun with a few '
-        'loose strands, fair-medium skin, large dark brown eyes, small red bindi, gold '
-        'jhumka earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari '
-        'floral embroidery, blue jeans, brown flip-flop sandals',
+    'Ria': _riaDesc,
+    'Rio': _rioDesc,
+    'Cuty': _cutyDesc,
+    'Mumma': _mummaDesc,
+    'Papa': _papaDesc,
+    'Daadi': _daadiDesc,
+    'Teacher': _teacherDesc,
   };
-
-  static const List<String> _beatPurposes = [
-    'Hook',
-    'Problem',
-    'Conflict',
-    'Turn',
-    'Solution',
-    'Ending',
-  ];
 
   static const List<String> _shotTypes = [
     'wide shot',
-    'close-up on face',
     'medium shot',
-    'from above',
-    'looking up',
-    'over the shoulder',
+    'close-up',
+    'over-the-shoulder shot',
+    'low-angle shot',
+    'high-angle shot',
   ];
 
-  GeminiVideoResult generateFromIdea({
-    required String idea,
+  GeminiVideoResult generateFromStory(
+    GeneratedStory story, {
     required int totalSeconds,
     required List<String> characters,
-    String additionalInstructions = '',
   }) {
     final partsCount = (totalSeconds / 10).round().clamp(2, 6);
     final charBlock = _buildCharacterBlock(characters);
-    final storyTitle = _titleFromIdea(idea);
-    final storyFoundation = _buildFoundation(idea, characters);
+    final storyTitle = story.title;
+    final storyFoundation = _buildFoundation(story, characters);
 
     final parts = <VideoPartPrompt>[];
     String previousEndingState = 'opening scene';
 
-    for (int i = 0; i < partsCount; i++) {
-      final beat = _beatPurposes[(i * _beatPurposes.length / partsCount).floor()
-          .clamp(0, _beatPurposes.length - 1)];
-      final partNumber = i + 1;
+    final beats = _buildStoryBeats(story, partsCount);
 
-      final purpose = _buildPurpose(beat, partNumber, partsCount);
+    for (int i = 0; i < partsCount; i++) {
+      final partNumber = i + 1;
+      final beat = beats[i];
+      final isLast = i == partsCount - 1;
+
+      final purpose = isLast
+          ? 'Ending: Resolve the conflict with a warm moment and clear takeaway'
+          : 'Hook: Show the situation that every parent recognises';
+
       final setting = _buildSetting(partNumber);
       final startingState = i == 0
-          ? 'Ria and Rio in the center of the room, Cuty nearby, neutral expressions'
+          ? 'Main characters in the center of the room, neutral expressions, ready to begin'
           : previousEndingState;
 
-      final action04 = _buildAction(beat, '0-4s', partNumber);
-      final action48 = _buildAction(beat, '4-8s', partNumber);
-      final action810 = _buildEndingAction(beat, partNumber, partsCount, i == partsCount - 1);
+      final action04 = _buildActionForBeat(beat, 1);
+      final action48 = _buildActionForBeat(beat, 2);
+      final action810 = isLast
+          ? _buildEndingAction(beat, characters)
+          : _buildActionForBeat(beat, 3);
 
-      final dialogue = i == 0
-          ? _buildHookDialogue(storyTitle)
-          : i == partsCount - 1
-              ? _buildResolutionDialogue()
-              : _buildMiddleDialogue();
-
+      final dialogue = _buildDialogue(story, partNumber, partsCount, beat);
       final endingState = _buildEndingState(beat, characters);
-      final continuityInto = 'Characters in same positions as ending state, '
-          'setting transitions seamlessly to the next scene';
+      final textHook = _buildTextHook(partNumber, partsCount, story);
+      final continuityFrom = i == 0
+          ? 'Opening scene'
+          : 'Direct cut from Part $i, characters and setting in same positions as ending state';
+      final continuityInto = isLast
+          ? 'Scene settles into closing card with lesson visible'
+          : 'Characters and setting hand off seamlessly to Part ${partNumber + 1}';
 
       final fullPrompt = _buildFullPrompt(
         storyTitle,
         storyFoundation,
+        textHook,
         partNumber,
         partsCount,
         purpose,
@@ -132,9 +164,9 @@ class OfflineVideoPromptGenerator {
         action48,
         action810,
         dialogue,
-        previousEndingState,
+        continuityFrom,
         continuityInto,
-        additionalInstructions,
+        null,
       );
 
       previousEndingState = endingState;
@@ -155,9 +187,164 @@ class OfflineVideoPromptGenerator {
     );
   }
 
+  List<String> _buildStoryBeats(GeneratedStory story, int partsCount) {
+    final List<String> beats;
+    if (partsCount <= 2) {
+      beats = ['problem', 'solution'];
+    } else if (partsCount == 3) {
+      beats = ['problem', 'twist', 'solution'];
+    } else {
+      beats = [
+        'problem',
+        'twist',
+        'worse',
+        'solution',
+        'solution',
+        'solution',
+      ];
+    }
+
+    if (beats.length > partsCount) {
+      return beats.sublist(0, partsCount);
+    }
+    while (beats.length < partsCount) {
+      beats.insert(beats.length ~/ 2, 'solution');
+    }
+    return beats;
+  }
+
+  String _buildCharacterBlock(List<String> characters) {
+    final buffer = StringBuffer();
+    for (final name in characters) {
+      final desc = _characterDescriptions[name] ??
+          'standard character appearance';
+      buffer.writeln('- $name: $desc');
+    }
+    return buffer.toString().trim();
+  }
+
+  String _buildFoundation(GeneratedStory story, List<String> characters) {
+    final who = characters.join(' and ');
+    var chars = who;
+    if (characters.length == 1) chars = characters.first;
+    if (characters.length > 2) {
+      chars =
+          '${characters.sublist(0, characters.length - 1).join(', ')} and ${characters.last}';
+    }
+
+    return '$chars go through a small everyday moment that every parent '
+        'recognises. The story starts mid-action, builds gently, and ends '
+        'with a warm lesson that parents can relate to.\n\n'
+        'Story: ${story.problem}\n'
+        'Twist: ${story.twist}\n'
+        'Resolution: ${story.solution}\n'
+        'Lesson: ${story.moral}';
+  }
+
+  String _buildSetting(int partNumber) {
+    final settings = [
+      'Indian home interior, warm morning light, soft textures, cream background',
+      'Living room corner with toys scattered, afternoon sunlight through window',
+      'Kitchen counter area, morning light, family items within reach',
+      'Bedroom doorway, soft evening glow, toys on the floor',
+      'Dining area, golden hour light, family chairs around table',
+    ];
+    return settings[(partNumber - 1) % settings.length];
+  }
+
+  String _buildActionForBeat(String beat, int segment) {
+    switch (beat) {
+      case 'problem':
+        switch (segment) {
+          case 1:
+            return 'Ria and Rio encounter the problem mid-action';
+          case 2:
+            return 'The situation becomes clear, characters react visibly';
+          case 3:
+            return 'Problem escalates slightly, building natural tension';
+        }
+        break;
+      case 'twist':
+        switch (segment) {
+          case 1:
+            return 'Unexpected element enters the scene';
+          case 2:
+            return 'Characters notice and respond to the change';
+          case 3:
+            return 'Twist creates new dynamic, tension rises';
+        }
+        break;
+      case 'worse':
+        switch (segment) {
+          case 1:
+            return 'The problem gets worse, frustration shows';
+          case 2:
+            return 'Both characters are involved, each reacts differently';
+          case 3:
+            return 'Tension builds through actions, not dialogue';
+        }
+        break;
+      case 'solution':
+        switch (segment) {
+          case 1:
+            return 'Small realization or change of approach begins';
+          case 2:
+            return 'Cuty does something that shifts direction positively';
+          case 3:
+            return 'Characters start working together toward resolution';
+        }
+        break;
+    }
+    return 'Scene develops naturally with clear action and emotion';
+  }
+
+  String _buildEndingAction(String beat, List<String> characters) {
+    final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
+    final char2 = characters.length > 1 ? characters[1] : 'Rio';
+    return '$char1 and $char2 resolve the situation with a warm '
+        'moment, scene settling toward the closing card with lesson visible';
+  }
+
+  String _buildTextHook(int partNumber, int totalParts, GeneratedStory story) {
+    if (partNumber == 1) {
+      return 'Top: "${story.hook.split(" ").take(3).join(" !")}!"';
+    }
+    if (partNumber == totalParts) {
+      return 'Top: "Teamwork ho toh sab easy! ✨"';
+    }
+    return 'Top: "Phir kya hua? 🤔"';
+  }
+
+  String _buildDialogue(GeneratedStory story, int partNumber, int totalParts,
+      String beat) {
+    if (partNumber == 1) {
+      final firstWord = story.problem.split(' ').where((w) => w.length > 3);
+      final subject = firstWord.isNotEmpty
+          ? firstWord.first
+          : 'something';
+      return 'Ria: "$subject dekho yeh kya hua!"\n'
+          'Rio: "Abhi thoda wait karo!"';
+    }
+    if (partNumber == totalParts) {
+      return 'Ria: "${story.endingLine}"\n'
+          'Rio: "Theek hai na Mama?"';
+    }
+    return 'Ria: "Rio, dekho yeh kya hua!"\n'
+        'Rio: "Abhi nahi, thoda wait karo!"';
+  }
+
+  String _buildEndingState(String beat, List<String> characters) {
+    final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
+    final char2 = characters.length > 1 ? characters[1] : 'Rio';
+    final char3 = characters.length > 2 ? characters[2] : 'Cuty';
+    return '$char1 and $char2 together, $char3 nearby, '
+        'expressions warm and resolved, scene settling';
+  }
+
   String _buildFullPrompt(
     String title,
     String foundation,
+    String textHook,
     int partNumber,
     int totalParts,
     String purpose,
@@ -170,7 +357,7 @@ class OfflineVideoPromptGenerator {
     String dialogue,
     String continuityFrom,
     String continuityInto,
-    String additionalInstructions,
+    String? additionalInstructions,
   ) {
     final buffer = StringBuffer();
     buffer.writeln('TITLE: $title');
@@ -179,6 +366,8 @@ class OfflineVideoPromptGenerator {
     buffer.writeln('FORMAT: vertical 9:16');
     buffer.writeln();
     buffer.writeln('STORY CONTEXT: $foundation');
+    buffer.writeln();
+    buffer.writeln('TEXT HOOK OVERLAY: $textHook');
     buffer.writeln();
     buffer.writeln('THIS PART\'S PURPOSE: $purpose');
     buffer.writeln();
@@ -203,22 +392,17 @@ class OfflineVideoPromptGenerator {
     buffer.writeln('4-8s: $action48');
     buffer.writeln('8-10s: $action810');
     buffer.writeln();
-    if (dialogue.isNotEmpty) {
-      buffer.writeln('DIALOGUE AND AUDIO: $dialogue');
-    } else {
-      buffer.writeln('DIALOGUE AND AUDIO: (no dialogue)');
-    }
+    buffer.writeln('DIALOGUE AND AUDIO: $dialogue');
     buffer.writeln();
     buffer.writeln('CONTINUITY FROM PREVIOUS PART: $continuityFrom');
     buffer.writeln();
     buffer.writeln('CONTINUITY INTO NEXT PART: $continuityInto');
     buffer.writeln();
-    buffer.writeln('VISUAL STYLE: $_visualStyle 1.5-5 year old Indian children, '
-        'warm family moments, cream backgrounds, gentle textures.');
+    buffer.writeln('VISUAL STYLE: $_visualStyle');
     buffer.writeln();
-    buffer
-        .writeln('NEGATIVE INSTRUCTIONS: $_negativeInstructions');
-    if (additionalInstructions.trim().isNotEmpty) {
+    buffer.writeln('NEGATIVE INSTRUCTIONS: $_negativeInstructions');
+    if (additionalInstructions != null &&
+        additionalInstructions.trim().isNotEmpty) {
       buffer.writeln();
       buffer.writeln('ADDITIONAL INSTRUCTIONS: $additionalInstructions');
     }
@@ -226,143 +410,20 @@ class OfflineVideoPromptGenerator {
     return buffer.toString();
   }
 
-  String _buildCharacterBlock(List<String> characters) {
-    final buffer = StringBuffer();
-    for (final name in characters) {
-      final desc = _characterDescriptions[name] ??
-          'standard character appearance';
-      buffer.writeln('- $name: $desc');
-    }
-    return buffer.toString().trim();
-  }
-
-  String _titleFromIdea(String idea) {
-    final words = idea.split(' ').where((w) => w.length > 2).toList();
-    if (words.isEmpty) return 'Quick Story';
-    return words.take(3).map((w) => _capitalize(w)).join(' ');
-  }
-
-  String _capitalize(String s) {
-    if (s.isEmpty) return s;
-    return s[0].toUpperCase() + s.substring(1);
-  }
-
-  String _buildFoundation(String idea, List<String> characters) {
-    final chars = characters.join(' and ');
-    return '$chars go through a small everyday moment that every parent '
-        'recognises. The story starts mid-action, builds gently, and ends '
-        'with a warm lesson that parents can relate to. Based on: $idea';
-  }
-
-  String _buildPurpose(String beat, int partNumber, int totalParts) {
-    if (partNumber == 1) return 'Hook: Show the situation that every parent recognises';
-    if (partNumber == totalParts) {
-      return 'Ending: Resolve the conflict with a warm moment and clear takeaway';
-    }
-    return '$beat: Develop the story naturally toward resolution';
-  }
-
-  String _buildSetting(int partNumber) {
-    final settings = [
-      'Indian home interior, warm morning light, soft textures, cream background',
-      'Living room corner with toys scattered, afternoon sunlight through window',
-      'Kitchen counter area, morning light, family items within reach',
-      'Bedroom doorway, soft evening glow, toys on the floor',
-      'Dining area, golden hour light, family chairs around table',
-    ];
-    return settings[(partNumber - 1) % settings.length];
-  }
-
-  String _buildAction(String beat, String timeSlot, int partNumber) {
-    final templates = <String>[];
-    switch (beat) {
-      case 'Hook':
-        templates.addAll([
-          'Ria and Rio are caught mid-action in a relatable moment',
-          'Camera focuses on the messy scene, building curiosity',
-          'A small moment unfolds that parents instantly recognise',
-        ]);
-        break;
-      case 'Problem':
-        templates.addAll([
-          'The conflict or situation is clearly shown',
-          'Character reacts with visible frustration or surprise',
-          'The problem is obvious for any parent watching',
-        ]);
-        break;
-      case 'Conflict':
-        templates.addAll([
-          'The situation escalates naturally',
-          'Both characters are involved, each with their own reaction',
-          'Tension builds through actions, not dialogue',
-        ]);
-        break;
-      case 'Turn':
-        templates.addAll([
-          'A small realization or change of approach',
-          'Cuty does something that shifts the direction',
-          'The characters try a different angle',
-        ]);
-        break;
-      case 'Solution':
-        templates.addAll([
-          'The resolution begins to take shape',
-          'Characters work together on the solution',
-          'A moment of teamwork and mutual understanding',
-        ]);
-        break;
-      default:
-        templates.addAll([
-          'Final moment lands with warmth and connection',
-          'Characters share a quiet conclusion',
-          'The lesson is shown, not stated',
-        ]);
-    }
-    return templates[_rng.nextInt(templates.length)];
-  }
-
-  String _buildEndingAction(
-      String beat, int partNumber, int totalParts, bool isLast) {
-    if (isLast) {
-      return 'Characters resolve the situation with a warm moment '
-          'that transitions to the closing card';
-    }
-    return 'Scene flows naturally into the next part, '
-        'characters and setting hand off smoothly';
-  }
-
-  String _buildHookDialogue(String title) {
-    final options = [
-      'Ria says: "Mama ne kaha, bas thoda sa koshish karo!"',
-      'Rio mutters: "Yeh baar toh pakka plan banega!"',
-      'Off-screen grown-up voice: "Jab tak try karo gaye, tab tak problem thi!"',
-    ];
-    return options[_rng.nextInt(options.length)];
-  }
-
-  String _buildMiddleDialogue() {
-    final options = [
-      'Ria: "Rio, dekho yeh kya hua!"',
-      'Rio: "Abhi nahi, thoda wait karo!"',
-      '',
-    ];
-    return options[_rng.nextInt(options.length)];
-  }
-
-  String _buildResolutionDialogue() {
-    final options = [
-      'Ria: "Ho gaya! Theek hai na Mama?"',
-      'Rio: "Next time, pehle maine kaha tha!"',
-      '',
-    ];
-    return options[_rng.nextInt(options.length)];
-  }
-
-  String _buildEndingState(String beat, List<String> characters) {
-    final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
-    final char2 = characters.length > 1 ? characters[1] : 'Rio';
-    final char3 = characters.length > 2 ? characters[2] : 'Cuty';
-    return '$char1 and $char2 together, $char3 nearby, '
-        'expressions warm and resolved, scene settling';
+  static GeneratedStory generateStoryFromHook(HookIdea hook,
+      {required List<String> characters}) {
+    return GeneratedStory(
+      title: hook.cover,
+      hook: hook.cover,
+      who: characters.join(', '),
+      where: 'at home',
+      problem: hook.problem,
+      twist: 'But then something unexpected happened.',
+      worse: 'It seemed like nothing could fix it.',
+      solution: hook.lesson,
+      endingLine: 'Now everyone knows what to do!',
+      moral: hook.lesson,
+      hookOptions: [],
+    );
   }
 }

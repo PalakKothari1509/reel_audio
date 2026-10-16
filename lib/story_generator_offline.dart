@@ -69,7 +69,9 @@ class GeneratedStory {
 
 class StoryGenerator {
   final Random _rng = Random();
-  final List<String> _characters = ['Ria', 'Rio', 'Cuty'];
+  final List<String> _characters = [
+    'Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Teacher'
+  ];
   final List<String> _hookTypes = [
     'Curiosity',
     'Parent relatable',

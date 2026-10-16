@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'characters.dart';
+import 'content_ideas.dart';
 import 'offline_engagement.dart';
 import 'prompts.dart';
 import 'story_generator_offline.dart';
@@ -23,7 +25,8 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
   GeneratedStory? _story;
   GeminiVideoResult? _videoResult;
   OfflineEngagementPackage? _engagement;
-  HookChoice? _selectedHook;
+  HookIdea? _selectedHookIdea;
+  HookChoice? _selectedStoryHook;
 
   static const _durations = [
     (20, '20s — 2 parts'),
@@ -31,8 +34,6 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
     (40, '40s — 4 parts'),
     (60, '60s — 6 parts'),
   ];
-
-  static const _characterOptions = ['Ria', 'Rio', 'Cuty', 'Mumma'];
 
   Future<void> _generateStory() async {
     setState(() {
@@ -42,7 +43,9 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
 
     try {
       final generator = StoryGenerator();
-      final story = generator.generate();
+      final story = _selectedHookIdea != null
+          ? _storyFromHook(_selectedHookIdea!)
+          : generator.generate();
 
       setState(() {
         _story = story;
@@ -50,8 +53,8 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
       });
 
       final videoGen = OfflineVideoPromptGenerator();
-      final videoResult = videoGen.generateFromIdea(
-        idea: story.problem,
+      final videoResult = videoGen.generateFromStory(
+        story,
         totalSeconds: _totalSeconds,
         characters: _selectedChars,
       );
@@ -79,18 +82,51 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
     }
   }
 
+  void _pickFromLibrary() async {
+    final HookIdea? picked = await showModalBottomSheet<HookIdea>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      builder: (ctx) => _LibraryPicker(),
+    );
+    if (picked != null && mounted) {
+      setState(() {
+        _selectedHookIdea = picked;
+        _selectedChars
+          ..clear()
+          ..addAll(['Ria', 'Rio', 'Cuty']);
+      });
+    }
+  }
+
+  GeneratedStory _storyFromHook(HookIdea hook) {
+    return GeneratedStory(
+      title: hook.cover,
+      hook: hook.cover,
+      who: _selectedChars.join(', '),
+      where: 'at home',
+      problem: hook.problem,
+      twist: 'But then something unexpected happened.',
+      worse: 'It seemed like nothing could fix it.',
+      solution: hook.lesson,
+      endingLine: 'Now everyone knows what to do!',
+      moral: hook.lesson,
+      hookOptions: [],
+    );
+  }
+
   Future<void> _regenerateStory() async {
     setState(() {
       _story = null;
       _videoResult = null;
       _engagement = null;
-      _selectedHook = null;
+      _selectedHookIdea = null;
     });
     await _generateStory();
   }
 
-  void _selectHook(HookChoice? hook) {
-    setState(() => _selectedHook = hook);
+  void _selectHook(HookChoice hook) {
+    setState(() => _selectedStoryHook = hook);
   }
 
   void _toggleChar(String name) {
@@ -122,14 +158,23 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _characterOptions.map((name) {
+              children: kCharacterNames.map((name) {
                 final selected = _selectedChars.contains(name);
                 return FilterChip(
                   label: Text(name),
                   selected: selected,
                   onSelected: (_) => _toggleChar(name),
                 );
-              }).toList(),
+              }            ).toList(),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _pickFromLibrary,
+                icon: const Icon(Icons.library_books_outlined, size: 18),
+                label: const Text('Select from Content Library'),
+              ),
             ),
             const SizedBox(height: 16),
             const Text('Video Duration', style: AppText.section),
@@ -218,11 +263,12 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            setState(() {
+          setState(() {
               _story = null;
               _videoResult = null;
               _engagement = null;
-              _selectedHook = null;
+              _selectedHookIdea = null;
+              _selectedStoryHook = null;
             });
           },
         ),
@@ -403,7 +449,7 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
           runSpacing: 8,
           children: story.hookOptions.asMap().entries.map((entry) {
             final hook = entry.value;
-            final selected = _selectedHook?.text == hook['text'];
+            final selected = _selectedStoryHook?.text == hook['text'];
             return ChoiceChip(
               label: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,14 +533,106 @@ class _VideoPartCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              part.fullPrompt,
-              style: const TextStyle(
-                  fontSize: 11, color: AppColors.textSoft, height: 1.5),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Text(
+                part.fullPrompt,
+                style: const TextStyle(
+                    fontSize: 11, color: AppColors.textSoft, height: 1.5),
+              ),
+            ],
+          ),
         ),
+      );
+  }
+}
+
+class _LibraryPicker extends StatefulWidget {
+  @override
+  State<_LibraryPicker> createState() => _LibraryPickerState();
+}
+
+class _LibraryPickerState extends State<_LibraryPicker> {
+  String _filter = '';
+  final _ctrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = kDefaultHooks
+        .where((h) =>
+            h.forApp &&
+            (_filter.isEmpty ||
+                h.cover.toLowerCase().contains(_filter) ||
+                h.problem.toLowerCase().contains(_filter) ||
+                h.category.toLowerCase().contains(_filter)))
+        .toList();
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.75,
+      maxChildSize: 0.95,
+      builder: (ctx, scroll) => Column(
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: TextField(
+              controller: _ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search ideas...',
+                prefixIcon: Icon(Icons.search, size: 20),
+                isDense: true,
+              ),
+              onChanged: (v) => setState(() => _filter = v.toLowerCase()),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              controller: scroll,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: filtered.length,
+              itemBuilder: (ctx, i) {
+                final h = filtered[i];
+                return ListTile(
+                  dense: true,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  title: Text(
+                    h.cover,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    h.problem,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppText.small,
+                  ),
+                  trailing: Text(
+                    h.category,
+                    style:
+                        const TextStyle(fontSize: 11, color: AppColors.textFaint),
+                  ),
+                  onTap: () => Navigator.pop(ctx, h),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

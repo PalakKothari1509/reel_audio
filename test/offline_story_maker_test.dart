@@ -41,10 +41,11 @@ void main() {
     });
   });
 
-  group('OfflineVideoPromptGenerator', () {
+   group('OfflineVideoPromptGenerator', () {
     test('generates correct number of parts for 30s', () {
-      final result = OfflineVideoPromptGenerator().generateFromIdea(
-        idea: 'Tooth brushing fight',
+      final story = StoryGenerator().generate();
+      final result = OfflineVideoPromptGenerator().generateFromStory(
+        story,
         totalSeconds: 30,
         characters: ['Ria', 'Rio', 'Cuty'],
       );
@@ -52,8 +53,9 @@ void main() {
     });
 
     test('generates correct number of parts for 20s', () {
-      final result = OfflineVideoPromptGenerator().generateFromIdea(
-        idea: 'Putting on shoes',
+      final story = StoryGenerator().generate();
+      final result = OfflineVideoPromptGenerator().generateFromStory(
+        story,
         totalSeconds: 20,
         characters: ['Ria', 'Rio'],
       );
@@ -61,8 +63,9 @@ void main() {
     });
 
     test('each part has a full prompt with required sections', () {
-      final result = OfflineVideoPromptGenerator().generateFromIdea(
-        idea: 'Sharing toys',
+      final story = StoryGenerator().generate();
+      final result = OfflineVideoPromptGenerator().generateFromStory(
+        story,
         totalSeconds: 30,
         characters: ['Ria', 'Rio', 'Cuty'],
       );
@@ -79,8 +82,9 @@ void main() {
     });
 
     test('story foundation is non-empty', () {
-      final result = OfflineVideoPromptGenerator().generateFromIdea(
-        idea: 'Bath time struggle',
+      final story = StoryGenerator().generate();
+      final result = OfflineVideoPromptGenerator().generateFromStory(
+        story,
         totalSeconds: 30,
         characters: ['Ria', 'Cuty'],
       );

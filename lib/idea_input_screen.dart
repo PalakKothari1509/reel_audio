@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'characters.dart';
 import 'content_ideas.dart';
 import 'theme.dart';
 
@@ -52,14 +53,6 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
   final _ideaCtrl = TextEditingController();
   final _instrCtrl = TextEditingController();
   final List<String> _selectedChars = ['ria', 'rio', 'cuty'];
-
-  static const _allChars = [
-    ('ria', 'Ria', '🌸'),
-    ('rio', 'Rio', '💙'),
-    ('cuty', 'Cuty', '🐰'),
-    ('mumma', 'Mumma', '👩'),
-    ('papa', 'Papa', '👨'),
-  ];
 
   @override
   void initState() {
@@ -151,14 +144,14 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: _allChars.map((c) {
-                    final selected = _selectedChars.contains(c.$1);
+                  children: kCharacterOptions.map((c) {
+                    final selected = _selectedChars.contains(c.id);
                     return GestureDetector(
                       onTap: () => setState(() {
                         if (selected) {
-                          _selectedChars.remove(c.$1);
+                          _selectedChars.remove(c.id);
                         } else {
-                          _selectedChars.add(c.$1);
+                          _selectedChars.add(c.id);
                         }
                       }),
                       child: Container(
@@ -174,10 +167,10 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(c.$3),
+                            Text(c.emoji),
                             const SizedBox(width: 6),
                             Text(
-                              c.$2,
+                              c.name,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: selected

@@ -192,3 +192,18 @@ class CharacterStore {
     if (await file.exists()) await file.delete();
   }
 }
+
+typedef CharOption = ({String id, String name, String emoji});
+
+const List<CharOption> kCharacterOptions = [
+  (id: 'ria', name: 'Ria', emoji: '🌸'),
+  (id: 'rio', name: 'Rio', emoji: '💙'),
+  (id: 'cuty', name: 'Cuty', emoji: '🐰'),
+  (id: 'mumma', name: 'Mumma', emoji: '👩'),
+  (id: 'papa', name: 'Papa', emoji: '👨'),
+  (id: 'daadi', name: 'Daadi', emoji: '👵'),
+  (id: 'teacher', name: 'Teacher', emoji: '👩‍🏫'),
+];
+
+const List<String> kCharacterNames =
+    ['Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Teacher'];

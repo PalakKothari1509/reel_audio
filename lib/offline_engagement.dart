@@ -69,11 +69,17 @@ const Map<String, String> _characterAppearances = {
       'no glasses, determined and thoughtful',
   'Cuty': 'small white bunny, long upright ears, coral-pink bow at neck, '
       'large dark brown eyes, pink nose, calm and peaceful',
-  'Mumma': 'young Indian mother, medium brown hair in a bun, dark brown eyes, '
+  'Mumma': 'young Indian mother, medium brown hair in a high bun, dark brown eyes, '
       'small red bindi, gold jhumka earrings, mustard-yellow kurta, '
       'warm and patient expression',
   'Papa': 'young Indian father, short black hair, warm brown eyes, '
       'light blue kurta, friendly smile, playful demeanor',
+  'Daadi': 'Indian grandmother, silver-grey hair in a neat bun, warm tan skin, '
+      'round gold-rimmed glasses, small red bindi, gold earrings, '
+      'cream saree with gold border, affectionate smile',
+  'Teacher': 'Indian school teacher, dark hair in a low bun with white gajra, '
+      'warm tan skin, dark brown eyes, round gold-rimmed glasses, '
+      'small red bindi, blue kurta, holding a book, encouraging smile',
 };
 
 List<Map<String, String>> buildOfflineCarouselSlides({
