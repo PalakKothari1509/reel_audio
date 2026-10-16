@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'brand_system.dart';
 import 'characters.dart';
 import 'gemini_call.dart';
+import 'master_prompt.dart';
 import 'secrets.dart';
 import 'prompts.dart';
 import 'story_ideas.dart';
@@ -119,22 +120,20 @@ Future<String> _geminiText(
 
 // ── Character block builder ───────────────────────────────────────────────────
 
-/// Builds the character lock section from the live cast for a given set of names.
+/// Builds the character lock section from canonical descriptions.
 String _characterBlock(List<String> characterNames) {
-  final cast = characterNames.isEmpty
-      ? kDefaultCast
-      : kDefaultCast.where((c) => characterNames
-          .map((n) => n.toLowerCase())
-          .contains(c.name.toLowerCase()))
-          .toList();
-  if (cast.isEmpty) return kDefaultCast.map(_charLine).join('\n');
-  return cast.map(_charLine).join('\n');
+  if (characterNames.isEmpty) {
+    return kCharacterNames
+        .map((name) => '- $name: ${characterDescription(name)}')
+        .join('\n');
+  }
+  return characterNames
+      .map((name) => '- $name: ${characterDescription(name)}')
+      .join('\n');
 }
 
-String _charLine(CharacterRef c) => '${c.name.toUpperCase()}: ${c.description}';
-
 String _brandStyleBlock() =>
-    'Visual style: ${BrandDefaults.visualStyle}\n'
+    '$kMasterPrompt\n\nNEGATIVE INSTRUCTIONS: $kNegativeInstructions\n'
     'Audience: ${BrandDefaults.audience}\n'
     'Brand: ${BrandDefaults.name} (${BrandDefaults.handle})';
 

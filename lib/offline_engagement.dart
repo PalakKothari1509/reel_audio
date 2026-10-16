@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'characters.dart';
+import 'master_prompt.dart';
+
 class OfflineEngagementPackage {
   final String caption;
   final List<String> hashtags;
@@ -37,13 +40,11 @@ String buildOfflineImagePrompt({
   String additionalInstructions = '',
 }) {
   final buffer = StringBuffer();
-  buffer.writeln('Soft 3D Pixar/Disney-style render, warm natural lighting.');
-  buffer.writeln('Cream background, gentle textures.');
-  buffer.writeln('NOT flat 2D, NOT watercolor, NOT kawaii-chibi.');
+  buffer.writeln(kVisualStyle);
   buffer.writeln();
   buffer.writeln('CHARACTERS:');
   for (final name in characters) {
-    final desc = _characterAppearances[name] ?? 'preschool child character';
+    final desc = characterDescription(name);
     buffer.writeln('- $name: $desc');
   }
   buffer.writeln();
@@ -53,34 +54,9 @@ String buildOfflineImagePrompt({
     buffer.writeln('ADDITIONAL INSTRUCTIONS: $additionalInstructions');
   }
   buffer.writeln();
-  buffer.writeln('Character lock rules:');
-  buffer.writeln('- Ria and Rio NEVER wear glasses.');
-  buffer.writeln('- Cuty is ALWAYS a small white bunny with a pink bow.');
-  buffer.writeln('- Outfits may change per scene but face/hair stay consistent.');
+  buffer.writeln(kStoryStructureRules);
   return buffer.toString();
 }
-
-const Map<String, String> _characterAppearances = {
-  'Ria': 'toddler girl, light brown hair in two short pigtails with pink bows, '
-      'large round dark brown eyes, fair skin with rosy cheeks, pink dress, '
-      'no glasses, energetic and playful',
-  'Rio': 'toddler boy, tousled medium brown hair, large round amber-brown eyes, '
-      'fair skin with rosy cheeks, blue-grey t-shirt and shorts, '
-      'no glasses, determined and thoughtful',
-  'Cuty': 'small white bunny, long upright ears, coral-pink bow at neck, '
-      'large dark brown eyes, pink nose, calm and peaceful',
-  'Mumma': 'young Indian mother, medium brown hair in a high bun, dark brown eyes, '
-      'small red bindi, gold jhumka earrings, mustard-yellow kurta, '
-      'warm and patient expression',
-  'Papa': 'young Indian father, short black hair, warm brown eyes, '
-      'light blue kurta, friendly smile, playful demeanor',
-  'Daadi': 'Indian grandmother, silver-grey hair in a neat bun, warm tan skin, '
-      'round gold-rimmed glasses, small red bindi, gold earrings, '
-      'cream saree with gold border, affectionate smile',
-  'Teacher': 'Indian school teacher, dark hair in a low bun with white gajra, '
-      'warm tan skin, dark brown eyes, round gold-rimmed glasses, '
-      'small red bindi, blue kurta, holding a book, encouraging smile',
-};
 
 List<Map<String, String>> buildOfflineCarouselSlides({
   required String idea,

@@ -207,3 +207,38 @@ const List<CharOption> kCharacterOptions = [
 
 const List<String> kCharacterNames =
     ['Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Teacher'];
+
+const Map<String, String> kCharacterDescriptions = {
+  'Ria': "toddler girl, light brown hair in two short pigtails tied with pink bows, "
+      "soft fringe across the forehead, large round dark brown eyes with long lashes, "
+      "fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress "
+      "covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, "
+      "chubby toddler body proportions",
+  'Rio': "toddler boy, tousled medium brown hair, large round amber-brown eyes with "
+      "long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey "
+      "short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black "
+      "lace-up sneakers with white soles, chubby toddler body proportions, slightly "
+      "taller than Ria",
+  'Cuty': "fluffy white bunny, long upright ears with soft pink inner colouring, "
+      "coral-pink fabric bow tied at the neck, very large round dark brown eyes with "
+      "lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing "
+      "upright like a toddler",
+  'Mumma': "young Indian mother, medium brown hair in a high bun with a few loose "
+      "strands, fair-medium skin, large dark brown eyes, small red bindi, gold jhumka "
+      "earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari "
+      "floral embroidery, blue jeans, comfortable smile",
+  'Papa': "young Indian father, short neat black hair, warm brown eyes, light stubble, "
+      "fair skin, light blue full-sleeve kurta with subtle embroidery, "
+      "matching pyjama trousers, brown juttis, friendly expression",
+  'Daadi': "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with "
+      "soft wrinkles and laugh lines, dark brown eyes behind round gold-rimmed glasses, "
+      "small red bindi, gold jhumka earrings, cream saree with gold border, warm "
+      "affectionate smile",
+  'Teacher': "Indian school teacher, dark hair in a low bun with small white gajra "
+      "flowers, warm tan skin, dark brown eyes, round gold-rimmed glasses, small red "
+      "bindi, small gold earrings, blue three-quarter-sleeve kurta, holding a book, "
+      "encouraging smile",
+};
+
+String characterDescription(String name) =>
+    kCharacterDescriptions[name] ?? 'standard character appearance';

@@ -52,19 +52,7 @@ IdeaEvaluation _buildOfflineEvaluation(String idea) {
 }
 
 GeminiVideoResult _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) {
-  final story = GeneratedStory(
-    title: 'Offline Story',
-    hook: idea,
-    who: chars.join(', '),
-    where: 'at home',
-    problem: idea,
-    twist: '',
-    worse: '',
-    solution: '',
-    endingLine: 'Theek hai na Mama?',
-    moral: '',
-    hookOptions: [],
-  );
+  final story = StoryGenerator().generate();
   final offlineResult = OfflineVideoPromptGenerator().generateFromStory(
     story,
     totalSeconds: totalSeconds,

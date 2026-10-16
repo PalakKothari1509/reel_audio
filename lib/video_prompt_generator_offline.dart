@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'characters.dart';
 import 'content_ideas.dart';
+import 'hook_system.dart';
+import 'master_prompt.dart';
 import 'story_generator_offline.dart';
 
 class VideoPartPrompt {
@@ -35,66 +38,6 @@ class GeminiVideoResult {
 
 class OfflineVideoPromptGenerator {
   final Random _rng = Random();
-
-  static const String _visualStyle =
-      'Soft 3D Pixar-Disney animation style, vertical 9:16, '
-      'warm natural lighting, semi-realistic quality, cream background';
-
-  static const String _negativeInstructions =
-      'No duplicate characters, no identity changes, no outfit changes throughout, '
-      'no distorted anatomy, no random text, no floating objects, '
-      'no glasses on Ria and Rio, Cuty always fluffy white bunny with coral-pink bow';
-
-  static const String _riaDesc =
-      "toddler girl, light brown hair in two short pigtails tied with pink bows, "
-      "soft fringe across the forehead, large round dark brown eyes with long lashes, "
-      "fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress "
-      "covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, "
-      "chubby toddler body proportions";
-
-  static const String _rioDesc =
-      "toddler boy, tousled medium brown hair, large round amber-brown eyes with "
-      "long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey "
-      "short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black "
-      "lace-up sneakers with white soles, chubby toddler body proportions, slightly "
-      "taller than Ria";
-
-  static const String _cutyDesc =
-      "fluffy white bunny, long upright ears with soft pink inner colouring, "
-      "coral-pink fabric bow tied at the neck, very large round dark brown eyes with "
-      "lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing "
-      "upright like a toddler";
-
-  static const String _mummaDesc =
-      "young Indian mother, medium brown hair in a high bun with a few loose strands, "
-      "fair-medium skin, large dark brown eyes, small red bindi, gold jhumka earrings, "
-      "mustard-yellow three-quarter-sleeve kurta with white chikankari floral embroidery, "
-      "blue jeans, comfortable smile";
-
-  static const String _papaDesc =
-      "young Indian father, short neat black hair, warm brown eyes, light stubble, "
-      "fair skin, light blue full-sleeve kurta with subtle embroidery, "
-      "matching pyjama trousers, brown juttis, friendly expression";
-
-  static const String _daadiDesc =
-      "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with soft "
-      "wrinkles, dark brown eyes behind round gold-rimmed glasses, small red bindi, "
-      "gold jhumka earrings, cream saree with gold border, warm affectionate smile";
-
-  static const String _teacherDesc =
-      "Indian school teacher, dark hair in a low bun with small white gajra, "
-      "warm tan skin, dark brown eyes, round gold-rimmed glasses, small red bindi, "
-      "blue three-quarter-sleeve kurta, holding a book, encouraging smile";
-
-  static const Map<String, String> _characterDescriptions = {
-    'Ria': _riaDesc,
-    'Rio': _rioDesc,
-    'Cuty': _cutyDesc,
-    'Mumma': _mummaDesc,
-    'Papa': _papaDesc,
-    'Daadi': _daadiDesc,
-    'Teacher': _teacherDesc,
-  };
 
   static const List<String> _shotTypes = [
     'wide shot',
@@ -142,7 +85,8 @@ class OfflineVideoPromptGenerator {
 
       final dialogue = _buildDialogue(story, partNumber, partsCount, beat);
       final endingState = _buildEndingState(beat, characters);
-      final textHook = _buildTextHook(partNumber, partsCount, story);
+      final textHook = generateHookText(story,
+          partNumber: partNumber, totalParts: partsCount);
       final continuityFrom = i == 0
           ? 'Opening scene'
           : 'Direct cut from Part $i, characters and setting in same positions as ending state';
@@ -216,8 +160,7 @@ class OfflineVideoPromptGenerator {
   String _buildCharacterBlock(List<String> characters) {
     final buffer = StringBuffer();
     for (final name in characters) {
-      final desc = _characterDescriptions[name] ??
-          'standard character appearance';
+      final desc = characterDescription(name);
       buffer.writeln('- $name: $desc');
     }
     return buffer.toString().trim();
@@ -305,16 +248,6 @@ class OfflineVideoPromptGenerator {
         'moment, scene settling toward the closing card with lesson visible';
   }
 
-  String _buildTextHook(int partNumber, int totalParts, GeneratedStory story) {
-    if (partNumber == 1) {
-      return 'Top: "${story.hook.split(" ").take(3).join(" !")}!"';
-    }
-    if (partNumber == totalParts) {
-      return 'Top: "Teamwork ho toh sab easy! ✨"';
-    }
-    return 'Top: "Phir kya hua? 🤔"';
-  }
-
   String _buildDialogue(GeneratedStory story, int partNumber, int totalParts,
       String beat) {
     if (partNumber == 1) {
@@ -398,9 +331,9 @@ class OfflineVideoPromptGenerator {
     buffer.writeln();
     buffer.writeln('CONTINUITY INTO NEXT PART: $continuityInto');
     buffer.writeln();
-    buffer.writeln('VISUAL STYLE: $_visualStyle');
+    buffer.writeln('VISUAL STYLE: $kVisualStyle');
     buffer.writeln();
-    buffer.writeln('NEGATIVE INSTRUCTIONS: $_negativeInstructions');
+    buffer.writeln('NEGATIVE INSTRUCTIONS: $kNegativeInstructions');
     if (additionalInstructions != null &&
         additionalInstructions.trim().isNotEmpty) {
       buffer.writeln();
