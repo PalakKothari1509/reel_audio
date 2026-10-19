@@ -102,6 +102,7 @@ extension QualityCheckTypeExtension on QualityCheckType {
 
 class QualityReport2 {
   final String id;
+  final String contentId;
   final String assetId;
   final QualityCheckType assetType;
   final int assetVersion;
@@ -112,6 +113,7 @@ class QualityReport2 {
 
   QualityReport2({
     required this.id,
+    required this.contentId,
     required this.assetId,
     required this.assetType,
     required this.assetVersion,
@@ -148,6 +150,7 @@ class QualityReport2 {
 
   Map<String, dynamic> toJson() => {
           'id': id,
+          'contentId': contentId,
           'assetId': assetId,
           'assetType': assetType.name,
           'assetVersion': assetVersion,
@@ -159,6 +162,8 @@ class QualityReport2 {
 
   factory QualityReport2.fromJson(Map<String, dynamic> json) => QualityReport2(
         id: json['id'] as String? ?? '',
+        contentId: json['contentId'] as String? ??
+            (json['assetId'] as String? ?? '').split('_').first,
         assetId: json['assetId'] as String? ?? '',
         assetType: QualityCheckTypeExtension.fromName(
             json['assetType'] as String? ?? 'script'),
@@ -183,6 +188,7 @@ class QualityReport2 {
   }) {
     return QualityReport2(
       id: id,
+      contentId: contentId,
       assetId: assetId,
       assetType: assetType,
       assetVersion: assetVersion,
@@ -228,6 +234,12 @@ class QualityCheckCenter {
   static Future<List<QualityReport2>> getByAsset(String assetId) async {
     final all = await getAll();
     return all.where((r) => r.assetId == assetId).toList()
+      ..sort((a, b) => b.checkedAt.compareTo(a.checkedAt));
+  }
+
+  static Future<List<QualityReport2>> getByContentId(String contentId) async {
+    final all = await getAll();
+    return all.where((r) => r.contentId == contentId).toList()
       ..sort((a, b) => b.checkedAt.compareTo(a.checkedAt));
   }
 
@@ -337,6 +349,7 @@ class QualityCheckCenter {
 
     return QualityReport2(
       id: '${contentId}_script_report_$now',
+      contentId: contentId,
       assetId: contentId,
       assetType: QualityCheckType.script,
       assetVersion: version,
@@ -348,6 +361,7 @@ class QualityCheckCenter {
   // ── Prompt quality check ───────────────────────────────────────────────
 
   static QualityReport2 checkPrompt({
+    required String contentId,
     required String assetId,
     required int version,
     required String promptText,
@@ -420,6 +434,7 @@ class QualityCheckCenter {
 
     return QualityReport2(
       id: '${assetId}_prompt_report_$now',
+      contentId: contentId,
       assetId: assetId,
       assetType: QualityCheckType.prompt,
       assetVersion: version,
@@ -507,6 +522,7 @@ class QualityCheckCenter {
 
     return QualityReport2(
       id: '${asset.id}_video_report_$now',
+      contentId: asset.contentId,
       assetId: asset.id,
       assetType: QualityCheckType.video,
       assetVersion: asset.version,

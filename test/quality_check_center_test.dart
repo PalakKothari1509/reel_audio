@@ -10,6 +10,7 @@ void main() {
     test('canApprove is false when critical issues exist', () {
       final report = QualityReport2(
         id: 'r1',
+        contentId: 'FLWP-0001',
         assetId: 'FLWP-0001',
         assetType: QualityCheckType.script,
         assetVersion: 1,
@@ -32,6 +33,7 @@ void main() {
     test('canApprove is false when major issues exist', () {
       final report = QualityReport2(
         id: 'r2',
+        contentId: 'FLWP-0001',
         assetId: 'FLWP-0001',
         assetType: QualityCheckType.script,
         assetVersion: 1,
@@ -54,6 +56,7 @@ void main() {
     test('canApprove is true when only suggestions exist', () {
       final report = QualityReport2(
         id: 'r3',
+        contentId: 'FLWP-0001',
         assetId: 'FLWP-0001',
         assetType: QualityCheckType.script,
         assetVersion: 1,
@@ -83,6 +86,7 @@ void main() {
     test('toJson and fromJson round-trip', () {
       final report = QualityReport2(
         id: 'r4',
+        contentId: 'FLWP-0001',
         assetId: 'FLWP-0001',
         assetType: QualityCheckType.video,
         assetVersion: 2,
@@ -104,6 +108,7 @@ void main() {
       final restored = QualityReport2.fromJson(json);
 
       expect(restored.id, 'r4');
+      expect(restored.contentId, 'FLWP-0001');
       expect(restored.assetId, 'FLWP-0001');
       expect(restored.assetType, QualityCheckType.video);
       expect(restored.findings.length, 1);
@@ -171,7 +176,8 @@ void main() {
   group('QualityCheckCenter.checkPrompt', () {
     test('detects missing characters as critical', () {
       final report = QualityCheckCenter.checkPrompt(
-        assetId: 'prompt-1',
+        contentId: 'FLWP-0001',
+        assetId: 'FLWP-0001_v1',
         version: 1,
         promptText: 'A scene with someone unnamed. 10 seconds, 9:16.',
         expectedCharacters: ['Ria'],
@@ -184,7 +190,8 @@ void main() {
 
     test('detects missing duration as major', () {
       final report = QualityCheckCenter.checkPrompt(
-        assetId: 'prompt-1',
+        contentId: 'FLWP-0001',
+        assetId: 'FLWP-0001_v1',
         version: 1,
         promptText: 'Scene with Ria. 9:16 vertical. No duplicates.',
         expectedCharacters: [],

@@ -18,6 +18,8 @@ class ContentStudioHome extends StatefulWidget {
   final NavCallback onImagePrompt;
   final NavCallback onCarouselPrompts;
   final NavCallback onGeminiVideo;
+  final NavCallback onPromptVault;
+  final NavCallback onVideoLibrary;
   final NavCallback? onOfflineStory;
 
   const ContentStudioHome({
@@ -29,6 +31,8 @@ class ContentStudioHome extends StatefulWidget {
     required this.onImagePrompt,
     required this.onCarouselPrompts,
     required this.onGeminiVideo,
+    required this.onPromptVault,
+    required this.onVideoLibrary,
     this.onOfflineStory,
   });
 
@@ -123,6 +127,22 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
             title: 'My Content',
             subtitle: 'Track production and published content',
             onTap: widget.onMyContent,
+          ),
+          const SizedBox(height: 10),
+          _NavCard(
+            icon: Icons.book_outlined,
+            iconColor: AppColors.primary,
+            title: 'Prompt Vault',
+            subtitle: 'View, search, and reuse saved prompts',
+            onTap: widget.onPromptVault,
+          ),
+          const SizedBox(height: 10),
+          _NavCard(
+            icon: Icons.video_library_outlined,
+            iconColor: AppColors.accent,
+            title: 'Video Library',
+            subtitle: 'Manage uploaded videos and quality checks',
+            onTap: widget.onVideoLibrary,
           ),
         ],
       ),

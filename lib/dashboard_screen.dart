@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'asset_completeness_service.dart';
 import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_audit.dart';
@@ -28,6 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<ContentLibraryItem> _items = [];
   List<ContentAuditItem> _auditItems = [];
   List<PackageMetadata> _packages = [];
+  List<AssetCompleteness> _completeness = [];
   bool _loading = true;
   String? _error;
 
@@ -47,12 +49,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final libraryItems = await ContentLibraryStore.getAll();
       final auditItems = await ContentAuditStore.instance.loadAll();
       final packages = await _loadPackages();
+      final completeness = await AssetCompletenessService.checkAll();
 
       if (!mounted) return;
       setState(() {
         _items = libraryItems;
         _auditItems = auditItems;
         _packages = packages;
+        _completeness = completeness;
         _loading = false;
       });
     } catch (e) {
@@ -193,6 +197,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       _buildSectionHeader('Formats Tested < 5 Times'),
                       Gap.s,
                       _buildUndertestedFormats(),
+                      Gap.l,
+                      _buildSectionHeader('Ready-to-Post Checklist'),
+                      Gap.s,
+                      _buildReadyToPost(),
                     ],
                   ),
                 ),
@@ -377,6 +385,77 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: AppText.body.copyWith(color: AppColors.textSoft),
             textAlign: TextAlign.center),
       ),
+    );
+  }
+
+  Widget _buildReadyToPost() {
+    final ready = _completeness.where((a) => a.isReadyToPost).toList();
+    final missing = _completeness.where((a) => !a.isReadyToPost).toList();
+
+    if (_completeness.isEmpty) {
+      return _buildEmptyState(
+        'No content ideas checked. Generate prompts to get started.');
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (ready.isNotEmpty) ...[
+          Text('${ready.length} ready to post', style: AppText.subtitle),
+          Gap.s,
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: ready.length.clamp(0, 10),
+            separatorBuilder: (_, _) => Gap.xs,
+            itemBuilder: (context, i) {
+              final item = ready[i];
+              return ListTile(
+                leading: const Icon(Icons.check_circle, color: AppColors.primary),
+                title: Text(item.title, style: AppText.body),
+                subtitle: Text('${item.contentId} · ${item.hasVideoAsset ? "video uploaded" : ""}',
+                    style: AppText.hint),
+              );
+            },
+          ),
+          if (ready.length > 10)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text('+ ${ready.length - 10} more ready',
+                  style: AppText.small.copyWith(color: AppColors.textSoft)),
+            ),
+          Gap.l,
+        ],
+        Text('${missing.length} need attention', style: AppText.subtitle),
+        Gap.s,
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: missing.length.clamp(0, 10),
+          separatorBuilder: (_, _) => Gap.xs,
+          itemBuilder: (context, i) {
+            final item = missing[i];
+            final missingItems = <String>[];
+            if (!item.hasScript) missingItems.add('script');
+            if (!item.hasVideoPrompt) missingItems.add('video prompt');
+            if (!item.hasVideoAsset) missingItems.add('video');
+            if (!item.hasQualityReport) missingItems.add('quality check');
+            return ListTile(
+              leading: const Icon(Icons.warning_amber_outlined,
+                  color: AppColors.warning),
+              title: Text(item.title, style: AppText.body),
+              subtitle: Text('Missing: ${missingItems.join(', ')}',
+                  style: AppText.hint),
+            );
+          },
+        ),
+        if (missing.length > 10)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text('+ ${missing.length - 10} more need attention',
+                style: AppText.small.copyWith(color: AppColors.textSoft)),
+          ),
+      ],
     );
   }
 }

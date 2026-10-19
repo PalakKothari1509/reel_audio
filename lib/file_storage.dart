@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'json_file_store.dart';
 
@@ -32,14 +33,11 @@ class FileStorageManager {
   }
 
   static Future<Directory> _getAppDocumentsDirectory() async {
-    // Lazy import to avoid adding path_provider to this file's dependencies
-    // if it is already available elsewhere.
-    final docs = await _getPath();
-    return docs;
-  }
-
-  static Future<Directory> _getPath() {
-    return Directory.systemTemp.createTemp('video_storage_test');
+    try {
+      return await getApplicationDocumentsDirectory();
+    } catch (_) {
+      return Directory.systemTemp.createTemp('video_storage_test');
+    }
   }
 
   /// Saves a video file into app-managed storage and returns the relative path.

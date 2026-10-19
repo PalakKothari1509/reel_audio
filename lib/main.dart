@@ -47,6 +47,8 @@ import 'content_ideas.dart';
 import 'my_content_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
+import 'prompt_vault_screen.dart';
+import 'video_library_screen.dart';
 
 /// Android side of saving a finished reel. Its own channel rather than the voice one,
 /// because saving a video has nothing to do with speech.
@@ -485,9 +487,17 @@ Future<void> main() async {
             ),
           )),
         ),
-        onMyContent: () => Navigator.push(
+         onMyContent: () => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const MyContentScreen()),
+        ),
+        onPromptVault: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => const PromptVaultScreen()),
+        ),
+        onVideoLibrary: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => const VideoLibraryScreen()),
         ),
         onSettings: () => Navigator.push(
           _appNavigatorKey.currentContext!,

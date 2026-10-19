@@ -6,11 +6,13 @@ import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
 import 'idea_review_screen.dart';
 import 'offline_engagement.dart';
+import 'prompt_vault.dart';
 import 'prompts.dart';
 import 'story_generator_offline.dart';
 import 'story_ideas.dart';
 import 'theme.dart';
-import 'video_prompt_generator_offline.dart' hide GeminiVideoResult, VideoPartPrompt;
+import 'video_prompt_generator_offline.dart'
+    hide GeminiVideoResult, VideoPartPrompt;
 
 bool _isGeminiError(Object e) {
   final msg = e.toString().toLowerCase();
@@ -28,6 +30,38 @@ String _storyTitleFromIdea(String idea) {
   if (words.isEmpty) return 'Story';
   final cap = words.first;
   return cap[0].toUpperCase() + cap.substring(1);
+}
+
+String _contentIdFromTitle(String title) {
+  final slug = title
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9 ]'), '')
+      .trim()
+      .replaceAll(' ', '-');
+  return 'FLWP-$slug';
+}
+
+Future<void> _saveVideoPromptsToVault(
+  GeminiVideoResult result,
+  String lastIdea,
+  List<String> lastCharacters,
+) async {
+  final contentId = _contentIdFromTitle(result.storyTitle);
+  final metadata = <String, dynamic>{
+    'idea': lastIdea,
+    'characters': lastCharacters,
+    'storyFoundation': result.storyFoundation,
+    'totalParts': result.parts.length,
+  };
+  for (final part in result.parts) {
+    await PromptVault.saveWithVersion(
+      contentId: contentId,
+      title: '${result.storyTitle} ${part.title}',
+      type: PromptType.video,
+      promptText: part.promptText,
+      metadata: {...metadata, 'partNumber': part.partNumber, 'textOverlay': part.textOverlay},
+    );
+  }
 }
 
 IdeaEvaluation _buildOfflineEvaluation(String idea) {
@@ -781,6 +815,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
         _evaluation = null;
         _status = '';
       });
+      _saveVideoPromptsToVault(result, idea, _ideaChars);
     } catch (e) {
       if (mounted) setState(() => _status = '❌ $e');
     } finally {
@@ -848,6 +883,18 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
               _status = '';
               _loading = false;
             });
+            final contentId = _contentIdFromTitle(current.storyTitle);
+            await PromptVault.saveWithVersion(
+              contentId: contentId,
+              title: '${current.storyTitle} ${newPart.title}',
+              type: PromptType.video,
+              promptText: newPart.promptText,
+              metadata: {
+                'partNumber': newPart.partNumber,
+                'textOverlay': newPart.textOverlay,
+                'regenerated': true,
+              },
+            );
           } catch (e) {
             if (mounted) {
               setState(() {

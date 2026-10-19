@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'file_storage.dart';
 import 'json_file_store.dart';
@@ -95,6 +96,44 @@ class VideoLibrary {
     );
 
     final all = await getAll();
+    all.insert(0, asset);
+    await _store.saveAll(all);
+    return asset;
+  }
+
+  static Future<VideoAsset?> pickAndUpload({
+    required String contentId,
+    required String title,
+    String aspectRatio = '9:16',
+    Map<String, dynamic>? metadata,
+  }) async {
+    final xFile = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (xFile == null) return null;
+
+    final file = File(xFile.path);
+    final size = await file.length();
+    final storedName = await FileStorageManager.saveVideo(file, contentId);
+
+    final all = await getAll();
+    final existing = all.where((v) => v.contentId == contentId).toList();
+    existing.sort((a, b) => b.version.compareTo(a.version));
+    final nextVersion = existing.isEmpty ? 1 : existing.first.version + 1;
+
+    final asset = VideoAsset(
+      id: '${contentId}_v$nextVersion',
+      contentId: contentId,
+      title: title,
+      fileName: storedName,
+      fileSizeBytes: size,
+      aspectRatio: aspectRatio,
+      version: nextVersion,
+      status: VideoStatus.uploaded,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      uploadedAt: DateTime.now(),
+      metadata: metadata ?? {},
+    );
+
     all.insert(0, asset);
     await _store.saveAll(all);
     return asset;

@@ -35,6 +35,8 @@ void main() {
             onImagePrompt: () {},
             onCarouselPrompts: () {},
             onGeminiVideo: () {},
+            onPromptVault: () {},
+            onVideoLibrary: () {},
           ),
         ),
       );
@@ -64,6 +66,8 @@ void main() {
             onImagePrompt: () {},
             onCarouselPrompts: () {},
             onGeminiVideo: () {},
+            onPromptVault: () {},
+            onVideoLibrary: () {},
           ),
         ),
       );

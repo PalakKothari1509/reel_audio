@@ -164,6 +164,18 @@ The app is organized into six connected modules for managing content from idea t
 - **Model**: `ContentLibraryItem` fields (`status`, `postedAt`, `instagramPostUrl`, `performanceMetrics`)
 - **Status flow**: idea → scripted → tested → ready → posted → archived
 
+### Module 7: Asset Completeness Service
+- **File**: `lib/asset_completeness_service.dart`
+- **Model**: `AssetCompleteness` — tracks whether content has script, video prompt, video asset, and quality report
+- **Service**: `AssetCompletenessService` — `checkContentId()`, `checkAll()`, `getMissing()`
+- **Features**: Identifies which content items are missing assets; drives the Ready-to-Post checklist on the Dashboard
+
+### Module 8: Dashboard & UI Screens
+- **File**: `lib/dashboard_screen.dart` — Added Ready-to-Post checklist showing ready items and items needing attention
+- **File**: `lib/prompt_vault_screen.dart` — UI for browsing, searching, filtering, copying, and deleting saved prompts
+- **File**: `lib/video_library_screen.dart` — UI for listing, uploading, previewing videos; status management (quality check, approve, mark posted)
+- **File**: `lib/home_screen.dart` — Added nav cards for Prompt Vault and Video Library
+
 ## Key design decisions
 
 1. **Single source of truth** — Characters defined in `characters.dart`, prompts in `master_prompt.dart` and `gemini_video_master_prompt.dart`, ideas in `content_ideas.dart`, collections in `content_collections.dart`
@@ -173,11 +185,13 @@ The app is organized into six connected modules for managing content from idea t
 5. **Automatic offline fallback** — `content_studio_screens.dart` detects Gemini errors (429/400/503) and switches to offline mode
 6. **Deterministic offline** — Uses `dart:math` seeded random for reproducible output
 7. **Shared UI** — `IdeaInputScreen` used by all online features, with character selection from `kCharacterOptions`
-8. **Prompt auto-save** — `VideoPartPrompt` now includes `textOverlay` field; prompts auto-saved to PromptVault
+8. **Prompt auto-save** — `VideoPartPrompt` now includes `textOverlay` field; prompts auto-saved to PromptVault after generation and after part regeneration
 9. **Hinglish language** — Video prompts require Hinglish dialogue and text overlays for sound-off viewing
-10. **Files separate from metadata** — Videos stored as files, metadata in JSON; `FileStorageManager` handles I/O
+10. **Files separate from metadata** — Videos stored as files, metadata in JSON; `FileStorageManager` handles file I/O
 11. **Version history** — Prompts and videos retain version history; new versions don't overwrite old ones
 12. **Quality checks with severity** — Critical/Major/Minor/Suggestion severity levels; reports tied to asset version
+13. **Content-level tracking** — `QualityReport2` has both `contentId` and `assetId` for flexible querying; `AssetCompletenessService` aggregates across all stores
+14. **Navigation hub** — Home screen has nav cards for Content Library, My Content, Prompt Vault, and Video Library
 
 ## Key files to modify
 - `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kRewrittenStories, kSafetyHooks)
@@ -192,5 +206,8 @@ The app is organized into six connected modules for managing content from idea t
 - `lib/video_library.dart` — VideoAsset model and VideoStatus enum
 - `lib/video_library_store.dart` — VideoLibrary store
 - `lib/file_storage.dart` — FileStorageManager for app-managed video storage
-- `lib/quality_check_center.dart` — QualityReport2, QualityFinding, QualityCheckCenter
-- `lib/content_studio_service.dart` — Gemini prompt generation (now with text_overlay and language support)
+  - `lib/quality_check_center.dart` — QualityReport2, QualityFinding, QualityCheckCenter
+- `lib/asset_completeness_service.dart` — AssetCompleteness model and AssetCompletenessService
+- `lib/prompt_vault_screen.dart` — UI for Prompt Vault browse/search/copy/delete
+- `lib/video_library_screen.dart` — UI for Video Library upload/preview/status management
+- `lib/content_studio_screens.dart` — Auto-saves video prompts to PromptVault after generation
