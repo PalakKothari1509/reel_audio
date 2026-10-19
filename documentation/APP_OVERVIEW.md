@@ -3,6 +3,7 @@
 ## What the app does
 A Flutter mobile app that generates Instagram reels and carousel posts for Indian preschool parents.
 Stories feature toddlers Ria, Rio, white bunny Cuty, an AI Robot, and adult characters (Mumma, Papa, Daadi, Teacher).
+The app manages the full content lifecycle: idea → script → prompt → video → quality check → posting.
 
 ## Core concepts
 
@@ -95,15 +96,88 @@ OfflineStoryMakerScreen:
   3. OfflineEngagementGenerator.generate(story.moral)
 ```
 
+## Architecture flow
+
+```
+User selects idea from Content Library (kDefaultHooksWithRewrite)
+    ↓
+If online: content_studio_service.dart → generateImagePrompt/generateCarouselPrompts/generateGeminiVideoPrompts
+    → Auto-saves prompt to PromptVault
+    → Auto-saves production plan to VideoProductionPlan store
+    ↓
+If offline or Gemini fails (429/400/503): content_studio_screens.dart
+    ↓
+OfflineStoryMakerScreen:
+  1. _storyFromHook(hook) → GeneratedStory (uses hook.problem, hook.lesson, hook.storyDetail)
+  2. OfflineVideoPromptGenerator.generateFromStory(story, duration, characters)
+     → Uses: generateHookText() for overlays, characterDescription() for blocks
+     → Uses: kVisualStyle, kNegativeInstructions from master_prompt.dart
+  3. OfflineEngagementGenerator.generate(story.moral)
+    ↓
+All generated prompts auto-saved to PromptVault
+All finished videos saved to VideoLibrary
+Quality reports saved to QualityCheckCenter
+```
+
+## Content Management Architecture
+
+The app is organized into six connected modules for managing content from idea to posted Reel:
+
+### Module 1: Content Library
+- **File**: `lib/content_library.dart`
+- **Stores**: `ContentLibraryStore` (persists to `content_library.json`)
+- **Model**: `ContentLibraryItem` with `sourceIdeaId`, `status`, `qualityReport`, `formatOutputs`
+- **Bridges**: Connects predefined ideas (`kDefaultHooks`) to production workflow
+
+### Module 2: Prompt Vault
+- **File**: `lib/prompt_vault.dart`
+- **Stores**: `PromptVault` (persists to `saved_prompts.json`)
+- **Models**: `SavedPrompt` (with `PromptType` enum: story, script, character, sceneImage, video, voice, caption, qualityCheck, custom)
+- **Features**: Automatic saving after generation, version history, type filtering, getLatest by content+type
+- **Integration**: All Gemini-generated prompts are saved automatically
+
+### Module 3: Gemini Video Master Prompt
+- **File**: `lib/gemini_video_master_prompt.dart`
+- **Template**: `kGeminiVideoMasterPrompt` — 30-second vertical Reel plan in Story/Twist/Resolution/Moral format
+- **Renderer**: `renderVideoMasterPrompt(VideoPromptVariables)` — fills template variables
+- **Rules**: Text overlays required, Hinglish dialogue, continuity between parts
+- **Model**: `lib/video_production_plan.dart` — `VideoProductionPlan` and `ClipPlan` classes
+
+### Module 4: Video Library
+- **Files**: `lib/video_library.dart`, `lib/video_library_store.dart`, `lib/file_storage.dart`
+- **Stores**: `VideoLibrary` (persists to `video_assets.json`)
+- **Model**: `VideoAsset` (with `VideoStatus` enum: draft, uploaded, qualityChecked, approved, posted, archived)
+- **Features**: Upload, preview, download, multiple versions, file existence checks
+- **Storage**: Files kept separate from metadata; `FileStorageManager` handles file I/O
+
+### Module 5: Quality Check Center
+- **File**: `lib/quality_check_center.dart`
+- **Models**: `QualityReport2`, `QualityFinding`, `QualityCheckType` enum (script, prompt, video)
+- **Findings**: Four severity levels — Critical, Major, Minor, Suggestion
+- **Checkers**:
+  - `checkScript()` — real-life relevance, age appropriateness, natural Hinglish, clear resolution
+  - `checkPrompt()` — characters present, duration specified, format, negative instructions
+  - `checkVideo()` — file readable, file size, duration, aspect ratio
+- **Store**: `QualityCheckCenter` (persists to `quality_reports.json`)
+
+### Module 6: Posting Tracker
+- **Model**: `ContentLibraryItem` fields (`status`, `postedAt`, `instagramPostUrl`, `performanceMetrics`)
+- **Status flow**: idea → scripted → tested → ready → posted → archived
+
 ## Key design decisions
 
-1. **Single source of truth** — Characters defined in `characters.dart`, prompts in `master_prompt.dart`, ideas in `content_ideas.dart`, collections in `content_collections.dart`
+1. **Single source of truth** — Characters defined in `characters.dart`, prompts in `master_prompt.dart` and `gemini_video_master_prompt.dart`, ideas in `content_ideas.dart`, collections in `content_collections.dart`
 2. **No duplication** — All generators import and reference the shared sources
 3. **Rewrite layer** — `kRewrittenStories` and `kSafetyHooks` allow improving scripts without changing the const `kDefaultHooks` list; `HookStore.load()` applies rewrites while preserving user edits
 4. **Collection grouping** — Ideas are grouped into 14 thematic collections via `collectionOf()`; the vault groups by `sourceIdeaId`
 5. **Automatic offline fallback** — `content_studio_screens.dart` detects Gemini errors (429/400/503) and switches to offline mode
 6. **Deterministic offline** — Uses `dart:math` seeded random for reproducible output
 7. **Shared UI** — `IdeaInputScreen` used by all online features, with character selection from `kCharacterOptions`
+8. **Prompt auto-save** — `VideoPartPrompt` now includes `textOverlay` field; prompts auto-saved to PromptVault
+9. **Hinglish language** — Video prompts require Hinglish dialogue and text overlays for sound-off viewing
+10. **Files separate from metadata** — Videos stored as files, metadata in JSON; `FileStorageManager` handles I/O
+11. **Version history** — Prompts and videos retain version history; new versions don't overwrite old ones
+12. **Quality checks with severity** — Critical/Major/Minor/Suggestion severity levels; reports tied to asset version
 
 ## Key files to modify
 - `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kRewrittenStories, kSafetyHooks)
@@ -112,3 +186,11 @@ OfflineStoryMakerScreen:
 - `lib/story_generator_offline.dart` — Add/edit story templates
 - `lib/master_prompt.dart` — Update brand rules
 - `lib/plan_data.dart` — HookStore.load() applies kRewrittenStories
+- `lib/prompt_vault.dart` — SavedPrompt model and PromptVault store
+- `lib/gemini_video_master_prompt.dart` — VideoProductionPlan template and renderer
+- `lib/video_production_plan.dart` — VideoProductionPlan and ClipPlan models
+- `lib/video_library.dart` — VideoAsset model and VideoStatus enum
+- `lib/video_library_store.dart` — VideoLibrary store
+- `lib/file_storage.dart` — FileStorageManager for app-managed video storage
+- `lib/quality_check_center.dart` — QualityReport2, QualityFinding, QualityCheckCenter
+- `lib/content_studio_service.dart` — Gemini prompt generation (now with text_overlay and language support)
