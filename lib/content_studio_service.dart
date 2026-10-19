@@ -167,10 +167,7 @@ CHARACTERS IN THIS IMAGE:
 $charBlock
 
 CHARACTER CONSISTENCY RULES:
-- Use the exact descriptions above for every character. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
-- Only the listed characters may appear.
+- Use the exact descriptions above for every part. Do not paraphrase.
 
 Return ONLY valid JSON in exactly this shape:
 
@@ -329,10 +326,12 @@ class VideoPartPrompt {
   final int partNumber;
   final int totalParts;
   final String promptText;
+  final String textOverlay;
   const VideoPartPrompt({
     required this.partNumber,
     required this.totalParts,
     required this.promptText,
+    this.textOverlay = '',
   });
   String get title => 'Part $partNumber of $totalParts';
 }
@@ -352,6 +351,7 @@ Future<GeminiVideoResult> generateGeminiVideoPrompts({
   required String idea,
   required int totalSeconds,
   required List<String> characters,
+  String language = 'Hinglish',
   String additionalInstructions = '',
   String? apiKey,
   void Function(String)? onWait,
@@ -366,6 +366,7 @@ Convert this story idea into $parts connected 10-second video prompts for Gemini
 
 IDEA: $idea
 TOTAL DURATION: ${totalSeconds}s ($parts parts × 10 seconds each)
+LANGUAGE: $language
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
 
 ${_brandStyleBlock()}
@@ -379,6 +380,7 @@ CHARACTER CONSISTENCY RULES:
 - Cuty is ALWAYS a small white bunny with a pink bow.
 - Only the listed characters may appear. Never duplicate any character.
 - Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
+- All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
 
 STORY STRUCTURE:
 - Part 1: Establish the problem/situation
@@ -388,6 +390,11 @@ STORY STRUCTURE:
 
 CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
 The ending state of each part becomes the starting state of the next.
+
+LANGUAGE RULES:
+- All dialogue must be in $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!").
+- All on-screen text overlays must be in $language — short, readable, max 2 lines.
+- Do not write in pure English or pure Hindi. Mix naturally, the way Indian parents actually speak.
 
 Return ONLY valid JSON:
 
@@ -404,10 +411,11 @@ Return ONLY valid JSON:
       "action_4_8s": "Continuation of action in seconds 4-8",
       "action_8_10s": "Complete this beat and establish transition to next part",
       "dialogue": "Exact dialogue if required, assigned to correct character, or empty string",
-      "ending_state": "Exact character positions, expressions, props at the END of this clip",
-      "continuity_from": "For Part 1: opening scene. For later parts: describe previous clip ending state",
-      "continuity_into": "Exact ending positions and environment the next part must continue from",
-      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no random text",
+       "text_overlay": "On-screen text for sound-off viewers, max 2 short lines",
+       "ending_state": "Exact character positions, expressions, props at the END of this clip",
+       "continuity_from": "For Part 1: opening scene. For later parts: describe previous clip ending state",
+       "continuity_into": "Exact ending positions and environment the next part must continue from",
+       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
       "full_prompt": "Complete copy-paste-ready video generation prompt for this part"
     }
   ]
@@ -424,6 +432,7 @@ Each "full_prompt" must be completely self-contained and include:
 - CAMERA (opening framing, movement, ending framing)
 - ACTION TIMELINE (0-4s, 4-8s, 8-10s)
 - DIALOGUE AND AUDIO
+- ON-SCREEN TEXT OVERLAYS (max 2 short lines, readable, for sound-off viewing)
 - CONTINUITY FROM PREVIOUS PART
 - CONTINUITY INTO NEXT PART
 - VISUAL STYLE
@@ -450,6 +459,7 @@ Return exactly $parts parts.
       partNumber: (p['part_number'] as num?)?.toInt() ?? 0,
       totalParts: parts,
       promptText: (p['full_prompt'] as String?)?.trim() ?? '',
+      textOverlay: (p['text_overlay'] as String?)?.trim() ?? '',
     );
   }).where((p) => p.promptText.isNotEmpty).toList();
 
@@ -469,6 +479,7 @@ Future<VideoPartPrompt> regenerateSingleVideoPart({
   required int partNumber,
   required int totalParts,
   required List<String> characters,
+  String language = 'Hinglish',
   String previousEndingState = '',
   String? apiKey,
   void Function(String)? onWait,
@@ -483,6 +494,7 @@ Regenerate ONLY Part $partNumber of $totalParts for this story. Keep the same st
 ORIGINAL IDEA: $idea
 STORY FOUNDATION: $storyFoundation
 PART TO REGENERATE: Part $partNumber of $totalParts
+LANGUAGE: $language
 ${previousEndingState.trim().isEmpty ? '' : 'PREVIOUS PART ENDED WITH: $previousEndingState'}
 
 ${_brandStyleBlock()}
@@ -495,13 +507,15 @@ CHARACTER CONSISTENCY RULES:
 - Ria and Rio NEVER wear glasses.
 - Cuty is ALWAYS a small white bunny with a pink bow.
 - Only the listed characters may appear.
+- All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
 
 Return ONLY valid JSON for this single part:
 
 {
   "part_number": $partNumber,
   "purpose": "What story beat this part communicates",
-  "full_prompt": "Complete copy-paste-ready video generation prompt for this part, self-contained with TITLE, PART $partNumber of $totalParts, DURATION 10 seconds, FORMAT vertical 9:16, STORY CONTEXT, CHARACTER LOCK, SCENE, STARTING STATE, CAMERA, ACTION TIMELINE 0-4s/4-8s/8-10s, DIALOGUE, CONTINUITY FROM/INTO, VISUAL STYLE, NEGATIVE INSTRUCTIONS"
+  "text_overlay": "On-screen text for sound-off viewers, max 2 short lines",
+  "full_prompt": "Complete copy-paste-ready video generation prompt for this part, self-contained with TITLE, PART $partNumber of $totalParts, DURATION 10 seconds, FORMAT vertical 9:16, STORY CONTEXT, CHARACTER LOCK, SCENE, STARTING STATE, CAMERA, ACTION TIMELINE 0-4s/4-8s/8-10s, DIALOGUE IN $language, ON-SCREEN TEXT OVERLAYS IN $language, CONTINUITY FROM/INTO, VISUAL STYLE, NEGATIVE INSTRUCTIONS"
 }
 ''';
 
@@ -522,6 +536,7 @@ Return ONLY valid JSON for this single part:
     partNumber: partNumber,
     totalParts: totalParts,
     promptText: promptText,
+    textOverlay: (json['text_overlay'] as String?)?.trim() ?? '',
   );
 }
 

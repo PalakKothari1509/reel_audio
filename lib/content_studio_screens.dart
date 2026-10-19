@@ -74,6 +74,7 @@ GeminiVideoResult _buildOfflineVideoResult(String idea, int totalSeconds, List<S
               partNumber: p.partNumber,
               totalParts: p.totalParts,
               promptText: p.promptText,
+              textOverlay: '',
             ))
         .toList(),
   );

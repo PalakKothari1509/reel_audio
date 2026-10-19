@@ -26,9 +26,8 @@ No duplicate characters, no identity changes, no outfit changes throughout.
 Ria and Rio NEVER wear glasses.
 Cuty is ALWAYS a small white bunny with a coral-pink neck bow.
 Must maintain exact character appearance descriptions across all parts.
-No distorted anatomy, no random text, no floating objects.
-If continuity breaks, prefer fewer characters in the scene rather than
-introducing look-alike duplicates.''';
+No distorted anatomy, no floating objects, no off-screen text, no blurry faces.
+On-screen text is REQUIRED for sound-off viewing: short, readable, max 2 lines.''';
 
 /// Story structure rules repeated in every prompt for consistency.
 const String kStoryStructureRules = '''
@@ -50,6 +49,7 @@ const List<String> kRequiredPromptSections = [
   'CAMERA',
   'ACTION TIMELINE',
   'DIALOGUE AND AUDIO',
+  'ON-SCREEN TEXT OVERLAYS',
   'CONTINUITY',
   'VISUAL STYLE',
   'NEGATIVE INSTRUCTIONS',
