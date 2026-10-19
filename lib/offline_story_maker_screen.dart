@@ -660,7 +660,7 @@ class _LibraryPickerState extends State<_LibraryPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = kDefaultHooks
+    final filtered = kDefaultHooksWithRewrite
         .where((h) =>
             h.forApp &&
             (_filter.isEmpty ||

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'characters.dart';
+import 'content_collections.dart';
 import 'content_ideas.dart';
 import 'theme.dart';
 
@@ -239,6 +240,7 @@ class _LibraryPicker extends StatefulWidget {
 class _LibraryPickerState extends State<_LibraryPicker> {
   String _filter = '';
   final _ctrl = TextEditingController();
+  String? _selectedCollection;
 
   @override
   void dispose() {
@@ -246,79 +248,182 @@ class _LibraryPickerState extends State<_LibraryPicker> {
     super.dispose();
   }
 
+  List<HookIdea> get _filtered {
+    final q = _filter.toLowerCase();
+    return kDefaultHooksWithRewrite
+        .where((h) =>
+            (_selectedCollection == null ||
+                collectionOf(h.id, custom: h.custom) == _selectedCollection) &&
+            (q.isEmpty ||
+                h.cover.toLowerCase().contains(q) ||
+                h.opening.toLowerCase().contains(q) ||
+                h.problem.toLowerCase().contains(q) ||
+                h.category.toLowerCase().contains(q)))
+        .toList();
+  }
+
+  Map<String, List<HookIdea>> get _grouped {
+    final map = <String, List<HookIdea>>{};
+    for (final h in _filtered) {
+      final c = collectionOf(h.id, custom: h.custom);
+      (map[c] ??= []).add(h);
+    }
+    return map;
+  }
+
+  List<String> get _orderedKeys {
+    final keys = <String>[];
+    for (final c in kCollections) {
+      if (_grouped.containsKey(c.id)) keys.add(c.id);
+    }
+    return keys;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filtered = kDefaultHooks
-        .where((h) =>
-            _filter.isEmpty ||
-            h.cover.toLowerCase().contains(_filter) ||
-            h.opening.toLowerCase().contains(_filter) ||
-            h.problem.toLowerCase().contains(_filter) ||
-            h.category.toLowerCase().contains(_filter))
-        .toList();
+    final grouped = _grouped;
+    final orderedKeys = _orderedKeys;
 
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.75,
       maxChildSize: 0.95,
       builder: (ctx, scroll) => Column(
-        children: [
-          const SizedBox(height: 8),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _ctrl,
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Search ideas...',
-                prefixIcon: Icon(Icons.search, size: 20),
-                isDense: true,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
               ),
-              onChanged: (v) => setState(() => _filter = v.toLowerCase()),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              controller: scroll,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filtered.length,
-              itemBuilder: (ctx, i) {
-                final h = filtered[i];
-                return ListTile(
-                  dense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 4, vertical: 2),
-                  title: Text(
-                    h.cover,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
-                  subtitle: Text(
-                    h.opening,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.small,
-                  ),
-                  trailing: Text(
-                    h.category,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.textFaint),
-                  ),
-                  onTap: () => Navigator.pop(ctx, h),
-                );
-              },
+            _collectionChips(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: TextField(
+                controller: _ctrl,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search ideas...',
+                  prefixIcon: Icon(Icons.search, size: 20),
+                  isDense: true,
+                ),
+                onChanged: (v) => setState(() => _filter = v.toLowerCase()),
+              ),
             ),
-          ),
+            Expanded(
+              child: grouped.isEmpty
+                  ? _empty()
+                  : ListView.builder(
+                      controller: scroll,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: orderedKeys.length,
+                      itemBuilder: (ctx, i) {
+                        final collectionId = orderedKeys[i];
+                        final ideas = grouped[collectionId]!;
+                        return ExpansionTile(
+                          key: PageStorageKey('col-$collectionId'),
+                          title: Text(
+                            '${kCollectionById[collectionId]?.emoji ?? '✏️'} '
+                            '${kCollectionById[collectionId]?.label ?? 'My Ideas'} '
+                            '(${ideas.length})',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          children: [
+                            for (final h in ideas) _ideaTile(ctx, h),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+    );
+  }
+
+  Widget _collectionChips() {
+    final counts = <String, int>{};
+    for (final h in _filtered) {
+      final c = collectionOf(h.id, custom: h.custom);
+      counts[c] = (counts[c] ?? 0) + 1;
+    }
+
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        children: [
+          _collectionChip(
+              null, 'All', _filtered.length, _selectedCollection == null),
+          for (final c in kCollections)
+            if (counts[c.id] != null || c.id == 'mine' || c.id == 'safety')
+              _collectionChip(
+                c.id,
+                '${c.emoji} ${c.label}',
+                counts[c.id] ?? 0,
+                _selectedCollection == c.id,
+                dimmed: c.id == 'safety',
+              ),
         ],
       ),
     );
   }
+
+  Widget _collectionChip(
+    String? value,
+    String label,
+    int count,
+    bool selected, {
+    bool dimmed = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(count == 0 && value != null ? label : '$label ($count)'),
+        selected: selected,
+        onSelected: (_) =>
+            setState(() => _selectedCollection = selected ? null : value),
+        disabledColor: dimmed ? Colors.grey.shade300 : null,
+        labelStyle: TextStyle(
+          color: dimmed && !selected ? Colors.grey : null,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  Widget _ideaTile(BuildContext ctx, HookIdea h) {
+    return ListTile(
+      dense: true,
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      title: Text(
+        h.cover,
+        style:
+            const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+      ),
+      subtitle: Text(
+        h.opening,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: AppText.small,
+      ),
+      trailing: Text(
+        h.category,
+        style:
+            const TextStyle(fontSize: 11, color: AppColors.textFaint),
+      ),
+      onTap: () => Navigator.pop(ctx, h),
+    );
+  }
+
+  Widget _empty() => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Text('No matching ideas'),
+        ),
+      );
 }

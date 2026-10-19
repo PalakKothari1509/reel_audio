@@ -147,6 +147,7 @@ class HookIdea {
         forApp: j['forApp'] as bool? ?? true,
         usedOn: j['usedOn'] as String? ?? '',
         custom: j['custom'] as bool? ?? false,
+        storyDetail: j['storyDetail'] as String? ?? '',
       );
 
   /// Laid out as the story form, ready for Write the script.
@@ -176,6 +177,102 @@ const kHookCategories = [
   'Series',
 ];
 
+/// Kids Safety hooks for the 🛡️ collection.
+/// Each carries a full storyDetail with the Story/Twist/Resolution/Moral
+/// labels the offline generator expects.
+const kSafetyHooks = <HookIdea>[
+  HookIdea(
+    id: 'safety-good-touch',
+    category: 'Warm lesson',
+    cover: 'Meri Marzi!',
+    opening: 'Uncle bole "Ek pappi do"... aur Ria ne bola nahi.',
+    problem: 'A relative asks for a hug and a kiss, and Ria does not want to',
+    lesson: 'Bachche ko "nahi" kehne ka haq hai, aur bade ko sunna chahiye',
+    forApp: true,
+    storyDetail: '''
+Story: Daadi ke ghar ek rishtedaar uncle aate hain: "Aao Ria, god mein baitho, ek pappi do!" Ria Mumma ke peeche chhup jaati hai: "Nahi."
+Twist: Uncle hanke: "Arre, ek hi toh pappi hai!" Ria ka chehra sikud jaata hai. Mumma aage aati hai, Ria ke kandhe par haath rakhke: "Ria ki marzi. Ria, tum high-five doge ya door se bye?"
+Resolution: Ria high-five deti hai aur muskurati hai. Raat ko Mumma poochhti hai: "Jab koi touch achha na lage, toh tumhara tummy kya bolta hai?" Ria: "Uh-oh!" "Aur phir kya karte hain?" "Mumma ko batate hain."
+Moral: Mera badan, meri marzi. Aur batana kabhi galat nahi hota.
+''',
+  ),
+  HookIdea(
+    id: 'safety-stranger',
+    category: 'Warm lesson',
+    cover: 'Chocolate Nahi!',
+    opening: 'Park mein aunty ne chocolate di... Ria ne kya kiya?',
+    problem: 'A person Ria does not know offers her a chocolate at the park',
+    lesson: 'Jo hume nahi jaanta, uske saath nahi jaate',
+    forApp: true,
+    storyDetail: '''
+Story: Park mein Ria jhoola jhool rahi hai. Ek aunty paas aake chocolate dikhati hain: "Ria, ye lo. Aao, udhar chalo, aur bhi hai."
+Twist: Ria jhoola rokti hai. Woh jaanti hai ki Mumma ne kaha tha: "Jo hume nahi jaante, unse kuch nahi lena." Woh chocolate ko dekhti hai, phir aunty ko, phir bench par baithi Mumma ko.
+Resolution: Ria zor se bolti hai: "Nahi!" aur bhaagke Mumma ke paas pahunchti hai. Mumma use godi mein uthati hai: "Shabash, Ria!" Mumma aunty ko door se dekhti hain, aur woh chali jaati hain.
+Moral: Mumma ke paas bhaago. Chocolate kal bhi mil jayegi.
+''',
+  ),
+  HookIdea(
+    id: 'safety-road',
+    category: 'Warm lesson',
+    cover: 'Ruko, Dekho, Chalo!',
+    opening: 'Zebra crossing par Rio ruk gaya... kisi ne bola nahi tha!',
+    problem: 'Toddlers run toward the road without stopping or looking',
+    lesson: 'Red light, green light ka khel ghar par seekho',
+    forApp: true,
+    storyDetail: '''
+Story: Ghar mein Cuty "red light, green light" ka khel khilata hai: Cuty haath uthata hai toh Ria aur Rio ruk jaate hain, haath hilata hai toh daudte hain. Dono kai baar hanste hue haante hain.
+Twist: Agle din sadak ke kinare Rio daudne ko hota hai... aur ek second ke liye ruk jaata hai. Woh Mumma ki taraf dekhta hai: "Red light!"
+Resolution: Mumma: "Haan. Ab dekho dono taraf. Gaadi aa rahi hai?" Rio dono taraf sar ghumaata hai: "Nahi!" Mumma: "Ab green light." Dono haath pakadke chalte hain.
+Moral: Khel mein seekha, sadak par kaam aaya.
+''',
+  ),
+  HookIdea(
+    id: 'safety-emergency-number',
+    category: 'Warm lesson',
+    cover: 'Mera Number Gaana',
+    opening: 'Ria ko Mumma ka number yaad nahi tha... phir gaana bana.',
+    problem: 'A preschooler cannot recall a parent\'s phone number when asked',
+    lesson: 'Gaane mein yaad karna aasaan hota hai',
+    forApp: true,
+    storyDetail: '''
+Story: Mumma poochhti hai: "Ria, Mumma ka phone number kya hai?" Ria soch mein padti hai: "Ek... do... pata nahi." Rio ko bhi nahi aata.
+Twist: Papa ek jaani-pehchani dhun mein number gaate hain, aur har dus ank ko do-teen ke tukdon mein todte hain. Rio hansta hai aur saath mein gaata hai. Cuty taal deta hai.
+Resolution: Kuch din baad Mumma phir poochhti hai. Ria seena tanke gaane lagti hai: poora number, dhun ke saath. Mumma ki aankhein chamak jaati hain.
+Moral: Number yaad hai, toh madad paas hai.
+''',
+  ),
+  HookIdea(
+    id: 'safety-lost-crowd',
+    category: 'Warm lesson',
+    cover: 'Mela Mein Kho Gayi',
+    opening: 'Bheed mein Mumma ka haath chhoot gaya... ab kya?',
+    problem: 'Ria loses her parents\' hand in a crowded fair',
+    lesson: 'Kho jao toh ruk jao, aur sahi insaan se madad maango',
+    forApp: true,
+    storyDetail: '''
+Story: Mela mein bheed hai. Ria jhoole dekhne mein rukti hai, aur jab palti hai toh Mumma ka haath nahi hai. Aas-paas sirf pair hi pair.
+Twist: Ria ka dil zor se dhadakta hai aur uski aankhon mein aansu aa jaate hain. Woh bhaagne ko hoti hai... phir Mumma ki baat yaad aati hai: "Kho jao toh jahaan ho wahin ruko."
+Resolution: Ria ruk jaati hai. Woh vardi pehne guard ko ya bachchon ke saath khadi mummy ko dhoondhti hai, aur unke paas jaake kehti hai: "Mera naam Ria hai. Mujhe Mumma ko dhoondhna hai." Phir woh apna gaana wala number gaati hai. Kuch hi der mein Mumma daudkar aati hain.
+Moral: Ruko. Guard ya mummy ke paas jao. Apna naam batao.
+''',
+  ),
+  HookIdea(
+    id: 'safety-kitchen-line',
+    category: 'Warm lesson',
+    cover: 'Laal Line Ke Peeche',
+    opening: 'Rasoi mein Ria ko aage jaana tha... par ek line thi.',
+    problem: 'A toddler keeps wandering into the kitchen while the stove is on',
+    lesson: 'Garam jagah ke liye ek clear line banao',
+    forApp: true,
+    storyDetail: '''
+Story: Mumma kadhai mein kuch tal rahi hain. Ria khilona lekar rasoi ki taraf aati hai: "Mumma, dekho!" Mumma jaldi se: "Garam! Peeche!" Ria chonk jaati hai.
+Twist: Agli subah Papa farsh par laal tape se rasoi ke darwaze par ek line chipkate hain: "Ye hai Laal Line. Jab gas jalti hai, yahin tak. Aage Mumma ya Papa ke saath."
+Resolution: Shaam ko Ria khilona leke line tak aati hai aur wahin rukkar bolti hai: "Mumma, main yahan hoon! Aao!" Mumma muskuraati hai aur khilona dekhne aati hai.
+Moral: Line ke peeche Ria, garam cheezein Mumma ke paas.
+''',
+  ),
+];
+
 /// The starting list. Merged from several AI suggestions and cut down hard: the same
 /// three problems (screen time, shoes, toy fights) appeared four or five times each,
 /// and several were written as "I" — a parent speaking — when the reels are told by a
@@ -203,7 +300,7 @@ Moral: Children need opportunities to practise everyday skills, even when it tak
     category: 'Relatable',
     cover: 'Bas 5 Minute Aur?!',
     opening: 'Phone band hua... aur Ria ka rona shuru!',
-    problem: 'Ria melts down when screen time ends suddenly',
+    problem: 'Ria cries when the cartoon is cut off mid-episode.',
     lesson: 'Achanak nahi, pehle se bataakar band karo',
     forApp: true,
     usedOn: '',
@@ -334,10 +431,10 @@ Moral: Small choices give big confidence—even if the boots don't last all day.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Mumma is at the park and sees three kids acting differently—"Yeh teeno kya kar rahe hain?"
-Twist: She recognizes Ria's determination, Rio's laughter, Cuty's quiet observation—"Mere bachche hi hain!"
-Resolution: The kids cheer—"Hum toh star hain!"—and they all pose for a selfie together.
-Moral: The audience creates the stars—every viewer is part of the story.
+Story: At the park, Ria races straight to the swings and starts pumping—"Mere saath koi nahi sahi!"
+Twist: Rio copies her but keeps falling off—"Main bhi kar sakta hoon!"—while Cuty sits quietly watching a ladybug.
+Resolution: Mumma points—"Ria tez, Rio mazak, Cuty dhyan"—and realises her three are right there in their own style.
+Moral: Tumhara bachcha kaunse character jaisa hai?
 ''',
     cover: 'Which Kid Is Yours?',
     opening: 'Ria = tofani, Rio = ziddi, Cuty = sleep lover.',
@@ -372,7 +469,7 @@ Resolution: Mumma offers a deal—"Jab ghar aayenge, toh princess dress pehn lo"
 Moral: Not all "no"s are endings—sometimes they're "not now" in disguise.
 ''',
     cover: 'When Mumma Says No',
-    opening: 'Ria protests, Rio refuses, Cuty quietly quietly gives in.',
+    opening: 'Ria protests, Rio refuses, Cuty quietly gives in.',
     problem: 'The same parent boundary can trigger three very different reactions',
     lesson: 'Kids react differently, but all of them need patience and clarity',
   ),
@@ -398,10 +495,10 @@ Moral: A countdown is better than a command—kids can own their transitions.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria says, "Mumma, your hair looks like a bird's nest!"—and Rio adds, "And Dada's beard looks like snow!"
-Twist: Cuty just smiles—"Toh kya bird and snow sabse achcha hai?"
-Resolution: Mumma laughs—"Haan, tum sabko lagta hai ki tum khoobsurat ho."
-Moral: Kids say the truth without a filter—sometimes it's the sweetest thing you'll hear.
+Story: It's bedtime, and Ria says—"Maine kaha tha na Mummy, maine kaha tha!"—then suddenly mumbles and her head nods.
+Twist: Rio whispers—"Cuty bhi aise hi so jaati hai!"—but Cuty is wide awake, humming.
+Resolution: Mumma tiptoes in, Ria is asleep with the book still open—"Theek hai beta, sweet dreams."
+Moral: Jab tak nahi so jata, tab tak sunate rehna padta hai.
 ''',
     cover: 'Things Kids Say',
     opening: 'Mumma, I am not sleepy and then five seconds later, snores.',
@@ -510,10 +607,10 @@ Moral: Engaging kids in a role turns shopping into teamwork.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Bedtime is different every night—Ria wants one more story, Rio asks for water five times, Cuty just wants to cuddle.
-Twist: Mumma handles all three at once—"Ek story, phir pani, phir cuddle time."
-Resolution: By the end of the routine, all three are snug—"Mummy, maine soch liya ki thoda bhi time nahi hai!"
-Moral: Bedtime is not a race—meeting each child's need makes the whole family restful.
+Story: Ria wants one more story—"Ek aur, Mummy!"—Rio keeps asking for water—"Paani chaiye!"—and Cuty just crawls into bed.
+Twist: Mumma does one round: story, then water for Rio, then tuck Cuty in, then back to Ria.
+Resolution: Ria finally says—"Theek hai, abhi so jaoongi"—and Rio snores on his pillow.
+Moral: Jo bhi order ho, sabse pehle pyar hi chahiye.
 ''',
     cover: 'Bedtime Personalities',
     opening: 'One child wants one more story, one wants one more screen, one is already asleep.',
@@ -638,10 +735,9 @@ Moral: Memory is subjective—but family humor makes every search an adventure.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: One day they won't ask you to carry them, and they won't need the same little routines.
-Twist: Mumma pauses—"Abhi toh yeh sab theek hai, par kabhi nahi chahiye!"
-Resolution: She hugs them all—"Tumhe pyar karta hoon, yeh din kabhi nahi lautenge."
-Moral: Enjoy the little moments while they are still happening—they don't last forever.
+Story: Cuty is asleep on the couch, and Mumma thinks—"Abhi bhi mere saath hai." But Ria is taller now—"Mummy, maine apni chaddi khud pehni!"
+Resolution: Mumma wraps her arms around both—"Tumhe pyar karti hoon, har pal ka."
+Ending line: "Thoda sa waqt jyada pad raha, par yehi toh haim."
 ''',
     cover: 'Parent Memory',
     opening: "One day they won't ask you to carry them, and they won't need the same little routines.",
@@ -720,10 +816,11 @@ Moral: Sometimes quiet presence is louder than loud reminders.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria's favorite hair clip breaks—"Nahi! Yeh toh bigad gaya!"
-Twist: Daadi takes the broken clip—"Kuchh toh achha hoga"—she turns it into a tiny mobile for Ria's window.
-Resolution: Ria hangs it by her window—"Ab yeh poora nayi si baat ban gayi!"—and waves good morning to it.
-Moral: What breaks can be remade—with a little love, it becomes something new.
+Story: Ria and Rio both grab the same toy car—"Mera pehle!"—and in the tug-of-war it snaps in half.
+Twist: Both stare at the broken pieces—"Mera car toota!"—"Mera bhi toota!"
+Resolution: Rio holds out one half—"Tum lo,"—and Ria says, "Nahi, dono milke banayenge."
+Ending line: Ria: "Dekho, do car bhi toh do car ban gaye!"
+Moral: Toote cheez pe gussa nahi, saath mein kaise theek karein.
 ''',
     cover: 'Tod Diya!',
     opening: 'Car ke do tukde... aur dono ek doosre ko blame kar rahe hain.',
@@ -738,10 +835,11 @@ Moral: What breaks can be remade—with a little love, it becomes something new.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria sees Mumma on the phone and says, "Phone bahut theek hai!"—but Mumma looks stressed.
-Twist: Ria brings Mumma a coloring page—"Mummy, yeh aapko khush karega!"
-Resolution: Mumma puts the phone down, hugs Ria, and says, "Tum hi toh asli phone hoke gaye."
-Moral: A child's love is the best connection—no screen can replace a cuddle.
+Story: Mumma is on the phone, and Ria keeps tugging her dupatta—"Mummy, phone dikhao!"
+Twist: Mumma puts the phone down—"Abhi nahi, Ria ke saath baitho"—but Ria grabs her own toy phone.
+Resolution: They play "phone" together—Ria answers her toy—"Hello, Mummy ke saath baitho!"
+Ending line: Ria into toy phone: "Hello? Haan, abhi mil rahi hoon."
+Moral: Dhyaan toh do, phone khud hi wapas aayega.
 ''',
     cover: 'Phone Asli Problem Nahi',
     opening: 'Ria ko phone se nahi, phone chhinne se gussa aata hai.',
@@ -819,11 +917,11 @@ Moral: Tell them what TO do, not what NOT to do—children follow positive direc
     category: 'Warm lesson',
     forApp: true,
     usedOn: '',
-    storyDetail: '''
-Story: Rio breaks a rule again—"Maine wieder kar diya!"
+storyDetail: '''
+Story: Rio takes cookie from the jar again—"Mummy, maine bas ek hi liya tha!"
 Twist: Instead of shouting, Mumma kneels down—"Haan beta, tumne kara. Par main tumhe pyar karti hoon."
-Resolution: Rio hugs her—"Mummy, main theek karunga!"—and promises to try again.
-Moral: Love holds the boundary—rules without connection create fear, not understanding.
+Resolution: Rio hugs her—"Next time I'll ask pehle!"—and puts the cookie back in the jar.
+Ending line: "Phir se promise, Mummy?" "Haan, phir se promise."
 ''',
     cover: 'Pyaar Bhi, Rule Bhi',
     opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
@@ -1192,8 +1290,8 @@ Moral: Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.
     id: 'shoe-bandhani',
     category: 'Relatable',
     cover: 'Shoe Bandhani',
-    opening: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
-    problem: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
+    opening: 'Rio ne apni jootiyein pehli baar khud pehnne ki koshish ki, lekin dono jooti ek doosre se juite hue the.',
+    problem: 'Rio ne apni jootiyein pehli baar khud pehnne ki koshish ki, lekin dono jooti ek doosre se juite hue the.',
     lesson: 'Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.',
     forApp: true,
     usedOn: '',
@@ -1224,13 +1322,13 @@ Moral: Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur 
     id: 'vegetable-drama',
     category: 'Relatable',
     cover: 'Vegetable Drama',
-    opening: 'Rio ne bhi kaha — Gobhi nahi khaoongi! — jab Mumma ne gobhi rakhi.',
-    problem: 'Rio ne bhi kaha — "Gobhi nahi khaoongi!" — jab Mumma ne gobhi rakhi.',
+    opening: 'Rio ne kaha — "Gobhi nahi khaoonga!" — jab Mumma ne gobhi rakhi.',
+    problem: 'Rio ne kaha — "Gobhi nahi khaoonga!" — jab Mumma ne gobhi rakhi.',
     lesson: 'Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-PART 1: Mumma places a plate of gobhi on the dining table. Rio pushes it away dramatically — "Gobhi nahi khaoongi!"
+PART 1: Mumma places a plate of gobhi on the dining table. Rio pushes it away dramatically — "Gobhi nahi khaoonga!"
 Twist: Ria sees the protest and joins in — "Yeh Mummy ke saath nahi khayenge!" Cuty even backs away.
 Resolution: Mumma names the gobhi "Bachcha" and "Rider" — suddenly both want to try.
 Moral: Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.
@@ -1247,8 +1345,8 @@ Moral: Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.
     usedOn: '',
     storyDetail: '''
 PART 1: Ria grabs her toothbrush but immediately protests — "Mujhe brush nahi karna!" She drops it in the sink.
-Twist: Rio says "Main karenge, main toh badi bacchi hoon!" but she just swirls the brush in water — no paste.
-Resolution: Cuty picks up the brush and trots between them — both girls start brushing, giggling.
+Twist: Rio says "Main karenge, main toh bada hoon!" but he just swirls the brush in water — no paste.
+Resolution: Cuty picks up the brush and trots between them — both siblings start brushing, giggling.
 Moral: Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.
 ''',
   ),
@@ -1719,7 +1817,7 @@ Moral: Sometimes your brain needs a break — not a forced push.
     id: 'robot-16',
     category: 'Series',
     cover: 'There Are Butterflies in My Tummy!',
-    opening: 'Robot, mere pitte mein buthadh phool rahe hain!',
+    opening: 'Robot, mere pet mein titliyan udd rahi hain!',
     problem: 'Ria gets pre-performance jitters before showing her artwork or speaking in front of others.',
     lesson: 'The robot explained that "butterflies" are excitement and courage, not fear.',
     postFormat: 'Reel',
@@ -1739,18 +1837,18 @@ Moral: Butterflies mean you care — and caring is the first step to courage.
     id: 'robot-17',
     category: 'Series',
     cover: 'I\'m Dying of Boredom!',
-    opening: 'Robot, marta mara hun ab tak!',
+    opening: 'Robot, sirhara pa gaya!',
     problem: 'Ria has finished all her activities and declares nothing is left to do.',
     lesson: 'The robot suggested the "boredom jar" — a list of simple activities she can pick from.',
     postFormat: 'Reel',
     strategy: 'Boredom productivity, creativity prompts, activity jar system',
-    caption: 'Marta mara hone ka time, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak',
+    caption: 'Sirhara pa gaya, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak',
     pinnedComment: 'A boredom jar is a happiness jar waiting to happen. Which activity will you pick? ❤️',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria has finished everything — drawing, puzzle, snack, dance — and declares, "Marta mara hun ab tak!"
-Twist: The robot produces a "Boredom Jar" filled with tiny scrolls, each with a creative activity she hasn\'t tried yet.
+Story: Ria has finished everything — drawing, puzzle, snack, dance — and declares, "Ab kuchh nahi bacha!"
+Twist: The robot produces a "Boredom Jar" filled with tiny scrolls, each with a creative activity she hasn't tried yet.
 Resolution: Ria draws a scroll — "Build a blanket fort!" — and spends the afternoon on an epic adventure.
 Moral: Boredom is just the moment before creativity kicks in.
 ''',
@@ -1812,10 +1910,106 @@ Moral: Words have power — choose to protect or share wisely.
 Story: Ria sees a table full of international foods and declares, "Mujhe poori duniya khana hai!" — she wants to eat everything.
 Twist: The robot produces a world map where each country lights up as Ria tastes its cuisine — one bite at a time.
 Resolution: Ria marks countries on her adventure map, trying one dish per day and learning about each culture.
-Moral: The world is huge — best to explore it one bite at a time.
+    Moral: The world is huge — best to explore it one bite at a time.
 ''',
   ),
+  ...kSafetyHooks,
 ];
+
+/// Rewritten storyDetail values that replace the originals at runtime.
+/// Each value uses the Story:/Twist:/Resolution:/Moral: label format
+/// the offline generator expects. Built-in ideas are preferred over
+/// the inline storyDetail on the HookIdea so updates can improve the
+/// stories without modifying the const list above.
+const kRewrittenStories = <String, String>{
+  'h01': '''
+Story: Bus ka time ho raha hai. Mumma jhukke Ria ke joote pehnane lagti hai. Ria uska haath jhatak deti hai: "Main khud!" Dono joote ulte pairon mein, aur Ria pengun ki tarah chalti hai.
+Twist: Mumma ka haath phir aage badhta hai… aur beech hawa mein ruk jaata hai. Mumma hothon ko dabaake dheere dheere paanch tak ginti hai.
+Resolution: Ria neeche dekhti hai: "Mumma, ye ulta hai?" Mumma: "Tum batao." Ria joote badalti hai. Bus ka horn bajta hai. Ria khadi hokar: "Dekho!"
+Moral: Paanch second ruk jao, baaki Ria kar legi.
+''',
+  'h02': '''
+Story: Screen time ka waqt ho raha hai. Mumma: "Phone band." Ria: "Bas paanch minute!" Mumma phone le leti hai aur Ria zor zor se rone lagti hai.
+Twist: Ria phone ke liye nahi ro rahi. Cartoon beech mep cut off ho gaya, aur woh jaanna chahti hai ki aage kya hua.
+Resolution: Agla din Mumma pehle puchhti hai: "Ye episode kab khatam hoga?" Episode khatam hota hai, Ria khud bolti hai "Khatam!" aur phone Mumma ko de deti hai.
+Moral: Beech mein nahi, khatam hone par.
+''',
+  'h03': '''
+Story: Rio ka tower teesri baar girta hai. Woh blocks ko haath se door karke bolta hai: "Mujhe nahi aata!"
+Twist: Ria madad karne aati hai, Rio uska haath hata deta hai: "Main karunga!" Mumma chup chaap do bade blocks Rio ke paas rakh deti hai aur kuch nahi bolti.
+Resolution: Rio bade blocks ko neeche rakhta hai. Tower khada rehta hai. Rio: "Dekho, khada hai!" Ria taali bajati hai.
+Moral: Hint do, haath mat lagao.
+''',
+  'h05': '''
+Story: Lights band. Ria: "Mumma, paani." Mumma deti hai. Ria: "Susu." Mumma le jaati hai. Ria: "Ek aur kahani."
+Twist: Mumma ko samajh aata hai ki roz yahi sab hota hai. Agli raat woh bottle pehle se stool par rakh deti hai, aur susu kahani se pehle karwa deti hai.
+Resolution: Lights band. Ria: "Paani?" Bottle dekhti hai: "Yahan hai!" Phir lambi chuppi: "Ab kya..." Phir: "Good night, Mumma."
+Moral: Jo roz maanga jaata hai, pehle se rakh do.
+''',
+  'h07': '''
+Story: Ria kambal ke andar chhup gayi hai: "Brush nahi karungi!" Mumma ke haath mein brush hai.
+Twist: Mumma kambal ko haath nahi lagati. Woh Cuty ko uthake kehti hai: "Cuty ke daant bahut gande hain. Ria, tum saaf karogi?"
+Resolution: Ria kambal se sar nikalti hai, chhota brush leti hai, aur Cuty ke daat saaf karti hai. Phir kehti hai: "Ab meri baari."
+Moral: Pehle Cuty, phir Ria.
+''',
+  'h08': '''
+Story: Plate mein broccoli. Ria haath baandhke baithi hai. Mumma kuch nahi bolti.
+Twist: Papa ek broccoli uthake bolta hai: "Ye chhota ped hai. Main giant hoon." Woh "gap" karke kha leta hai. Ria hasne lagti hai.
+Resolution: Ria ek chhota ped uthati hai, thoda kutarti hai, chehra banati hai… chabati hai. "Theek hai." Mumma kuch nahi kehti, bas plate mein ek aur rakh deti hai.
+Moral: Ek bite bhi jeet hai.
+''',
+  'h12': '''
+Story: Saat bajke das minute. Ria abhi tak kambal mein hai. Mumma teen baar utha chuki hai.
+Twist: Mumma kehti hai: "Theek hai, main bhi so jaati hoon." Woh Ria ke bagal mein let jaati hai aur aankhein band kar leti hai. Ria ek aankh kholti hai: "Mumma, uthho! School late ho jayega!"
+Resolution: Ria Mumma ko kheench kar uthati hai. Dono das minute mein ready ho jaate hain.
+Moral: Kabhi kabhi role badal do.
+''',
+  'h13': '''
+Story: Ria zameen par drawing bana rahi hai. Mumma rasoi se bulati hai: "Khana!" Phir: "Ria, khana!" Teesri baar awaaz oonchi hoti hai. Ria ko kuch sunai hi nahi deta.
+Twist: Mumma aati hai, ghutnon par baithti hai, aur dheere se kehti hai: "Ria." Ria turant sar uthati hai.
+Resolution: Mumma: "Khana ready hai. Drawing yahin rahegi, promise." Ria: "Kitni der?" "Paanch minute." Ria uthke chal padti hai.
+Moral: Paas jaake bolo, chillao mat.
+''',
+  'h16': '''
+Story: Papa ke liye couver aaya hai. Rio ka naya robot toy bhi aaya hai. Rio robot ko dekhta bhi nahi aur khaali dabbe mein ghus jaata hai.
+Twist: Papa dabba uthaane aate hain: "Ye kabaad mein jayega." Rio: "Ye mera rocket hai!"
+Resolution: Papa robot ko dabbe mein bitha dete hain: "Ye astronaut hai." Dono ulti ginti karte hain: "5, 4, 3, 2, 1… chalo!"
+Moral: Dabba hi kaafi hai.
+''',
+  'h17': '''
+Story: Khidki ke paas Ria: "Mumma, baarish mein khelna hai!" Mumma: "Abhi nahi, bijli chamak rahi hai." Ria: "Toh bijli ko bolo band ho jaye!"
+Twist: Mumma: "Bijli mere kehne se nahi ruki." Ria khidki par udaas chehra banati hai. Peeth karke baithi, par har gadgadahat par chaunk jaati hai aur dikhayi nahi deti ki nahi chaunki.
+Resolution: Bijli ruk jaati hai. Mumma: "Boots lao." Ria ulte pairon mein boots pehenke daudti hai. Dono puddle mein kudte hain: "Ek, do, teen… kood!"
+Moral: Bijli ne sun li, boots se nahi.
+''',
+  'h19': '''
+Story: Parking mein Mumma: "Rio, mat bhaago!" Rio aur tez bhaagta hai.
+Twist: Mumma daud ke pakadti hai aur ab alag bolti hai: "Rio, meri ungli pakdo." Rio ruk jaata hai: "Kyun?"
+Resolution: "Gaadi aati hai. Ungli pakdo, hum dono saath cross karenge." Rio ungli kaske pakad leta hai. Dono dhire dhire chalte hain.
+Moral: "Mat" nahi, "ungli pakdo".
+''',
+  'pal03': '''
+Story: Mumma: "Aaj chocolate nahi." Ria: "Kyun nahi?!" Rio zameen par baith jaata hai, haath baandhke: "Mujhe chahiye!" Cuty dono ko dekta hai.
+Twist: Mumma fridge kholti hai: "Aaj do choice: kela ya seb." Ria aur Rio kela aur seb par ladne lagte hain.
+Resolution: Cuty chupchaap Mumma ke paas jaata hai, gajar uthata hai aur kutarne lagta hai. Dono bachche dekhte rehte hain aur phir jaldi se apna fal utha lete hain.
+Moral: Do option do, teen nahi.
+''',
+  'pal19': '''
+Story: Subah ki daud. Mumma: "Joote pehno! Daudo mat! Bottle kahan hai? Idhar aao!" Rio sab sunta rehta hai.
+Twist: Rio Cuty ko pakadke bilkul Mumma ki tarah bolta hai: "Joote pehno! Daudo mat! Bottle kahan hai? Idhar aao!"
+Resolution: Mumma jam jaati hai, phir hans padti hai: "Main itna bolti hoon?" Rio: "Haan, roz."
+Moral: Bachche wahi bolte hain jo roz sunte hain.
+''',
+};
+
+/// Built-in hooks with [kRewrittenStories] applied where present.
+/// Callers use this instead of [kDefaultHooks] so that rewritten story
+/// detail is preferred over the inline const value.
+final kDefaultHooksWithRewrite = kDefaultHooks
+    .map((h) => kRewrittenStories.containsKey(h.id)
+        ? h.copyWith(storyDetail: kRewrittenStories[h.id]!)
+        : h)
+    .toList();
 
 // ── The 14-Day Post Packages ───────────────────────────────────────────────────
 

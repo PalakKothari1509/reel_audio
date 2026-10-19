@@ -199,6 +199,7 @@ const List<CharOption> kCharacterOptions = [
   (id: 'ria', name: 'Ria', emoji: '🌸'),
   (id: 'rio', name: 'Rio', emoji: '💙'),
   (id: 'cuty', name: 'Cuty', emoji: '🐰'),
+  (id: 'robot', name: 'Robot', emoji: '🤖'),
   (id: 'mumma', name: 'Mumma', emoji: '👩'),
   (id: 'papa', name: 'Papa', emoji: '👨'),
   (id: 'daadi', name: 'Daadi', emoji: '👵'),
@@ -206,7 +207,7 @@ const List<CharOption> kCharacterOptions = [
 ];
 
 const List<String> kCharacterNames =
-    ['Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Teacher'];
+    ['Ria', 'Rio', 'Cuty', 'Robot', 'Mumma', 'Papa', 'Daadi', 'Teacher'];
 
 const Map<String, String> kCharacterDescriptions = {
   'Ria': "toddler girl, light brown hair in two short pigtails tied with pink bows, "
@@ -223,6 +224,10 @@ const Map<String, String> kCharacterDescriptions = {
       "coral-pink fabric bow tied at the neck, very large round dark brown eyes with "
       "lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing "
       "upright like a toddler",
+  'Robot': "friendly AI robot, white and silver sleek body with soft edges, teal blue "
+      "accent lights along the chest and arms, expressive LED screen face that shows "
+      "gentle eyes and curious expressions, small retractable arms with precision grippers, "
+      "compact and child-height so it can interact at eye level with Ria and Rio",
   'Mumma': "young Indian mother, medium brown hair in a high bun with a few loose "
       "strands, fair-medium skin, large dark brown eyes, small red bindi, gold jhumka "
       "earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari "

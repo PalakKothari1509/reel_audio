@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'content_axes.dart';
+import 'content_collections.dart';
 import 'content_library.dart';
 import 'format_adapter.dart';
 
@@ -31,6 +32,12 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
   /// `all` member: the value comes straight off a filter chip.
   String _statusFilter = '';
 
+  /// Search query that matches across title, topic, and tags.
+  String _searchQuery = '';
+
+  /// Collection filter, or null for "all collections".
+  String? _selectedCollection;
+
   @override
   void initState() {
     super.initState();
@@ -46,9 +53,33 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
     });
   }
 
-  List<ContentLibraryItem> get _visible => _statusFilter.isEmpty
-      ? _items
-      : _items.where((i) => i.status.name == _statusFilter).toList();
+  List<ContentLibraryItem> get _visible =>
+      _items.where((i) => _matchesFilters(i)).toList();
+
+  bool _matchesFilters(ContentLibraryItem i) {
+    if (_statusFilter.isNotEmpty && i.status.name != _statusFilter) {
+      return false;
+    }
+    if (_searchQuery.isNotEmpty) {
+      final q = _searchQuery.toLowerCase();
+      if (!i.title.toLowerCase().contains(q) &&
+          !i.topic.toLowerCase().contains(q) &&
+          !i.tags.any((t) => t.toLowerCase().contains(q))) {
+        return false;
+      }
+    }
+    if (_selectedCollection != null &&
+        _collectionOfItem(i) != _selectedCollection) {
+      return false;
+    }
+    return true;
+  }
+
+  String _collectionOfItem(ContentLibraryItem item) {
+    final sourceId = item.sourceIdeaId;
+    if (sourceId == null || sourceId.isEmpty) return 'mine';
+    return collectionOf(sourceId);
+  }
 
   Future<void> _setStatus(ContentLibraryItem item, IdeaStatus status) async {
     await ContentLibraryStore.updateStatus(item.id, status);
@@ -93,6 +124,20 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: TextField(
+              key: const Key('search-field'),
+              decoration: InputDecoration(
+                hintText: 'Search ideas...',
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (v) => setState(() => _searchQuery = v),
+            ),
+          ),
+          _collectionChips(),
           _statusChips(),
           const Divider(height: 1),
           Expanded(child: _body()),
@@ -101,9 +146,62 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
     );
   }
 
-  Widget _statusChips() {
+  Widget _collectionChips() {
     final counts = <String, int>{};
     for (final i in _items) {
+      final c = _collectionOfItem(i);
+      counts[c] = (counts[c] ?? 0) + 1;
+    }
+
+    return SizedBox(
+      height: 52,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        children: [
+          _collectionChip(null, 'All', _items.length, _selectedCollection == null),
+          for (final c in kCollections)
+            if (c.id != 'mine')
+              _collectionChip(
+                c.id,
+                '${c.emoji} ${c.label}',
+                counts[c.id] ?? 0,
+                _selectedCollection == c.id,
+                dimmed: c.id == 'safety',
+              ),
+          _collectionChip('mine', '✏️ My Ideas', counts['mine'] ?? 0,
+              _selectedCollection == 'mine'),
+        ],
+      ),
+    );
+  }
+
+  Widget _collectionChip(
+    String? value,
+    String label,
+    int count,
+    bool selected, {
+    bool dimmed = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(count == 0 && value != null ? label : '$label ($count)'),
+        selected: selected,
+        onSelected: (_) =>
+            setState(() => _selectedCollection = selected ? null : value),
+        disabledColor: dimmed ? Colors.grey.shade300 : null,
+        labelStyle: TextStyle(
+          color: dimmed && !selected ? Colors.grey : null,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  Widget _statusChips() {
+    final counts = <String, int>{};
+    for (final i in _visible) {
       counts[i.status.name] = (counts[i.status.name] ?? 0) + 1;
     }
 
@@ -113,15 +211,15 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         children: [
-          _chip('', 'All', _items.length),
+          _statusChip('', 'All', _visible.length),
           for (final s in IdeaStatus.values)
-            _chip(s.name, s.label, counts[s.name] ?? 0),
+            _statusChip(s.name, s.label, counts[s.name] ?? 0),
         ],
       ),
     );
   }
 
-  Widget _chip(String value, String label, int count) {
+  Widget _statusChip(String value, String label, int count) {
     final selected = _statusFilter == value;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -146,52 +244,112 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
     }
     if (_visible.isEmpty) {
       return _empty(
-         'No ${IdeaStatus.values.byName(_statusFilter).label.toLowerCase()} '
-             'items',
-        'Try a different filter.',
+        'No matching items',
+        'Try changing your filters.',
       );
     }
 
-    return ListView.separated(
+    return _groupedByCollection();
+  }
+
+  /// Groups _visible items by collection, using the kCollections preferred
+  /// order with "My Ideas" last.
+  Widget _groupedByCollection() {
+    final grouped = <String, List<ContentLibraryItem>>{};
+    for (final item in _visible) {
+      final c = _collectionOfItem(item);
+      (grouped[c] ??= []).add(item);
+    }
+
+    final orderedKeys = <String>[];
+    for (final c in kCollections) {
+      if (c.id != 'mine' && grouped.containsKey(c.id)) {
+        orderedKeys.add(c.id);
+      }
+    }
+    if (grouped.containsKey('mine')) orderedKeys.add('mine');
+
+    return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _visible.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
+      itemCount: orderedKeys.length,
       itemBuilder: (context, index) {
-        final item = _visible[index];
-        return ListTile(
-          title: Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-          subtitle: Text(
-            '${item.format.label} · ${item.bucket.shortLabel} · '
-            '${item.formatOutputs.length} formats',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+        final collectionId = orderedKeys[index];
+        final items = grouped[collectionId]!;
+        final collection = kCollectionById[collectionId];
+
+        return ExpansionTile(
+          key: PageStorageKey('col-$collectionId'),
+          title: Text(
+            '${collection?.emoji ?? '✏️'} '
+            '${collection?.label ?? 'My Ideas'} (${items.length})',
           ),
-          trailing: PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'delete') {
-                _delete(item);
-                return;
-              }
-              _setStatus(item, IdeaStatus.values.byName(value));
-             },
-             itemBuilder: (context) => [
-               for (final s in IdeaStatus.values)
-                 if (s != item.status)
-                   PopupMenuItem(value: s.name, child: Text('Move to ${s.label}')),
-              const PopupMenuDivider(),
-              const PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-          ),
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ContentLibraryDetailScreen(itemId: item.id),
-              ),
-            );
-            await _load();
-          },
+          children: [
+            for (final item in items) _itemTile(item),
+          ],
         );
+      },
+    );
+  }
+
+  Widget _itemTile(ContentLibraryItem item) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: item.bucket.softColor,
+        child: Text(item.bucket.emoji, style: const TextStyle(fontSize: 20)),
+      ),
+      title: Text(
+        item.title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Wrap(
+        spacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            item.status.emoji,
+            style: const TextStyle(fontSize: 16),
+          ),
+          Text(item.status.label),
+          const SizedBox(width: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              item.format.emoji,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+          Text(item.format.label),
+        ],
+      ),
+      trailing: PopupMenuButton<String>(
+        onSelected: (value) {
+          if (value == 'delete') {
+            _delete(item);
+            return;
+          }
+          _setStatus(item, IdeaStatus.values.byName(value));
+        },
+        itemBuilder: (context) => [
+          for (final s in IdeaStatus.values)
+            if (s != item.status)
+              PopupMenuItem(value: s.name, child: Text('Move to ${s.label}')),
+          const PopupMenuDivider(),
+          const PopupMenuItem(value: 'delete', child: Text('Delete')),
+        ],
+      ),
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ContentLibraryDetailScreen(itemId: item.id),
+          ),
+        );
+        await _load();
       },
     );
   }

@@ -88,7 +88,7 @@ class StoryGenerator {
   ];
 
   List<HookIdea> get _available =>
-      kDefaultHooks.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
+      kDefaultHooksWithRewrite.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
 
   static String _extractLine(String detail, String label) {
     final lines = detail.split('\n');

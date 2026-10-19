@@ -549,7 +549,7 @@ class ProjectBackup {
       final incoming = (raw['hooks'] as List).whereType<Map<String, dynamic>>()
           .map(HookIdea.fromJson).where((h) => h.id.isNotEmpty);
       String sig(HookIdea h) => jsonEncode(h.toJson());
-      final defaults = {for (final d in kDefaultHooks) d.id: sig(d)};
+      final defaults = {for (final d in kDefaultHooksWithRewrite) d.id: sig(d)};
       final merged = [
         ...have.map((h) {
           final match = incoming.where((i) => i.id == h.id);
