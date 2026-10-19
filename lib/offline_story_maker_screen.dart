@@ -203,7 +203,27 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
   }
 
   void _selectHook(HookChoice hook) {
-    setState(() => _selectedStoryHook = hook);
+    setState(() {
+      _selectedStoryHook = hook;
+      _story = _story!.copyWith(hook: hook.text);
+      _status = 'Regenerating video prompts...';
+    });
+    _regenerateVideoPrompt();
+  }
+
+  Future<void> _regenerateVideoPrompt() async {
+    final story = _story!;
+    final videoGen = OfflineVideoPromptGenerator();
+    final videoResult = videoGen.generateFromStory(
+      story,
+      totalSeconds: _totalSeconds,
+      characters: _selectedChars,
+    );
+
+    setState(() {
+      _videoResult = videoResult;
+      _status = '';
+    });
   }
 
   void _toggleChar(String name) {
@@ -597,9 +617,9 @@ class _VideoPartCard extends StatelessWidget {
                         fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                 ),
-                IconButton(
+                TextButton.icon(
                   icon: const Icon(Icons.copy, size: 18),
-                  tooltip: 'Copy this prompt',
+                  label: const Text('Copy', style: TextStyle(fontSize: 12)),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: part.fullPrompt));
                     ScaffoldMessenger.of(context).showSnackBar(

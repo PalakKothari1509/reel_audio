@@ -173,6 +173,7 @@ const kHookCategories = [
   'Warm lesson',
   'Page & milestone',
   'Navratri',
+  'Series',
 ];
 
 /// The starting list. Merged from several AI suggestions and cut down hard: the same
@@ -188,6 +189,14 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Ria ne Mumma ka haath jhatak diya... joote khud pehnenge!',
     problem: 'Ria insists on putting her shoes on herself and pushes Mumma away',
     lesson: 'Thoda intezaar, aur bachcha khud seekh jaata hai',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma is getting Ria ready to leave, running late. She tries to put Ria's shoes on for her, but Ria insists on doing it herself. Ria firmly moves Mumma's hand away and struggles — the shoe goes on incorrectly and slips off.
+Twist: Mumma is tempted to take over completely, but realizes that doing it for Ria will not give her a chance to practice.
+Resolution: Mumma sits beside Ria instead of taking the shoe away. She turns the shoe correctly, points to where toes go, and lets Ria try again with guidance.
+Moral: Children need opportunities to practise everyday skills, even when it takes longer — patience and support build confidence.
+''',
   ),
   HookIdea(
     id: 'h02',
@@ -196,6 +205,14 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Phone band hua... aur Ria ka rona shuru!',
     problem: 'Ria melts down when screen time ends suddenly',
     lesson: 'Achanak nahi, pehle se bataakar band karo',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is watching a cartoon on a phone. Mumma tells her screen time is over and switches it off without warning. Ria immediately protests and demands "five more minutes."
+Twist: Ria becomes genuinely upset — not just protesting, but really distressed by the sudden stop.
+Resolution: Mumma acknowledges Ria's disappointment instead of arguing, introduces a visual timer for next time, and offers building blocks as an alternative activity. Ria gradually transitions.
+Moral: Advance warnings, predictable routines, and an appealing alternative may make transitions easier.
+''',
   ),
   HookIdea(
     id: 'h03',
@@ -204,6 +221,14 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Rio ka tower teesri baar gira... aur usne haar maan li.',
     problem: 'Rio gives up when his block tower keeps falling',
     lesson: 'Galti se hi seekhte hain, phir se try karo',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio builds a tall tower from blocks. It falls. He tries again — it falls again. On his third attempt, Rio is frustrated and declares, "I can't do it!" Ria tries to help by building the tower herself, but Rio is more upset because he wanted to succeed on his own.
+Twist: Ria takes over the building, unintentionally making Rio feel worse.
+Resolution: Ria stops and sits beside him. Cuty nudges a wide base block toward Rio, and Ria suggests "let's put the big blocks on the bottom." Rio rebuilds with a broad base and succeeds.
+Moral: Mistakes can help children discover a different approach — support means helping them think, not doing it for them.
+''',
   ),
   HookIdea(
     id: 'h04',
@@ -212,6 +237,14 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Poore kamre mein khilone... aur Cuty gayab!',
     problem: 'Cuty is lost in the messy room; tidying turns into a treasure hunt',
     lesson: 'Saaf kamra, sab kuch saamne',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria and Rio have toys scattered all over the room. When Ria wants Cuty, she cannot find him. They search everywhere but keep getting distracted by other toys, making the room even messier.
+Twist: The search creates more clutter instead of finding Cuty.
+Resolution: Rio suggests clearing the floor first. They sort toys into baskets one area at a time, and finally find Cuty peacefully sleeping underneath a blanket in a cleared space.
+Moral: Putting things in predictable places makes them easier to find — and tidying can be a team effort.
+''',
   ),
   HookIdea(
     id: 'h05',
@@ -220,18 +253,42 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Lights band... aur Ria ko phir se paani chahiye.',
     problem: 'Bedtime stretches on with one more water, one more story, one more hug',
     lesson: 'Roz ek jaisa routine, neend jaldi aati hai',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma has finished Ria's bedtime routine — story read, lights dimmed, Ria tucked in. But Ria keeps asking for more: water, another hug, teddy moved closer. Mumma is patient but exhausted.
+Twist: The same requests repeat every night, and Mumma realizes she can prepare for the usual needs in advance.
+Resolution: The next evening, Mumma and Ria create a bedtime checklist — water placed, teddy chosen, hug given, story read. Ria participates and the routine feels calmer. The final request becomes a happy "good night!" instead of another demand.
+Moral: Predictable routines may reduce repeated requests and help children know what comes next.
+''',
   ),
   HookIdea(
     id: 'h06',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria and Rio both want to sit in the driver's seat of the toy car—"Mera pehle, mera pehle!"
+Twist: They start pushing each other, and the car almost falls over—Cuty tries to squeeze in too.
+Resolution: Mumma says, "Ek minute Ria, ek minute Rio"—they take turns, and the car is happy too.
+Moral: Sharing means everyone gets their turn—and the fun lasts longer.
+''',
     cover: 'Meri Car Hai!',
     opening: 'Ria aur Rio ne car do taraf se kheenchi...',
     problem: 'Ria and Rio fight over one toy car',
-    lesson: 'Baari baari khelne mein sabka mazaa',
+    lesson: 'Baari baari khelne mein sabka mazza',
   ),
   HookIdea(
     id: 'h07',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria hides under the blanket to avoid brushing her teeth—"Nahi! Mujhe brush karne ka maza nahi aata!"
+Twist: Papa starts singing a funny tooth-brushing song, and Rio copies him with a silly dance.
+Resolution: Ria joins in laughing, and before she knows it, her teeth are clean and sparkling.
+Moral: Turning routines into play makes even stubborn tasks feel like fun.
+''',
     cover: 'Brush Nahi Karungi!',
     opening: 'Ria kambal ke andar chhup gayi... brush ke dar se!',
     problem: 'Ria hides under the blanket to avoid brushing her teeth',
@@ -240,6 +297,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h08',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria pushes the broccoli on her plate away—"Broccoli? Bilkul nahi!"
+Twist: Mumma says, "Broccoli ke bhi best friends hote hain"—she makes a silly face with the broccoli.
+Resolution: Ria giggles and tries a tiny bite—then asks for more with a big smile.
+Moral: A little creativity on the plate can turn a stubborn "no" into a happy "yes."
+''',
     cover: 'Broccoli? Bilkul Nahi!',
     opening: 'Plate aage aayi... aur Ria ne haath baandh liye.',
     problem: 'Ria refuses vegetables at the table',
@@ -248,6 +313,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h09',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria wants to wear mismatched winter boots in summer—"Mummy, yeh hi pasand hai!"
+Twist: Mumma lets her try, but after 2 minutes Ria says, "Thandi lag rahi hain!"
+Resolution: They compromise—"Boots ghar mein, jootey bahar"—and Ria happily agrees.
+Moral: Small choices give big confidence—even if the boots don't last all day.
+''',
     cover: 'Apne Kapde Khud!',
     opening: 'Garmi mein bhi Ria ko winter boots hi pehenne hain!',
     problem: 'Ria wants to choose her own mismatched outfit',
@@ -258,6 +331,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal01',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma is at the park and sees three kids acting differently—"Yeh teeno kya kar rahe hain?"
+Twist: She recognizes Ria's determination, Rio's laughter, Cuty's quiet observation—"Mere bachche hi hain!"
+Resolution: The kids cheer—"Hum toh star hain!"—and they all pose for a selfie together.
+Moral: The audience creates the stars—every viewer is part of the story.
+''',
     cover: 'Which Kid Is Yours?',
     opening: 'Ria = tofani, Rio = ziddi, Cuty = sleep lover.',
     problem: 'Parents want to recognise their child in a playful character style',
@@ -266,6 +347,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal02',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria says "no" to broccoli, wants the same spoon every time, and suddenly needs Mumma—all in one morning.
+Twist: Mumma realizes each behavior is a tiny adventure—"Maine socha, maine maan liya, maine kar liya!"
+Resolution: Ria turns her 7 behaviors into a "Very Busy Day" song that makes the whole family laugh.
+Moral: Toddler behaviors aren't chaos—they're curiosity in motion.
+''',
     cover: '7 Things Every Toddler Does',
     opening: 'Says no, wants the same spoon, and suddenly needs Mumma.',
     problem: 'Parents need a humorous way to see their own daily chaos reflected back',
@@ -274,6 +363,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal03',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria wants to wear her princess dress to the grocery store—"Mummy, main princess banungi!"
+Twist: Mumma says no, Ria's face falls—"Par mujhe bahut pasand hai!"
+Resolution: Mumma offers a deal—"Jab ghar aayenge, toh princess dress pehn lo"—Ria agrees with a smile.
+Moral: Not all "no"s are endings—sometimes they're "not now" in disguise.
+''',
     cover: 'When Mumma Says No',
     opening: 'Ria protests, Rio refuses, Cuty quietly quietly gives in.',
     problem: 'The same parent boundary can trigger three very different reactions',
@@ -282,6 +379,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal04',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is playing and doesn't want to stop—"Bas 5 minute aur!"
+Twist: Papa sets a timer—"5 minute hai, phir cleanup time."
+Resolution: Ria cleans up exactly when the timer dings—"Maine kiya!"—and gets a hug.
+Moral: A countdown is better than a command—kids can own their transitions.
+''',
     cover: '5 Minute Warning!',
     opening: 'Five minutes left and suddenly every child hears a different story.',
     problem: 'Screen time transitions create a dramatic meltdown in most homes',
@@ -290,6 +395,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal05',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria says, "Mumma, your hair looks like a bird's nest!"—and Rio adds, "And Dada's beard looks like snow!"
+Twist: Cuty just smiles—"Toh kya bird and snow sabse achcha hai?"
+Resolution: Mumma laughs—"Haan, tum sabko lagta hai ki tum khoobsurat ho."
+Moral: Kids say the truth without a filter—sometimes it's the sweetest thing you'll hear.
+''',
     cover: 'Things Kids Say',
     opening: 'Mumma, I am not sleepy and then five seconds later, snores.',
     problem: 'Kids say the funniest things right before bedtime and during chaos',
@@ -298,6 +411,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal06',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is a "Sunshine Sprinter," Rio is a "Sleepy Cuddlebug," Cuty is a "Quiet Observer."
+Twist: Mumma tries to rush them all the same way—"Jaldi utho, jaldi khao!"
+Resolution: When Mumma adapts to each child's rhythm—"Ria, your energy! Rio, slow and steady! Cuty, take your time!"—everyone is ready.
+Moral: Morning is not a race—meeting each child where they are saves everyone stress.
+''',
     cover: 'Morning Personalities',
     opening: 'Ria wakes up ready to play, Rio wants five more minutes, and Cuty is still sleeping.',
     problem: 'Morning energy can look very different across siblings and personalities',
@@ -306,6 +427,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal07',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is ready in 2 minutes—"Maine sab kuch kar liya!"—but Rio forgot his shoes and Cuty is still in pajamas.
+Twist: Ria helps Rio find shoes and reminds Cuty—"Chalo, hum sab milkar nikalenge."
+Resolution: They leave the house together, Ria holding both hands—"Team complete!"
+Moral: Being ready means helping others who aren't—and that makes you a leader.
+''',
     cover: 'Ready to Go?',
     opening: 'One child is ready, one is searching for a toy, and one is still half asleep.',
     problem: 'Leaving the house is a daily family-level circus',
@@ -314,6 +443,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal08',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Something is missing—"Mumma, Ria ki pink bottle kahan hai?"—toys everywhere and Cuty has "borrowed" them.
+Twist: Mumma and Ria retrace the day—"Pehle yahan tha, phir wahan."
+Resolution: They find the bottle under the couch—"Haan! Cuty ne chhupayi thi!"—and Ria beams with pride.
+Moral: Every little detective deserves a magnifying glass—and a hug when they solve the case.
+''',
     cover: "Mumma's Little Detective",
     opening: 'Who did it? Toys everywhere, crumbs on the floor, and one very innocent rabbit.',
     problem: 'Kids create chaos and then deny it with talent',
@@ -322,6 +459,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal09',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria insists on putting on her own shoes—"Main khud karungi!"—but the shoes are on the wrong feet.
+Twist: Papa fake-thinks about it—"Kya pata chal gaya ki yeh galat side pe hain?"
+Resolution: Ria tries again, gets them right, and runs out—"Dekho, sahi hai!"—and Papa cheers.
+Moral: Doing things yourself is worth the struggle—even if they're backwards first.
+''',
     cover: 'Main Khud Karungi',
     opening: 'Let me do it myself and I will do it my way.',
     problem: 'Kids want independence even when the task is small',
@@ -330,6 +475,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal10',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Cuty suddenly says, "Mumma, tumne mujhe kal chocolate diya tha!"—referring to an event from 3 weeks ago.
+Twist: Ria adds, "Aur mujhe Saturday ko extra stories padhne wale!"
+Resolution: Mumma realizes kids remember the small moments—"Haan, maine tumhe suna tha."
+Moral: Children store up tiny kindness like treasures—you never know what they'll recall.
+''',
     cover: 'Little Things Kids Remember',
     opening: 'The bedtime story, the silly dance, the hug after a bad day.',
     problem: 'Parents often forget that tiny everyday moments become the memories children hold',
@@ -338,6 +491,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal11',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: At the supermarket, Ria wants everything in sight—"Mummy, yeh lelo!"—Rio grabs the toy, and Cuty just wants to go home.
+Twist: Mumma gives each one a task—"Ria, pick one treat. Rio, find the cereal. Cuty, carry the list."
+Resolution: The kids focus on their missions and forget the chaos—"Hamari shopping team badi achhi hai!"
+Moral: Engaging kids in a role turns shopping into teamwork.
+''',
     cover: 'At The Supermarket',
     opening: 'Ria wants everything, Rio wants the toy, Cuty is already ready to go home.',
     problem: 'Shopping turns into a mini-lesson in patience, negotiation and excitement',
@@ -346,6 +507,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal12',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Bedtime is different every night—Ria wants one more story, Rio asks for water five times, Cuty just wants to cuddle.
+Twist: Mumma handles all three at once—"Ek story, phir pani, phir cuddle time."
+Resolution: By the end of the routine, all three are snug—"Mummy, maine soch liya ki thoda bhi time nahi hai!"
+Moral: Bedtime is not a race—meeting each child's need makes the whole family restful.
+''',
     cover: 'Bedtime Personalities',
     opening: 'One child wants one more story, one wants one more screen, one is already asleep.',
     problem: 'Bedtime is always different inside the same house',
@@ -354,6 +523,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal13',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria's toy car has a broken wheel—"Nahi! Yeh toot gaya!"
+Twist: Papa takes it—"Kuchh fixing ki koshish kartey hain"—he tries superglue.
+Resolution: The car doesn't drive perfectly, but Ria says—"Ab yeh toh special car ban gayi!"—and pushes it with pride.
+Moral: Broken things don't lose their magic—just gain a new kind of charm.
+''',
     cover: 'Toy Broke!',
     opening: 'The toy breaks, everyone reacts differently, and then they learn together.',
     problem: 'Small losses feel huge when a child is attached to a favourite thing',
@@ -362,6 +539,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal14',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is crying over a torn drawing—"MERI drawing phaa gaya!"
+Twist: Mumma kneels down—"Yeh paper toh gaya, lekin tumhara rishta kabhi nahi jayega."
+Resolution: They make a new drawing together—"Nayi shuruaat!"—and Ria's tears turn to giggles.
+Moral: Big feelings over small things are real—and they deserve big love to match.
+''',
     cover: 'Big Feelings, Little Problems',
     opening: 'To a child, a broken biscuit or a missing sock feels enormous.',
     problem: 'Little problems can feel huge when your child is overwhelmed',
@@ -370,6 +555,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal15',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria wants to set her own house rules—"Mummy, main banaungi rule!"—she declares "No vegetables" and "24-hour dessert."
+Twist: Papa fake-thinks about it—"Kya pata chal gaya ki yeh kaam nahi karega?"
+Resolution: They negotiate—"Sabse pehle vegetables, phir dessert"—and Ria agrees with a high-five.
+Moral: Letting kids set their own rules teaches them to think before they demand.
+''',
     cover: "Ria's House Rules",
     opening: "Ria's five rules for fun, chaos and completely valid family drama.",
     problem: 'Kids often create their own rules and logic in the middle of daily life',
@@ -378,6 +571,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal16',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio's vocabulary for the day is just "BALL!"—and he says it 47 times.
+Twist: Everyone echoes "ball"—"Haan, ball!"—and Cuty gets confused—"Toh kya ball sabse achcha hai?"
+Resolution: They count all the balls in the house—"1, 2, 3, 4... ball hi ball!"—and Rio is satisfied.
+Moral: One word can fill a whole day with fun—when you lean into it together.
+''',
     cover: "Rio's Vocabulary",
     opening: "Rio's top words are no, mine, why, and one more time.",
     problem: 'The toddler vocabulary is often very short but very intense',
@@ -386,6 +587,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal17',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Cuty is quietly watching everyone—"Sab log kuchh kar rahe hain, par main kyunkar?"
+Twist: When Ria falls down, Cuty toddles over first—"Chaliye, main madad karungi!"
+Resolution: Cuty's quiet observation helps Ria feel better—"Cuty ne toh samajh liya!"—and Mumma smiles.
+Moral: The quietest voice often speaks the loudest truth.
+''',
     cover: 'Cuty Knows Best',
     opening: 'Cuty believes in naps, calm, and never rushing through life.',
     problem: 'Some children are highly sensitive to noise, pressure and movement',
@@ -394,6 +603,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal18',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria, Rio, and Cuty are all getting ready at the same time—"Mujhe brush karna hai, mujhe shoes pana hai, mujhe breakfast chahiye!"
+Twist: Mumma is running in three directions—"Thoda sa, thoda sa, thoda sa!"
+Resolution: They line up—"Ek ek karke"—and by the time Cuty is dressed, Ria is eating and Rio has shoes.
+Moral: Three kids, one mom—one line, one by one, makes everyone happy.
+''',
     cover: 'One House, Three Kids',
     opening: 'Same house, different universes: Ria, Rio and Cuty all live in their own rhythm.',
     problem: 'Each child has a different personality, energy level and way of reacting',
@@ -402,6 +619,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal19',
     category: 'Relatable',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma asks, "Jootey kahan rakha?"—and gets 5 different answers.
+Twist: Rio says, "Mummy ne kaha tha woh wahan!"—but Ria points to the couch.
+Resolution: They find the shoes, but Cuty has "borrowed" them as a drum—"Dum-dum-dum!"
+Moral: Memory is subjective—but family humor makes every search an adventure.
+''',
     cover: 'Mumma Says This Daily',
     opening: 'Put your shoes on, stop running, where is your bottle, and come here.',
     problem: 'Parents repeat the same phrases each day because the day repeats itself',
@@ -410,6 +635,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'pal20',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: One day they won't ask you to carry them, and they won't need the same little routines.
+Twist: Mumma pauses—"Abhi toh yeh sab theek hai, par kabhi nahi chahiye!"
+Resolution: She hugs them all—"Tumhe pyar karta hoon, yeh din kabhi nahi lautenge."
+Moral: Enjoy the little moments while they are still happening—they don't last forever.
+''',
     cover: 'Parent Memory',
     opening: "One day they won't ask you to carry them, and they won't need the same little routines.",
     problem: 'Parents need a reminder to value the current chaos before it changes',
@@ -420,6 +653,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h10',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio spills paint everywhere by accident—"Arre, badi galti ho gayi!"
+Twist: Mumma hands him a napkin—"Chhote bachcho ki badi badi galtiyan sabse achhi hoti hain."
+Resolution: Together they clean up, and Rio learns how easy it is to fix small messes.
+Moral: Mistakes happen—but cleaning up together makes them less scary.
+''',
     cover: '1 Galti, Bada Mess!',
     opening: 'Rio ke haath se saare rang gir gaye...',
     problem: 'Rio spills paint everywhere by accident',
@@ -428,6 +669,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h11',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio builds a tall block tower—"Dekho, kitni badi hai!"—then Ria accidentally knocks it down.
+Twist: Rio's face crumples, but Cuty hands him a block—"Phir se banayenge na?"
+Resolution: They rebuild together, making it even taller this time—with Rio, Ria, and Cuty each adding a floor.
+Moral: What falls down can always be built back up—especially when friends help.
+''',
     cover: 'Tower Gir Gaya!',
     opening: 'Rio zameen pe lot gaya... sirf blocks ke liye?',
     problem: 'Rio has a big tantrum when his tower breaks',
@@ -436,6 +685,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h12',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Morning is chaotic—Ria wants her blue dress, Rio lost his favorite toy, Cuty won't brush.
+Twist: Mumma takes a deep breath—"Ek minute sabko, chai peene ka time."
+Resolution: One by one, they get ready, and by the time Mumma sips her chai, everyone is smiling.
+Moral: A calm minute in the morning saves a hundred rushed minutes later.
+''',
     cover: 'Subah Ka Drama',
     opening: 'School ka time... aur Ria abhi tak bistar mein!',
     problem: 'Morning school prep turns into a battle',
@@ -444,6 +701,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h13',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is deep in her drawing—"Mummy, main painting kar rahi hoon!"—and ignores Mumma calling her for lunch.
+Twist: Mumma sits beside her and quietly adds a dot to the painting—"Ek nayi star hai tumhari painting mein."
+Resolution: Ria looks up and smiles—"Mummy bhi artist ban gayi!"—and follows her to lunch hand in hand.
+Moral: Sometimes quiet presence is louder than loud reminders.
+''',
     cover: 'Suno Na, Ria!',
     opening: 'Mumma teesri baar bulaa rahi hain... Ria sun hi nahi rahi.',
     problem: 'Ria ignores instructions called from across the room',
@@ -452,6 +717,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h14',
     category: 'Struggle first',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria's favorite hair clip breaks—"Nahi! Yeh toh bigad gaya!"
+Twist: Daadi takes the broken clip—"Kuchh toh achha hoga"—she turns it into a tiny mobile for Ria's window.
+Resolution: Ria hangs it by her window—"Ab yeh poora nayi si baat ban gayi!"—and waves good morning to it.
+Moral: What breaks can be remade—with a little love, it becomes something new.
+''',
     cover: 'Tod Diya!',
     opening: 'Car ke do tukde... aur dono ek doosre ko blame kar rahe hain.',
     problem: 'The shared toy breaks and both children blame each other',
@@ -462,6 +735,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h15',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria sees Mumma on the phone and says, "Phone bahut theek hai!"—but Mumma looks stressed.
+Twist: Ria brings Mumma a coloring page—"Mummy, yeh aapko khush karega!"
+Resolution: Mumma puts the phone down, hugs Ria, and says, "Tum hi toh asli phone hoke gaye."
+Moral: A child's love is the best connection—no screen can replace a cuddle.
+''',
     cover: 'Phone Asli Problem Nahi',
     opening: 'Ria ko phone se nahi, phone chhinne se gussa aata hai.',
     problem: 'The upset is about the sudden stop, not the screen itself',
@@ -470,6 +751,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h16',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio is bored with all his expensive toys—"Kuchh bhi nahi maza aa raha!"
+Twist: He spots an empty box—"Mummy, yeh dabba rocket ban sakta hai!"
+Resolution: Mumma helps him decorate it—"Dabba rocket tayar!"—and Rio blasts off across the living room.
+Moral: Simple things spark the biggest imagination.
+''',
     cover: 'Dabba Ban Gaya Rocket!',
     opening: 'Itne saare khilone... aur Rio ko chahiye khaali dabba?',
     problem: 'Expensive toys are ignored; an empty box becomes a spaceship',
@@ -478,6 +767,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h17',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria begs to play in the rain—"Mummy, bahaar khelo!"
+Twist: Mumma says no—"Abhi nahi, baad mein"—Ria thinks Mumma is being mean.
+Resolution: Later, Mumma shows her the rain boots—"Ab khelo, yeh paani pakadne ke liye!"
+Moral: Sometimes "no" means "wait"—the answer often comes with preparation.
+''',
     cover: 'Mumma Ne NO Kyun Bola?',
     opening: 'Baarish mein bahar jaana tha... Mumma ne mana kar diya!',
     problem: 'Ria thinks Mumma is mean for saying no to playing in the rain',
@@ -486,6 +783,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h18',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria shows off her drawing—"Mummy, maine khud banaya!"
+Twist: Mumma notices the crayon is broken—"Tumhe pata hai, yeh bhi toot gaya."
+Resolution: Ria says, "Par maine khud kiya!"—and Mumma realizes effort matters more than perfection.
+Moral: Praise the doing, not just the done—process builds confidence.
+''',
     cover: 'Tumne Khud Kiya!',
     opening: 'Ria ko "good girl" nahi... kuch aur sunna tha.',
     problem: 'Praising the effort instead of calling the child good',
@@ -494,6 +799,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h19',
     category: 'Surprising',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma says "Mat bhaago" at the crossing—Rio runs faster!
+Twist: Mumma changes—"Ruko, phir dheere chalo"—Rio walks right beside her.
+Resolution: They cross together, hand in hand, and Rio says, "Mummy aapka haath pakadna sabse achcha hai!"
+Moral: Tell them what TO do, not what NOT to do—children follow positive direction.
+''',
     cover: 'Bhaago Mat? Dheere Chalo!',
     opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
     problem: "A child ignores \"don't\" but follows a clear \"do\"",
@@ -504,6 +817,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h20',
     category: 'Warm lesson',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio breaks a rule again—"Maine wieder kar diya!"
+Twist: Instead of shouting, Mumma kneels down—"Haan beta, tumne kara. Par main tumhe pyar karti hoon."
+Resolution: Rio hugs her—"Mummy, main theek karunga!"—and promises to try again.
+Moral: Love holds the boundary—rules without connection create fear, not understanding.
+''',
     cover: 'Pyaar Bhi, Rule Bhi',
     opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
     problem: 'Holding a boundary kindly instead of giving in or shouting',
@@ -512,7 +833,15 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'h21',
     category: 'Warm lesson',
-    cover: 'Ria Ne Samjhaaya',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria watches Mumma struggle with the grocery bags—"Mummy, thak gayi ho?"
+Twist: Ria brings her tiny stool—"Mummy, baith jao, main saaf karti hoon."
+Resolution: They sit together—"Tum toh meri help karo gi!"—and the floor is clean in minutes.
+Moral: Children teach us as much as we teach them—sometimes they see our weariness first.
+''',
+    cover: 'Ria Ne Samjhaaya!',
     opening: 'Aaj Ria ne Mumma ko ek baat sikha di...',
     problem: 'A small child says something that makes the adult rethink',
     lesson: 'Bachche humse zyada samajhte hain',
@@ -522,6 +851,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'p05',
     category: 'Page & milestone',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria, Rio, and Cuty discover the 100th post card on the wall—"Dekho, humara 100th post!"
+Twist: Ria claims she made it—"Maine banaya!"—Rio says NO—"Nahi, maine kaha tha!"—and Cuty is sleeping on the camera.
+Resolution: Mumma shows them a slideshow of all 100 posts, ending with all three of them at the center—"Tum log hi toh hain hamari duniya."
+Moral: Every post is a team effort—stories, learning, masti, and everyday childhood all grown from one small idea.
+''',
     cover: '100 Posts. One World.',
     opening: '100 posts. ❤️ But who are we? Ria jumps in, Rio says NO, and Cuty is sleeping.',
     problem: 'A new visitor should understand Fun Learning With Palak, the three characters, and the page world in one reel',
@@ -534,6 +871,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'p06',
     category: 'Page & milestone',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma opens a time-lapse video—"100 posts pehle yehi soch rahi thi..." showing one empty wall where Ria's first drawing was taped.
+Twist: Rio points at the screen—"Woh toh sirf ek drawing thi!" and Cuty toddles over to see—"Ab toh bohot saari hain!"
+Resolution: The video ends with all three characters waving at the camera—"From one idea to our little world. ❤️"
+Moral: One small idea can grow into a little family and a community that learns together.
+''',
     cover: '100 Posts Ago...',
     opening: '100 posts ago, there was no big world — just one little idea and one little character.',
     problem: 'The page journey and its characters need an emotional introduction for new visitors',
@@ -546,10 +891,18 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'p07',
     category: 'Page & milestone',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria, Rio, and Cuty are excited about Post 100—"Mere saath photo lelo, maine banaya hai!"
+Twist: Each one claims they made it—Ria says she did, Rio says NO, Cuty is sleeping through it.
+Resolution: The final card reveals "POST #100" with all three of them—"Hum logon ne milkar banaya!"
+Moral: Milestones are team achievements—even the sleeping teammate deserves credit.
+''',
     cover: 'Who Made Post 100?',
     opening: 'Ria says she made Post 100. Rio says NO. Cuty says wake me up at Post 200.',
     problem: 'A milestone announcement can feel too formal unless the characters make it funny and memorable',
-    lesson: "Ria's masti, Rio's zidd and Cuty's neend are what make this little world special",
+    lesson: "Ria\'s masti, Rio's zidd and Cuty's neend are what make this little world special",
     postFormat: 'Funny Reel / Trial Reel',
     strategy: 'Use the funniest version for discovery. Ria claims credit, Rio argues, Cuty keeps sleeping, and the final card reveals POST #100 🎉.',
     caption: 'Who made it to Post #100? 😂\n\nRia says it was her. Rio says NO. Cuty is sleeping through the celebration.\n\nStill causing trouble, one little story at a time. ❤️',
@@ -558,6 +911,14 @@ const kDefaultHooks = <HookIdea>[
   HookIdea(
     id: 'p08',
     category: 'Page & milestone',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria, Rio, and Cuty give a tour of their house—"Yeh meri room, yeh rhi Rio ki, yeh Cuty ka play zone!"
+Twist: Each room has a special memory—"Yahan pe Ria ne pehli baar bike ki," "Yahan pe Rio ne pehli baar painting banayi."
+Resolution: The tour ends in the family room—"Yeh sab hamara hai, aur ham sab milke isse banaenge stories."
+Moral: Your little world is the biggest world—when you live inside it with love.
+''',
     cover: 'Meet Our Little World',
     opening: 'Meet Ria, Rio and Cuty — one is Tofani, one is Ziddi, and one just wants to sleep.',
     problem: 'New followers need a simple pinned introduction to the characters and the page promise',
@@ -618,6 +979,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Navratri mein bachche ko Garba se ghar kaise laayein? Thodi si planning, aur outing mein kam tension! #NavratriWithKids #ParentingHack #FunLearningWithPalak',
     pinnedComment: 'Tip: Garba se pehle 5 minute "one more song" sunao — phir packup signal dikhao',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is dancing happily at Garba, but when Mumma says it's time to leave, she protests—"Nahi, aur ghoomna hai!"
+Twist: Ria spots other parents also packing up their kids—"Dekho, sab bachche yahan se jaa rahe hain!"
+Resolution: Mumma gives Ria a "Garba star" sticker and lets her put her tiny bangles in her pocket to keep for home—"Kal phir milenge!"
+Moral: One more song, then it's time to go—good-byes feel easier with a small promise.
+''',
   ),
   HookIdea(
     id: 'navratri-bachcha-roye',
@@ -630,6 +999,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Garba night par bachcha enjoy karne ki jagah rone lage toh? Quiet corner aur safe space sabse pehle! #NavratriTips #ToddlerLife #FunLearningWithPalak',
     pinnedComment: 'Tip: Venue par pehle se quiet family corner dhoondh ke rakhein!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria and Rio are excited for Garba, but the loud dhol and flashing lights make Cuty cover her ears and cry.
+Twist: Mumma moves the kids to the quiet corner where Daadi is sitting—"Yahan se bhi Garba dikhai dega!"
+Resolution: Daadi teaches Cuty to clap along to a softer beat, and soon Cuty is smiling and joining in her own way.
+Moral: Every child celebrates differently—finding their comfort rhythm is its own kind of joy.
+''',
   ),
   HookIdea(
     id: 'navratri-junk-food',
@@ -642,6 +1019,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Garba jaate waqt bachche ke food tantrums ka kya karein? Lunch box mein favorite snack bhi saath le jao! #NavratriFood #ToddlerTips #FunLearningWithPalak',
     pinnedComment: 'Tip: Small snack pouch—5 bites before Garba, 5 after. Tantrum-free!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is ready for Garba but keeps asking for chips and sweets, saying "Mummy, bhookh lagi hai!"
+Twist: Mumma offers the healthy snack box she packed—"Pehle yeh khao, phir Garba!"—but Ria still wants the chips.
+Resolution: Mumma lets Ria choose one small sweet after the first round of Garba—balancing treat and fun.
+Moral: Hunger at parties is often excitement—redirect with healthy fuel, then a small treat.
+''',
   ),
   HookIdea(
     id: 'navratri-late-night',
@@ -654,6 +1039,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Late-night Garba vs bachche ki sleep! 9 baje tak enjoy karo, phir cozy bedtime. #LateNightParenting #Navratri #FunLearningWithPalak',
     pinnedComment: 'Tip: Toddler ka comfort item (chhoti blanket ya soft toy) zaroor saath rakhein.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: It's 10 PM and Ria is enjoying Garba, but suddenly she yawns and says, "Mummy, main thak gayi hoon."
+Twist: Mumma checks the clock—only one more song left, but Ria is already sleepy and cranky.
+Resolution: Mumma whispers, "Ek last dance, then straight to bed"—Ria dances one more time, then happily goes home.
+Moral: Late nights are okay sometimes, but knowing the end is near helps kids say goodbye.
+''',
   ),
   HookIdea(
     id: 'navratri-uncomfortable-outfit',
@@ -666,6 +1059,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Navratri outfit pehna diya, ab bachcha chidchid kar raha hai? Comfort pe focus karo—style apne aap aayega. #NavratriFashion #ToddlerLife #FunLearningWithPalak',
     pinnedComment: 'Tip: Heavy accessories pehnane se pehle 5-minute comfort test zaroor karein!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is excited to wear her new Navratri lehenga, but as soon as the heavy dupatta touches her shoulders, she starts fussing — "Nikal do, nikal do!"
+Twist: Mumma tries to distract her with the mirror and bangles, but the tight waistband makes it worse — "Mumma yeh dard hai!"
+Resolution: Mumma swaps the heavy dupatta for a light organza one and lets Ria help pick comfortable jhumkas — suddenly Ria is twirling and smiling.
+Moral: Comfort before style — when kids feel good, they shine.
+''',
   ),
   HookIdea(
     id: 'navratri-no-partner',
@@ -678,6 +1079,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Chhote bachchon ko Garba mein kaise include karein? Simple steps aur extra smiles—perfection se zyada khushi zaroori hai. #InclusiveGarba #KidsDance #FunLearningWithPalak',
     pinnedComment: 'Tip: Toddler ke saath simple 2-step taali banayein—kids energy copy karte hain!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria sees older kids dancing and wants to join, but she can't follow the complex steps—"Mummy, main nahi kar paa rahi!"
+Twist: Papa joins her with a simple 2-step twist—"Ria-style dance, papa-style dance!"—and soon Rio and Cuty copy them.
+Resolution: Ria's simple steps become the hit of the circle—everyone wants to learn the "toddler twist."
+Moral: You don't need to follow—it's better to create your own way to celebrate.
+''',
   ),
   HookIdea(
     id: 'navratri-late-ready',
@@ -690,6 +1099,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Garba party ke liye late ho rahe hain aur bachcha ready hi nahi? Game banao, pressure nahi! #LastMinuteGarba #ToddlerRoutine #FunLearningWithPalak',
     pinnedComment: 'Tip: Shoes pehne ke baad "Garba star" sticker challenge try karke dekhiye!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Garba is starting in 5 minutes, but Ria is still struggling with her jootneys—"Jootey pehne mein dikkat ho rahi hai!"
+Twist: Papa turns it into a game—"Jootey pehne, superhero ban jao!"—Ria giggles and slips them on.
+Resolution: Ria runs to join the Garba circle just in time, her "superhero jootneys" clicking as she dances.
+Moral: Rushing creates resistance—transform the race into play and everything falls into place.
+''',
   ),
   HookIdea(
     id: 'navratri-bumped-crowd',
@@ -702,6 +1119,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Crowded Garba mein toddler ko safe kaise rakhein? Family boundary banayein aur sides mein enjoy karein. #SafeGarba #CrowdedEvents #FunLearningWithPalak',
     pinnedComment: 'Tip: Event entry par hi family corner aur quiet spot pehle dekh lein.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: The Garba floor is packed and Ria gets accidentally bumped—she looks scared and clings to Mumma.
+Twist: Mumma lifts Ria onto her shoulders so she can see over the crowd—"Ab dekho, yeh sab kuch badiya lag raha hai!"
+Resolution: From above, Ria sees the beautiful lights and starts waving at other dancers—her fear turns to wonder.
+Moral: A new perspective can turn overwhelm into magic—sometimes elevation helps us see the beauty.
+''',
   ),
   HookIdea(
     id: 'navratri-phone-at-event',
@@ -714,6 +1139,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Garba mein phone ke bina toddler ko busy kaise rakhein? Chhota activity pouch—crayons, stickers aur finger puppets! #ScreenFreeKids #NavratriTips #FunLearningWithPalak',
     pinnedComment: 'Tip: Activity bag mein sirf 3-4 favorite items rakhein—focus bana rehta hai.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Garba has started but Ria keeps asking for her phone—"Mummy, phone dikhao, videos banana hai!"
+Twist: Mumma gives Ria a small bag with crayons and stickers—"Garba mein draw kar lo kya dekh rahe ho!"
+Resolution: Ria is busy drawing her Garba scene and forgets about the phone—she shows Mumma her artwork happily.
+Moral: Engagement beats screen time—small offline activities keep little hands busy during big moments.
+''',
   ),
   HookIdea(
     id: 'navratri-attention-prep',
@@ -726,6 +1159,14 @@ const kDefaultHooks = <HookIdea>[
     strategy: 'parenting-relatability',
     caption: 'Navratri preparations mein bachche ko time nahi mil raha? Unhe helping hands banaiye! #MomLife #NavratriPrep #FunLearningWithPalak',
     pinnedComment: 'Tip: Decor items arrange karne ya phool ginne ka task dijiye—bachcha khush!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma is decorating the house for Navratri, but Ria keeps interrupting—"Mere saath khelo, Mummy!"
+Twist: Mumma hands Ria a small basket—"Tum bhi Maa ki helper ho, phool lagao!"—Ria takes it seriously.
+Resolution: Ria carefully places marigolds around the space, proud of her contribution—"Mainne madad ki!"
+Moral: Invitations beat interruptions—when kids feel helpful, they don't need to compete for attention.
+''',
   ),
   // ── New 30s Reel Stories ─────────────────────────────────────────────────────
   /// Built-in offline story seeds. Each carries a full `storyDetail` with three
@@ -738,6 +1179,7 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Ria plate mein khana rakhti thi, par jab Mumma ne dekha toh plate zameen par gir gayi.',
     problem: 'Ria plate mein khana rakhti thi, par jab Mumma ne dekha toh plate zameen par gir gayi.',
     lesson: 'Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Ria places her plate with care on the dining table, but as she steps back, her foot catches the edge of a rug. The plate tilts — then crashes to the floor in slow motion.
@@ -753,6 +1195,7 @@ Moral: Saath milkar kaam karo toh koi bhi problem aasani se hal ho jati hai.
     opening: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
     problem: 'Rio apni jootiyein paheli pahli pehnna chaaha, lekin dono jooti ek doosre ke saath juite hue the.',
     lesson: 'Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Rio squats by the shoe rack, holding one sneaker in each hand. They are tangled together — left and right, laces crossed. He tugs, they don't separate.
@@ -768,6 +1211,7 @@ Moral: Jab saab milkar jooti jod lein, toh koi bhi single joota alag nahi lagta.
     opening: 'Ria aur Rio dono ek hi toy car ko pakad kar khushboo mein latke the.',
     problem: 'Ria aur Rio dono ek hi toy car ko pakad kar khushboo mein latke the.',
     lesson: 'Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur hota hai.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Ria and Rio both grab the same red-yellow toy car and tug in opposite directions on the living room rug. The car wobbles between them.
@@ -783,6 +1227,7 @@ Moral: Share karne se toy gam nahi hota, saath khelne se toh mazaa hi kuchh aur 
     opening: 'Rio ne bhi kaha — Gobhi nahi khaoongi! — jab Mumma ne gobhi rakhi.',
     problem: 'Rio ne bhi kaha — "Gobhi nahi khaoongi!" — jab Mumma ne gobhi rakhi.',
     lesson: 'Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Mumma places a plate of gobhi on the dining table. Rio pushes it away dramatically — "Gobhi nahi khaoongi!"
@@ -798,6 +1243,7 @@ Moral: Jab koi bhi cheez thoda maza aa jata hai, tabhi toh woh khayi jati hai.
     opening: 'Ria ne brush pakda, par turant se poochh li — "Mujhe brush nahi karna!"',
     problem: 'Ria ne brush pakda, par turant se poochh li — "Mujhe brush nahi karna!"',
     lesson: 'Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Ria grabs her toothbrush but immediately protests — "Mujhe brush nahi karna!" She drops it in the sink.
@@ -813,6 +1259,7 @@ Moral: Jab koi aur dikhaye gaal, toh brush bhi khelke lag jata hai.
     opening: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab papa ne time khatam kaha.',
     problem: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab papa ne time khatam kaha.',
     lesson: 'Game toh game hota hai, lekin har game ek nayi baat sunane dega.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Park time is over. Papa checks his watch — "Time to go." Ria plants her feet — "Main yahan nahi jaungi park se!"
@@ -828,6 +1275,7 @@ Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega.
     opening: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions.',
     problem: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions on the living room rug.',
     lesson: 'Sharing something means twice the fun, not twice the fight.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Ria and Rio both grab the same red-yellow toy car and tug in opposite directions on the living room rug. The car wobbles between them.
@@ -843,6 +1291,7 @@ Moral: Sharing something means twice the fun, not twice the fight.
     opening: 'Rio carefully balanced the final wooden block on a tall colorful tower.',
     problem: 'Rio carefully balanced the final wooden block on a tall colorful tower while afternoon sun streamed through the window.',
     lesson: 'A mistake is just a new game waiting to be named.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Rio balances the final wooden block on a tall tower, proud of his creation.
@@ -858,6 +1307,7 @@ Moral: A mistake is just a new game waiting to be named.
     opening: 'A bright snack box sat just out of reach on the low kitchen counter ledge.',
     problem: 'A bright snack box sat just out of reach on the low kitchen counter ledge, and Ria stretched on tiptoes trying to grab it.',
     lesson: 'When you lift each other up, even high shelves become easy.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Ria stretches on tiptoes to grab a snack box on the low kitchen counter, but her tiptoes barely reach halfway.
@@ -873,6 +1323,7 @@ Moral: When you lift each other up, even high shelves become easy.
     opening: 'At 9:30 PM, Ria dropped the bombshell — tomorrow was Annual Day!',
     problem: 'At 9:30 PM, Ria casually dropped the bombshell — tomorrow was Annual Day and she needed a yellow costume and cardboard sunflower prop.',
     lesson: 'Even the messiest all-nighter ends when everyone works as a team.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: At 9:30 PM, Ria drops the bombshell — Annual Day is tomorrow and she needs a costume.
@@ -888,6 +1339,7 @@ Moral: Even the messiest all-nighter ends when everyone works as a team.
     opening: 'Mummy found the living room in complete chaotic toddler disarray.',
     problem: 'Mummy found the living room in complete chaotic toddler disarray — crayons, blocks, cushions, and snack bowls scattered everywhere.',
     lesson: 'Ten minutes of peace and a lifetime of love — perfectly balanced.',
+    forApp: true,
     usedOn: '',
     storyDetail: '''
 PART 1: Mummy finds the living room in complete chaotic toddler disarray. She rolls up her sleeves and begins the satisfying deep clean.
@@ -896,7 +1348,7 @@ Resolution: She sits back on the pristine sofa with her chai in pure bliss — t
 Moral: Ten minutes of peace and a lifetime of love — perfectly balanced.
 ''',
   ),
-  // ── New 30s Reel Stories ── (moved from story_generator_offline.dart duplicates)
+  // ── New 30s Reel Stories ─────────────────────────────────────────────────────
   HookIdea(
     id: 'dangerous-silence',
     category: 'Relatable',
@@ -955,6 +1407,412 @@ Story: Mummy snapped a big round cookie in half to share, and Ria acted dramatic
 Twist: Rio became "Doctor Rio," dipping his finger in warm milk to glue the broken halves back together, but Cuty took a nibble right on the seam.
 Resolution: Instead of tears, both kids burst into uncontrollable belly laughs — the broken biscuit became the funniest thing ever.
 Moral: A shared laugh turns every broken thing into something sweet.
+''',
+  ),
+
+  // ── Ria Talking to AI Robot Series ─────────────────────────────────────────────
+  // 20 scripted reel ideas following a consistent character-driven comedy format.
+  // Each uses Story:/Twist:/Resolution:/Moral: labels inside storyDetail so
+  // the offline StoryGenerator can parse and break it into video parts.
+
+  HookIdea(
+    id: 'robot-01',
+    category: 'Series',
+    cover: 'Robot, Mumma Has Lost Her Mind!',
+    opening: 'Robot, mujhe lagta hai Mumma ka dimaag kho gaya!',
+    problem: 'Mumma cannot find her phone while it is already in her hand.',
+    lesson: 'The robot literally scanned every room and handed the phone back, helping Mumma realise she was holding it all along.',
+    postFormat: 'Reel',
+    strategy: 'AI comedy misunderstanding, family situation, physical comedy payoff',
+    caption: 'Jab Mumma ka phone haath mein hai lekin woh kho dhundh rahi hai... aur Robot ne phone wapas dedi! 😂 Har mummy ko yehi dekhna chahiye. #RiaAndRobot #IndianMomLife #FunLearningWithPalak',
+    pinnedComment: 'We all need a personal robot who tells us the truth — and hands back our phone from our own hand! 🤖',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma frantically pats her pockets, checks every surface, asks everyone — her phone is lost. But she is holding it in her hand the whole time.
+Twist: Ria calls the robot for help. The robot takes her request literally: "Mumma has lost her mind — scanning for lost objects in the vicinity."  It starts waving sensors and scanning Mumma's head.
+Resolution: The robot\'s scanner beeps and points at Mumma's own hand — the phone was there the entire time.  Mumma laughs at the absurdity.
+Moral: Sometimes the simplest solution is right in front of you — and a robot\'s logic can remind you.
+''',
+  ),
+  HookIdea(
+    id: 'robot-02',
+    category: 'Series',
+    cover: 'My Tummy Doesn\'t Like Palak!',
+    opening: 'Robot, meri tummy ko palak bilkul pasand nahi!',
+    problem: 'A child rejects dinner before even trying it, pushing the plate away.',
+    lesson: 'The robot suggested a tiny bite first, and Ria discovered palak was actually yummy with a little cheese.',
+    postFormat: 'Reel',
+    strategy: 'Food refusal humor, gentle parenting lesson',
+    caption: 'Palak se pehle ek bite, aur suddenly "Mumma, aur thoda dena!" 😂 Har meal time fight ka asan hal. #RiaAndRobot #ToddlerMeals #FunLearningWithPalak',
+    pinnedComment: 'The robot was right — one tiny bite can change everything! 👶',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria pushes her dinner plate away, declaring her tummy hates palak and refusing to even try it.
+Twist: The robot interprets "tummy doesn't like palak" as a medical emergency and starts a gentle diagnostic routine — checking temperature, offering a tiny spoon.
+Resolution: After one small bite with cheese, Ria grins and asks for more — "Mumma, palak actually tasty hai!"
+Moral: Sometimes you have to try before you decide you don't like something.
+''',
+  ),
+  HookIdea(
+    id: 'robot-03',
+    category: 'Series',
+    cover: 'Can You Fix My Broken Heart?',
+    opening: 'Robot, Rio ne mera heart tod diya!',
+    problem: 'Ria\'s sibling damages her favorite toy and doesn\'t apologise, leaving Ria upset.',
+    lesson: 'The robot suggested a heart-shaped bandage and helped Ria talk to Rio about sharing and saying sorry.',
+    postFormat: 'Reel',
+    strategy: 'Emotional expression, sibling dynamics, heart-shaped bandage visual',
+    caption: 'Jab bhaiya ne toy kharab kar diya, toh Robot ne diya heart bandage! ❤️ Sibling love, properly patched. #RiaAndRobot #SiblingLove #FunLearningWithPalak',
+    pinnedComment: 'Every broken heart needs a robot and a heart-shaped bandage. ❤️🩹',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio accidentally breaks Ria\'s favorite toy, and Ria is devastated, declaring her heart is broken.
+Twist: The robot takes "broken heart" literally and produces a large adhesive bandage shaped like a heart, applying it to Ria\'s chest.
+Resolution: Seeing the silly bandage, both kids laugh, Rio apologises, and they repair the toy together with the robot\'s help.
+Moral: A little humor and teamwork can mend both toys and feelings.
+''',
+  ),
+  HookIdea(
+    id: 'robot-04',
+    category: 'Series',
+    cover: 'Make My Mess Disappear!',
+    opening: 'Robot, meri room ki mess gayab kar do!',
+    problem: 'Ria wants a clean room instantly without doing any cleanup herself.',
+    lesson: 'The robot started tidying, but Ria joined in and realized cleanup can be fun with a dance playlist.',
+    postFormat: 'Reel',
+    strategy: 'Chore avoidance comedy, collaborative cleanup dance',
+    caption: 'Mess gayab karne ke liye ek robot nahi… ek dance playlist aur Ria milake hi chahiye! 💃🧹 #RiaAndRobot #CleanUpDance #FunLearningWithPalak',
+    pinnedComment: 'The robot may start, but Ria finishing makes it a win! 10/10 teamwork.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria demands the robot make her room\'s mess disappear instantly, refusing to lift a finger.
+Twist: The robot starts tidying up efficiently, but Ria realises she is still standing there.  She tries to avoid cleaning by hiding behind the robot.
+Resolution: The robot puts on a cheery song and starts dancing while tidying — Ria joins in, and soon both are cleaning to the beat.
+Moral: Work feels lighter when you do it together — even if a robot started the dance.
+''',
+  ),
+  HookIdea(
+    id: 'robot-05',
+    category: 'Series',
+    cover: 'Give Me a Break!',
+    opening: 'Robot, mujhe bas ek break chahiye!',
+    problem: 'Ria feels overwhelmed by too many instructions and needs space to breathe.',
+    lesson: 'The robot suggested a 5-minute quiet corner with breathing cards that helped Ria reset.',
+    postFormat: 'Reel',
+    strategy: 'Overstimulation handling, emotional regulation, breathing exercise',
+    caption: 'Jab sabse zindagi mein bahut kuchh ho raha hai... toh ek robot breathing cards ke saath madad karta hai! 🧘‍♀️ #RiaAndRobot #EmotionalRegulation #FunLearningWithPalak',
+    pinnedComment: 'Five minutes of quiet, a breathing card, and Ria was back to her playful self. 💙',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Overloaded by multiple instructions from adults, Ria throws her hands up and demands "just one break."
+Twist: The robot interprets it as a request for scheduled downtime and creates a mini "quiet pod" with breathing cards and a timer.
+Resolution: After five minutes of calm breathing in the quiet corner, Ria returns to her activities refreshed and able to focus.
+Moral: Everyone needs a break — and a robot can help create the right moment to reset.
+''',
+  ),
+  HookIdea(
+    id: 'robot-06',
+    category: 'Series',
+    cover: 'I Want to Sleep Like a Baby!',
+    opening: 'Robot, mujhe baby ki tarah sona hai!',
+    problem: 'Ria uses the idiom "sleep like a baby" expecting peaceful rest.',
+    lesson: 'The robot misunderstood and brought a baby monitor, a rattler, and scheduled 2 AM "baby feeding" checks.',
+    postFormat: 'Reel',
+    strategy: 'Idiom misunderstanding, baby paraphernalia comedy',
+    caption: 'Jab "sleep like a baby" ka matlab pata nahi hota... toh robot leke aata hai baby monitor! 🤖🍼 #RiaAndRobot #IdiomFail #FunLearningWithPalak',
+    pinnedComment: 'Pro tip: never say "sleep like a baby" to a robot that takes everything literally!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria says "I want to sleep like a baby!" expecting peaceful, deep sleep.
+Twist: The robot takes it literally and brings a baby monitor, rattler, and a feeding schedule — it starts checking on her every two hours "for the baby routine."
+Resolution: Ria clarifies she means sleeping peacefully, and the robot sets up a cozy nest with soft music instead.
+Moral: Words matter — especially when a robot is listening!
+''',
+  ),
+  HookIdea(
+    id: 'robot-07',
+    category: 'Series',
+    cover: 'Rio Is Driving Me Crazy!',
+    opening: 'Robot, Rio mujhe crazy kar raha hai!',
+    problem: 'Rio constantly copies everything Ria does, driving her slightly mad.',
+    lesson: 'The robot suggested a "me time" station and a "Rio time" station so both get individual play space.',
+    postFormat: 'Reel',
+    strategy: 'Sibling mimicry, parallel play setup, individual attention',
+    caption: 'Rio har baat copy karta hai, toh Robot ne banaya "me time" aur "Rio time" stations! ✨ #RiaAndRobot #SiblingDynamics #FunLearningWithPalak',
+    pinnedComment: 'A me-station and a Rio-station — problem solved! Everyone gets their own space. 😍',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Rio relentlessly copies everything Ria does — her poses, her words, her drawing style — and Ria reaches her limit.
+Twist: The robot sets up two parallel stations labeled "Ria Time" and "Rio Time" to give each child individual play space.
+Resolution: Ria discovers that Rio copying her can also mean copying her creativity, and they start a collaborative game instead.
+Moral: A little space helps, but shared creativity can turn copying into collaboration.
+''',
+  ),
+  HookIdea(
+    id: 'robot-08',
+    category: 'Series',
+    cover: 'Mumma Said Keep Your Shoes On!',
+    opening: 'Robot, sab mujhe jaldi-jaldi kyun bolte hain?',
+    problem: 'Everyone is rushing to leave, but Ria insists on putting her shoes on herself, causing delays.',
+    lesson: 'The robot suggested a shoe timer game — if Ria puts shoes on in 2 minutes, they get to choose the car song.',
+    postFormat: 'Reel',
+    strategy: 'Independence conflict, shoe timer game, family car song choice',
+    caption: 'Jaldi-jaldi ka time, par Ria apne joote khud pehengi! Robot ne banaya shoe timer game. ⏰👟 #RiaAndRobot #ShoeRace #FunLearningWithPalak',
+    pinnedComment: 'Two minutes to put on shoes = choosing the car song. Ria always wins! 😂',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Everyone is ready to leave except Ria, who insists on putting her shoes on herself — and taking forever to do it.
+Twist: The robot turns it into a game: "If you put your shoes on in two minutes, you choose the car song."  Ria agrees.
+Resolution: Racing against the timer, Ria gets her shoes on just as the doorbell rings — and gets to pick the song.
+Moral: A little game can turn a rush into fun — and independence into teamwork.
+''',
+  ),
+  HookIdea(
+    id: 'robot-09',
+    category: 'Series',
+    cover: 'My Drawing Is Wrong!',
+    opening: 'Robot, meri drawing kharab ho gayi!',
+    problem: 'Ria compares her drawing to an example and feels she made a mistake.',
+    lesson: 'The robot scanned Ria\'s drawing and created a magical animated version showing her unique style.',
+    postFormat: 'Reel',
+    strategy: 'Artistic confidence, drawing validation, animated gallery',
+    caption: 'Jab "kharab" drawing Robot ke saamne magic ban gayi! ✨ Har art perfect hota hai. #RiaAndRobot #ArtConfidence #FunLearningWithPalak',
+    pinnedComment: 'Your unique style is what makes your art special — the robot said so!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria shows her drawing to the robot, upset that it doesn\'t look like the example picture.
+Twist: The robot scans the drawing and projects an animated version, highlighting how her unique style brings the picture to life in ways the example never could.
+Resolution: Ria beams with pride — "Mere drawings alive hote hain!" — and wants to draw ten more.
+Moral: There\'s no "wrong" way to create art — your style is your superpower.
+''',
+  ),
+  HookIdea(
+    id: 'robot-10',
+    category: 'Series',
+    cover: 'Catch My Feelings!',
+    opening: 'Robot, main pehle happy thi... ab gussa aa raha hai!',
+    problem: 'Ria\'s block tower falls down and she suddenly feels angry, confused, and sad.',
+    lesson: 'The robot taught Ria the "feelings weather" method to name and process changing emotions.',
+    postFormat: 'Reel',
+    strategy: 'Emotional literacy, feelings weather chart, tower rebuilt together',
+    caption: 'Block tower gir gaya, feelings badal liye... lekin Robot ne sikhaaya feelings weather! 🌦️ #RiaAndRobot #FeelingsFirst #FunLearningWithPalak',
+    pinnedComment: 'Feelings are like weather — they change. But tower can always be rebuilt. ❤️',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria watches her carefully built block tower collapse and instantly feels happy \u2192 angry \u2192 sad all in five seconds.
+Twist: The robot shows a "feelings weather" chart and explains that emotions change like the weather — it\'s normal.
+Resolution: Ria identifies "stormy mad" then "sunny calm," and together they rebuild an even taller tower.
+Moral: Feelings come and go — what matters is learning to name them and keep building.
+''',
+  ),
+  HookIdea(
+    id: 'robot-11',
+    category: 'Series',
+    cover: 'My Hands Are Full!',
+    opening: 'Robot, mere haath bahut full hai!',
+    problem: 'Ria is juggling too many items and needs help carrying them all at once.',
+    lesson: 'The robot demonstrated the "one trip at a time" method so Ria could carry things efficiently.',
+    postFormat: 'Reel',
+    strategy: 'Task overload, efficient carrying method, priority sorting',
+    caption: 'Jab haath itne full ho jaye ki kuchh girne wala hai... Robot ne sikhaaya efficient method! 💪 #RiaAndRobot #LittleHelper #FunLearningWithPalak',
+    pinnedComment: 'One trip at a time — the robot\'s golden rule for busy little hands. ✨',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria tries to carry snacks, toys, and a book all at once — her hands are completely full and things start to fall.
+Twist: The robot takes everything literally and produces an absurdly large pocket dimension bag, overwhelming her further.
+Resolution: The robot simplifies: "One trip at a time." It helps Ria sort items by priority and carry them in batches.
+Moral: Sometimes doing less at once means getting more done.
+''',
+  ),
+  HookIdea(
+    id: 'robot-12',
+    category: 'Series',
+    cover: 'Mumma Has Eyes in the Back of Her Head!',
+    opening: 'Robot, Mumma ke saamne wala dimaag bhi dekhti hai!',
+    problem: 'Ria is caught doing something she shouldn\'t because Mumma "always knows."',
+    lesson: 'The robot explained the science of peripheral vision and how parents develop super-senses for their children.',
+    postFormat: 'Reel',
+    strategy: 'Parental sixth sense, peripheral vision science, playful acknowledgment',
+    caption: 'Robot ne bataya science: "Mumma ke aankhon mein 360 degree vision hoti hai!" 🔄👀 #RiaAndRobot #ParentSuperpower #FunLearningWithPalak',
+    pinnedComment: 'It\'s not magic — it\'s parental peripheral vision. We see EVERYTHING. 😉',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria tries to sneak a cookie but Mumma catches her instantly — "How did you see that?!"
+Twist: The robot scans Mumma and displays "Parental Super-Senses v2.0 — Peripheral Vision: ACTIVE" on its screen.
+Resolution: The robot explains how parents develop 360-degree awareness for their children, and Ria laughs instead of protests.
+Moral: Parents may not have literal eyes in the back of their heads — but their love sees everything.
+''',
+  ),
+  HookIdea(
+    id: 'robot-13',
+    category: 'Series',
+    cover: 'I Need Some Space!',
+    opening: 'Robot, mujhe thoda space chahiye!',
+    problem: 'Ria feels crowded by siblings or adults and needs breathing room.',
+    lesson: 'The robot suggested a physical "space bubble" marked with tape on the floor for quiet time.',
+    postFormat: 'Reel',
+    strategy: 'Personal boundaries, calm-down space, respectful communication',
+    caption: 'Jab thoda space chahiye ho... toh Robot banata hai "calm-down tent"! 🏕️ #RiaAndRobot #Boundaries #FunLearningWithPalak',
+    pinnedComment: 'Respecting "I need space" makes everyone calmer — kids and adults alike.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria feels overwhelmed by too many people crowding her — siblings, adults, even Cuty — and demands space.
+Twist: The robot interprets this literally and draws a large chalk circle on the floor: "One-person zone activated."
+Resolution: Everyone waits their turn to enter the space, and Ria emerges refreshed, understanding that asking for space is healthy.
+Moral: Needing space is normal — and respecting it helps everyone.
+''',
+  ),
+  HookIdea(
+    id: 'robot-14',
+    category: 'Series',
+    cover: 'Rio Stole My Thunder!',
+    opening: 'Robot, Rio ne mera thunder chura liya!',
+    problem: 'Ria had planned a special moment, but Rio accidentally or intentionally upstaged her.',
+    lesson: 'The robot helped Ria rehearse her "big moment" so she could shine even with an interruption.',
+    postFormat: 'Reel',
+    strategy: 'Sibling competition, sharing spotlight, confidence building',
+    caption: 'Jab bhaiya ne steal kar diya tha your thunder... toh Robot ne diya confidence booster! ⚡ #RiaAndRobot #BigSister #FunLearningWithPalak',
+    pinnedComment: 'Ria\'s moment was still magical — and Rio learned to be a supportive big brother.',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria had planned to show her dance routine at the family gathering, but Rio runs in singing the same song first.
+Twist: The robot helps Ria turn it into a duet — "Two stars shine brighter than one."
+Resolution: Ria performs with Rio, and they both get applause for being amazing teammates.
+Moral: Someone else\'s spotlight doesn\'t dim yours — it can even make yours brighter.
+''',
+  ),
+  HookIdea(
+    id: 'robot-15',
+    category: 'Series',
+    cover: 'My Brain Is Not Working!',
+    opening: 'Robot, meri soch toh bandh ho gayi!',
+    problem: 'Ria is frustrated she can\'t solve a puzzle or remember something she knows.',
+    lesson: 'The robot suggested a "brain reboot" — five minutes of movement, water, and a fresh start.',
+    postFormat: 'Reel',
+    strategy: 'Cognitive fatigue, brain reboot method, growth mindset',
+    caption: 'Jab dil bhi soch raha hai ki soch bandh ho gayi... toh Robot ka "brain reboot" chalega! 🧠✨ #RiaAndRobot #BrainBreak #FunLearningWithPalak',
+    pinnedComment: 'Movement + water + reset = brain works again. The robot knows best! 💧',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria is stuck on a puzzle — she knows the answer but her brain "says stop." She declares, "Meri soch bandh ho gayi!"
+Twist: The robot literally scans her head and shows a "Brain Busy" warning, then suggests a "brain reboot" protocol.
+Resolution: After five minutes of jumping, drinking water, and a fresh start, Ria solves the puzzle with a grin.
+Moral: Sometimes your brain needs a break — not a forced push.
+''',
+  ),
+  HookIdea(
+    id: 'robot-16',
+    category: 'Series',
+    cover: 'There Are Butterflies in My Tummy!',
+    opening: 'Robot, mere pitte mein buthadh phool rahe hain!',
+    problem: 'Ria gets pre-performance jitters before showing her artwork or speaking in front of others.',
+    lesson: 'The robot explained that "butterflies" are excitement and courage, not fear.',
+    postFormat: 'Reel',
+    strategy: 'Performance anxiety, excitement vs fear, courage visualization',
+    caption: 'Jab "butterflies" ke matlab excitement hota hai, na ki darr... toh Robot ne samjhaana mushkil nahi! 🦋 #RiaAndRobot #Courage #FunLearningWithPalak',
+    pinnedComment: 'Those butterflies? They\'re cheering you on, not warning you away. 💪',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria feels butterflies in her tummy before showing her drawing to the class and says the robot about them.
+Twist: The robot scans her and displays "Excitement Detected: 97% — Butterflies = Courage, Not Fear."
+Resolution: The robot teaches her a "butterfly breath" and Ria confidently shows her drawing to everyone.
+Moral: Butterflies mean you care — and caring is the first step to courage.
+''',
+  ),
+  HookIdea(
+    id: 'robot-17',
+    category: 'Series',
+    cover: 'I\'m Dying of Boredom!',
+    opening: 'Robot, marta mara hun ab tak!',
+    problem: 'Ria has finished all her activities and declares nothing is left to do.',
+    lesson: 'The robot suggested the "boredom jar" — a list of simple activities she can pick from.',
+    postFormat: 'Reel',
+    strategy: 'Boredom productivity, creativity prompts, activity jar system',
+    caption: 'Marta mara hone ka time, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak',
+    pinnedComment: 'A boredom jar is a happiness jar waiting to happen. Which activity will you pick? ❤️',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria has finished everything — drawing, puzzle, snack, dance — and declares, "Marta mara hun ab tak!"
+Twist: The robot produces a "Boredom Jar" filled with tiny scrolls, each with a creative activity she hasn\'t tried yet.
+Resolution: Ria draws a scroll — "Build a blanket fort!" — and spends the afternoon on an epic adventure.
+Moral: Boredom is just the moment before creativity kicks in.
+''',
+  ),
+  HookIdea(
+    id: 'robot-18',
+    category: 'Series',
+    cover: 'Mumma Is on Cloud Nine!',
+    opening: 'Robot, Mumma badi khush hai... jaise koi clouds pile ho rahe hain!',
+    problem: 'Mumma is beaming with happiness after receiving good news, and Ria wants to understand her joy.',
+    lesson: 'The robot showed Ria a visual "happiness cloud" that matched Mumma\'s mood and how joy multiplies.',
+    postFormat: 'Reel',
+    strategy: 'Emotional contagion, happiness visualization, parent-child bonding',
+    caption: 'Jab Mumma khush hai, toh Ria ke saath bhi clouds pile ho jaate hain! ☁️☁️ #RiaAndRobot #HappyFamily #FunLearningWithPalak',
+    pinnedComment: 'Joy is contagious — when Mumma smiles, the whole family floats. ❤️',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Mumma comes home glowing with happiness from good news, and Ria asks the robot why Mumma looks like she\'s on "cloud nine."
+Twist: The robot projects a visual happiness cloud above Mumma, showing how her positive energy spreads.
+Resolution: Ria joins the cloud, and both laugh as the robot measures "Family Joy: 150% capacity."
+Moral: Happiness shared is happiness multiplied.
+''',
+  ),
+  HookIdea(
+    id: 'robot-19',
+    category: 'Series',
+    cover: 'Rio Has a Big Mouth!',
+    opening: 'Robot, Rio ne meri baat sabko bata di!',
+    problem: 'Rio blurts out something private that Ria whispered in confidence.',
+    lesson: 'The robot helped Ria explain her boundaries to Rio using a "secret vs surprise" chart.',
+    postFormat: 'Reel',
+    strategy: 'Privacy boundaries, secret vs surprise, sibling communication',
+    caption: 'Jab Rio ne secret sabko bata diya... toh Robot ne banaya "secret vs surprise" chart! 🔐 #RiaAndRobot #Boundaries #FunLearningWithPalak',
+    pinnedComment: 'Secrets stay with you, surprises are meant to share — Ria learned the difference!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria whispers a secret to the robot, but Rio overhears and tells everyone — "Ria ne kaha ki Mumma ko surprise gift chahiye!"
+Twist: The robot creates a "Secret vs Surprise" chart explaining that secrets are private, but surprises are meant to share.
+Resolution: Rio understands the difference and promises to be a "secret keeper," earning Ria\'s forgiveness.
+Moral: Words have power — choose to protect or share wisely.
+''',
+  ),
+  HookIdea(
+    id: 'robot-20',
+    category: 'Series',
+    cover: 'I Want to Eat the Whole World!',
+    opening: 'Robot, mujhe poori duniya khana hai!',
+    problem: 'Ria is curious about every food she sees and wants to try everything at once.',
+    lesson: 'The robot created a "world foods adventure map" so Ria could explore tastes one country at a time.',
+    postFormat: 'Reel',
+    strategy: 'Food curiosity, cultural exploration, adventure map',
+    caption: 'Poori duniya khana hai? Robot ne banaya "world foods adventure map!" Har din ek naya desh. 🌍 #RiaAndRobot #WorldFoods #FunLearningWithPalak',
+    pinnedComment: 'One country, one flavor at a time — the robot\'s recipe for culinary courage!',
+    forApp: true,
+    usedOn: '',
+    storyDetail: '''
+Story: Ria sees a table full of international foods and declares, "Mujhe poori duniya khana hai!" — she wants to eat everything.
+Twist: The robot produces a world map where each country lights up as Ria tastes its cuisine — one bite at a time.
+Resolution: Ria marks countries on her adventure map, trying one dish per day and learning about each culture.
+Moral: The world is huge — best to explore it one bite at a time.
 ''',
   ),
 ];
