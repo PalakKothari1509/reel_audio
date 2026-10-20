@@ -30,12 +30,9 @@ import 'caption_renderer.dart';
 import 'story_ideas.dart';
 import 'theme.dart';
 import 'music.dart';
-import 'quick_content.dart' as qc;
 import 'home_screen.dart';
 import 'content_library_screen.dart';
 import 'review_idea_screen.dart';
-import 'shot_planner.dart';
-import 'ai_provider.dart';
 import 'ai_content_service.dart';
 import 'ai_content_service_impl.dart';
 import 'gemini_client.dart';
@@ -49,10 +46,8 @@ import 'content_ideas.dart';
 import 'my_content_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
-import 'prompt_vault_screen.dart';
-import 'video_library_screen.dart';
 
-/// Android side of saving a finished reel. Its own channel rather than the voice one,
+/// Android side of saving a finished reel.
 /// because saving a video has nothing to do with speech.
 const _mediaChannel = MethodChannel('com.example.reel_audio/media');
 

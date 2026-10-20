@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'content_ideas.dart';
+import 'plan_data.dart';
 
 class GeneratedStory {
   final String title;
@@ -87,27 +88,32 @@ class StoryGenerator {
     'Emotional',
   ];
 
-  List<HookIdea> get _available =>
-      kDefaultHooksWithRewrite.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
+  Future<List<HookIdea>> _loadAvailable() async {
+    final hooks = await HookStore.load();
+    return hooks.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
+  }
 
-  static String _extractLine(String detail, String label) {
+  static String extractLine(String detail, String label, [String? fallbackLabel]) {
     final lines = detail.split('\n');
     for (final line in lines) {
       final trimmed = line.trim();
       if (trimmed.startsWith(label)) {
         return trimmed.substring(label.length).trim();
       }
+      if (fallbackLabel != null && trimmed.startsWith(fallbackLabel)) {
+        return trimmed.substring(fallbackLabel.length).trim();
+      }
     }
     return '';
   }
 
-  GeneratedStory generate({String? customProblem, String? customAge}) {
-    final hooks = _available;
+  Future<GeneratedStory> generate({String? customProblem, String? customAge}) async {
+    final hooks = await _loadAvailable();
     final h = hooks[_rng.nextInt(hooks.length)];
     final who = _selectCharacters();
-    final problem = _extractLine(h.storyDetail, 'Story:');
-    final twist = _extractLine(h.storyDetail, 'Twist:');
-    final worse = _extractLine(h.storyDetail, 'Resolution:');
+    final problem = extractLine(h.storyDetail, 'Story:', 'PART 1:');
+    final twist = extractLine(h.storyDetail, 'Twist:');
+    final worse = extractLine(h.storyDetail, 'Resolution:');
     final hookText = _buildHook(h, who);
     final hookOptions = _buildHookOptions(h, hookText);
 
@@ -120,7 +126,7 @@ class StoryGenerator {
       twist: twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
       worse: worse.isNotEmpty ? worse : _fallbackWorse(h.problem),
       solution: h.lesson,
-      endingLine: _extractLine(h.storyDetail, 'Moral:'),
+      endingLine: extractLine(h.storyDetail, 'Moral:'),
       moral: h.lesson,
       hookOptions: hookOptions,
     );
@@ -196,9 +202,9 @@ class _StoryGeneratorScreenState extends State<StoryGeneratorScreen> {
   GeneratedStory? _story;
   bool _loading = false;
 
-  void _generate() {
+  void _generate() async {
     setState(() => _loading = true);
-    final story = _generator.generate();
+    final story = await _generator.generate();
     setState(() {
       _story = story;
       _loading = false;

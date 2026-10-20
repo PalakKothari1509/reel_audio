@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'characters.dart';
 import 'content_ideas.dart';
 import 'offline_engagement.dart';
+import 'plan_data.dart';
 import 'prompts.dart';
 import 'story_generator_offline.dart';
 import 'theme.dart';
@@ -47,7 +48,7 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
       final generator = StoryGenerator();
       final story = _selectedHookIdea != null
           ? _storyFromHook(_selectedHookIdea!)
-          : generator.generate();
+          : await generator.generate();
 
       setState(() {
         _story = story;
@@ -128,8 +129,8 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
     if (detail.trim().isEmpty) return result;
     for (final line in detail.split('\n')) {
       final trimmed = line.trim();
-      if (trimmed.startsWith('Story:')) {
-        result['problem'] = trimmed.substring('Story:'.length).trim();
+      if (trimmed.startsWith('Story:') || trimmed.startsWith('PART 1:')) {
+        result['problem'] = trimmed.substring(trimmed.indexOf(':') + 1).trim();
       } else if (trimmed.startsWith('Twist:')) {
         result['twist'] = trimmed.substring('Twist:'.length).trim();
       } else if (trimmed.startsWith('Resolution:')) {
@@ -651,6 +652,25 @@ class _LibraryPicker extends StatefulWidget {
 class _LibraryPickerState extends State<_LibraryPicker> {
   String _filter = '';
   final _ctrl = TextEditingController();
+  List<HookIdea> _hooks = [];
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHooks();
+    _ctrl.addListener(() {
+      setState(() => _filter = _ctrl.text.toLowerCase());
+    });
+  }
+
+  Future<void> _loadHooks() async {
+    final loaded = await HookStore.load();
+    setState(() {
+      _hooks = loaded.where((h) => h.forApp).toList();
+      _loaded = true;
+    });
+  }
 
   @override
   void dispose() {
@@ -660,13 +680,12 @@ class _LibraryPickerState extends State<_LibraryPicker> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = kDefaultHooksWithRewrite
+    final filtered = _hooks
         .where((h) =>
-            h.forApp &&
-            (_filter.isEmpty ||
-                h.cover.toLowerCase().contains(_filter) ||
-                h.problem.toLowerCase().contains(_filter) ||
-                h.category.toLowerCase().contains(_filter)))
+            _filter.isEmpty ||
+            h.cover.toLowerCase().contains(_filter) ||
+            h.problem.toLowerCase().contains(_filter) ||
+            h.category.toLowerCase().contains(_filter))
         .toList();
 
     return DraggableScrollableSheet(
@@ -675,60 +694,67 @@ class _LibraryPickerState extends State<_LibraryPicker> {
       maxChildSize: 0.95,
       builder: (ctx, scroll) => Column(
         children: [
-          const SizedBox(height: 8),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _ctrl,
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Search ideas...',
-                prefixIcon: Icon(Icons.search, size: 20),
-                isDense: true,
+          if (!_loaded)
+            const Expanded(
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            ...[
+              const SizedBox(height: 8),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              onChanged: (v) => setState(() => _filter = v.toLowerCase()),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              controller: scroll,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filtered.length,
-              itemBuilder: (ctx, i) {
-                final h = filtered[i];
-                return ListTile(
-                  dense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  title: Text(
-                    h.cover,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w700),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: TextField(
+                  controller: _ctrl,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Search ideas...',
+                    prefixIcon: Icon(Icons.search, size: 20),
+                    isDense: true,
                   ),
-                  subtitle: Text(
-                    h.problem,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppText.small,
-                  ),
-                  trailing: Text(
-                    h.category,
-                    style:
-                        const TextStyle(fontSize: 11, color: AppColors.textFaint),
-                  ),
-                  onTap: () => Navigator.pop(ctx, h),
-                );
-              },
-            ),
-          ),
+                  onChanged: (v) => setState(() => _filter = v.toLowerCase()),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  controller: scroll,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: filtered.length,
+                  itemBuilder: (ctx, i) {
+                    final h = filtered[i];
+                    return ListTile(
+                      dense: true,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      title: Text(
+                        h.cover,
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text(
+                        h.problem,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.small,
+                      ),
+                      trailing: Text(
+                        h.category,
+                        style: const TextStyle(
+                            fontSize: 11, color: AppColors.textFaint),
+                      ),
+                      onTap: () => Navigator.pop(ctx, h),
+                    );
+                  },
+                ),
+              ),
+            ],
         ],
       ),
     );

@@ -1,17 +1,34 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../lib/json_file_store.dart';
 import '../lib/story_generator_offline.dart';
 import '../lib/video_prompt_generator_offline.dart';
 import '../lib/offline_engagement.dart';
 import '../lib/offline_story_maker_screen.dart';
+import '../lib/content_ideas.dart';
 
 void main() {
+  late Directory tempDir;
+
+  setUp(() {
+    tempDir = Directory.systemTemp.createTempSync('story_gen_test');
+    JsonFileStore.setTestDirectory(tempDir);
+  });
+
+  tearDown(() {
+    JsonFileStore.clearTestDirectory();
+    if (tempDir.existsSync()) {
+      tempDir.deleteSync(recursive: true);
+    }
+  });
+
   group('StoryGenerator (offline)', () {
-    test('generates a story with all required fields', () {
-      final story = StoryGenerator().generate();
+    test('generates a story with all required fields', () async {
+      final story = await StoryGenerator().generate();
       expect(story.title, isNotEmpty);
       expect(story.hook, isNotEmpty);
       expect(story.problem, isNotEmpty);
@@ -21,8 +38,8 @@ void main() {
       expect(story.moral, isNotEmpty);
     });
 
-    test('generates exactly 5 hook options with type and text', () {
-      final story = StoryGenerator().generate();
+    test('generates exactly 5 hook options with type and text', () async {
+      final story = await StoryGenerator().generate();
       expect(story.hookOptions, isNotEmpty);
       for (final h in story.hookOptions) {
         expect(h['type'], isNotEmpty);
@@ -30,8 +47,8 @@ void main() {
       }
     });
 
-    test('produces valid JSON from toJson', () {
-      final story = StoryGenerator().generate();
+    test('produces valid JSON from toJson', () async {
+      final story = await StoryGenerator().generate();
       final json = story.toJson();
       final encoded = jsonEncode(json);
       final decoded = jsonDecode(encoded) as Map<String, dynamic>;
@@ -39,11 +56,51 @@ void main() {
       expect(decoded['hook'], isNotEmpty);
       expect(decoded['hook_options'], isA<List>());
     });
+
+    test('_extractLine handles PART 1: format as fallback for Story:', () {
+      const detail = '''
+Story: This is the proper story.
+Twist: A twist occurred.
+Resolution: All resolved.
+Moral: The lesson.
+''';
+      expect(StoryGenerator.extractLine(detail, 'Story:', 'PART 1:'),
+          contains('proper story'));
+
+      const partDetail = '''
+PART 1: This is a PART 1 story.
+Twist: A twist occurred.
+Resolution: All resolved.
+Moral: The lesson.
+''';
+      expect(StoryGenerator.extractLine(partDetail, 'Story:', 'PART 1:'),
+          contains('PART 1 story'));
+      expect(StoryGenerator.extractLine(partDetail, 'Story:', 'PART 1:'),
+          isNotEmpty);
+    });
+
+    test('PART 1 hooks produce non-empty problem field', () async {
+      final result = await StoryGenerator().generate();
+      expect(result.problem, isNotEmpty);
+    });
+
+    test('all PART 1 hooks are parseable by _extractLine', () {
+      final part1Hooks = kDefaultHooksWithRewrite
+          .where((h) => h.storyDetail.contains('PART 1:'));
+      expect(part1Hooks, isNotEmpty,
+          reason: 'There should be hooks using PART 1: format');
+      for (final h in part1Hooks) {
+        final problem =
+            StoryGenerator.extractLine(h.storyDetail, 'Story:', 'PART 1:');
+        expect(problem, isNotEmpty,
+            reason: 'Hook ${h.id} PART 1: not parsed as story');
+      }
+    });
   });
 
    group('OfflineVideoPromptGenerator', () {
-    test('generates correct number of parts for 30s', () {
-      final story = StoryGenerator().generate();
+    test('generates correct number of parts for 30s', () async {
+      final story = await StoryGenerator().generate();
       final result = OfflineVideoPromptGenerator().generateFromStory(
         story,
         totalSeconds: 30,
@@ -52,8 +109,8 @@ void main() {
       expect(result.parts.length, 3);
     });
 
-    test('generates correct number of parts for 20s', () {
-      final story = StoryGenerator().generate();
+    test('generates correct number of parts for 20s', () async {
+      final story = await StoryGenerator().generate();
       final result = OfflineVideoPromptGenerator().generateFromStory(
         story,
         totalSeconds: 20,
@@ -62,8 +119,8 @@ void main() {
       expect(result.parts.length, 2);
     });
 
-    test('each part has a full prompt with required sections', () {
-      final story = StoryGenerator().generate();
+    test('each part has a full prompt with required sections', () async {
+      final story = await StoryGenerator().generate();
       final result = OfflineVideoPromptGenerator().generateFromStory(
         story,
         totalSeconds: 30,
@@ -81,8 +138,8 @@ void main() {
       }
     });
 
-    test('story foundation is non-empty', () {
-      final story = StoryGenerator().generate();
+    test('story foundation is non-empty', () async {
+      final story = await StoryGenerator().generate();
       final result = OfflineVideoPromptGenerator().generateFromStory(
         story,
         totalSeconds: 30,

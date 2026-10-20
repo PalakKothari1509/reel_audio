@@ -64,8 +64,8 @@ Future<void> _saveVideoPromptsToVault(
   }
 }
 
-IdeaEvaluation _buildOfflineEvaluation(String idea) {
-  final story = StoryGenerator().generate();
+Future<IdeaEvaluation> _buildOfflineEvaluation(String idea) async {
+  final story = await StoryGenerator().generate();
   final check = StoryCheck(
     score: 8,
     good: ['Strong relatable hook', 'Clear character fit', 'Satisfying ending'],
@@ -85,8 +85,8 @@ IdeaEvaluation _buildOfflineEvaluation(String idea) {
   return IdeaEvaluation(check: check, shareability: shareability);
 }
 
-GeminiVideoResult _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) {
-  final story = StoryGenerator().generate();
+Future<GeminiVideoResult> _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) async {
+  final story = await StoryGenerator().generate();
   final mergedStory = story.copyWith(
     title: _storyTitleFromIdea(idea),
     hook: idea,
@@ -162,7 +162,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
     } catch (e) {
       if (_isGeminiError(e)) {
         setState(() => _status = 'Using offline idea evaluator...');
-        final evaluation = _buildOfflineEvaluation(idea);
+        final evaluation = await _buildOfflineEvaluation(idea);
         if (!mounted) return;
         setState(() => _evaluation = evaluation);
       } else if (mounted) {
@@ -360,7 +360,7 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
     } catch (e) {
       if (_isGeminiError(e)) {
         setState(() => _status = 'Using offline idea evaluator...');
-        final evaluation = _buildOfflineEvaluation(idea);
+        final evaluation = await _buildOfflineEvaluation(idea);
         if (!mounted) return;
         setState(() => _evaluation = evaluation);
       } else if (mounted) {
@@ -755,7 +755,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
     } catch (e) {
       if (_isGeminiError(e)) {
         setState(() => _status = 'Using offline story generator...');
-        final evaluation = _buildOfflineEvaluation(idea);
+        final evaluation = await _buildOfflineEvaluation(idea);
         if (!mounted) return;
         setState(() => _evaluation = evaluation);
       } else if (mounted) {
@@ -801,7 +801,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       } catch (e) {
         if (_isGeminiError(e)) {
           setState(() => _status = 'Using offline video prompts...');
-          result = _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
+          result = await _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
         } else {
           rethrow;
         }
