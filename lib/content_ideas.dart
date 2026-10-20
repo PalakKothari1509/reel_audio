@@ -346,7 +346,7 @@ Moral: Putting things in predictable places makes them easier to find — and ti
   HookIdea(
     id: 'h05',
     category: 'Relatable',
-    cover: 'Ek Aur Paani!',
+    cover: 'Mumma Bhi Hairaan!',
     opening: 'Lights band... aur Ria ko phir se paani chahiye.',
     problem: 'Bedtime stretches on with one more water, one more story, one more hug',
     lesson: 'Roz ek jaisa routine, neend jaldi aati hai',
@@ -1923,28 +1923,34 @@ Resolution: Ria marks countries on her adventure map, trying one dish per day an
 /// stories without modifying the const list above.
 const kRewrittenStories = <String, String>{
   'h01': '''
-Story: Bus ka time ho raha hai. Mumma jhukke Ria ke joote pehnane lagti hai. Ria uska haath jhatak deti hai: "Main khud!" Dono joote ulte pairon mein, aur Ria pengun ki tarah chalti hai.
-Twist: Mumma ka haath phir aage badhta hai… aur beech hawa mein ruk jaata hai. Mumma hothon ko dabaake dheere dheere paanch tak ginti hai.
-Resolution: Ria neeche dekhti hai: "Mumma, ye ulta hai?" Mumma: "Tum batao." Ria joote badalti hai. Bus ka horn bajta hai. Ria khadi hokar: "Dekho!"
+Story: Bus ka samay ho raha hai, Mumma jhukkar Ria ke joote pehnane lagti hai. Ria haath jhatak deti hai: "Main khud karungi!" Joota ulte pairon lag jaata hai, Ria pengun ban kar chalti hai.
+Twist: Mumma apni taraf se joota theek karni ka mashwara deti hai, par Ria kehti hai: "Mumma, ye ulta hai?"
+Resolution: Ria joote badalta hai, saahi se bandh jaata hai. Bus ka horn bajta hai. Ria khadi hoti hai, haath jod kar: "Dekho!"
 Moral: Paanch second ruk jao, baaki Ria kar legi.
 ''',
   'h02': '''
-Story: Screen time ka waqt ho raha hai. Mumma: "Phone band." Ria: "Bas paanch minute!" Mumma phone le leti hai aur Ria zor zor se rone lagti hai.
-Twist: Ria phone ke liye nahi ro rahi. Cartoon beech mep cut off ho gaya, aur woh jaanna chahti hai ki aage kya hua.
-Resolution: Agla din Mumma pehle puchhti hai: "Ye episode kab khatam hoga?" Episode khatam hota hai, Ria khud bolti hai "Khatam!" aur phone Mumma ko de deti hai.
-Moral: Beech mein nahi, khatam hone par.
+Story: Cartoon band hone ka waqt. Mumma: "Phone band." Ria: "Bas paanch minute!" Ria royi, lekin asli dikat yeh nahi ki phone band ho raha tha — episode beech mein toot gaya tha.
+Twist: Agle din Mumma pehle puchhti: "Ye episode kab khatam hoga?" Ek visual timer lagati hai.
+Resolution: Episode khatam hota hai, Ria khud kehti hai "Khatam!" aur phone Mumma ko deti hai. "Kal timer pehle lagayege.
+Moral: Beech mein nahi, khatam hone par — par pehle se batana bhi badi baat hai.
 ''',
   'h03': '''
-Story: Rio ka tower teesri baar girta hai. Woh blocks ko haath se door karke bolta hai: "Mujhe nahi aata!"
-Twist: Ria madad karne aati hai, Rio uska haath hata deta hai: "Main karunga!" Mumma chup chaap do bade blocks Rio ke paas rakh deti hai aur kuch nahi bolti.
-Resolution: Rio bade blocks ko neeche rakhta hai. Tower khada rehta hai. Rio: "Dekho, khada hai!" Ria taali bajati hai.
-Moral: Hint do, haath mat lagao.
+Story: Rio ka tower teesri baar girta hai. Woh blocks se haath kash karke bolta hai: "Mujhe nahi aata!"
+Twist: Ria turant madad karne aati hai, lekin Rio uska haath hata deta hai: "Main karunga!" Ria samajh jaati hai ki madad karne ka matlab haath chhune se nahi, sochne se hai.
+Resolution: Ria chupchaap do bade blocks Rio ke paas rakhti hai: "Neece rakho, base bana ke dekho." Rio tower khada kar deta hai. "Dekho, khada hai!"
+Moral: Hint do, haath mat lagao — bachcha khud hi seekh jaata hai.
+''',
+  'h04': '''
+Story: Ria ne Cuty dhundhna hai, lekin khilone pooray kamre mein phail gaye hain. Har cheez dekhkar Ria distract ho jaati hai.
+Twist: Rio kehti hai, "Hum Cuty dhoondh rahe hain ya aur toys bana rahe hain?" Dono dusre toys ko bhi dekhkar mushkil seprate karte hain.
+Resolution: Ek chhote area ko saaf karte hain, toys ko baskets mein daalte hain. Cuty blanked ko neeche patti ke andar sone wala pata hai.
+Moral: Ek chhota area, ek basket — saaf kamra, sab kuch saamne.
 ''',
   'h05': '''
-Story: Lights band. Ria: "Mumma, paani." Mumma deti hai. Ria: "Susu." Mumma le jaati hai. Ria: "Ek aur kahani."
-Twist: Mumma ko samajh aata hai ki roz yahi sab hota hai. Agli raat woh bottle pehle se stool par rakh deti hai, aur susu kahani se pehle karwa deti hai.
-Resolution: Lights band. Ria: "Paani?" Bottle dekhti hai: "Yahan hai!" Phir lambi chuppi: "Ab kya..." Phir: "Good night, Mumma."
-Moral: Jo roz maanga jaata hai, pehle se rakh do.
+Story: Lights band hone ke baad, Ria ne phir se paani maanga. Fir teddy ko adjust kiya. Fir ek aur hugg chahiye.
+Twist: Mumma samajh jaati hai ki ye har raat dobara hota hai. Agli raat woh ek chhota bedtime checklist banati hai — paani, teddy, story, hug.
+Resolution: Ria checklist ko khud tick karti hai. "Ab sab ready. Good night, Mumma!" Cuty pehle se hi sone wala hai.
+Moral: Jo roz maanga jaata hai, pehle se rakh do — ek chhota routine, ek calmer bedtime.
 ''',
   'h07': '''
 Story: Ria kambal ke andar chhup gayi hai: "Brush nahi karungi!" Mumma ke haath mein brush hai.
