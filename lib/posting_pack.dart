@@ -616,12 +616,11 @@ class _ActionButtons extends StatelessWidget {
         ),
         action: SnackBarAction(
           label: 'View',
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ContentLibraryDetailScreen(itemId: item.id),
-            ),
-          ),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Content detail screen coming soon')),
+            );
+          },
         ),
       ),
     );

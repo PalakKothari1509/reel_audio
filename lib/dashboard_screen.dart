@@ -5,6 +5,7 @@ import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_audit.dart';
 import 'content_library.dart';
+import 'content_library_service.dart';
 import 'package_store.dart';
 import 'theme.dart';
 
@@ -19,7 +20,20 @@ import 'theme.dart';
 class DashboardScreen extends StatefulWidget {
   final PackageStore? packageStore;
 
-  const DashboardScreen({super.key, this.packageStore});
+  /// Callbacks provided by the parent (main.dart / home_screen.dart).
+  final VoidCallback? onReviewAllIdeas;
+  final VoidCallback? onAddNewIdea;
+  final VoidCallback? onCreateContent;
+  final VoidCallback? onManageVideos;
+
+  const DashboardScreen({
+    super.key,
+    this.packageStore,
+    this.onReviewAllIdeas,
+    this.onAddNewIdea,
+    this.onCreateContent,
+    this.onManageVideos,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -76,7 +90,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return pkgs.map((pkg) => PackageMetadata(
         id: pkg.id,
         ideaId: pkg.ideaId,
-        status: PackageStatus.posted,
+        status: pkg.publishedAt != null
+            ? PackageStatus.posted
+            : PackageStatus.videoBuilt,
         experimentCount: pkg.testCount ?? 0,
       )).toList();
     } catch (_) {
@@ -154,6 +170,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // ── Dashboard metric helpers (from ContentLibraryService) ──────────────
+
+  int _totalIdeas = 0;
+  int _needReview = 0;
+  int _inProduction = 0;
+  int _readyToPost = 0;
+  int _posted = 0;
+  bool _ideaCountsLoaded = false;
+
+  Future<void> _loadIdeaCounts() async {
+    try {
+      final service = ContentLibraryService.instance;
+      final ideas = await service.getAllIdeas();
+      final completeness = await AssetCompletenessService.checkAll();
+
+      int needReview = 0;
+      int inProduction = 0;
+      int posted = 0;
+      for (final idea in ideas) {
+        if (idea.status == IdeaStatus.idea) needReview++;
+        if (idea.status.index > IdeaStatus.idea.index &&
+            idea.status != IdeaStatus.posted &&
+            idea.status != IdeaStatus.archived) {
+          inProduction++;
+        }
+        if (idea.status == IdeaStatus.posted) posted++;
+      }
+
+      int ready = 0;
+      for (final a in completeness) {
+        if (a.isReadyToPost) ready++;
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _totalIdeas = ideas.length;
+        _needReview = needReview;
+        _inProduction = inProduction;
+        _readyToPost = ready;
+        _posted = posted;
+        _ideaCountsLoaded = true;
+      });
+    } catch (_) {
+      // File stores may not be available in test context; counts stay at 0.
+      if (!mounted) return;
+      setState(() {
+        _ideaCountsLoaded = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,7 +230,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh_outlined),
-            onPressed: _loadDashboardData,
+            onPressed: () {
+              _loadDashboardData();
+              _loadIdeaCounts();
+            },
           ),
         ],
       ),
@@ -178,32 +248,202 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: _loadDashboardData,
-                  child: ListView(
+                  onRefresh: () async {
+                    await _loadDashboardData();
+                    await _loadIdeaCounts();
+                  },
+                  child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    children: [
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildWelcome(),
+                        Gap.l,
+
+                      // Section A — Main Actions
+                      _buildSectionHeader('Main Actions'),
+                      Gap.s,
+                      _buildMainActions(),
+                      Gap.l,
+
+                      // Section B — Your Content Progress
+                      _buildSectionHeader('Your Content Progress'),
+                      Gap.s,
+                      _buildContentProgress(),
+                      Gap.l,
+
+                      // Section C — Ideas by Pillar
                       _buildSectionHeader('Ideas by Pillar'),
                       Gap.s,
                       _buildPillarSummary(),
                       Gap.l,
+
+                      // Section D — Ready to Produce
                       _buildSectionHeader('Ready to Produce'),
                       Gap.s,
                       _buildReadyToProduce(),
                       Gap.l,
+
+                      // Published by Format
                       _buildSectionHeader('Published by Format'),
                       Gap.s,
                       _buildFormatSummary(),
                       Gap.l,
+
+                      // Formats Tested < 5 Times
                       _buildSectionHeader('Formats Tested < 5 Times'),
                       Gap.s,
                       _buildUndertestedFormats(),
                       Gap.l,
+
+                      // Ready-to-Post Checklist
                       _buildSectionHeader('Ready-to-Post Checklist'),
                       Gap.s,
                       _buildReadyToPost(),
                     ],
                   ),
                 ),
+              ),
+            );
+  }
+
+  Widget _buildWelcome() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Welcome to Fun Learning With Palak',
+          style: AppText.screenTitle,
+        ),
+        const SizedBox(height: 4),
+        Text('Your content workspace', style: AppText.hint),
+      ],
+    );
+  }
+
+  Widget _buildMainActions() {
+    return Column(
+      children: [
+        _mainActionCard(
+          icon: Icons.library_books,
+          color: AppColors.primary,
+          title: 'Content Library',
+          subtitle: 'Browse, search, edit, and review every idea',
+          onTap: widget.onReviewAllIdeas,
+        ),
+        Gap.s,
+        _mainActionCard(
+          icon: Icons.add,
+          color: AppColors.accent,
+          title: 'Add New Idea',
+          subtitle: 'Create a new content idea from scratch',
+          onTap: widget.onAddNewIdea,
+        ),
+        Gap.s,
+        _mainActionCard(
+          icon: Icons.auto_awesome,
+          color: AppColors.warning,
+          title: 'Create Content',
+          subtitle: 'Select an idea and generate stories, scripts, prompts',
+          onTap: widget.onCreateContent,
+        ),
+        Gap.s,
+        _mainActionCard(
+          icon: Icons.video_library_outlined,
+          color: AppColors.accent,
+          title: 'My Videos',
+          subtitle: 'Upload, preview, and manage finished reels',
+          onTap: widget.onManageVideos,
+        ),
+      ],
+    );
+  }
+
+  Widget _mainActionCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, size: 28, color: color),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppText.screenTitle.copyWith(fontSize: 18)),
+                    const SizedBox(height: 4),
+                    Text(subtitle, style: AppText.hint),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: AppColors.textFaint),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentProgress() {
+    return Column(
+      children: [
+        _progressMetric('Total Ideas', _totalIdeas, Icons.lightbulb_outline),
+        Gap.xs,
+        _progressMetric('Need Review', _needReview, Icons.visibility_outlined),
+        Gap.xs,
+        _progressMetric('In Production', _inProduction, Icons.build_outlined),
+        Gap.xs,
+        _progressMetric('Ready to Post', _readyToPost, Icons.check_circle_outline),
+        Gap.xs,
+        _progressMetric('Posted', _posted, Icons.campaign_outlined),
+      ],
+    );
+  }
+
+  Widget _progressMetric(String label, int count, IconData icon) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.primary),
+            const SizedBox(width: 12),
+            Text(label, style: AppText.body),
+            const Spacer(),
+            Text(count.toString(), style: AppText.screenTitle.copyWith(fontSize: 20, color: AppColors.primary)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -457,5 +697,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
       ],
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_ideaCountsLoaded) {
+      _ideaCountsLoaded = true;
+      _loadIdeaCounts();
+    }
   }
 }

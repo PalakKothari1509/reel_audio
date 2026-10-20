@@ -25,21 +25,6 @@ void main() {
       } catch (_) {}
     });
 
-    Future<void> _settleAfterPump(WidgetTester tester) async {
-      await tester.runAsync(() async {
-        await Future.delayed(const Duration(milliseconds: 300));
-      });
-      await tester.pump();
-      await tester.runAsync(() async {
-        await Future.delayed(const Duration(milliseconds: 300));
-      });
-      await tester.pump();
-      await tester.runAsync(() async {
-        await Future.delayed(const Duration(milliseconds: 300));
-      });
-      await tester.pump();
-    }
-
     void _writeItems(List<ContentLibraryItem> items) {
       final path = '${tempDir.path}/content_library.json';
       final json = jsonEncode(items.map((i) => i.toJson()).toList());
@@ -73,7 +58,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.text('Ideas by Pillar'), findsOneWidget);
       expect(find.text('Ready to Produce'), findsOneWidget);
@@ -85,7 +70,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.byTooltip('Refresh'), findsOneWidget);
     });
@@ -94,7 +79,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.text('No ideas in the library yet.'), findsOneWidget);
       expect(find.text('Nothing ready to produce yet.'), findsOneWidget);
@@ -107,7 +92,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.text('1 item ready'), findsOneWidget);
       expect(find.text('Test Idea'), findsOneWidget);
@@ -119,7 +104,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.text('PLAY · 1'), findsOneWidget);
     });
@@ -130,7 +115,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.textContaining('ContentFormat.reel'), findsWidgets);
     });
@@ -141,14 +126,20 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(home: DashboardScreen()),
       );
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
       expect(find.text('1 item ready'), findsOneWidget);
+
+      // Write more items and refresh
+      _writeItems([
+        _makeItem(id: '1', title: 'Refresh Test', status: IdeaStatus.approved, tags: ['challenge']),
+        _makeItem(id: '2', title: 'Another Idea', status: IdeaStatus.approved, tags: ['challenge']),
+      ]);
 
       await tester.tap(find.byTooltip('Refresh'));
-      await _settleAfterPump(tester);
+      await tester.pumpAndSettle();
 
-      expect(find.text('1 item ready'), findsOneWidget);
+      expect(find.text('2 items ready'), findsOneWidget);
     });
   });
 }

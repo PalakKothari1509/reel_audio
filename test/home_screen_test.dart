@@ -24,6 +24,7 @@ void main() {
 
     testWidgets('renders welcome section and navigation, responds to taps', (tester) async {
       var settingsTapped = false;
+      var contentLibraryTapped = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -31,28 +32,24 @@ void main() {
             onCreateReel: (_) {},
             onMyContent: () {},
             onSettings: () => settingsTapped = true,
-            onIdeaVault: () {},
-            onImagePrompt: () {},
-            onCarouselPrompts: () {},
-            onGeminiVideo: () {},
-            onPromptVault: () {},
-            onVideoLibrary: () {},
+            onContentLibrary: () => contentLibraryTapped = true,
           ),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Good morning, Palak!'), findsOneWidget);
-      expect(find.text('Reel from Images'), findsOneWidget);
-      expect(find.text('Gemini Story Video'), findsOneWidget);
-
-      await tester.scrollUntilVisible(find.text('Idea Vault'), 100);
-      expect(find.text('Idea Vault'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('My Content'), 100);
-      expect(find.text('My Content'), findsOneWidget);
+      expect(find.text('Create Content'), findsOneWidget);
+      expect(find.text('Content Library'), findsOneWidget);
+      expect(find.text('My Videos'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Settings'));
+      await tester.pumpAndSettle();
       expect(settingsTapped, isTrue);
+
+      await tester.tap(find.text('Content Library'));
+      await tester.pumpAndSettle();
+      expect(contentLibraryTapped, isTrue);
     });
 
     testWidgets('has no duplicate Create button', (tester) async {
@@ -62,19 +59,59 @@ void main() {
             onCreateReel: (_) => {},
             onMyContent: () {},
             onSettings: () {},
-            onIdeaVault: () {},
-            onImagePrompt: () {},
-            onCarouselPrompts: () {},
-            onGeminiVideo: () {},
-            onPromptVault: () {},
-            onVideoLibrary: () {},
+            onContentLibrary: () {},
           ),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      // Exactly one Reel from Images card, not duplicated.
-      expect(find.text('Reel from Images'), findsOneWidget);
+      // Exactly one Create Content card, not duplicated.
+      expect(find.text('Create Content'), findsOneWidget);
+    });
+
+    testWidgets('optionally shows Add New Idea and legacy create cards', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ContentStudioHome(
+            onCreateReel: (_) => {},
+            onMyContent: () {},
+            onSettings: () {},
+            onContentLibrary: () {},
+            onAddNewIdea: () {},
+            onImagePrompt: () {},
+            onCarouselPrompts: () {},
+            onGeminiVideo: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add New Idea'), findsOneWidget);
+      expect(find.text('Image Generation Prompt'), findsOneWidget);
+      expect(find.text('Carousel Generation'), findsOneWidget);
+      expect(find.text('Gemini Story Video'), findsOneWidget);
+    });
+
+    testWidgets('conditionally hides optional cards when callbacks are null', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ContentStudioHome(
+            onCreateReel: (_) => {},
+            onMyContent: () {},
+            onSettings: () {},
+            onContentLibrary: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // With no optional callbacks, none of those cards should render.
+      expect(find.text('Add New Idea'), findsNothing);
+      expect(find.text('Image Generation Prompt'), findsNothing);
+      expect(find.text('Carousel Generation'), findsNothing);
+      expect(find.text('Gemini Story Video'), findsNothing);
+      expect(find.text('Review All Ideas'), findsNothing);
+      expect(find.text('Video Library'), findsNothing);
     });
   });
 }

@@ -38,6 +38,7 @@ class AppColors {
 
   static const warning = Color(0xFFB4690E);
   static const danger = Color(0xFFC0392B);
+  static const success = Color(0xFF2E7D32);
 }
 
 class AppText {
@@ -47,6 +48,8 @@ class AppText {
       TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.textSoft, letterSpacing: 0.8);
   static const body =
       TextStyle(fontSize: 15, color: AppColors.text, height: 1.45);
+  static const bodySmall =
+      TextStyle(fontSize: 13, color: AppColors.textSoft, height: 1.4);
   static const hint =
       TextStyle(fontSize: 13, color: AppColors.textSoft, height: 1.4);
   static const small =
@@ -143,7 +146,7 @@ class StepBar extends StatelessWidget {
           final here = i == current;
           final colour = here
               ? AppColors.primary
-              : done ? AppColors.primary.withOpacity(0.55) : AppColors.border;
+              : done ? AppColors.primary.withValues(alpha: 0.55) : AppColors.border;
 
           return Expanded(
             child: GestureDetector(
@@ -160,7 +163,7 @@ class StepBar extends StatelessWidget {
                   Expanded(child: Container(height: 3,
                     color: i == steps.length - 1
                         ? Colors.transparent
-                        : (i < current ? AppColors.primary.withOpacity(0.55) : AppColors.border))),
+                        : (i < current ? AppColors.primary.withValues(alpha: 0.55) : AppColors.border))),
                 ]),
                 const SizedBox(height: 5),
                 Text(steps[i],
@@ -363,9 +366,9 @@ class StatusBar extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colour.withOpacity(0.08),
+        color: colour.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colour.withOpacity(0.3)),
+        border: Border.all(color: colour.withValues(alpha: 0.3)),
       ),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Icon(bad ? Icons.error_outline : good ? Icons.check_circle_outline : Icons.info_outline,

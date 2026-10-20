@@ -32,6 +32,8 @@ import 'theme.dart';
 import 'music.dart';
 import 'quick_content.dart' as qc;
 import 'home_screen.dart';
+import 'content_library_screen.dart';
+import 'review_idea_screen.dart';
 import 'shot_planner.dart';
 import 'ai_provider.dart';
 import 'ai_content_service.dart';
@@ -471,33 +473,36 @@ Future<void> main() async {
       navigatorKey: _appNavigatorKey,
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
+      routes: {
+        '/review-idea': (context) {
+          final ideaId = ModalRoute.of(context)!.settings.arguments as String? ?? '';
+          return ReviewIdeaScreen(ideaId: ideaId);
+        },
+      },
       home: ContentStudioHome(
         onCreateReel: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const StoryScreen()),
         ),
-        onIdeaVault: () => Navigator.push(
+        onContentLibrary: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => MaterialApp(
-            home: qc.IdeaInboxScreen(
-              onCreateReel: () => Navigator.push(
-                _appNavigatorKey.currentContext!,
-                MaterialPageRoute(builder: (_) => const StoryScreen()),
-              ),
-            ),
-          )),
+          MaterialPageRoute(builder: (_) => const ContentLibraryScreen()),
         ),
-         onMyContent: () => Navigator.push(
+        onReviewAllIdeas: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(builder: (_) => const ContentLibraryScreen()),
+        ),
+        onAddNewIdea: () => ScaffoldMessenger.of(_appNavigatorKey.currentContext!)
+            .showSnackBar(const SnackBar(content: Text('Add Idea screen coming soon'))),
+        onCreateContent: (ideaId) => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => const StoryScreen(),
+          ),
+        ),
+        onMyContent: () => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const MyContentScreen()),
-        ),
-        onPromptVault: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const PromptVaultScreen()),
-        ),
-        onVideoLibrary: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const VideoLibraryScreen()),
         ),
         onSettings: () => Navigator.push(
           _appNavigatorKey.currentContext!,

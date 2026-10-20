@@ -14,12 +14,20 @@ class ContentStudioHome extends StatefulWidget {
   final CreateCallback onCreateReel;
   final NavCallback onMyContent;
   final NavCallback onSettings;
-  final NavCallback onIdeaVault;
-  final NavCallback onImagePrompt;
-  final NavCallback onCarouselPrompts;
-  final NavCallback onGeminiVideo;
-  final NavCallback onPromptVault;
-  final NavCallback onVideoLibrary;
+
+  /// New simplified callbacks.
+  final NavCallback onContentLibrary;
+  final NavCallback? onReviewAllIdeas;
+  final NavCallback? onAddNewIdea;
+  final CreateCallback? onCreateContent;
+  final NavCallback? onManageVideos;
+
+  /// Legacy support — if provided, these appear as additional Create options.
+  final NavCallback? onImagePrompt;
+  final NavCallback? onCarouselPrompts;
+  final NavCallback? onGeminiVideo;
+
+  /// Optional offline story generator.
   final NavCallback? onOfflineStory;
 
   const ContentStudioHome({
@@ -27,12 +35,14 @@ class ContentStudioHome extends StatefulWidget {
     required this.onCreateReel,
     required this.onMyContent,
     required this.onSettings,
-    required this.onIdeaVault,
-    required this.onImagePrompt,
-    required this.onCarouselPrompts,
-    required this.onGeminiVideo,
-    required this.onPromptVault,
-    required this.onVideoLibrary,
+    required this.onContentLibrary,
+    this.onReviewAllIdeas,
+    this.onAddNewIdea,
+    this.onCreateContent,
+    this.onManageVideos,
+    this.onImagePrompt,
+    this.onCarouselPrompts,
+    this.onGeminiVideo,
     this.onOfflineStory,
   });
 
@@ -43,6 +53,145 @@ class ContentStudioHome extends StatefulWidget {
 class _ContentStudioHomeState extends State<ContentStudioHome> {
   @override
   Widget build(BuildContext context) {
+    final createActions = <Widget>[
+      _PrimaryAction(
+        icon: Icons.auto_awesome,
+        title: 'Create Content',
+        subtitle: 'Select an idea from the library to generate story, script, prompts',
+        onTap: () {
+          final cb = widget.onCreateContent ?? widget.onCreateReel;
+          cb(null);
+        },
+      ),
+    ];
+
+    if (widget.onAddNewIdea != null) {
+      createActions.addAll([
+        const SizedBox(height: 10),
+        _PrimaryAction(
+          icon: Icons.add,
+          title: 'Add New Idea',
+          subtitle: 'Write a new idea directly into the Content Library',
+          onTap: widget.onAddNewIdea!,
+        ),
+      ]);
+    }
+    if (widget.onImagePrompt != null) {
+      createActions.addAll([
+        const SizedBox(height: 10),
+        _PrimaryAction(
+          icon: Icons.image_outlined,
+          title: 'Image Generation Prompt',
+          subtitle: 'One detailed prompt ready to paste into an image generator',
+          onTap: widget.onImagePrompt!,
+        ),
+      ]);
+    }
+    if (widget.onCarouselPrompts != null) {
+      createActions.addAll([
+        const SizedBox(height: 10),
+        _PrimaryAction(
+          icon: Icons.view_carousel_outlined,
+          title: 'Carousel Generation',
+          subtitle: 'Full set of slide prompts for a carousel post',
+          onTap: widget.onCarouselPrompts!,
+        ),
+      ]);
+    }
+    if (widget.onGeminiVideo != null) {
+      createActions.addAll([
+        const SizedBox(height: 10),
+        _PrimaryAction(
+          icon: Icons.smart_display_outlined,
+          title: 'Gemini Story Video',
+          subtitle: 'Connected 10-second video prompts with continuity lock',
+          onTap: widget.onGeminiVideo!,
+        ),
+      ]);
+    }
+    if (widget.onOfflineStory != null) {
+      createActions.addAll([
+        const SizedBox(height: 10),
+        _PrimaryAction(
+          icon: Icons.offline_bolt,
+          title: 'Offline Story Generator',
+          subtitle: 'Generate stories, video prompts, and captions without API',
+          onTap: widget.onOfflineStory!,
+        ),
+      ]);
+    }
+
+    final goToActions = <Widget>[
+      _NavCard(
+        icon: Icons.library_books,
+        iconColor: AppColors.primary,
+        title: 'Content Library',
+        subtitle: 'Browse, search, review, and edit every idea',
+        onTap: widget.onContentLibrary,
+      ),
+    ];
+
+    if (widget.onReviewAllIdeas != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.visibility_outlined,
+          iconColor: AppColors.warning,
+          title: 'Review All Ideas',
+          subtitle: 'Dashboard quick-filter for ideas needing attention',
+          onTap: widget.onReviewAllIdeas!,
+        ),
+      ]);
+    }
+
+    goToActions.addAll([
+      const SizedBox(height: 10),
+      _NavCard(
+        icon: Icons.video_library_outlined,
+        iconColor: AppColors.accent,
+        title: 'My Videos',
+        subtitle: 'Upload, preview, and manage finished reels',
+        onTap: widget.onMyContent,
+      ),
+    ]);
+
+    if (widget.onManageVideos != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.video_file_outlined,
+          iconColor: AppColors.primary,
+          title: 'Video Library',
+          subtitle: 'Full video asset management with quality checks',
+          onTap: widget.onManageVideos!,
+        ),
+      ]);
+    }
+
+    final children = <Widget>[
+      const Text(
+        'Good morning, Palak!',
+        style: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+          color: AppColors.text,
+        ),
+      ),
+      const SizedBox(height: 4),
+      const Text(
+        'What would you like to create today?',
+        style: AppText.hint,
+      ),
+      const SizedBox(height: 24),
+      const Text('Create', style: AppText.section),
+      const SizedBox(height: 12),
+      ...createActions,
+      const SizedBox(height: 24),
+      const Text('Go to', style: AppText.section),
+      const SizedBox(height: 12),
+      ...goToActions,
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Fun Learning With Palak'),
@@ -54,97 +203,12 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
           ),
         ],
       ),
-      body: ListView(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        children: [
-          const Text(
-            'Good morning, Palak!',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: AppColors.text,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'What would you like to create today?',
-            style: AppText.hint,
-          ),
-          const SizedBox(height: 24),
-
-          const Text('Create', style: AppText.section),
-          const SizedBox(height: 12),
-          _PrimaryAction(
-            icon: Icons.movie_creation_outlined,
-            title: 'Reel from Images',
-            subtitle: 'Story → script → pictures → voice → video',
-            onTap: () => widget.onCreateReel(null),
-          ),
-          const SizedBox(height: 10),
-          _PrimaryAction(
-            icon: Icons.image_outlined,
-            title: 'Image Generation Prompt',
-            subtitle: 'One detailed prompt ready to paste into an image generator',
-            onTap: widget.onImagePrompt,
-          ),
-          const SizedBox(height: 10),
-          _PrimaryAction(
-            icon: Icons.view_carousel_outlined,
-            title: 'Carousel Generation',
-            subtitle: 'Full set of slide prompts for a carousel post',
-            onTap: widget.onCarouselPrompts,
-          ),
-          const SizedBox(height: 10),
-          _PrimaryAction(
-            icon: Icons.smart_display_outlined,
-            title: 'Gemini Story Video',
-            subtitle: 'Connected 10-second video prompts with continuity lock',
-            onTap: widget.onGeminiVideo,
-          ),
-          const SizedBox(height: 10),
-          _PrimaryAction(
-            icon: Icons.offline_bolt,
-            title: 'Offline Story Generator',
-            subtitle: 'Generate stories, video prompts, and captions without API',
-            onTap: widget.onOfflineStory ??
-                () {},
-          ),
-          const SizedBox(height: 24),
-
-          const Text('Go to', style: AppText.section),
-          const SizedBox(height: 12),
-          _NavCard(
-            icon: Icons.lightbulb_outline,
-            iconColor: AppColors.primary,
-            title: 'Idea Vault',
-            subtitle: 'Capture, browse, organise, and develop ideas',
-            onTap: widget.onIdeaVault,
-          ),
-          const SizedBox(height: 10),
-          _NavCard(
-            icon: Icons.library_books,
-            iconColor: AppColors.warning,
-            title: 'My Content',
-            subtitle: 'Track production and published content',
-            onTap: widget.onMyContent,
-          ),
-          const SizedBox(height: 10),
-          _NavCard(
-            icon: Icons.book_outlined,
-            iconColor: AppColors.primary,
-            title: 'Prompt Vault',
-            subtitle: 'View, search, and reuse saved prompts',
-            onTap: widget.onPromptVault,
-          ),
-          const SizedBox(height: 10),
-          _NavCard(
-            icon: Icons.video_library_outlined,
-            iconColor: AppColors.accent,
-            title: 'Video Library',
-            subtitle: 'Manage uploaded videos and quality checks',
-            onTap: widget.onVideoLibrary,
-          ),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: children,
+        ),
       ),
     );
   }
@@ -192,7 +256,7 @@ class _PrimaryAction extends StatelessWidget {
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, size: 28, color: AppColors.accent),
+                child: Icon(icon, size: 28, color: AppColors.surface),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -255,7 +319,7 @@ class _NavCard extends StatelessWidget {
                   color: iconColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, size: 24, color: iconColor),
+                child: Icon(icon, size: 24, color: AppColors.text),
               ),
               const SizedBox(width: 16),
               Expanded(
