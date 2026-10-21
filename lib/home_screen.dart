@@ -20,7 +20,6 @@ class ContentStudioHome extends StatefulWidget {
   final NavCallback? onReviewAllIdeas;
   final NavCallback? onAddNewIdea;
   final CreateCallback? onCreateContent;
-  final NavCallback? onManageVideos;
 
   /// Legacy support — if provided, these appear as additional Create options.
   final NavCallback? onImagePrompt;
@@ -39,7 +38,6 @@ class ContentStudioHome extends StatefulWidget {
     this.onReviewAllIdeas,
     this.onAddNewIdea,
     this.onCreateContent,
-    this.onManageVideos,
     this.onImagePrompt,
     this.onCarouselPrompts,
     this.onGeminiVideo,
@@ -154,19 +152,6 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         onTap: widget.onMyContent,
       ),
     ]);
-
-    if (widget.onManageVideos != null) {
-      goToActions.addAll([
-        const SizedBox(height: 10),
-        _NavCard(
-          icon: Icons.video_file_outlined,
-          iconColor: AppColors.primary,
-          title: 'Video Library',
-          subtitle: 'Full video asset management with quality checks',
-          onTap: widget.onManageVideos!,
-        ),
-      ]);
-    }
 
     final children = <Widget>[
       const Text(

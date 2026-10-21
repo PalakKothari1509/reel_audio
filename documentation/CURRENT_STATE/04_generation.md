@@ -174,6 +174,36 @@ From `video_builder.dart` comments: Instagram overlays its own UI (header, profi
 3. **429 has two meanings**: Per-minute (retry) vs per-day (stop) — the app distinguishes them
 4. **Timeout is not retried**: A request that timed out will usually time out again
 5. **Missing models cached**: 404'd model names are remembered for 7 days
+6. **400 = switch models** (Path A only): "Model rejected request — switching to next model..."
+7. **Path B has no fallback**: 400/429/503 → immediate hard failure (no retry, no switch)
+
+---
+
+## 5. Two Parallel Gemini Code Paths (CORRECTION)
+
+### Path A: Raw HTTP via `geminiPost()` — `lib/gemini_call.dart` (210 lines)
+
+All text generation calls from `content_studio_service.dart` go through `geminiPost()` with:
+- Primary model: `gemini-3.8-flash` (content_studio_service.dart:18)
+- Fallback chain: `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-2.5-flash` (content_studio_service.dart:27-32)
+- Full retry, backoff, 429 detection, model fallback (404 cache, 400 model switch)
+- **Call sites using this path**: `content_studio_service.dart` (6 calls), `caption_generator.dart` (409:), `story_ideas.dart` (4 calls), `prompt_builder.dart` (2 calls), `main.dart` (1 call)
+
+### Path B: SDK via `google_generative_ai` — `lib/gemini_client.dart` (381 lines)
+
+**This is NOT an empty stub.** It's 381 lines that implements `AIProvider` using the `google_generative_ai` package directly:
+- Model: `gemini-3.5-flash-lite` (gemini_client.dart:17) — **NOT** the same as Path A
+- **No retry, no fallback, no backoff** — the comment at line 12-14 explicitly says it "gets none of that helper's model fallback and 404 handling"
+- Used by `AiContentServiceImpl` (created at main.dart:96)
+- `AiContentServiceImpl` is created but only appears in main.dart — **verify if actually used in any screen flow**
+
+**400 Error Risk**: Path B (`gemini_client.dart`) uses `gemini-3.5-flash-lite` with no fallback. If this model returns 400, the call fails immediately with no retry. This is likely the source of the user's intermittent failures ("works 2 out of 10 times").
+
+### Path B Call Sites
+- `main.dart:96` — creates `AiContentServiceImpl(GeminiClient(...))`
+- `AiContentServiceImpl` implements `AiContentService` (ai_content_service_impl.dart)
+
+> **Finding**: Two Gemini code paths exist with different models, different error handling, and different callers. Path B has zero retry/fallback — any 400/429/503 is a hard failure.
 
 ---
 

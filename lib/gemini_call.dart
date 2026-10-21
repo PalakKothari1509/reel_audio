@@ -18,14 +18,14 @@ import 'package:path_provider/path_provider.dart';
 /// as-is, because retrying a bad request just makes the same mistake more slowly.
 ///
 /// 500 is Google's own fault, 503 is Google being busy, 429 is too many too quickly.
-const _retryable = {429, 500, 503};
+const retryableStatusCodes = {429, 500, 503};
 
 /// How long to wait before each retry, when Google does not say.
 ///
 /// A real demand spike on a popular model lasts longer than a few seconds, so giving
 /// up quickly meant the retry rarely got to do its job at all. Waiting a minute beats
 /// retyping the story, as long as the screen keeps saying why it is waiting.
-const _backoff = [
+const backoffDurations = [
   Duration(seconds: 4),
   Duration(seconds: 10),
   Duration(seconds: 20),
@@ -165,13 +165,13 @@ Future<http.Response> geminiPost({
     response = await http.post(url, headers: headers, body: body).timeout(timeout);
   }
 
-  for (final fallback in _backoff) {
-    if (!_retryable.contains(response.statusCode)) return response;
+  for (var i = 0; i < backoffDurations.length; i++) {
+    if (!retryableStatusCodes.contains(response.statusCode)) return response;
     // Out for the day: stop here rather than spend four more requests learning it.
     if (response.statusCode == 429 && isDailyLimit(response.body)) return response;
 
     // Google's own number wins when it gives one.
-    final wait = googlesRetryDelay(response.body) ?? fallback;
+    final wait = googlesRetryDelay(response.body) ?? backoffDurations[i];
     final why = response.statusCode == 429
         ? 'Gemini is rate limiting this key'
         : 'Gemini is busy';

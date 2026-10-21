@@ -28,7 +28,7 @@
 1. **Callback-driven shell**: `ContentStudioHome` (main navigation) delegates to `ContentStudioScreens` via callbacks (`onCreateReel`, `onMyContent`, etc.). Screens don't know about each other.
 2. **Offline-first persistence**: All data via `JsonFileStore<T>` — generic JSON file store with per-row decoding and safe defaults. Files live in `getApplicationDocumentsDirectory()/content_library/`.
 3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 99 built-in ideas (including 6 safety hooks). `HookStore` merges user edits from `hooks.json`. `kRewrittenStories` overrides story details at runtime.
-4. **Single Gemini path**: All text requests go through `geminiPost()` in `gemini_call.dart` with unified retry/backoff logic.
+4. **Two Gemini paths**: Path A (`gemini_call.dart`) — raw HTTP with retry/fallback; Path B (`gemini_client.dart`) — SDK-based, no retry/fallback (see 04_generation.md §5)
 5. **Story label parsing**: `StoryGenerator.extractLine()` parses `Story:`, `Twist:`, `Resolution:`, `Moral:` labels (with `PART 1:` fallback).
 
 ## Folder Map (lib/)
@@ -47,7 +47,7 @@ Full file listing with line counts:
 | 43 | bucket_group.dart | DEAD CODE — group widget |
 | 545 | caption_generator.dart | Instagram caption generator with house format |
 | 519 | caption_renderer.dart | Caption rendering engine |
-| 250 | characters.dart | Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher characters |
+| 250 | characters.dart | Ria, Rio, Cuty, Mumma, Papa, Daadi, Teacher, Robot (8 chars) |
 | 491 | content_audit.dart | Content audit helper |
 | 548 | content_axes.dart | Enums: ContentBucket, ContentFormat, IdeaStatus, etc. |
 | 118 | content_collections.dart | Thematic collection grouping (collectionOf) |
@@ -66,8 +66,8 @@ Full file listing with line counts:
 | 76 | file_storage.dart | File storage for video assets |
 | 629 | format_adapter.dart | Package → format-specific output adapter |
 | 803 | format_handbook.dart | Format rules and definitions |
-| 211 | gemini_call.dart | **The real Gemini HTTP client** (see 04_generation.md) |
-| 381 | gemini_client.dart | Empty wrapper stub (all logic in gemini_call.dart) |
+| 211 | gemini_call.dart | Primary Gemini HTTP client (Path A, with retry/fallback) |
+| 381 | gemini_client.dart | SDK-based Gemini client (Path B, no retry/fallback) — implements AIProvider |
 | 198 | gemini_video_master_prompt.dart | Gemini prompt for video planning |
 | 346 | home_screen.dart | ContentStudioHome (main navigation shell) |
 | 102 | hook_system.dart | Hook system logic |

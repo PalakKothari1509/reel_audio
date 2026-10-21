@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter/foundation.dart';
 
- import 'ai_parser_validator.dart';
+import 'ai_parser_validator.dart';
 import 'ai_provider.dart';
 import 'brand_system.dart';
 import 'content_generator.dart';
+import 'gemini_call.dart';
 import 'regenerator.dart';
 
 class GeminiClient implements AIProvider {
@@ -14,37 +16,215 @@ class GeminiClient implements AIProvider {
   // 404 handling. The name therefore has to be one this key can actually serve.
   // It was 'gemini-1.5-flash', which no longer resolves; the rest of the app
   // already uses the name below, so both paths now ask for the same model.
+  // Retry/fallback (404 -> fallback model, 429/500/503 -> backoff with
+  // googlesRetryDelay + isDailyLimit) is now applied via [_safeGenerate],
+  // sharing the constants from gemini_call.dart.
   static const String _modelName = 'gemini-3.5-flash-lite';
   static const int _maxOutputTokens = 8192;
   static const double _temperature = 0.7;
-  static const Duration _timeout = Duration(seconds: 45);
 
   final GenerativeModel _model;
   final String _apiKey;
+  final GenerationConfig _genConfig;
 
   GeminiClient({required String apiKey})
       : _apiKey = apiKey,
+        _genConfig = _buildGenerationConfig(),
         _model = GenerativeModel(
           model: _modelName,
           apiKey: apiKey,
-          generationConfig: GenerationConfig(
-            temperature: _temperature,
-            topP: 0.9,
-            topK: 40,
-            maxOutputTokens: _maxOutputTokens,
-            responseMimeType: 'application/json',
-            responseSchema: _contentPackageSchema(),
-            // `thinkingConfig` is deliberately absent. The `google_generative_ai` SDK
-            // has no such parameter, which is why the reasoning cap could only ever be
-            // applied to the hand-built JSON call sites and never here.
-            //
-            // That leaves this the one large generation call that can still spend
-            // budget thinking and return truncated JSON. Fixing it means dropping the
-            // SDK for a hand-built request, or moving off a deprecated package — both
-            // are T-26, not a one-line change.
-          ),
+          generationConfig: _buildGenerationConfig(),
           systemInstruction: Content.system(_systemPrompt()),
         );
+
+  static GenerationConfig _buildGenerationConfig() => GenerationConfig(
+        temperature: _temperature,
+        topP: 0.9,
+        topK: 40,
+        maxOutputTokens: _maxOutputTokens,
+        responseMimeType: 'application/json',
+        responseSchema: _contentPackageSchema(),
+        // `thinkingConfig` is deliberately absent. The `google_generative_ai` SDK
+        // has no such parameter, which is why the reasoning cap could only ever be
+        // applied to the hand-built JSON call sites and never here.
+        //
+        // That leaves this the one large generation call that still spends budget
+        // thinking and may return truncated JSON. Fixing it means dropping the SDK
+        // for a hand-built request, or moving off a deprecated package — both
+        // are T-26, not a one-line change.
+      );
+
+  static const String _fallbackModel = 'gemini-3.5-flash';
+  static const Duration _requestTimeout = Duration(seconds: 45);
+
+  /// Extracts a numeric HTTP status code from an SDK exception message.
+  ///
+  /// The `google_generative_ai` SDK (v0.4.x) does not expose a structured
+  /// status code on its exceptions. For 500+ responses it throws
+  /// `GenerativeAIException('Server Error [503]: ...')`, embedding the code in
+  /// the message. For non-500 responses it calls `parseError()` which creates
+  /// `ServerException` with the raw JSON body in the message — that body
+  /// contains Google's error `status` string (e.g. `NOT_FOUND`,
+  /// `RESOURCE_EXHAUSTED`).
+  ///
+  /// We extract the code so the same retry/fallback logic from
+  /// `gemini_call.dart` applies to both the raw-HTTP and SDK paths.
+  static int _statusCodeFromException(GenerativeAIException e) {
+    final msg = e.toString();
+
+    // Format: "Server Error [503]: ..."
+    final bracketMatch = RegExp(r'Server Error \[(\d+)\]').firstMatch(msg);
+    if (bracketMatch != null) {
+      return int.parse(bracketMatch.group(1)!);
+    }
+
+    // Format: JSON body with "status": "NOT_FOUND"
+    final statusMatch = RegExp(r'"status"\s*:\s*"(\w+)"').firstMatch(msg);
+    if (statusMatch != null) {
+      return switch (statusMatch.group(1)) {
+        'NOT_FOUND' => 404,
+        'RESOURCE_EXHAUSTED' => 429,
+        'UNAVAILABLE' => 503,
+        'INTERNAL' => 500,
+        'PERMISSION_DENIED' => 403,
+        'INVALID_ARGUMENT' => 400,
+        'UNAUTHENTICATED' => 401,
+        _ => 500,
+      };
+    }
+
+    // For InvalidApiKey and other non-server errors, default to 500 so the
+    // retry loop handles them consistently.
+    return 500;
+  }
+
+  /// Wraps a single SDK `generateContent` call with the same retry-and-fallback
+  /// logic that `geminiPost` in `gemini_call.dart` applies to raw HTTP requests.
+  ///
+  /// The SDK throws `GenerativeAIException` (subtypes: `ServerException`,
+  /// `InvalidApiKey`, `UnsupportedUserLocation`) for HTTP errors rather than
+  /// returning a response with a status code. Without this wrapper each transient
+  /// failure immediately throws, triggering the AIProviderWithFallback template
+  /// path even though a retry would likely succeed.
+  Future<GenerateContentResponse> _safeGenerate(
+    Future<GenerateContentResponse> Function(GenerativeModel model) call,
+    String operationName,
+    void Function(String message)? onWait,
+  ) async {
+    var retryable = false;
+    var firstCode = 0;
+    var firstBody = '';
+    GenerativeModel? fallback;
+
+    // Initial attempt on the primary model.
+    try {
+      return await call(_model).timeout(_requestTimeout);
+    } on GenerativeAIException catch (e) {
+      final code = _statusCodeFromException(e);
+      final body = e.toString();
+
+      // 404 means the model name does not resolve for this key — swap to fallback
+      // model and try once. Same logic as geminiPost's 404 handling.
+      if (code == 404 && _fallbackModel != _modelName) {
+        debugPrint('GeminiClient.$operationName: model $_modelName not available, trying $_fallbackModel');
+        fallback = _buildFallbackModel();
+        try {
+          return await call(fallback).timeout(_requestTimeout);
+        } on GenerativeAIException catch (e2) {
+          final code2 = _statusCodeFromException(e2);
+          final body2 = e2.toString();
+          if (retryableStatusCodes.contains(code2)) {
+            retryable = true;
+            firstCode = code2;
+            firstBody = body2;
+          } else {
+            _handleFailure(code2, body2, operationName);
+          }
+        } on TimeoutException {
+          throw Exception(geminiBusyMessage(503, 'Request timed out after $_requestTimeout'));
+        }
+      } else if (retryableStatusCodes.contains(code)) {
+        // Transient error — enter the retry loop below.
+        retryable = true;
+        firstCode = code;
+        firstBody = body;
+      } else {
+        _handleFailure(code, body, operationName);
+      }
+    } on TimeoutException {
+      throw Exception(geminiBusyMessage(503, 'Request timed out after $_requestTimeout'));
+    }
+
+    // Retry loop for transient errors (429, 500, 503) — mirrors geminiPost.
+    if (!retryable) {
+      // If not retryable and we didn't return above, the first attempt succeeded
+      // silently (shouldn't happen, but guard against it).
+      throw Exception(geminiBusyMessage(503, 'Unexpected state for $operationName'));
+    }
+
+    for (var i = 0; i < backoffDurations.length; i++) {
+      // Daily limit on first code — already tried, propagate without retry.
+      if (i == 0 && firstCode == 429 && isDailyLimit(firstBody)) {
+        _handleFailure(firstCode, firstBody, operationName);
+      }
+
+      final wait = googlesRetryDelay(firstBody) ?? backoffDurations[i];
+      final why = firstCode == 429
+          ? 'Gemini is rate limiting this key'
+          : 'Gemini is busy';
+
+      for (var left = wait.inSeconds; left > 0; left--) {
+        onWait?.call('$why — trying again in ${left}s...');
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+
+      try {
+        final model = fallback ?? _model;
+        return await call(model).timeout(_requestTimeout);
+      } on GenerativeAIException catch (e) {
+        final code = _statusCodeFromException(e);
+        final body = e.toString();
+
+        // Not transient — propagate with a user-friendly message.
+        if (!retryableStatusCodes.contains(code)) {
+          _handleFailure(code, body, operationName);
+        }
+
+        // Daily limit — stop retrying, let the message propagate.
+        if (code == 429 && isDailyLimit(body)) {
+          _handleFailure(code, body, operationName);
+        }
+
+        // Still transient — continue the retry loop with this new error info.
+        firstCode = code;
+        firstBody = body;
+      } on TimeoutException {
+        throw Exception(geminiBusyMessage(503, 'Request timed out after $_requestTimeout'));
+      }
+    }
+
+    // Exhausted all retries — throw a user-friendly message.
+    throw Exception(geminiBusyMessage(503, 'All retry attempts exhausted'));
+  }
+
+  /// Builds a fallback [GenerativeModel] using [_fallbackModel] with the same
+  /// [GenerationConfig] and system instruction as [_model].
+  GenerativeModel _buildFallbackModel() => GenerativeModel(
+        model: _fallbackModel,
+        apiKey: _apiKey,
+        generationConfig: _genConfig,
+        systemInstruction: Content.system(_systemPrompt()),
+      );
+
+  Never _handleFailure(int code, String body, String operationName) {
+    if (code == 429 && isDailyLimit(body)) {
+      throw Exception(geminiBusyMessage(429, body));
+    }
+    if (retryableStatusCodes.contains(code)) {
+      throw Exception(geminiBusyMessage(code, body));
+    }
+    throw Exception('GeminiClient.$operationName error $code: $body');
+  }
 
   @override
   String get providerName => 'Gemini 3.6 Flash';
@@ -54,7 +234,11 @@ class GeminiClient implements AIProvider {
 
   @override
   Future<void> testConnection() async {
-    final response = await _model.generateContent([Content.text('Test connection - reply with "OK"')]).timeout(_timeout);
+    final response = await _safeGenerate(
+      (model) => model.generateContent([Content.text('Test connection - reply with "OK"')]),
+      'testConnection',
+      null,
+    );
     if (response.text?.contains('OK') != true) {
       throw Exception('Connection test failed: unexpected response');
     }
@@ -63,14 +247,22 @@ class GeminiClient implements AIProvider {
   @override
   Future<ContentPackage> generate(IdeaInput input) async {
     final prompt = _buildGeneratePrompt(input);
-    final response = await _model.generateContent([Content.text(prompt)]).timeout(_timeout);
+    final response = await _safeGenerate(
+      (model) => model.generateContent([Content.text(prompt)]),
+      'generate',
+      (msg) => debugPrint('GeminiClient.generate: $msg'),
+    );
     return parseResponse(response.text ?? '{}', input);
   }
 
   @override
   Future<ContentPackage> regenerate(ContentPackage pkg, RegenerateTarget target, RegenerateStyle style) async {
     final prompt = _buildRegeneratePrompt(pkg, target, style);
-    final response = await _model.generateContent([Content.text(prompt)]).timeout(_timeout);
+    final response = await _safeGenerate(
+      (model) => model.generateContent([Content.text(prompt)]),
+      'regenerate',
+      (msg) => debugPrint('GeminiClient.regenerate: $msg'),
+    );
     return parseResponse(response.text ?? '{}', IdeaInput(
       topic: pkg.idea,
       bucket: pkg.bucket,

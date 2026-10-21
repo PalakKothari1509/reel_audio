@@ -401,14 +401,7 @@ class ContentLibraryService {
       result.add(_hookToIdea(h, isCustom: h.custom));
     }
 
-    // 3. Safety hooks (already included in kDefaultHooks via kDefaultHooksWithRewrite,
-    //    but we check here to be safe in case they were removed from the main list)
-    for (final h in kSafetyHooks) {
-      if (!seen.add(h.id)) continue;
-      result.add(_hookToIdea(h, isCustom: h.custom));
-    }
-
-    // 4. QuickIdea posts from kDay14Posts
+    // 3. QuickIdea posts from kDay14Posts
     for (final q in kDay14Posts) {
       if (!seen.add(q.id)) continue;
       result.add(_quickIdeaToContentIdea(q));

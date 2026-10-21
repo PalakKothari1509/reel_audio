@@ -24,7 +24,6 @@ class DashboardScreen extends StatefulWidget {
   final VoidCallback? onReviewAllIdeas;
   final VoidCallback? onAddNewIdea;
   final VoidCallback? onCreateContent;
-  final VoidCallback? onManageVideos;
 
   const DashboardScreen({
     super.key,
@@ -32,7 +31,6 @@ class DashboardScreen extends StatefulWidget {
     this.onReviewAllIdeas,
     this.onAddNewIdea,
     this.onCreateContent,
-    this.onManageVideos,
   });
 
   @override
@@ -346,14 +344,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           title: 'Create Content',
           subtitle: 'Select an idea and generate stories, scripts, prompts',
           onTap: widget.onCreateContent,
-        ),
-        Gap.s,
-        _mainActionCard(
-          icon: Icons.video_library_outlined,
-          color: AppColors.accent,
-          title: 'My Videos',
-          subtitle: 'Upload, preview, and manage finished reels',
-          onTap: widget.onManageVideos,
         ),
       ],
     );

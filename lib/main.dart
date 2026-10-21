@@ -32,6 +32,7 @@ import 'theme.dart';
 import 'music.dart';
 import 'home_screen.dart';
 import 'content_library_screen.dart';
+import 'content_library_service.dart';
 import 'review_idea_screen.dart';
 import 'ai_content_service.dart';
 import 'ai_content_service_impl.dart';
@@ -477,7 +478,9 @@ Future<void> main() async {
       home: ContentStudioHome(
         onCreateReel: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const StoryScreen()),
+          MaterialPageRoute(
+            builder: (_) => StoryScreen(ideaId: ideaId),
+          ),
         ),
         onContentLibrary: () => Navigator.push(
           _appNavigatorKey.currentContext!,
@@ -492,7 +495,7 @@ Future<void> main() async {
         onCreateContent: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(
-            builder: (_) => const StoryScreen(),
+            builder: (_) => StoryScreen(ideaId: ideaId),
           ),
         ),
         onMyContent: () => Navigator.push(
@@ -678,8 +681,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class StoryScreen extends StatefulWidget {
   final String initialText;
+  final String? ideaId;
 
-  const StoryScreen({super.key, this.initialText = ''});
+  const StoryScreen({super.key, this.initialText = '', this.ideaId});
+
   @override
   State<StoryScreen> createState() => _StoryScreenState();
 }
@@ -707,6 +712,21 @@ class _StoryScreenState extends State<StoryScreen> {
     super.initState();
     if (widget.initialText.isNotEmpty) _descCtrl.text = widget.initialText;
     _descCtrl.addListener(_autoSave);
+    if (widget.ideaId != null && widget.ideaId!.isNotEmpty) {
+      _loadIdea(widget.ideaId!);
+    }
+  }
+
+  /// Loads a story idea from the content library and populates the story box.
+  Future<void> _loadIdea(String ideaId) async {
+    final idea = await ContentLibraryService.instance.getIdeaById(ideaId);
+    if (idea == null || !mounted) return;
+    setState(() {
+      _descCtrl.text = idea.storyDetail.isNotEmpty
+          ? idea.storyDetail
+          : '${idea.problem}\n${idea.lesson}';
+      _status = '💡 ${idea.title} — fill in anything you like, then write the script.';
+    });
   }
 
   @override

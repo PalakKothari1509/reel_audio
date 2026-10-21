@@ -1,3 +1,4 @@
+import 'plan_data.dart';
 import 'content_ideas.dart';
 import 'prompt_vault.dart';
 import 'quality_check_center.dart';
@@ -92,7 +93,9 @@ class AssetCompletenessService {
 
     final results = <AssetCompleteness>[];
 
-    for (final idea in kDefaultHooks) {
+    // 1. HookIdeas with user edits applied (via HookStore, not kDefaultHooks directly)
+    final hooks = await HookStore.load();
+    for (final idea in hooks) {
       if (!idea.forApp) continue;
       results.add(_checkFromPreloaded(
         contentId: idea.id,

@@ -74,4 +74,4 @@ PromoCommentVaultScreen.
   and the library UI depend on, but not the screens themselves.
 
 ## Running
-`flutter test` from the repo root; the README states 412 tests as of the last count.
+`flutter test` from the repo root. Current count: **499 tests** (verified by running `flutter test`).

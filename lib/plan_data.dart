@@ -63,7 +63,7 @@ class HookStore {
     } catch (_) {}
 
     final defaults = {
-      for (final d in kDefaultHooks) d.id: d,
+      for (final d in kDefaultHooksWithRewrite) d.id: d,
     };
 
     return [

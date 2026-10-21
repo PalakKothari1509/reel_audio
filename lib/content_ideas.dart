@@ -164,7 +164,9 @@ class HookIdea {
       'Post format: $postFormat\n'
       'Strategy: $strategy\n'
       'Caption: $caption\n'
-      'Pinned comment: $pinnedComment';
+      'Pinned comment: $pinnedComment\n'
+      '${storyDetail.isNotEmpty ? '$storyDetail\n' : ''}'
+      'Status: ${usedOn.isEmpty ? "New" : usedOn}';
 }
 
 const kHookCategories = [
