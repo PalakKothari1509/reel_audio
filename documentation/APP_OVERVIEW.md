@@ -79,22 +79,26 @@ OfflineEngagementGenerator().generate(storyMoral: String) → OfflineEngagementP
 - Returns caption, hashtags (5), pinnedComment, suggestedReplies (6), followReason
 - `buildOfflineImagePrompt()` and `buildOfflineCarouselSlides()` for other formats
 
-## Architecture flow
+## Data Layer
 
-```
-User selects idea from Content Library (kDefaultHooksWithRewrite)
-    ↓
-If online: content_studio_service.dart → generateImagePrompt/generateCarouselPrompts/generateGeminiVideoPrompts
-    ↓
-If offline or Gemini fails (429/400/503): content_studio_screens.dart
-    ↓
-OfflineStoryMakerScreen:
-  1. _storyFromHook(hook) → GeneratedStory (uses hook.problem, hook.lesson, hook.storyDetail)
-  2. OfflineVideoPromptGenerator.generateFromStory(story, duration, characters)
-     → Uses: generateHookText() for overlays, characterDescription() for blocks
-     → Uses: kVisualStyle, kNegativeInstructions from master_prompt.dart
-  3. OfflineEngagementGenerator.generate(story.moral)
-```
+All persistent data is stored as JSON files in the app's documents directory, backed by a shared `JsonFileStore<T>` base class. The full store catalog, model fields, ID schemes, cross-store relationships, and error-resilience patterns are documented in [DATA.md](./DATA.md).
+
+**Quick reference of stores:**
+
+| Store | JSON file | Model | Purpose |
+|---|---|---|---|
+| `ContentLibraryStore` | `content_library.json` | `ContentLibraryItem` | All content packages with status flow |
+| `PromptVault` | `saved_prompts.json` | `SavedPrompt` | Versioned AI prompts |
+| `VideoLibrary` | `video_assets.json` | `VideoAsset` | Video metadata + file references |
+| `HookStore` | `hooks.json` | `HookIdea` | User-edited hooks + rewrites |
+| `ScheduleStore` | `schedule.json` | `PostSlot` | Posting schedule (7 slots) |
+| `PostLogStore` | `posts.json` | `PostRecord` | Posted content + performance |
+| `PromoCommentStore` | `promo_comments.json` | `PromoComment` | Engagement comment vault |
+| `QuickIdeaStore` | `quick_ideas.json` | `QuickIdea` | Saved quick content ideas |
+| `QuickHistoryStore` | `quick_post_history.json` | `QuickIdea` | Last 50 generated ideas |
+| `QualityCheckCenter` | `quality_reports.json` | `QualityReport2` | Quality check reports |
+
+See DATA.md for full model field tables, methods, ID schemes, versioning, error resilience, and test seams.
 
 ## Architecture flow
 
@@ -194,20 +198,24 @@ The app is organized into six connected modules for managing content from idea t
 14. **Navigation hub** — Home screen has nav cards for Content Library, My Content, Prompt Vault, and Video Library
 
 ## Key files to modify
-- `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kRewrittenStories, kSafetyHooks)
+- `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kRewrittenStories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite)
+- `lib/hook_templates.dart` — 12 hook templates, HookGenerator class, power words lists
 - `lib/content_collections.dart` — Add/edit collection mappings
 - `lib/characters.dart` — Update character descriptions (kCharacterOptions, kCharacterNames, kCharacterDescriptions)
 - `lib/story_generator_offline.dart` — Add/edit story templates
 - `lib/master_prompt.dart` — Update brand rules
-- `lib/plan_data.dart` — HookStore.load() applies kRewrittenStories
+- `lib/plan_data.dart` — HookStore, ScheduleStore, PostLogStore; HookStore.load() applies kRewrittenStories
 - `lib/prompt_vault.dart` — SavedPrompt model and PromptVault store
 - `lib/gemini_video_master_prompt.dart` — VideoProductionPlan template and renderer
 - `lib/video_production_plan.dart` — VideoProductionPlan and ClipPlan models
 - `lib/video_library.dart` — VideoAsset model and VideoStatus enum
 - `lib/video_library_store.dart` — VideoLibrary store
-- `lib/file_storage.dart` — FileStorageManager for app-managed video storage
-  - `lib/quality_check_center.dart` — QualityReport2, QualityFinding, QualityCheckCenter
+- `lib/json_file_store.dart` — Base class for all JSON stores (path resolution, test seam, per-row decoding)
+- `lib/file_storage.dart` — FileStorageManager for app-managed video file storage
+- `lib/quality_check_center.dart` — QualityReport2, QualityFinding, QualityCheckCenter
 - `lib/asset_completeness_service.dart` — AssetCompleteness model and AssetCompletenessService
-- `lib/prompt_vault_screen.dart` — UI for Prompt Vault browse/search/copy/delete
-- `lib/video_library_screen.dart` — UI for Video Library upload/preview/status management
-- `lib/content_studio_screens.dart` — Auto-saves video prompts to PromptVault after generation
+- `lib/quality_check.dart` — Legacy QualityReport, QualityChecker, and 35 quality rules
+- `lib/content_library.dart` — ContentLibraryItem model and ContentLibraryStore
+- `lib/models/quick_idea.dart` — QuickIdea model, QuickIdeaStore, QuickHistoryStore
+- `lib/quick_content.dart` — PromoComment model and PromoCommentStore
+- `documentation/DATA.md` — Full data architecture reference (stores, models, IDs, relationships, error resilience)
