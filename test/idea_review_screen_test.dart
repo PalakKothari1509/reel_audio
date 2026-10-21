@@ -361,6 +361,56 @@ void main() {
       expect(regenerateCalled, isTrue);
     });
 
+    testWidgets('Improve band shows Improve Idea button when onEditIdea provided',
+        (tester) async {
+      bool editCalled = false;
+      final evaluation = buildEvaluation(
+        score: 8,
+        band: 'Improve',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: IdeaReviewScreen(
+            evaluation: evaluation,
+            originalIdea: 'test',
+            onApprove: (_) {},
+            onRegenerate: () {},
+            onBack: () {},
+            onEditIdea: () {
+              editCalled = true;
+            },
+          ),
+        ),
+      );
+
+      await tester.ensureVisible(find.text('Improve Idea'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Improve Idea'));
+      await tester.pump();
+
+      expect(editCalled, isTrue);
+    });
+
+    testWidgets('Improve band hides Improve Idea button when onEditIdea is null',
+        (tester) async {
+      final evaluation = buildEvaluation(score: 8, band: 'Improve');
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: IdeaReviewScreen(
+            evaluation: evaluation,
+            originalIdea: 'test',
+            onApprove: (_) {},
+            onRegenerate: () {},
+            onBack: () {},
+          ),
+        ),
+      );
+
+      expect(find.text('Improve Idea'), findsNothing);
+    });
+
     testWidgets('shows status when provided', (tester) async {
       final evaluation = buildEvaluation();
 

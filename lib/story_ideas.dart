@@ -231,6 +231,15 @@ rewordings of one line. The examples show the style only; write new ones for thi
 
 "score" is 1 to 10 and should roughly equal the number of checks passed. Be strict:
 9 or 10 means ready to make today.
+
+GLOBAL RULES for all generated content:
+1. Keep every original ID. For merged archived items, preserve the ID as an alias/status so app references do not break.
+2. No Navratri-specific publishing now that Navratri is over. Seasonal concepts are shelved or converted to evergreen only where stated.
+3. Stories must show a real problem, child reaction, escalation, earned resolution and a short memorable ending. Natural Indian Hinglish; no forced moral speeches.
+4. Robot is funny when it misunderstands Ria literally, but not in every story. Keep jokes visual and understandable to a preschooler.
+5. A rating is not a promise: do not mark all ideas 8-9+. Re-score only after rewrite against hook, relatability, originality, payoff and shareability.
+6. Captions that specify hashtags must use exactly five. Do not invent personal experiences, footage, audience votes, milestones or child quotes.
+7. Safety stories must stay calm, age-appropriate and caregiver-centred; get expert review where noted.
 ''';
 
   final response = await geminiPost(

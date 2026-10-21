@@ -62,6 +62,9 @@ class HookIdea {
   /// so an update that adds new ones never fights with your changes.
   final bool custom;
 
+  /// True for posts that have been retired from active rotation.
+  final bool archived;
+
   /// Full 3-part video prompt detail for offline generation. Empty when the
   /// offline generator should derive prompts from the story template fields.
   final String storyDetail;
@@ -80,6 +83,7 @@ class HookIdea {
     this.forApp = true,
     this.usedOn = '',
     this.custom = false,
+    this.archived = false,
     this.storyDetail = '',
   });
 
@@ -97,6 +101,7 @@ class HookIdea {
     bool? forApp,
     String? usedOn,
     bool? custom,
+    bool? archived,
     String? storyDetail,
   }) =>
       HookIdea(
@@ -113,6 +118,7 @@ class HookIdea {
         forApp: forApp ?? this.forApp,
         usedOn: usedOn ?? this.usedOn,
         custom: custom ?? this.custom,
+        archived: archived ?? this.archived,
         storyDetail: storyDetail ?? this.storyDetail,
       );
 
@@ -126,6 +132,7 @@ class HookIdea {
         'forApp': forApp,
         'usedOn': usedOn,
         'custom': custom,
+        'archived': archived,
         'postFormat': postFormat,
         'strategy': strategy,
         'caption': caption,
@@ -147,6 +154,7 @@ class HookIdea {
         forApp: j['forApp'] as bool? ?? true,
         usedOn: j['usedOn'] as String? ?? '',
         custom: j['custom'] as bool? ?? false,
+        archived: j['archived'] as bool? ?? false,
         storyDetail: j['storyDetail'] as String? ?? '',
       );
 
@@ -191,6 +199,7 @@ const kSafetyHooks = <HookIdea>[
     problem: 'A relative asks for a hug and a kiss, and Ria does not want to',
     lesson: 'Bachche ko "nahi" kehne ka haq hai, aur bade ko sunna chahiye',
     forApp: true,
+    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत मम्मी या पापा के पास चला जाओ। Family code word तय करें — अगर कोई पूछे, तो कहें "मम्मी ने कहा था!" कभी भी अपना number न दिखाएं। #ChildSafety #GoodTouchBadTouch #SafetyFirst #IndianParents #FunLearningWithPalak',
     storyDetail: '''
 Story: Daadi ke ghar ek rishtedaar uncle aate hain: "Aao Ria, god mein baitho, ek pappi do!" Ria Mumma ke peeche chhup jaati hai: "Nahi."
 Twist: Uncle hanke: "Arre, ek hi toh pappi hai!" Ria ka chehra sikud jaata hai. Mumma aage aati hai, Ria ke kandhe par haath rakhke: "Ria ki marzi. Ria, tum high-five doge ya door se bye?"
@@ -206,6 +215,7 @@ Moral: Mera badan, meri marzi. Aur batana kabhi galat nahi hota.
     problem: 'A person Ria does not know offers her a chocolate at the park',
     lesson: 'Jo hume nahi jaanta, uske saath nahi jaate',
     forApp: true,
+    caption: 'जो हम नहीं जानते, उनसे कुछ नहीं लेना सीखाएं। Family code word: अगर कोई दावा करे या पूछे तो कोड शब्द बताओ। #StrangerSafety #ChildSafety #SafetyTips #IndianParents #FunLearningWithPalak',
     storyDetail: '''
 Story: Park mein Ria jhoola jhool rahi hai. Ek aunty paas aake chocolate dikhati hain: "Ria, ye lo. Aao, udhar chalo, aur bhi hai."
 Twist: Ria jhoola rokti hai. Woh jaanti hai ki Mumma ne kaha tha: "Jo hume nahi jaante, unse kuch nahi lena." Woh chocolate ko dekhti hai, phir aunty ko, phir bench par baithi Mumma ko.
@@ -221,8 +231,9 @@ Moral: Mumma ke paas bhaago. Chocolate kal bhi mil jayegi.
     problem: 'Toddlers run toward the road without stopping or looking',
     lesson: 'Red light, green light ka khel ghar par seekho',
     forApp: true,
+    caption: 'सड़क पार करते समय हमेशा adult के साथ चलें। Family code word: अगर कोई मदद पूछे तो कहें कोड शब्द। #RoadSafety #ChildSafety #CrossingSafety #IndianParents #FunLearningWithPalak',
     storyDetail: '''
-Story: Ghar mein Cuty "red light, green light" ka khel khilata hai: Cuty haath uthata hai toh Ria aur Rio ruk jaate hain, haath hilata hai toh daudte hain. Dono kai baar hanste hue haante hain.
+Story: Ghar mein Cuty "red light, green light" ka khel khilata hai: Cuty haath uthata hai toh Ria aur Rio ruk jaate hain, haath hilata hai toh daudte hain. Dono kai baar hanste hue haste hain.
 Twist: Agle din sadak ke kinare Rio daudne ko hota hai... aur ek second ke liye ruk jaata hai. Woh Mumma ki taraf dekhta hai: "Red light!"
 Resolution: Mumma: "Haan. Ab dekho dono taraf. Gaadi aa rahi hai?" Rio dono taraf sar ghumaata hai: "Nahi!" Mumma: "Ab green light." Dono haath pakadke chalte hain.
 Moral: Khel mein seekha, sadak par kaam aaya.
@@ -236,6 +247,7 @@ Moral: Khel mein seekha, sadak par kaam aaya.
     problem: 'A preschooler cannot recall a parent\'s phone number when asked',
     lesson: 'Gaane mein yaad karna aasaan hota hai',
     forApp: true,
+    caption: 'घर में एक family code word रखें — सिर्फ़ परिवार जानता है। कभी भी real emergency number न दिखाएं, बस code word से सुरक्षित रहें। #EmergencySafety #ChildSafety #SafetyTip #IndianParents #FunLearningWithPalak',
     storyDetail: '''
 Story: Mumma poochhti hai: "Ria, Mumma ka phone number kya hai?" Ria soch mein padti hai: "Ek... do... pata nahi." Rio ko bhi nahi aata.
 Twist: Papa ek jaani-pehchani dhun mein number gaate hain, aur har dus ank ko do-teen ke tukdon mein todte hain. Rio hansta hai aur saath mein gaata hai. Cuty taal deta hai.
@@ -251,6 +263,7 @@ Moral: Number yaad hai, toh madad paas hai.
     problem: 'Ria loses her parents\' hand in a crowded fair',
     lesson: 'Kho jao toh ruk jao, aur sahi insaan se madad maango',
     forApp: true,
+    caption: 'खो जाओ तो रुक जाओ और सुरक्षित adult से मदद माँगो। Family code word: अगर कोई पूछे तो कहें "मम्मी ने सिखाया था!" #LostChild #CrowdSafety #ChildSafety #IndianParents #FunLearningWithPalak',
     storyDetail: '''
 Story: Mela mein bheed hai. Ria jhoole dekhne mein rukti hai, aur jab palti hai toh Mumma ka haath nahi hai. Aas-paas sirf pair hi pair.
 Twist: Ria ka dil zor se dhadakta hai aur uski aankhon mein aansu aa jaate hain. Woh bhaagne ko hoti hai... phir Mumma ki baat yaad aati hai: "Kho jao toh jahaan ho wahin ruko."
@@ -266,6 +279,7 @@ Moral: Ruko. Guard ya mummy ke paas jao. Apna naam batao.
     problem: 'A toddler keeps wandering into the kitchen while the stove is on',
     lesson: 'Garam jagah ke liye ek clear line banao',
     forApp: true,
+    caption: 'गर्म जगह के पास न जाना — लाल line हमेशा मानें। Family code word: अगर कोई मदद करना चाहे तो कोड शब्द बताओ। #KitchenSafety #ChildSafety #SafetyFirst #IndianParents #FunLearningWithPalak',
     storyDetail: '''
 Story: Mumma kadhai mein kuch tal rahi hain. Ria khilona lekar rasoi ki taraf aati hai: "Mumma, dekho!" Mumma jaldi se: "Garam! Peeche!" Ria chonk jaati hai.
 Twist: Agli subah Papa farsh par laal tape se rasoi ke darwaze par ek line chipkate hain: "Ye hai Laal Line. Jab gas jalti hai, yahin tak. Aage Mumma ya Papa ke saath."
@@ -331,24 +345,24 @@ Moral: Mistakes can help children discover a different approach — support mean
   ),
   HookIdea(
     id: 'h04',
-    category: 'Relatable',
+    category: 'routines',
     cover: 'Cuty Kahan Gaya?!',
-    opening: 'Poore kamre mein khilone... aur Cuty gayab!',
-    problem: 'Cuty is lost in the messy room; tidying turns into a treasure hunt',
-    lesson: 'Saaf kamra, sab kuch saamne',
+    opening: 'Ria ki awaaz tezi — "Cuty kahan gaya?!"',
+    problem: 'Room so messy they keep getting distracted',
+    lesson: 'Clear one small path at a time',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria and Rio have toys scattered all over the room. When Ria wants Cuty, she cannot find him. They search everywhere but keep getting distracted by other toys, making the room even messier.
-Twist: The search creates more clutter instead of finding Cuty.
-Resolution: Rio suggests clearing the floor first. They sort toys into baskets one area at a time, and finally find Cuty peacefully sleeping underneath a blanket in a cleared space.
-Moral: Putting things in predictable places makes them easier to find — and tidying can be a team effort.
+Story: Ria shouts, "Cuty kahan gaya?!" The floor is a toy jungle. Every time Rio searches, he starts playing.
+Twist: Ria makes a "Cuty rescue basket" — they clear just one path, then spot Cuty asleep under a blanket.
+Resolution: Rio whispers, "Hum poora room saaf karne aaye the?" Ria: "Shhh, patient so raha hai."
+Moral: Ek chhota sa raasta bhi bada madad karta hai.
 ''',
   ),
   HookIdea(
     id: 'h05',
     category: 'Relatable',
-    cover: 'Mumma Bhi Hairaan!',
+    cover: 'Ek Aur Paani!',
     opening: 'Lights band... aur Ria ko phir se paani chahiye.',
     problem: 'Bedtime stretches on with one more water, one more story, one more hug',
     lesson: 'Roz ek jaisa routine, neend jaldi aati hai',
@@ -470,7 +484,7 @@ Twist: Mumma says no, Ria's face falls—"Par mujhe bahut pasand hai!"
 Resolution: Mumma offers a deal—"Jab ghar aayenge, toh princess dress pehn lo"—Ria agrees with a smile.
 Moral: Not all "no"s are endings—sometimes they're "not now" in disguise.
 ''',
-    cover: 'When Mumma Says No',
+    cover: 'Three Kids, One No',
     opening: 'Ria protests, Rio refuses, Cuty quietly gives in.',
     problem: 'The same parent boundary can trigger three very different reactions',
     lesson: 'Kids react differently, but all of them need patience and clarity',
@@ -572,20 +586,20 @@ Moral: Doing things yourself is worth the struggle—even if they're backwards f
     lesson: 'Support effort and trust them to learn through trying',
   ),
   HookIdea(
-    id: 'pal10',
-    category: 'Warm lesson',
+     id: 'pal10',
+    category: 'parent',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Cuty suddenly says, "Mumma, tumne mujhe kal chocolate diya tha!"—referring to an event from 3 weeks ago.
-Twist: Ria adds, "Aur mujhe Saturday ko extra stories padhne wale!"
-Resolution: Mumma realizes kids remember the small moments—"Haan, maine tumhe suna tha."
-Moral: Children store up tiny kindness like treasures—you never know what they'll recall.
+Story: Mumma tells Ria at bedtime, "Aaj jaldi sona hai." Later that night, Ria tucks Teddy in and repeats Mumma's phrase: "Teddy, negotiation band."
+Twist: Mumma, sitting nearby on the bed, tries not to laugh — she's heard every word.
+Resolution: Ria whispers, "Mumma ne kaha tha!" and Mumma gives her a quiet hug.
+Moral: Jo baatein hum dete hain, wohi din mein dobara sunai deti hain — par pyaar ke saath.
 ''',
-    cover: 'Little Things Kids Remember',
-    opening: 'The bedtime story, the silly dance, the hug after a bad day.',
-    problem: 'Parents often forget that tiny everyday moments become the memories children hold',
-    lesson: 'Love is built in the little, repeated moments of the day',
+    cover: 'Mumma Ne Kaha Tha!',
+    opening: 'Mumma ne kaha — "Aaj jaldi sona hai."',
+    problem: 'Children repeat the smallest things adults say — often at exactly the wrong moment',
+    lesson: 'Small phrases stick; what we say becomes their inner voice',
   ),
   HookIdea(
     id: 'pal11',
@@ -652,36 +666,36 @@ Moral: Big feelings over small things are real—and they deserve big love to ma
     lesson: 'What seems small to us is often a big emotion to them',
   ),
   HookIdea(
-    id: 'pal15',
-    category: 'Surprising',
+     id: 'pal15',
+    category: 'parent',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria wants to set her own house rules—"Mummy, main banaungi rule!"—she declares "No vegetables" and "24-hour dessert."
-Twist: Papa fake-thinks about it—"Kya pata chal gaya ki yeh kaam nahi karega?"
-Resolution: They negotiate—"Sabse pehle vegetables, phir dessert"—and Ria agrees with a high-five.
-Moral: Letting kids set their own rules teaches them to think before they demand.
+Story: Papa: "Do blocks aur, phir shoes." Rio: "Ab do aur do!"
+Twist: Papa holds firm: "Ek bite dal, phir do-minute phone." Rio stomps but the timer starts.
+Resolution: They settle at "Ek bite dal, phir do-minute phone." Rio gets the timer and phone, then takes his bite of dal — everyone wins a high-five.
+Moral: Ek chhota sa bargain sabke liye badi khushiyon ka source.
 ''',
-    cover: "Ria's House Rules",
-    opening: "Ria's five rules for fun, chaos and completely valid family drama.",
-    problem: 'Kids often create their own rules and logic in the middle of daily life',
-    lesson: 'Playful routines and family humour keep the home feeling lighter',
+    cover: 'Do Aur Do!',
+    opening: 'Papa: "Do blocks aur, phir shoes." Rio: "Ab do aur do!"',
+    problem: 'Toddler insists on more — more blocks, more time, more everything',
+    lesson: 'One small bargain can turn "more" into "done"',
   ),
   HookIdea(
-    id: 'pal16',
-    category: 'Surprising',
+     id: 'pal16',
+    category: 'Relatable',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Rio's vocabulary for the day is just "BALL!"—and he says it 47 times.
-Twist: Everyone echoes "ball"—"Haan, ball!"—and Cuty gets confused—"Toh kya ball sabse achcha hai?"
-Resolution: They count all the balls in the house—"1, 2, 3, 4... ball hi ball!"—and Rio is satisfied.
-Moral: One word can fill a whole day with fun—when you lean into it together.
+Story: Rio's vocabulary for the day is just "No!" "Mine!" "Why!" — three escalating moments when Ria tries to share, take, and explain.
+Twist: Everyone echoes "No! Mine! Why!" — Ria: "No, mujhe bhi!" — and Cuty gets confused: "Toh kya sabke paas ek hi jawaab hai?"
+Resolution: They count all the "no, mine, why" moments — and end with Rio handing Cuty the ball: "Tumhara bhi hai."
+Moral: One word can fill a whole day — and then just as quickly, it can end.
 ''',
-    cover: "Rio's Vocabulary",
-    opening: "Rio's top words are no, mine, why, and one more time.",
-    problem: 'The toddler vocabulary is often very short but very intense',
-    lesson: 'A little repetition and a lot of parenting grace go a long way',
+    cover: 'No, Mine, Why!',
+    opening: 'Rio kehte hain: No! Mine! Why!',
+    problem: 'One word repeated drives parents to the edge of sanity',
+    lesson: 'Lean into the word — count it, echo it, then watch it lose its power',
   ),
   HookIdea(
     id: 'pal17',
@@ -732,19 +746,22 @@ Moral: Memory is subjective—but family humor makes every search an adventure.
     lesson: 'Even the hard repeated words are part of the family rhythm',
   ),
   HookIdea(
-    id: 'pal20',
-    category: 'Warm lesson',
+     id: 'pal20',
+    category: 'parent',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Cuty is asleep on the couch, and Mumma thinks—"Abhi bhi mere saath hai." But Ria is taller now—"Mummy, maine apni chaddi khud pehni!"
-Resolution: Mumma wraps her arms around both—"Tumhe pyar karti hoon, har pal ka."
-Ending line: "Thoda sa waqt jyada pad raha, par yehi toh haim."
+Story: Mumma comes home tired, bag on floor. Ria notices, picks up bag, hands it over. Small believable gesture.
+Twist: Mumma starts to take the bag back — "Beta, I've got it."
+Worse: Ria insists: "Tum bahut thak gayi ho. Main help kar sakta hun."
+Resolution: Mumma lets Ria help. They sit together — Mumma with her tea, Ria with a small drawing. No words about growing up; just two people being quiet.
+Ending line: "Mumma: Shukriya beta. Ria: Tumhara saath hi toh maza aata hai."
+Moral: Sometimes noticing is the gift.
 ''',
-    cover: 'Parent Memory',
-    opening: "One day they won't ask you to carry them, and they won't need the same little routines.",
-    problem: 'Parents need a reminder to value the current chaos before it changes',
-    lesson: 'Enjoy the little moments while they are still happening',
+    cover: 'Notice the Bag!',
+    opening: 'Mumma neeche gir gaya bag, Ria ne notice kiya.',
+    problem: 'Children see when parents are tired — and can offer small help without being asked',
+    lesson: 'A small gesture needs no speech; noticing is already love in action',
   ),
 
   // Struggle first: open on the moment it goes wrong.
@@ -837,16 +854,16 @@ Moral: Toote cheez pe gussa nahi, saath mein kaise theek karein.
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Mumma is on the phone, and Ria keeps tugging her dupatta—"Mummy, phone dikhao!"
-Twist: Mumma puts the phone down—"Abhi nahi, Ria ke saath baitho"—but Ria grabs her own toy phone.
-Resolution: They play "phone" together—Ria answers her toy—"Hello, Mummy ke saath baitho!"
-Ending line: Ria into toy phone: "Hello? Haan, abhi mil rahi hoon."
-Moral: Dhyaan toh do, phone khud hi wapas aayega.
+Story: Rio is dancing to his favorite song when the music suddenly stops mid-beat. Rio freezes, eyes wide.
+Twist: Mumma names the change: "Music bandh ho gayi. Ab kya karein?" She offers: "Ek minute aur dance karo, ya turant room saaf karo?"
+Resolution: Rio chooses one more minute of dance, then they clean up the toys together. Mumma restarts soft music.
+Ending line: Rio: "Next time phone use karoongi!" Mumma: "Haan, volume button dikha."
+Moral: Badlaav ka intezaar karo, phir agla kadam lagao.
 ''',
-    cover: 'Phone Asli Problem Nahi',
-    opening: 'Ria ko phone se nahi, phone chhinne se gussa aata hai.',
-    problem: 'The upset is about the sudden stop, not the screen itself',
-    lesson: 'Timer lagao, badlaav aasaan ho jaata hai',
+    cover: 'Music Sudden Ruko!',
+    opening: 'Music bandh ho gayi... Rio freezz!',
+    problem: 'Music suddenly stops mid-play, and Rio freezes or protests',
+    lesson: 'Name the change, then offer the next step',
   ),
   HookIdea(
     id: 'h16',
@@ -924,6 +941,7 @@ Story: Rio takes cookie from the jar again—"Mummy, maine bas ek hi liya tha!"
 Twist: Instead of shouting, Mumma kneels down—"Haan beta, tumne kara. Par main tumhe pyar karti hoon."
 Resolution: Rio hugs her—"Next time I'll ask pehle!"—and puts the cookie back in the jar.
 Ending line: "Phir se promise, Mummy?" "Haan, phir se promise."
+Moral: Pyaar ke saath rule set karna, bachcha safe mehsoos karta hai.
 ''',
     cover: 'Pyaar Bhi, Rule Bhi',
     opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
@@ -936,15 +954,16 @@ Ending line: "Phir se promise, Mummy?" "Haan, phir se promise."
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria watches Mumma struggle with the grocery bags—"Mummy, thak gayi ho?"
-Twist: Ria brings her tiny stool—"Mummy, baith jao, main saaf karti hoon."
-Resolution: They sit together—"Tum toh meri help karo gi!"—and the floor is clean in minutes.
-Moral: Children teach us as much as we teach them—sometimes they see our weariness first.
+Story: Ria notices Mumma tired, picks up bag from floor and hands it.
+Twist: Mumma starts to refuse — "Maine kaha tha, main saambhaa lunga."
+Resolution: Ria: "Tum itni thak gayi ho!" Mumma lets her help, ruffles her hair.
+Ending line: "Mumma: Shukriya beta. Ria: Tumhara saath hi toh maza aata hai."
+Moral: Children see tiredness before we admit it — and small hands can still hold a big bag.
 ''',
-    cover: 'Ria Ne Samjhaaya!',
-    opening: 'Aaj Ria ne Mumma ko ek baat sikha di...',
-    problem: 'A small child says something that makes the adult rethink',
-    lesson: 'Bachche humse zyada samajhte hain',
+    cover: 'Bag On Floor!',
+    opening: 'Mumma ke saath bag gir gaya, Ria ne turant pick up kiya.',
+    problem: 'Ria sees Mumma tired and picks up the bag from the floor',
+    lesson: 'A child noticing and helping without being asked',
   ),
 
   // Milestone posts: complete concepts for the 100th Instagram post.
@@ -1034,6 +1053,7 @@ Moral: Your little world is the biggest world—when you live inside it with lov
     id: 'p01',
     category: 'Page & milestone',
     forApp: false,
+    archived: true,
     cover: '1,000 Ke Paas!',
     opening: 'Ruko... hum 1,000 dost hone wale hain?!',
     problem: 'Milestone reel as you approach 1,000 followers',
@@ -1043,6 +1063,7 @@ Moral: Your little world is the biggest world—when you live inside it with lov
     id: 'p02',
     category: 'Page & milestone',
     forApp: false,
+    archived: true,
     cover: '1,000 Dost!',
     opening: 'Aaj Ria, Rio aur Cuty ke 1,000 dost ho gaye.',
     problem: 'Thank-you reel on reaching 1,000',
@@ -1458,7 +1479,7 @@ Moral: Ten minutes of peace and a lifetime of love — perfectly balanced.
     lesson: 'Check on quiet toddlers - creative chaos always follows.',
     postFormat: 'Reel',
     strategy: 'Suspense hook, then reveal',
-    caption: 'Ghar mein 2 minute ki shanti... DANGER! 😱 Jab bachche bilkul silent ho jaate hain, toh bura haal hota hai. Watched the full video to see what Cuty was up to! #toddlermeltdown #indianparents #funlearningwithpalak',
+    caption: 'Ghar mein 2 minute ki shanti... DANGER! 😱 Jab bachche bilkul silent ho jaate hain, toh bura haal hota hai. Watched the full video to see what Cuty was up to! #toddlermeltdown #indianparents #funlearningwithpalak #PreschoolMeltdown #ToddlerHumor',
     pinnedComment: 'Tip: The silence is always louder than the chaos that came before. Check on them! 🐰',
     forApp: true,
     usedOn: '',
@@ -1478,7 +1499,7 @@ Moral: The most suspicious silences always end with something creative to clean 
     lesson: 'The things we lose are just having their own adventure.',
     postFormat: 'Reel',
     strategy: 'Morning rush comedy, relatable chaos',
-    caption: 'School van neeche aa gayi... aur ek joota gayab! 🚐 Joota kho gaya, par kahaan gaya? Full video dekho. #morningrush #toddlerlife #funlearningwithpalak #indianparents',
+    caption: 'School van neeche aa gayi... aur ek joota gayab! 🚐 Joota kho gaya, par kahaan gaya? Full video dekho. #morningrush #toddlerlife #funlearningwithpalak #indianparents #MomLife',
     pinnedComment: 'Tip: Always check the balcony curtains — shoes love to hide there! 👟',
     forApp: true,
     usedOn: '',
@@ -1498,7 +1519,7 @@ Moral: Sometimes the things we lose are just having their own adventure.
     lesson: 'A shared laugh turns every broken thing into something sweet.',
     postFormat: 'Reel',
     strategy: 'Exaggerated emotion, then sweet payoff',
-    caption: 'Biscuit toota matlab duniya khatam! 🍪😭 Doctor Rio ne banaya jugaad repair, par Cuty ne bhi ek nibble liya! #toddlerlogic #biscuitcrisis #funlearningwithpalak',
+    caption: 'Biscuit toota matlab duniya khatam! 🍪😭 Doctor Rio ne banaya jugaad repair, par Cuty ne bhi ek nibble liya! #toddlerlogic #biscuitcrisis #funlearningwithpalak #ToddlerHumor #BiscuitDrama',
     pinnedComment: 'When your toddler snaps a cookie and treats it like breaking the Mona Lisa! 😂',
     forApp: true,
     usedOn: '',
@@ -1524,7 +1545,7 @@ Moral: A shared laugh turns every broken thing into something sweet.
     lesson: 'The robot literally scanned every room and handed the phone back, helping Mumma realise she was holding it all along.',
     postFormat: 'Reel',
     strategy: 'AI comedy misunderstanding, family situation, physical comedy payoff',
-    caption: 'Jab Mumma ka phone haath mein hai lekin woh kho dhundh rahi hai... aur Robot ne phone wapas dedi! 😂 Har mummy ko yehi dekhna chahiye. #RiaAndRobot #IndianMomLife #FunLearningWithPalak',
+    caption: 'Jab Mumma ka phone haath mein hai lekin woh kho dhundh rahi hai... aur Robot ne phone wapas dedi! 😂 Har mummy ko yehi dekhna chahiye. #RiaAndRobot #IndianMomLife #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'We all need a personal robot who tells us the truth — and hands back our phone from our own hand! 🤖',
     forApp: true,
     usedOn: '',
@@ -1544,7 +1565,7 @@ Moral: Sometimes the simplest solution is right in front of you — and a robot\
     lesson: 'The robot suggested a tiny bite first, and Ria discovered palak was actually yummy with a little cheese.',
     postFormat: 'Reel',
     strategy: 'Food refusal humor, gentle parenting lesson',
-    caption: 'Palak se pehle ek bite, aur suddenly "Mumma, aur thoda dena!" 😂 Har meal time fight ka asan hal. #RiaAndRobot #ToddlerMeals #FunLearningWithPalak',
+    caption: 'Palak se pehle ek bite, aur suddenly "Mumma, aur thoda dena!" 😂 Har meal time fight ka asan hal. #RiaAndRobot #ToddlerMeals #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'The robot was right — one tiny bite can change everything! 👶',
     forApp: true,
     usedOn: '',
@@ -1564,7 +1585,7 @@ Moral: Sometimes you have to try before you decide you don't like something.
     lesson: 'The robot suggested a heart-shaped bandage and helped Ria talk to Rio about sharing and saying sorry.',
     postFormat: 'Reel',
     strategy: 'Emotional expression, sibling dynamics, heart-shaped bandage visual',
-    caption: 'Jab bhaiya ne toy kharab kar diya, toh Robot ne diya heart bandage! ❤️ Sibling love, properly patched. #RiaAndRobot #SiblingLove #FunLearningWithPalak',
+    caption: 'Jab bhaiya ne toy kharab kar diya, toh Robot ne diya heart bandage! ❤️ Sibling love, properly patched. #RiaAndRobot #SiblingLove #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Every broken heart needs a robot and a heart-shaped bandage. ❤️🩹',
     forApp: true,
     usedOn: '',
@@ -1584,7 +1605,7 @@ Moral: A little humor and teamwork can mend both toys and feelings.
     lesson: 'The robot started tidying, but Ria joined in and realized cleanup can be fun with a dance playlist.',
     postFormat: 'Reel',
     strategy: 'Chore avoidance comedy, collaborative cleanup dance',
-    caption: 'Mess gayab karne ke liye ek robot nahi… ek dance playlist aur Ria milake hi chahiye! 💃🧹 #RiaAndRobot #CleanUpDance #FunLearningWithPalak',
+    caption: 'Mess gayab karne ke liye ek robot nahi… ek dance playlist aur Ria milake hi chahiye! 💃🧹 #RiaAndRobot #CleanUpDance #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'The robot may start, but Ria finishing makes it a win! 10/10 teamwork.',
     forApp: true,
     usedOn: '',
@@ -1604,7 +1625,7 @@ Moral: Work feels lighter when you do it together — even if a robot started th
     lesson: 'The robot suggested a 5-minute quiet corner with breathing cards that helped Ria reset.',
     postFormat: 'Reel',
     strategy: 'Overstimulation handling, emotional regulation, breathing exercise',
-    caption: 'Jab sabse zindagi mein bahut kuchh ho raha hai... toh ek robot breathing cards ke saath madad karta hai! 🧘‍♀️ #RiaAndRobot #EmotionalRegulation #FunLearningWithPalak',
+    caption: 'Jab sabse zindagi mein bahut kuchh ho raha hai... toh ek robot breathing cards ke saath madad karta hai! 🧘‍♀️ #RiaAndRobot #EmotionalRegulation #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Five minutes of quiet, a breathing card, and Ria was back to her playful self. 💙',
     forApp: true,
     usedOn: '',
@@ -1618,21 +1639,21 @@ Moral: Everyone needs a break — and a robot can help create the right moment t
   HookIdea(
     id: 'robot-06',
     category: 'Series',
-    cover: 'I Want to Sleep Like a Baby!',
-    opening: 'Robot, mujhe baby ki tarah sona hai!',
-    problem: 'Ria uses the idiom "sleep like a baby" expecting peaceful rest.',
-    lesson: 'The robot misunderstood and brought a baby monitor, a rattler, and scheduled 2 AM "baby feeding" checks.',
+    cover: 'Sleep Like a Teddy!',
+    opening: 'Robot, mujhe teddy ki tarah sojana hai!',
+    problem: 'Ria wants to sleep as peacefully as her teddy bear, who just sits there all night.',
+    lesson: 'The robot misunderstands and brings a teddy costume, a night-vision camera, and a "sleep surveillance" report.',
     postFormat: 'Reel',
-    strategy: 'Idiom misunderstanding, baby paraphernalia comedy',
-    caption: 'Jab "sleep like a baby" ka matlab pata nahi hota... toh robot leke aata hai baby monitor! 🤖🍼 #RiaAndRobot #IdiomFail #FunLearningWithPalak',
-    pinnedComment: 'Pro tip: never say "sleep like a baby" to a robot that takes everything literally!',
+    strategy: 'Literal misunderstanding, visual gag',
+    caption: 'Jab "teddy ki tarah sojana" ka matlab pata nahi hota... toh Robot ne banaya teddy costume! 🧸 #RiaAndRobot #SleepTips #FunLearningWithPalak #IndianMoms #KidsComedy',
+    pinnedComment: 'The robot took "sleep like a bear" way too literally!',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria says "I want to sleep like a baby!" expecting peaceful, deep sleep.
-Twist: The robot takes it literally and brings a baby monitor, rattler, and a feeding schedule — it starts checking on her every two hours "for the baby routine."
-Resolution: Ria clarifies she means sleeping peacefully, and the robot sets up a cozy nest with soft music instead.
-Moral: Words matter — especially when a robot is listening!
+Story: Ria says "Mujhe teddy ki tarah so jana hai!" expecting soft, still sleep.
+Twist: The robot takes it literally — it brings a teddy costume for Ria, a night-vision camera that keeps blinking, and starts a "sleep surveillance" report.
+Resolution: Ria laughs, says she just wants to sleep peacefully. The robot turns off the camera, puts the costume aside, and tucks her in with a nightlight that glows like a friendly star.
+Moral: Sometimes a simple sleep is the best sleep.
 ''',
   ),
   HookIdea(
@@ -1644,7 +1665,7 @@ Moral: Words matter — especially when a robot is listening!
     lesson: 'The robot suggested a "me time" station and a "Rio time" station so both get individual play space.',
     postFormat: 'Reel',
     strategy: 'Sibling mimicry, parallel play setup, individual attention',
-    caption: 'Rio har baat copy karta hai, toh Robot ne banaya "me time" aur "Rio time" stations! ✨ #RiaAndRobot #SiblingDynamics #FunLearningWithPalak',
+    caption: 'Rio har baat copy karta hai, toh Robot ne banaya "me time" aur "Rio time" stations! ✨ #RiaAndRobot #SiblingDynamics #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'A me-station and a Rio-station — problem solved! Everyone gets their own space. 😍',
     forApp: true,
     usedOn: '',
@@ -1664,7 +1685,7 @@ Moral: A little space helps, but shared creativity can turn copying into collabo
     lesson: 'The robot suggested a shoe timer game — if Ria puts shoes on in 2 minutes, they get to choose the car song.',
     postFormat: 'Reel',
     strategy: 'Independence conflict, shoe timer game, family car song choice',
-    caption: 'Jaldi-jaldi ka time, par Ria apne joote khud pehengi! Robot ne banaya shoe timer game. ⏰👟 #RiaAndRobot #ShoeRace #FunLearningWithPalak',
+    caption: 'Jaldi-jaldi ka time, par Ria apne joote khud pehengi! Robot ne banaya shoe timer game. ⏰👟 #RiaAndRobot #ShoeRace #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Two minutes to put on shoes = choosing the car song. Ria always wins! 😂',
     forApp: true,
     usedOn: '',
@@ -1684,7 +1705,7 @@ Moral: A little game can turn a rush into fun — and independence into teamwork
     lesson: 'The robot scanned Ria\'s drawing and created a magical animated version showing her unique style.',
     postFormat: 'Reel',
     strategy: 'Artistic confidence, drawing validation, animated gallery',
-    caption: 'Jab "kharab" drawing Robot ke saamne magic ban gayi! ✨ Har art perfect hota hai. #RiaAndRobot #ArtConfidence #FunLearningWithPalak',
+    caption: 'Jab "kharab" drawing Robot ke saamne magic ban gayi! ✨ Har art perfect hota hai. #RiaAndRobot #ArtConfidence #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Your unique style is what makes your art special — the robot said so!',
     forApp: true,
     usedOn: '',
@@ -1704,7 +1725,7 @@ Moral: There\'s no "wrong" way to create art — your style is your superpower.
     lesson: 'The robot taught Ria the "feelings weather" method to name and process changing emotions.',
     postFormat: 'Reel',
     strategy: 'Emotional literacy, feelings weather chart, tower rebuilt together',
-    caption: 'Block tower gir gaya, feelings badal liye... lekin Robot ne sikhaaya feelings weather! 🌦️ #RiaAndRobot #FeelingsFirst #FunLearningWithPalak',
+    caption: 'Block tower gir gaya, feelings badal liye... lekin Robot ne sikhaaya feelings weather! 🌦️ #RiaAndRobot #FeelingsFirst #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Feelings are like weather — they change. But tower can always be rebuilt. ❤️',
     forApp: true,
     usedOn: '',
@@ -1724,7 +1745,7 @@ Moral: Feelings come and go — what matters is learning to name them and keep b
     lesson: 'The robot demonstrated the "one trip at a time" method so Ria could carry things efficiently.',
     postFormat: 'Reel',
     strategy: 'Task overload, efficient carrying method, priority sorting',
-    caption: 'Jab haath itne full ho jaye ki kuchh girne wala hai... Robot ne sikhaaya efficient method! 💪 #RiaAndRobot #LittleHelper #FunLearningWithPalak',
+    caption: 'Jab haath itne full ho jaye ki kuchh girne wala hai... Robot ne sikhaaya efficient method! 💪 #RiaAndRobot #LittleHelper #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'One trip at a time — the robot\'s golden rule for busy little hands. ✨',
     forApp: true,
     usedOn: '',
@@ -1738,21 +1759,21 @@ Moral: Sometimes doing less at once means getting more done.
   HookIdea(
     id: 'robot-12',
     category: 'Series',
-    cover: 'Mumma Has Eyes in the Back of Her Head!',
-    opening: 'Robot, Mumma ke saamne wala dimaag bhi dekhti hai!',
-    problem: 'Ria is caught doing something she shouldn\'t because Mumma "always knows."',
-    lesson: 'The robot explained the science of peripheral vision and how parents develop super-senses for their children.',
+    cover: 'Mumma Sun Leti Hai!',
+    opening: 'Robot, Mumma ko peeche bhi dikhta hai kya?',
+    problem: 'Ria is caught doing something she shouldn\'t, but it isn\'t magic — Mumma heard the clues',
+    lesson: 'The robot shows how parents pick up sounds and signs, not superpowers.',
     postFormat: 'Reel',
-    strategy: 'Parental sixth sense, peripheral vision science, playful acknowledgment',
-    caption: 'Robot ne bataya science: "Mumma ke aankhon mein 360 degree vision hoti hai!" 🔄👀 #RiaAndRobot #ParentSuperpower #FunLearningWithPalak',
-    pinnedComment: 'It\'s not magic — it\'s parental peripheral vision. We see EVERYTHING. 😉',
+    strategy: 'Parental awareness, hearing clues, playful acknowledgment',
+    caption: 'Robot ne bataya: "Mumma ne suna — steps, crinkles, timer beep!" 🔄👂 #RiaAndRobot #ParentSuperpower #FunLearningWithPalak #IndianMoms #KidsComedy',
+    pinnedComment: 'It\'s not magic — it\'s Mumma\'s ears! We hear EVERYTHING. 😉',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria tries to sneak a cookie but Mumma catches her instantly — "How did you see that?!"
-Twist: The robot scans Mumma and displays "Parental Super-Senses v2.0 — Peripheral Vision: ACTIVE" on its screen.
-Resolution: The robot explains how parents develop 360-degree awareness for their children, and Ria laughs instead of protests.
-Moral: Parents may not have literal eyes in the back of their heads — but their love sees everything.
+Story: Ria tries to sneak a cookie, but Mumma calls out — "Ruk jao, meri aankh bhi nahi todi!"
+Twist: Mumma explains: "Maine tumhare steps suna, aur wrapper ki awaaz li." The robot projects a "clue chart" — footsteps, crinkles, timer beep.
+Resolution: Ria laughs instead of protests. "Toh main kabhi bhi nahi chupke se cookie le sakti?"
+Moral: Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.
 ''',
   ),
   HookIdea(
@@ -1764,7 +1785,7 @@ Moral: Parents may not have literal eyes in the back of their heads — but thei
     lesson: 'The robot suggested a physical "space bubble" marked with tape on the floor for quiet time.',
     postFormat: 'Reel',
     strategy: 'Personal boundaries, calm-down space, respectful communication',
-    caption: 'Jab thoda space chahiye ho... toh Robot banata hai "calm-down tent"! 🏕️ #RiaAndRobot #Boundaries #FunLearningWithPalak',
+    caption: 'Jab thoda space chahiye ho... toh Robot banata hai "calm-down tent"! 🏕️ #RiaAndRobot #Boundaries #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Respecting "I need space" makes everyone calmer — kids and adults alike.',
     forApp: true,
     usedOn: '',
@@ -1784,7 +1805,7 @@ Moral: Needing space is normal — and respecting it helps everyone.
     lesson: 'The robot helped Ria rehearse her "big moment" so she could shine even with an interruption.',
     postFormat: 'Reel',
     strategy: 'Sibling competition, sharing spotlight, confidence building',
-    caption: 'Jab bhaiya ne steal kar diya tha your thunder... toh Robot ne diya confidence booster! ⚡ #RiaAndRobot #BigSister #FunLearningWithPalak',
+    caption: 'Jab bhaiya ne steal kar diya tha your thunder... toh Robot ne diya confidence booster! ⚡ #RiaAndRobot #BigSister #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Ria\'s moment was still magical — and Rio learned to be a supportive big brother.',
     forApp: true,
     usedOn: '',
@@ -1798,21 +1819,21 @@ Moral: Someone else\'s spotlight doesn\'t dim yours — it can even make yours b
   HookIdea(
     id: 'robot-15',
     category: 'Series',
-    cover: 'My Brain Is Not Working!',
-    opening: 'Robot, meri soch toh bandh ho gayi!',
-    problem: 'Ria is frustrated she can\'t solve a puzzle or remember something she knows.',
-    lesson: 'The robot suggested a "brain reboot" — five minutes of movement, water, and a fresh start.',
+    cover: 'Puzzle Pakad Lo!',
+    opening: 'Robot, meri puzzle abhi bhi nahi ban sakti!',
+    problem: 'Ria is stuck on a puzzle, unable to place any pieces',
+    lesson: 'The robot suggested sorting pieces by color first, then trying one piece at a time.',
     postFormat: 'Reel',
-    strategy: 'Cognitive fatigue, brain reboot method, growth mindset',
-    caption: 'Jab dil bhi soch raha hai ki soch bandh ho gayi... toh Robot ka "brain reboot" chalega! 🧠✨ #RiaAndRobot #BrainBreak #FunLearningWithPalak',
-    pinnedComment: 'Movement + water + reset = brain works again. The robot knows best! 💧',
+    strategy: 'Puzzle approach, sorting by color, step-by-step',
+    caption: 'Jab puzzle kharab lag raha ho... toh Robot ke saath pehle sort karo! 🧩 #RiaAndRobot #PuzzleTime #FunLearningWithPalak #IndianMoms #KidsComedy',
+    pinnedComment: 'Sort, then one piece at a time — puzzle banegi hi banegi! 😄',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria is stuck on a puzzle — she knows the answer but her brain "says stop." She declares, "Meri soch bandh ho gayi!"
-Twist: The robot literally scans her head and shows a "Brain Busy" warning, then suggests a "brain reboot" protocol.
-Resolution: After five minutes of jumping, drinking water, and a fresh start, Ria solves the puzzle with a grin.
-Moral: Sometimes your brain needs a break — not a forced push.
+Story: Ria tries a 6-piece puzzle but can't place a single piece. "Koi bhi piece fit nahi karta!"
+Twist: The robot helps her sort pieces by color — red corners here, blue corners there.
+Resolution: With sorted pieces, Ria places three in a row and grins. "Ab main khud banati hun!"
+Moral: Pehle organize karo, phir try karo.
 ''',
   ),
   HookIdea(
@@ -1824,7 +1845,7 @@ Moral: Sometimes your brain needs a break — not a forced push.
     lesson: 'The robot explained that "butterflies" are excitement and courage, not fear.',
     postFormat: 'Reel',
     strategy: 'Performance anxiety, excitement vs fear, courage visualization',
-    caption: 'Jab "butterflies" ke matlab excitement hota hai, na ki darr... toh Robot ne samjhaana mushkil nahi! 🦋 #RiaAndRobot #Courage #FunLearningWithPalak',
+    caption: 'Jab "butterflies" ke matlab excitement hota hai, na ki darr... toh Robot ne samjhaana mushkil nahi! 🦋 #RiaAndRobot #Courage #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Those butterflies? They\'re cheering you on, not warning you away. 💪',
     forApp: true,
     usedOn: '',
@@ -1839,12 +1860,12 @@ Moral: Butterflies mean you care — and caring is the first step to courage.
     id: 'robot-17',
     category: 'Series',
     cover: 'I\'m Dying of Boredom!',
-    opening: 'Robot, sirhara pa gaya!',
+    opening: 'Main bore ho rai hoon!',
     problem: 'Ria has finished all her activities and declares nothing is left to do.',
     lesson: 'The robot suggested the "boredom jar" — a list of simple activities she can pick from.',
     postFormat: 'Reel',
     strategy: 'Boredom productivity, creativity prompts, activity jar system',
-    caption: 'Sirhara pa gaya, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak',
+    caption: 'Sirhara pa gaya, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'A boredom jar is a happiness jar waiting to happen. Which activity will you pick? ❤️',
     forApp: true,
     usedOn: '',
@@ -1864,7 +1885,7 @@ Moral: Boredom is just the moment before creativity kicks in.
     lesson: 'The robot showed Ria a visual "happiness cloud" that matched Mumma\'s mood and how joy multiplies.',
     postFormat: 'Reel',
     strategy: 'Emotional contagion, happiness visualization, parent-child bonding',
-    caption: 'Jab Mumma khush hai, toh Ria ke saath bhi clouds pile ho jaate hain! ☁️☁️ #RiaAndRobot #HappyFamily #FunLearningWithPalak',
+    caption: 'Jab Mumma khush hai, toh Ria ke saath bhi clouds pile ho jaate hain! ☁️☁️ #RiaAndRobot #HappyFamily #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'Joy is contagious — when Mumma smiles, the whole family floats. ❤️',
     forApp: true,
     usedOn: '',
@@ -1878,21 +1899,21 @@ Moral: Happiness shared is happiness multiplied.
   HookIdea(
     id: 'robot-19',
     category: 'Series',
-    cover: 'Rio Has a Big Mouth!',
-    opening: 'Robot, Rio ne meri baat sabko bata di!',
-    problem: 'Rio blurts out something private that Ria whispered in confidence.',
-    lesson: 'The robot helped Ria explain her boundaries to Rio using a "secret vs surprise" chart.',
+    cover: 'Rio Ne Surprise Diya!',
+    opening: 'Robot, Rio ne ek surprise plan kiya hai!',
+    problem: 'Rio tells everyone about a surprise Ria planned for Mumma, but Ria wanted it to stay secret until the big reveal.',
+    lesson: 'The robot explains that surprises are meant to share, but secrets that make you uncomfortable must always be told to a trusted grown-up.',
     postFormat: 'Reel',
     strategy: 'Privacy boundaries, secret vs surprise, sibling communication',
-    caption: 'Jab Rio ne secret sabko bata diya... toh Robot ne banaya "secret vs surprise" chart! 🔐 #RiaAndRobot #Boundaries #FunLearningWithPalak',
-    pinnedComment: 'Secrets stay with you, surprises are meant to share — Ria learned the difference!',
+    caption: 'Jab Rio ne surprise sabko bata diya... toh Robot ne banaya Surprise vs Secret chart! 🎁 #RiaAndRobot #KidSafety #FunLearningWithPalak #IndianMoms #KidsComedy',
+    pinnedComment: 'Surprises are fun to share later. Secrets that feel icky? Tell a grown-up right away!',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria whispers a secret to the robot, but Rio overhears and tells everyone — "Ria ne kaha ki Mumma ko surprise gift chahiye!"
-Twist: The robot creates a "Secret vs Surprise" chart explaining that secrets are private, but surprises are meant to share.
-Resolution: Rio understands the difference and promises to be a "secret keeper," earning Ria\'s forgiveness.
-Moral: Words have power — choose to protect or share wisely.
+Story: Ria tells the robot about a surprise she is planning for Mumma. Rio overhears and blurts it out to everyone — "Ria ne Mumma ko surprise gift banaya hai!"
+Twist: The robot draws a picture chart in two columns. One side: "Surprise = fun to share later!" Other side: "Secret = if it makes you sad or scared, tell Mumma or Papa right away."
+Resolution: Rio understands: surprises are exciting when shared at the right time, and any feeling that feels icky must be told to a trusted grown-up immediately.
+Moral: Surprises are sweet to share; secrets that make you uncomfortable must be told to a grown-up right away.
 ''',
   ),
   HookIdea(
@@ -1904,7 +1925,7 @@ Moral: Words have power — choose to protect or share wisely.
     lesson: 'The robot created a "world foods adventure map" so Ria could explore tastes one country at a time.',
     postFormat: 'Reel',
     strategy: 'Food curiosity, cultural exploration, adventure map',
-    caption: 'Poori duniya khana hai? Robot ne banaya "world foods adventure map!" Har din ek naya desh. 🌍 #RiaAndRobot #WorldFoods #FunLearningWithPalak',
+    caption: 'Poori duniya khana hai? Robot ne banaya "world foods adventure map!" Har din ek naya desh. 🌍 #RiaAndRobot #WorldFoods #FunLearningWithPalak #IndianMoms #KidsComedy',
     pinnedComment: 'One country, one flavor at a time — the robot\'s recipe for culinary courage!',
     forApp: true,
     usedOn: '',
@@ -1957,7 +1978,7 @@ Moral: Jo roz maanga jaata hai, pehle se rakh do — ek chhota routine, ek calme
   'h07': '''
 Story: Ria kambal ke andar chhup gayi hai: "Brush nahi karungi!" Mumma ke haath mein brush hai.
 Twist: Mumma kambal ko haath nahi lagati. Woh Cuty ko uthake kehti hai: "Cuty ke daant bahut gande hain. Ria, tum saaf karogi?"
-Resolution: Ria kambal se sar nikalti hai, chhota brush leti hai, aur Cuty ke daat saaf karti hai. Phir kehti hai: "Ab meri baari."
+Resolution: Ria kambal se sar nikalti hai, chhota brush leti hai, aur Cuty ke daant saaf karti hai. Phir kehti hai: "Ab meri baari."
 Moral: Pehle Cuty, phir Ria.
 ''',
   'h08': '''
@@ -1979,7 +2000,7 @@ Resolution: Mumma: "Khana ready hai. Drawing yahin rahegi, promise." Ria: "Kitni
 Moral: Paas jaake bolo, chillao mat.
 ''',
   'h16': '''
-Story: Papa ke liye couver aaya hai. Rio ka naya robot toy bhi aaya hai. Rio robot ko dekhta bhi nahi aur khaali dabbe mein ghus jaata hai.
+Story: Papa ke liye cover aaya hai. Rio ka naya robot toy bhi aaya hai. Rio robot ko dekhta bhi nahi aur khaali dabbe mein ghus jaata hai.
 Twist: Papa dabba uthaane aate hain: "Ye kabaad mein jayega." Rio: "Ye mera rocket hai!"
 Resolution: Papa robot ko dabbe mein bitha dete hain: "Ye astronaut hai." Dono ulti ginti karte hain: "5, 4, 3, 2, 1… chalo!"
 Moral: Dabba hi kaafi hai.
@@ -1993,7 +2014,7 @@ Moral: Bijli ne sun li, boots se nahi.
   'h19': '''
 Story: Parking mein Mumma: "Rio, mat bhaago!" Rio aur tez bhaagta hai.
 Twist: Mumma daud ke pakadti hai aur ab alag bolti hai: "Rio, meri ungli pakdo." Rio ruk jaata hai: "Kyun?"
-Resolution: "Gaadi aati hai. Ungli pakdo, hum dono saath cross karenge." Rio ungli kaske pakad leta hai. Dono dhire dhire chalte hain.
+Resolution: "Gaadi aati hai. Ungli pakdo, hum dono saath cross karenge." Rio ungli kas ke pakad leta hai. Dono dhire dhire chalte hain.
 Moral: "Mat" nahi, "ungli pakdo".
 ''',
   'pal03': '''
@@ -2036,7 +2057,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'The car — it\'s the only one that\'s not food!',
     visualStyle: 'Bright, clean, minimal — 4 large icon-style illustrations on a cream card',
     imagePrompt: 'Create a bright, clean preschool puzzle card, square format, cream pastel background. Four large, simple, colorful illustrations in a row: a red apple, a yellow banana, an orange, and a small blue toy car. Rounded card border, soft drop shadow under each object, minimal clutter, no text inside the image, playful children\'s illustration style.',
-    caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak',
+    caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
     cta: 'Comment your child\'s answer below 👇',
     hashtags: '#preschoolactivities #toddlerlearning #kidsbrainbooster #earlylearningindia #funlearningwithpalak #momsofinstagram #observationskills',
     comments: [
@@ -2065,7 +2086,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Tag a parent who needs to see this',
     visualStyle: 'Bright cartoon reel style, soft 3D Pixar aesthetic, cream background, vertical 9:16',
     imagePrompt: 'Soft 3D Disney/Pixar-style render, cream background, vertical 9:16. Scene 1: Ria barefoot holding shoes, "Coming!" speech bubble, 5 min later still barefoot. Scene 2: Rio shrugging, water bottle beside him. Scene 3: Ria and Rio sprinting past, Cuty asleep. Scene 4: Both with angry faces, Cuty still asleep. Scene 5: Parent searching, "COME HERE!" text. No glasses on Ria and Rio.',
-    caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak',
+    caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
     cta: 'Be honest — how many times today? 👇',
     hashtags: '#parentingmemes #toddlerlife #momsofindia #relatablemom #funlearningwithpalak #parentinghumor #toddlermom',
     comments: [
@@ -2094,7 +2115,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: '1. Give your child the 5 spoons. 2. Ask them to line them up from smallest to biggest. 3. Count them together out loud — "1, 2, 3, 4, 5!"',
     visualStyle: 'Soft 3D Pixar/Disney style, warm cozy cream kitchen setting',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream kitchen countertop background, five spoons of varying sizes arranged playfully, a small illustrated child\'s hand reaching toward them, warm cozy lighting, minimal text, square format.',
-    caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak',
+    caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
     cta: 'Save this for your next kitchen moment ❤️',
     hashtags: '#preschoolactivities #kitchenlearning #toddleractivities #earlylearning #sortingskills #funlearningwithpalak #momhacks',
     comments: [
@@ -2123,7 +2144,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Encourages imagination and gives you a window into how your child thinks.',
     visualStyle: 'Cozy, soft evening lighting, warm Pixar aesthetic',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream bedroom background, warm evening lighting. Ria (pigtails with pink bows, pink star dress) sitting on her bed hugging Cuty the white bunny, a small thought bubble above Cuty\'s head with a question mark. Rio (blue-grey t-shirt) peeking in from the doorway curiously. No glasses, no text inside image, gentle cozy mood, square format.',
-    caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak',
+    caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
     cta: 'What did they say? Comment below 👇',
     hashtags: '#talkwithyourkids #parentingtips #bedtimeroutine #toddlerconversations #funlearningwithpalak #earlychildhood #momlife',
     comments: [
@@ -2152,7 +2173,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: '1. Identify basic colours\n2. Name 5 fruits\n3. Recognise their own name\n4. Count 1–10\n5. Identify body parts',
     visualStyle: 'Clean checklist card, soft pastel icons per item',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Ria and Rio standing together pointing at a floating checklist icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, minimal text inside image, square format.',
-    caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak',
+    caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
     cta: 'Bookmark this for your 3-year-old\'s next milestone check 📌',
     hashtags: '#preschoolmilestones #3yearoldactivities #toddlerdevelopment #earlylearning #parentingindia #funlearningwithpalak #momsofinstagram',
     comments: [
@@ -2181,7 +2202,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Tag a parent who has lived this exact equation',
     visualStyle: 'Bold, bright, meme-style text overlays, vertical 9:16',
     imagePrompt: 'Bold bright meme-style reel, soft 3D Pixar animation, cream background, vertical 9:16. Scene 1: "1 biscuit = hungry" — Rio holding one biscuit, neutral face. Scene 2: "2 biscuits = still hungry" — same neutral face. Scene 3: "3 biscuits = \'MUMMA, MORE!\'" — dramatic happy face, arms outstretched. Scene 4: Cuty unimpressed, nibbling one carrot. No glasses.',
-    caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak',
+    caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
     cta: 'Tag a parent who gets this 😅',
     hashtags: '#toddlerlife #parentingmemes #momsofindia #relatablehumor #funlearningwithpalak #toddlermom #parentinghumor',
     comments: [
@@ -2210,7 +2231,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Cuty was hidden behind a flower pot — look for the pink bow!',
     visualStyle: 'Busy but not overwhelming, bright colors, lots of details to scan',
     imagePrompt: 'Soft 3D Pixar/Disney-style render illustrated garden scene, cream and green tones, flowers, bushes, small toys scattered around. Cuty the small white bunny cleverly tucked partially behind a bush or flower pot with only ears and pink bow peeking out. Ria and Rio standing to the side looking around playfully, no glasses, square format, minimal text inside image.',
-    caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak',
+    caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
     cta: 'How fast did you find him? ⏱️ Comment below!',
     hashtags: '#hiddenobject #spotthedifference #preschoolgames #observationskills #toddleractivities #funlearningwithpalak #kidsgames',
     comments: [
@@ -2239,7 +2260,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: '1. Dump the basket. 2. Ask "Can you find all the matching pairs?" 3. Celebrate every match!',
     visualStyle: 'Cozy home laundry scene, bright sock colors, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream laundry room background, vertical 9:16. Scene 1: Pile of mismatched colorful socks on floor, Ria and Rio diving in curiously. Scene 2: Rio holds two socks of different colors, shakes head "no match." Scene 3: Ria finds matching pair, holds triumphantly. Scene 4: Montage of pairs stacking, Cuty sitting on finished pile. No glasses on Ria and Rio.',
-    caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak',
+    caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
     cta: 'Try this before your next laundry day 😂',
     hashtags: '#laundryhacks #toddleractivities #preschoollearning #momhacks #sortingskills #funlearningwithpalak #parentingtips',
     comments: [
@@ -2268,7 +2289,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Small questions can open up the biggest conversations.',
     visualStyle: 'Soft, cozy, one question per slide with gentle illustration',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, warm evening lighting. Ria and Rio sitting together on the floor in conversation, Cuty curled nearby, gentle cozy family mood, no glasses, minimal text inside image, square format.',
-    caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak',
+    caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
     cta: 'Save this — ask one each night this week.',
     hashtags: '#talkwithyourkids #parentingtips #mindfulparenting #toddlerconversations #funlearningwithpalak #familytime #momlife',
     comments: [
@@ -2297,7 +2318,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: '1. Count 1–20\n2. Recognise A–Z\n3. Name the days of the week\n4. Sort objects by category\n5. Follow 2–3 step instructions',
     visualStyle: 'Same clean checklist card style as Day 6, for visual series consistency',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Rio and Ria standing together pointing at a floating icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, square format.',
-    caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak',
+    caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
     cta: 'Bookmark this for your 4-year-old\'s next milestone check 📌',
     hashtags: '#preschoolmilestones #4yearoldactivities #toddlerdevelopment #earlylearning #parentingindia #funlearningwithpalak #momsofinstagram',
     comments: [
@@ -2326,7 +2347,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Every family has all three at the dinner table',
     visualStyle: 'Three-panel meme layout, bright and simple, soft 3D Pixar render',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, three-panel layout on cream background, dinner table setting. Panel 1: Ria poking curiously at a plate of food, questioning expression. Panel 2: Rio with arms crossed, refusing his plate, stubborn expression. Panel 3: Cuty the white bunny calmly and happily eating a carrot from a small bowl. No glasses, clean simple outlines, minimal text inside image, square format.',
-    caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak',
+    caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
     cta: 'Which one is your child? 👇',
     hashtags: '#parentingmemes #toddlerdinner #relatablehumor #momsofindia #pickyeater #funlearningwithpalak #toddlermom',
     comments: [
@@ -2355,7 +2376,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Yellow is the correct next color in the sequence.',
     visualStyle: 'Bold, simple shapes, clean animation-style reveal, vertical 9:16',
     imagePrompt: 'Bold simple animation-style reel, soft 3D Pixar style, cream background, vertical 9:16. Yellow and blue circles appear in sequence: 🟡🔵🟡🔵. Then a large question mark where the next circle should go. Ria taps her chin, thinking. Yellow circle slides into place, Ria claps, Cuty hops happily. No glasses.',
-    caption: 'Can your child guess what comes next? 🟡🔵🟡🔵❓ A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak',
+    caption: 'Can your child guess what comes next? 🟡🔵🟡🔵❓ A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
     cta: 'Did your child guess it before the reveal? 😄',
     hashtags: '#patternrecognition #preschoolmath #earlylearning #toddlerbrain #funlearningwithpalak #kidsactivities #momsofinstagram',
     comments: [
@@ -2384,7 +2405,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Use this post\'s engagement + Insights data to decide bucket weighting for Days 15-30.',
     visualStyle: 'Clean 5-tile grid or carousel, cream background, one word label per tile',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, small icon representing the bucket theme (puzzle piece / speech bubble / house / laughing face / checklist), Ria, Rio, or Cuty featured lightly in the corner depending on tile, clean minimal design, square format.',
-    caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak',
+    caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
     cta: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
     hashtags: '#newcontent #parentingcommunity #preschoollearning #funlearningwithpalak #momsofinstagram #instagramgrowth',
     comments: [
@@ -2413,7 +2434,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Race Track → broomstick + 2 chairs as hurdle, dupatta as line | Concert → wooden spoon mic, steel plate drums | Art Studio → any paper + slate/notebook, kitchen chalk on floor | Detective → sunglasses/toy binoculars or cupped hands | Rescue Team → laundry basket, dupatta/old rope | Treasure Box → any box/tiffin with lid, small toys inside | Daily Care → owned tiffin, water bottle, toothbrush',
     visualStyle: 'Same consistent characters, showing the "official" prop next to the "at-home swap"',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) appear across all slides with Cuty the white bunny (pink bow). Each slide shows split view: left side "official" mission prop, right side "at-home swap" using household items. Slide 1: broomstick between chairs + dupatta line. Slide 2: wooden spoon mic + steel plates. Slide 3: paper/slate + kitchen chalk. Slide 4: sunglasses/binoculars + cupped hands. Slide 5: laundry basket + dupatta rope. Slide 6: tiffin box with toys. Slide 7: tiffin, water bottle, toothbrush. Warm, practical, encouraging mood.',
-    caption: 'Promised, delivered! 🏠 Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak',
+    caption: 'Promised, delivered! 🏠 Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Save this — now you have zero excuses to skip a mission! 📌',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities',
     comments: [
@@ -2442,7 +2463,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Reveal the winning mission with a small "why this one might be the most popular" note (e.g., "Detective Mission is your favorite — mystery never gets old!")',
     visualStyle: 'Celebratory, confetti, winning mission\'s characters front and center',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, celebratory mood with confetti. Ria and Rio (brown eyes, warm skin tone, no glasses) holding a trophy, Cuty the white bunny (pink bow) cheering. Winning mission number displayed prominently (e.g., "Mission 5 Won!"). Colorful, joyful, vertical 4:5 or square format.',
-    caption: 'You voted, and Mission [X] won! 🏆 Here\'s why we think it\'s such a hit... [one line reason]. Try it today and show us how it goes! #FunLearningWithPalak',
+    caption: 'You voted, and Mission [X] won! 🏆 Here\'s why we think it\'s such a hit... [one line reason]. Try it today and show us how it goes! #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
     cta: 'Try today\'s winning mission and tag us in your Story! 🏆',
     hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome',
     comments: [
@@ -2460,18 +2481,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 17 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day17-mission1-race-track',
-    title: 'Mission 2: On Your Mark! 🏁',
+    title: 'Mission 1: On Your Mark! 🏁',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Energetic / Fun',
-    hook: 'MISSION 2: ON YOUR MARK! 🏁',
+    hook: 'MISSION 1: ON YOUR MARK! 🏁',
     mainIdea: 'Ria & Rio running, jumping a pillow hurdle, walking a line - Mission 1 of the 7 Mission Week.',
     problem: 'Parents need a simple, structured movement activity for toddlers.',
     lesson: 'Race Track builds coordination, listening skills, and gross motor confidence.',
     visualStyle: 'Consistent characters, home setting with pillow hurdle and taped line, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) in a home hallway/living room. Scene: Rio jumping over a pillow "hurdle" made from cushions, Ria walking a taped line on floor, Cuty the white bunny (pink bow) cheering from the side. Bright morning light, energetic movement captured in soft 3D Pixar render style.',
-    caption: 'Mission 2: Race Track! 🏁 Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak',
+    caption: 'Mission 1: Race Track! 🏁 Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Tag us trying this mission! 🏁',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #grossmotorskills',
     comments: [
@@ -2481,7 +2502,7 @@ final kDay14Posts = <QuickIdea>[
       'Great energy burner before nap time!',
       'Cuty cheering is the best part 🐰💕',
     ],
-    script: 'Scene 1: "Mission 2: On Your Mark! 🏁" — Ria and Rio at start line\nScene 2: Rio jumps pillow hurdle — "Jump!"\nScene 3: Ria walks taped line carefully — "Walk the line"\nScene 4: Both run to finish — "Run!"\nScene 5: Cuty hands them a "medal" (spoon) 🏅\nScene 6: "Try Mission 2 today! Tag us 🏁"',
+    script: 'Scene 1: "Mission 1: On Your Mark! 🏁" — Ria and Rio at start line\nScene 2: Rio jumps pillow hurdle — "Jump!"\nScene 3: Ria walks taped line carefully — "Walk the line"\nScene 4: Both run to finish — "Run!"\nScene 5: Cuty hands them a "medal" (spoon) 🏅\nScene 6: "Try Mission 2 today! Tag us 🏁"',
     bucket: 'activity',
     createdAt: DateTime(2026, 9, 27),
   ),
@@ -2489,18 +2510,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 18 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day18-mission2-concert',
-    title: 'Mission 3: Living Room Concert! 🎤',
+    title: 'Mission 2: Living Room Concert! 🎤',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Energetic / Fun',
-    hook: 'MISSION 3: LIVING ROOM CONCERT! 🎤',
+    hook: 'MISSION 2: LIVING ROOM CONCERT! 🎤',
     mainIdea: 'Singing into a spoon mic, dancing, clapping to rhythm - Mission 2 of the 7 Mission Week.',
     problem: 'Parents need a simple music and movement activity.',
     lesson: 'Concert builds rhythm awareness, self-expression, and language through song.',
     visualStyle: 'Consistent characters, home setting with wooden spoon mic and steel plate drums, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) singing into a wooden spoon microphone, Rio (brown eyes, warm skin tone, no glasses) clapping and dancing, Cuty the white bunny (pink bow) tapping a steel plate like a drum. Kitchen utensils as instruments visible. Joyful musical chaos, warm family energy.',
-    caption: 'Mission 3: Concert! 🎤 Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! 🎤 #FunLearningWithPalak',
+    caption: 'Mission 2: Concert! 🎤 Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! 🎤 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Show us your concert! 🎤',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #musiceducation',
     comments: [
@@ -2510,7 +2531,7 @@ final kDay14Posts = <QuickIdea>[
       'Love how this uses kitchen items as instruments.',
       'Cuty on drums is everything 🐰🥁',
     ],
-    script: 'Scene 1: "Mission 3: Living Room Concert! 🎤"\nScene 2: Ria sings into wooden spoon — "La la la!"\nScene 3: Rio dances, claps to rhythm\nScene 4: Cuty taps steel plate — "Drum solo!"\nScene 5: Family bow together 🎭\nScene 6: "Your turn! Show us your concert 🎤"',
+    script: 'Scene 1: "Mission 2: Living Room Concert! 🎤"\nScene 2: Ria sings into wooden spoon — "La la la!"\nScene 3: Rio dances, claps to rhythm\nScene 4: Cuty taps steel plate — "Drum solo!"\nScene 5: Family bow together 🎭\nScene 6: "Your turn! Show us your concert 🎤"',
     bucket: 'activity',
     createdAt: DateTime(2026, 9, 28),
   ),
@@ -2518,18 +2539,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 19 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day19-mission3-art-studio',
-    title: 'Mission 4: Art Corner Time! 🎨',
+    title: 'Mission 3: Art Corner Time! 🎨',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Creative / Calm',
-    hook: 'MISSION 4: ART CORNER TIME! 🎨',
+    hook: 'MISSION 3: ART CORNER TIME! 🎨',
     mainIdea: 'Reading a book, writing their name, drawing a sun - Mission 3 of the 7 Mission Week.',
     problem: 'Parents need a simple fine motor / creative activity.',
     lesson: 'Art Studio builds fine motor skills, early literacy, and creative confidence.',
     visualStyle: 'Consistent characters, home art corner with paper, slate, chalk, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) drawing a big yellow sun on paper, Rio (brown eyes, warm skin tone, no glasses) writing his name on a slate with chalk, Cuty the white bunny (pink bow) watching curiously. Kitchen chalk drawing on floor visible. Cozy creative atmosphere, warm light.',
-    caption: 'Mission 4: Art Studio! 🎨 Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! 🎨 #FunLearningWithPalak',
+    caption: 'Mission 3: Art Studio! 🎨 Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! 🎨 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Share your child\'s masterpiece! 🎨',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #fineartforkids',
     comments: [
@@ -2539,7 +2560,7 @@ final kDay14Posts = <QuickIdea>[
       'Love the paper + slate + chalk variety.',
       'Art corner doesn\'t need fancy supplies!',
     ],
-    script: 'Scene 1: "Mission 4: Art Corner Time! 🎨"\nScene 2: Ria draws sun on paper — "Look, a sun!"\nScene 3: Rio writes name on slate — "R-I-O"\nScene 4: Kitchen chalk on floor — "Big canvas!"\nScene 5: Cuty hops through drawings 🐰\nScene 6: "Show us your masterpiece! 🎨"',
+    script: 'Scene 1: "Mission 3: Art Corner Time! 🎨"\nScene 2: Ria draws sun on paper — "Look, a sun!"\nScene 3: Rio writes name on slate — "R-I-O"\nScene 4: Kitchen chalk on floor — "Big canvas!"\nScene 5: Cuty hops through drawings 🐰\nScene 6: "Show us your masterpiece! 🎨"',
     bucket: 'activity',
     createdAt: DateTime(2026, 9, 29),
   ),
@@ -2547,18 +2568,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 20 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day20-mission4-detective',
-    title: 'Mission 5: Case Open! 🕵️',
+    title: 'Mission 4: Case Open! 🕵️',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Mysterious / Playful',
-    hook: 'MISSION 5: CASE OPEN! 🕵️',
+    hook: 'MISSION 4: CASE OPEN! 🕵️',
     mainIdea: 'Looking through binoculars, closing eyes to listen, solving a clue - Mission 4 of the 7 Mission Week.',
     problem: 'Parents need an observation and critical thinking activity.',
     lesson: 'Detective builds observation skills, auditory discrimination, and problem-solving.',
     visualStyle: 'Consistent characters, home setting with cardboard tube binoculars or cupped hands, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) looking through cardboard tube binoculars, Rio (brown eyes, warm skin tone, no glasses) with cupped hands around eyes, Cuty the white bunny (pink bow) with a magnifying glass. A "clue" (toy footprint) on floor. Playful mystery mood.',
-    caption: 'Mission 5: Detective! 🕵️ Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak',
+    caption: 'Mission 4: Detective! 🕵️ Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Did your detective solve it? 🕵️',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #criticalthinking',
     comments: [
@@ -2568,7 +2589,7 @@ final kDay14Posts = <QuickIdea>[
       'Love how this builds real observation skills.',
       'Cuty with magnifying glass 🐰🔍',
     ],
-    script: 'Scene 1: "Mission 5: Case Open! 🕵️"\nScene 2: Ria with cardboard binoculars — "I see something!"\nScene 3: Rio cupped hands around eyes — "Looking closely"\nScene 4: Rio closes eyes to listen — "Shhh, I hear it!"\nScene 5: Found the clue! 🎉\nScene 6: "Did your detective solve it? 🕵️"',
+    script: 'Scene 1: "Mission 4: Case Open! 🕵️"\nScene 2: Ria with cardboard binoculars — "I see something!"\nScene 3: Rio cupped hands around eyes — "Looking closely"\nScene 4: Rio closes eyes to listen — "Shhh, I hear it!"\nScene 5: Found the clue! 🎉\nScene 6: "Did your detective solve it? 🕵️"',
     bucket: 'challenge',
     createdAt: DateTime(2026, 9, 30),
   ),
@@ -2576,18 +2597,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 21 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day21-mission5-rescue',
-    title: 'Mission 6: Rescue Time! 🧸',
+    title: 'Mission 5: Rescue Time! 🧸',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Heroic / Teamwork',
-    hook: 'MISSION 6: RESCUE TIME! 🧸',
+    hook: 'MISSION 5: RESCUE TIME! 🧸',
     mainIdea: 'Pushing a laundry basket, pulling a rope, helping tidy up - Mission 5 of the 7 Mission Week.',
     problem: 'Parents need a heavy work / proprioception activity.',
     lesson: 'Rescue Team builds gross motor strength, teamwork, and helpfulness.',
     visualStyle: 'Consistent characters, home setting with laundry basket and dupatta rope, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) pushing a laundry basket with toys inside, Rio (brown eyes, warm skin tone, no glasses) pulling a dupatta rope attached to the basket, Cuty the white bunny (pink bow) riding in the basket. Heavy work play, teamwork energy, warm home setting.',
-    caption: 'Mission 6: Rescue Team! 🧸 Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? 🧸 #FunLearningWithPalak',
+    caption: 'Mission 5: Rescue Team! 🧸 Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? 🧸 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Teamwork tip from your house? 🧸',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #heavywork #proprioception',
     comments: [
@@ -2597,7 +2618,7 @@ final kDay14Posts = <QuickIdea>[
       'Cuty riding in the basket is the cutest 🐰',
       'This turns cleanup into a mission!',
     ],
-    script: 'Scene 1: "Mission 6: Rescue Time! 🧸"\nScene 2: Ria pushes laundry basket — "Coming through!"\nScene 3: Rio pulls dupatta rope — "Pulling hard!"\nScene 4: Cuty rides inside — "Rescue complete!"\nScene 5: High five teamwork moment ✋\nScene 6: "Your teamwork tip? 🧸"',
+    script: 'Scene 1: "Mission 5: Rescue Time! 🧸"\nScene 2: Ria pushes laundry basket — "Coming through!"\nScene 3: Rio pulls dupatta rope — "Pulling hard!"\nScene 4: Cuty rides inside — "Rescue complete!"\nScene 5: High five teamwork moment ✋\nScene 6: "Your teamwork tip? 🧸"',
     bucket: 'activity',
     createdAt: DateTime(2026, 10, 1),
   ),
@@ -2605,18 +2626,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 22 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day22-mission6-treasure',
-    title: 'Mission 7: Treasure Hunt! 🎁',
+    title: 'Mission 6: Treasure Hunt! 🎁',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Exciting / Cozy',
-    hook: 'MISSION 7: TREASURE HUNT! 🎁',
+    hook: 'MISSION 6: TREASURE HUNT! 🎁',
     mainIdea: 'Opening a box, finding a toy, closing it, tucking bunny to sleep - Mission 6 of the 7 Mission Week.',
     problem: 'Parents need an object permanence / fine motor activity.',
     lesson: 'Treasure Box builds object permanence, fine motor skills, and nurturing play.',
     visualStyle: 'Consistent characters, home setting with tiffin box or any box with lid, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) opening a tiffin box to find a small toy, Rio (brown eyes, warm skin tone, no glasses) closing the box carefully, Cuty the white bunny (pink bow) being tucked into a blanket nearby. Cozy bedtime transition energy.',
-    caption: 'Mission 7: Treasure Box! 🎁 Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? 🎁 #FunLearningWithPalak',
+    caption: 'Mission 6: Treasure Box! 🎁 Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? 🎁 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'What treasure did you hide? 🎁',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #finemotor #objectpermanence',
     comments: [
@@ -2626,7 +2647,7 @@ final kDay14Posts = <QuickIdea>[
       'We used an old shoebox and it worked perfectly.',
       'The bedtime transition at the end is so smooth!',
     ],
-    script: 'Scene 1: "Mission 7: Treasure Hunt! 🎁"\nScene 2: Ria opens tiffin — "What\'s inside?"\nScene 3: Finds toy — "Treasure!"\nScene 4: Rio closes box carefully — "Safe now"\nScene 5: Tucking Cuty in — "Night night bunny" 🐰\nScene 6: "What treasure did you hide? 🎁"',
+    script: 'Scene 1: "Mission 6: Treasure Hunt! 🎁"\nScene 2: Ria opens tiffin — "What\'s inside?"\nScene 3: Finds toy — "Treasure!"\nScene 4: Rio closes box carefully — "Safe now"\nScene 5: Tucking Cuty in — "Night night bunny" 🐰\nScene 6: "What treasure did you hide? 🎁"',
     bucket: 'age_practice',
     createdAt: DateTime(2026, 10, 2),
   ),
@@ -2634,18 +2655,18 @@ final kDay14Posts = <QuickIdea>[
   // ── DAY 23 ────────────────────────────────────────────────────────────────────
   QuickIdea(
     id: 'day23-mission7-daily-care',
-    title: 'Mission 8: Self-Care Squad! 🍎',
+    title: 'Mission 7: Self-Care Squad! 🍎',
     postType: 'Reel',
     audience: 'Parents of 1.5-4 year olds',
     contentGoal: 'Drive daily engagement + saves',
     mood: 'Warm / Routine',
-    hook: 'MISSION 8: SELF-CARE SQUAD! 🍎',
+    hook: 'MISSION 7: SELF-CARE SQUAD! 🍎',
     mainIdea: 'Eating fruit, drinking water, brushing teeth, bedtime routine - Mission 7 of the 7 Mission Week.',
     problem: 'Parents need to build independent self-care routines.',
     lesson: 'Daily Care builds independence, body awareness, and healthy habits. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.',
     visualStyle: 'Consistent characters, home bathroom/kitchen setting, vertical 9:16',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) eating apple slices from her tiffin, Rio (brown eyes, warm skin tone, no glasses) drinking from his water bottle, both brushing teeth side by side, Cuty the white bunny (pink bow) watching from the counter. Cozy bathroom/kitchen routine atmosphere.',
-    caption: 'Mission 8: Daily Care! 🍎 Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak',
+    caption: 'Mission 7: Daily Care! 🍎 Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Which routine is hardest at your house? 🍎',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #selfcare #routinesforkids',
     comments: [
@@ -2655,7 +2676,7 @@ final kDay14Posts = <QuickIdea>[
       'Bedtime routine is still our biggest battle 😭',
       'Cuty watching them brush is too cute 🐰',
     ],
-    script: 'Scene 1: "Mission 8: Self-Care Squad! 🍎"\nScene 2: Ria eats apple from tiffin — "Crunch!"\nScene 3: Rio drinks water — "Glug glug"\nScene 4: Ria struggles to brush — Mumma waits 5 seconds — Ria tries — Mumma helps only when needed — "Scrub scrub"\nScene 5: Cuty watches from counter 🐰\nScene 6: "Hardest routine at your house? 🍎"',
+    script: 'Scene 1: "Mission 7: Self-Care Squad! 🍎"\nScene 2: Ria eats apple from tiffin — "Crunch!"\nScene 3: Rio drinks water — "Glug glug"\nScene 4: Ria struggles to brush — Mumma waits 5 seconds — Ria tries — Mumma helps only when needed — "Scrub scrub"\nScene 5: Cuty watches from counter 🐰\nScene 6: "Hardest routine at your house? 🍎"',
     bucket: 'age_practice',
     createdAt: DateTime(2026, 10, 3),
   ),
@@ -2674,7 +2695,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'Recap card at the end listing all 7 mission names quickly.',
     visualStyle: 'Fast cuts (1-2 sec per mission), consistent characters, upbeat music, vertical 9:16',
     imagePrompt: 'Fast-cut vertical 9:16 reel montage, Soft 3D Pixar/Disney-style render, cream background. Quick 1-2 second shots: 1) Ria/Rio jumping pillow hurdle (Race Track) 2) Ria singing into spoon, Rio on plate drums (Concert) 3) Ria drawing sun, Rio on slate (Art Studio) 4) Ria with binoculars, Rio cupped hands (Detective) 5) Pushing laundry basket, pulling rope (Rescue) 6) Opening tiffin box, finding toy (Treasure) 7) Eating fruit, drinking water, brushing (Daily Care). Final frame: All 7 mission icons in a grid, "We Did It!" celebration with Ria, Rio, Cuty. Upbeat, energetic, no glasses on children.',
-    caption: '7 screen-free missions, 60 seconds, zero shopping required 🏠✨ Follow along as we play through all of them with Ria & Rio! #FunLearningWithPalak',
+    caption: '7 screen-free missions, 60 seconds, zero shopping required 🏠✨ Follow along as we play through all of them with Ria & Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
     cta: 'Follow for a new mission every day this week! 🏠',
     hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #earlylearning',
     comments: [
@@ -2703,7 +2724,7 @@ final kDay14Posts = <QuickIdea>[
     lesson: 'One slide per mission with a one-line "what we learned" note, then a final "what\'s next" teaser.',
     visualStyle: 'Celebratory, consistent characters, confetti/trophy theme matching the original "We Did It!" page',
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, square carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses), Rio (brown eyes, warm skin tone, no glasses), Cuty (white bunny, pink bow) across all slides. Celebratory confetti/trophy theme. Slide 1: "WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉" with trophy. Slides 2-8: Each mission with one-line learning note. Slide 9: "What\'s next? Tell us below!" with Ria, Rio, Cuty excited for new adventures.',
-    caption: 'A full week of screen-free missions, complete! 🎉 From racing to detective work to bedtime routines, Ria & Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak',
+    caption: 'A full week of screen-free missions, complete! 🎉 From racing to detective work to bedtime routines, Ria & Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
     cta: 'Which mission will you repeat this week? Comment below! 🎉',
     hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome #milestone',
     comments: [

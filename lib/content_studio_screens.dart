@@ -69,8 +69,8 @@ Future<IdeaEvaluation> _buildOfflineEvaluation(String idea) async {
   final check = StoryCheck(
     score: 8,
     good: ['Strong relatable hook', 'Clear character fit', 'Satisfying ending'],
-    missing: [],
-    verdict: 'Generated offline — ready to use',
+    missing: ['Review originality and share value — online evaluation can do more'],
+    verdict: 'Offline check passed — review suggestions to make it stronger',
     rows: kStoryChecks.map((name) => CheckRow(name, true, 'auto')).toList(),
     hooks: story.hookOptions
         .map((h) => HookChoice(h['type']!, h['text']!))
@@ -281,7 +281,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       );
     }
 
-    if (_evaluation != null) {
+     if (_evaluation != null) {
       return IdeaReviewScreen(
         evaluation: _evaluation!,
         originalIdea: _ideaText,
@@ -291,9 +291,9 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
         onApprove: _handleApproval,
         onRegenerate: _handleRegenerate,
         onBack: _handleBack,
+        onEditIdea: _handleBack,
       );
     }
-
     return IdeaInputScreen(
       feature: ContentFeature.imagePrompt,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
@@ -753,8 +753,10 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (_isGeminiError(e)) {
-        setState(() => _status = 'Using offline story generator...');
+      if (widget.keyStore.hasCustomGeminiKey()) {
+        setState(() => _status = '❌ Gemini failed: $e');
+      } else if (_isGeminiError(e)) {
+        setState(() => _status = 'Using offline idea evaluator...');
         final evaluation = await _buildOfflineEvaluation(idea);
         if (!mounted) return;
         setState(() => _evaluation = evaluation);
@@ -917,9 +919,9 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
         onApprove: _handleApproval,
         onRegenerate: _handleRegenerate,
         onBack: _handleBack,
+        onEditIdea: _handleBack,
       );
     }
-
     return IdeaInputScreen(
       feature: ContentFeature.geminiVideo,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,

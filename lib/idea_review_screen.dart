@@ -19,6 +19,7 @@ class IdeaReviewScreen extends StatefulWidget {
   final void Function(HookChoice? hook) onApprove;
   final VoidCallback onRegenerate;
   final VoidCallback onBack;
+  final VoidCallback? onEditIdea;
 
   const IdeaReviewScreen({
     super.key,
@@ -27,6 +28,7 @@ class IdeaReviewScreen extends StatefulWidget {
     required this.onApprove,
     required this.onRegenerate,
     required this.onBack,
+    this.onEditIdea,
     this.isRegenerating = false,
     this.isGenerating = false,
     this.status = '',
@@ -140,6 +142,7 @@ class _IdeaReviewScreenState extends State<IdeaReviewScreen> {
               agreed: _agreed,
               onChanged: (v) => setState(() => _agreed = v ?? false),
               onRegenerate: widget.onRegenerate,
+              onEditIdea: widget.onEditIdea,
               isRegenerating: widget.isRegenerating,
               isGenerating: widget.isGenerating,
               status: widget.status,
@@ -529,6 +532,7 @@ class _ApprovalGate extends StatelessWidget {
   final bool agreed;
   final void Function(bool?) onChanged;
   final VoidCallback onRegenerate;
+  final VoidCallback? onEditIdea;
   final bool isRegenerating;
   final bool isGenerating;
   final String status;
@@ -540,6 +544,7 @@ class _ApprovalGate extends StatelessWidget {
     required this.agreed,
     required this.onChanged,
     required this.onRegenerate,
+    this.onEditIdea,
     required this.isRegenerating,
     required this.isGenerating,
     required this.status,
@@ -588,6 +593,17 @@ class _ApprovalGate extends StatelessWidget {
                   color: AppColors.danger),
             ),
           ),
+        if (band == 'Improve' && onEditIdea != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Tap Improve Idea to edit and re-check before generating.',
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.warning),
+            ),
+          ),
         if (status.isNotEmpty) ...[
           StatusBar(message: status),
           Gap.s,
@@ -607,6 +623,17 @@ class _ApprovalGate extends StatelessWidget {
           icon: Icons.refresh,
           onPressed: isRegenerating ? null : onRegenerate,
         ),
+        if (band == 'Improve' && onEditIdea != null) ...[
+          Gap.s,
+          SizedBox(
+            width: double.infinity,
+            child: SecondaryButton(
+              label: 'Improve Idea',
+              icon: Icons.edit,
+              onPressed: isGenerating ? null : onEditIdea!,
+            ),
+          ),
+        ],
       ],
     );
   }
