@@ -70,19 +70,14 @@ class HookStore {
       ...kDefaultHooksWithRewrite.map((d) {
         final savedHook = saved[d.id];
         if (savedHook == null) return d;
-        // If this built-in hook is in kRewrittenStories, the rewrite is only
-        // overridden when the user has explicitly edited its story. We detect
-        // that by checking whether the saved storyDetail differs from the
-        // ORIGINAL built-in value (not the rewritten one).
-        if (kRewrittenStories.containsKey(d.id) &&
-            savedHook.storyDetail.trim().isNotEmpty &&
+        // Since stories and moments are now baked into kDefaultHooks directly,
+        // we only need to check if the user has customized the storyDetail.
+        // The original built-in value already includes any rewrites.
+        if (savedHook.storyDetail.trim().isNotEmpty &&
             savedHook.storyDetail != originalDefaults[d.id]!.storyDetail) {
           return savedHook;
         }
-        // Otherwise apply the rewrite to the saved hook.
-        return kRewrittenStories.containsKey(d.id)
-            ? savedHook.copyWith(storyDetail: kRewrittenStories[d.id])
-            : savedHook;
+        return d;
       }),
        ...saved.values.where((h) => h.custom),
     ];

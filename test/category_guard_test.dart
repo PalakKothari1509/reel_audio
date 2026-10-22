@@ -4,15 +4,12 @@ import 'package:reel_audio/content_ideas.dart';
 
 void main() {
   group('Category guards', () {
-    test('kHookCategories: all 3 lists match in length', () {
-      // kHookCategories is a flat list of category names
+    test('kHookCategories: all categories have at least one hook', () {
       final allIdsByCategory = <String, List<String>>{};
       for (final h in kDefaultHooks) {
-        final cat = h.category ?? 'Unknown';
+        final cat = h.category.isNotEmpty ? h.category : 'Unknown';
         allIdsByCategory.putIfAbsent(cat, () => []).add(h.id);
       }
-      final lengths = allIdsByCategory.values.map((l) => l.length).toSet();
-      // Categories can have different counts, just verify no empty categories
       for (final entry in allIdsByCategory.entries) {
         expect(entry.value.length, greaterThan(0),
             reason: 'Category "${entry.key}" has no hooks');
@@ -25,11 +22,14 @@ void main() {
           reason: 'Duplicate IDs found in kDefaultHooks');
     });
 
-    test('kDefaultHooks: every category ID has a matching HookIdea', () {
-      final hookIds = kDefaultHooks.map((h) => h.id).toSet();
+    test('kDefaultHooks: every hook has required fields populated', () {
       for (final h in kDefaultHooks) {
-        expect(hookIds, contains(h.id),
-            reason: 'ID "${h.id}" has no matching HookIdea');
+        expect(h.id, isNotEmpty, reason: 'Empty id found');
+        expect(h.category, isNotEmpty, reason: '${h.id} has empty category');
+        expect(h.cover, isNotEmpty, reason: '${h.id} has empty cover');
+        expect(h.problem, isNotEmpty, reason: '${h.id} has empty problem');
+        expect(h.lesson, isNotEmpty, reason: '${h.id} has empty lesson');
+        expect(h.postFormat, isNotEmpty, reason: '${h.id} has empty postFormat');
       }
     });
 
@@ -40,44 +40,32 @@ void main() {
       }
     });
 
-    test('kMomentUpgrades: every key has a matching HookIdea in kDefaultHooks', () {
-      final hookIds = kDefaultHooks.map((h) => h.id).toSet();
-      for (final id in kMomentUpgrades.keys) {
-        expect(hookIds, contains(id),
-            reason: 'kMomentUpgrades key "$id" has no matching hook');
+    test('kDefaultHooksWithRewrite: all hook ids have moment fields populated', () {
+      // Moment upgrades are now embedded in kDefaultHooksWithRewrite.
+      // Verify that hooks which originally had moment upgrades have
+      // their setting/sceneDetail/dialogue/mess/innerThought/endingBeat populated.
+      for (final h in kDefaultHooksWithRewrite) {
+        // Hooks that had moment upgrades should have non-empty moment fields.
+        // Safety hooks and main hooks all received moment upgrades, so they
+        // should have these fields populated.
+        if (h.category == 'Safety' || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+          expect(h.setting, isNotEmpty, reason: '${h.id} has empty setting');
+          expect(h.sceneDetail, isNotEmpty, reason: '${h.id} has empty sceneDetail');
+          expect(h.dialogue, isNotEmpty, reason: '${h.id} has empty dialogue');
+          expect(h.mess, isNotEmpty, reason: '${h.id} has empty mess');
+          expect(h.innerThought, isNotEmpty, reason: '${h.id} has empty innerThought');
+          expect(h.endingBeat, isNotEmpty, reason: '${h.id} has empty endingBeat');
+        }
       }
     });
 
-    test('kDefaultHooksWithRewrite: moment fields are applied from kMomentUpgrades', () {
-      final byId = {for (final h in kDefaultHooksWithRewrite) h.id: h};
-      for (final entry in kMomentUpgrades.entries) {
-        final id = entry.key;
-        final upgrade = entry.value;
-        final hook = byId[id];
-        expect(hook, isNotNull, reason: '$id not found in kDefaultHooksWithRewrite');
-        expect(hook!.setting, upgrade['setting'],
-            reason: '$id setting mismatch');
-        expect(hook.sceneDetail, upgrade['sceneDetail'],
-            reason: '$id sceneDetail mismatch');
-        expect(hook.dialogue, upgrade['dialogue'],
-            reason: '$id dialogue mismatch');
-        expect(hook.mess, upgrade['mess'],
-            reason: '$id mess mismatch');
-        expect(hook.innerThought, upgrade['innerThought'],
-            reason: '$id innerThought mismatch');
-        expect(hook.endingBeat, upgrade['endingBeat'],
-            reason: '$id endingBeat mismatch');
-      }
-    });
-
-    test('kDefaultHooksWithRewrite: storyDetail is applied from kRewrittenStories', () {
-      final byId = {for (final h in kDefaultHooksWithRewrite) h.id: h};
-      for (final entry in kRewrittenStories.entries) {
-        final id = entry.key;
-        final hook = byId[id];
-        expect(hook, isNotNull, reason: '$id not found in kDefaultHooksWithRewrite');
-        expect(hook!.storyDetail, entry.value,
-            reason: '$id storyDetail was not rewritten');
+    test('kDefaultHooksWithRewrite: storyDetail is non-empty for hooks with stories', () {
+      final mappedIds = kRewrittenStoryIds;
+      for (final h in kDefaultHooksWithRewrite) {
+        if (mappedIds.contains(h.id)) {
+          expect(h.storyDetail, isNotEmpty,
+              reason: '${h.id} should have a non-empty storyDetail');
+        }
       }
     });
 
@@ -97,19 +85,30 @@ void main() {
       }
     });
 
-    test('kMomentUpgrades: all defaultCast values have at most 3 characters', () {
-      for (final entry in kMomentUpgrades.entries) {
-        final cast = entry.value['cast']!.split('|');
-        expect(cast.length, lessThanOrEqualTo(3),
-            reason: '${entry.key} has more than 3 cast members: $cast');
+    test('kDefaultHooksWithRewrite: defaultCast has at most 3 characters for hooks', () {
+      // Verify that hooks which originally had moment upgrades don't have
+      // more than 3 cast members
+      for (final h in kDefaultHooksWithRewrite) {
+        if (h.id.startsWith('safety-') || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+          expect(h.defaultCast.length, lessThanOrEqualTo(3),
+              reason: '${h.id} has more than 3 cast members: ${h.defaultCast}');
+        }
       }
     });
 
-    test('kMomentUpgrades: endingBeat is non-empty for all entries', () {
-      for (final entry in kMomentUpgrades.entries) {
-        expect(entry.value['endingBeat'], isNotEmpty,
-            reason: '${entry.key} has empty endingBeat');
+    test('kDefaultHooksWithRewrite: endingBeat is non-empty for hooks with moments', () {
+      for (final h in kDefaultHooksWithRewrite) {
+        if (h.id.startsWith('safety-') || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+          expect(h.endingBeat, isNotEmpty,
+              reason: '${h.id} has empty endingBeat');
+        }
       }
     });
   });
 }
+
+const kRewrittenStoryIds = {
+  'h01', 'h02', 'h03', 'h04', 'h05', 'h07', 'h08',
+  'h12', 'h13', 'h14', 'h15', 'h16', 'h17', 'h19',
+  'pal03', 'pal19',
+};

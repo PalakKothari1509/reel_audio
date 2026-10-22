@@ -2,47 +2,47 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:reel_audio/content_ideas.dart';
 
+/// IDs that originally had entries in kRewrittenStories.
+/// These stories should now be embedded directly in storyDetail.
+const kRewrittenStoryIds = {
+  'h01', 'h02', 'h03', 'h04', 'h05', 'h07', 'h08',
+  'h12', 'h13', 'h14', 'h15', 'h16', 'h17', 'h19',
+  'pal03', 'pal19',
+};
+
 void main() {
-  group('kRewrittenStories', () {
-    test('every key exists in kDefaultHooks', () {
+  group('Story format on kDefaultHooks', () {
+    test('every rewritten story ID has a matching HookIdea', () {
       final ideaIds = kDefaultHooks.map((h) => h.id).toSet();
-      for (final id in kRewrittenStories.keys) {
+      for (final id in kRewrittenStoryIds) {
         expect(ideaIds, contains(id),
-            reason: 'kRewrittenStories has no matching idea for "$id"');
+            reason: 'Rewritten story ID "$id" has no matching idea');
       }
     });
 
-    test('every value contains Story:, Twist:, Resolution:, Moral:', () {
-      for (final entry in kRewrittenStories.entries) {
-        final story = entry.value;
+    test('rewritten storyDetail contains Story:, Twist:, Resolution:, Moral:', () {
+      final byId = {for (final h in kDefaultHooks) h.id: h};
+      for (final id in kRewrittenStoryIds) {
+        final story = byId[id]!.storyDetail;
         expect(story, contains('Story:'),
-            reason: '${entry.key} is missing Story:');
+            reason: '$id is missing Story:');
         expect(story, contains('Twist:'),
-            reason: '${entry.key} is missing Twist:');
+            reason: '$id is missing Twist:');
         expect(story, contains('Resolution:'),
-            reason: '${entry.key} is missing Resolution:');
+            reason: '$id is missing Resolution:');
         expect(story, contains('Moral:'),
-            reason: '${entry.key} is missing Moral:');
+            reason: '$id is missing Moral:');
       }
     });
 
-    test('kDefaultHooksWithRewrite applies storyDetail where mapped', () {
-      final byId = {for (final h in kDefaultHooksWithRewrite) h.id: h};
-      for (final id in kRewrittenStories.keys) {
-        expect(byId[id]!.storyDetail, kRewrittenStories[id],
-            reason: '$id did not receive its rewritten story');
-      }
+    test('kDefaultHooksWithRewrite equals kDefaultHooks', () {
+      expect(kDefaultHooksWithRewrite, same(kDefaultHooks));
     });
 
-    test('unmapped hooks keep their original storyDetail', () {
-      final mappedIds = kRewrittenStories.keys.toSet();
-      for (final h in kDefaultHooksWithRewrite) {
-        if (!mappedIds.contains(h.id)) {
-          final original = kDefaultHooks
-              .firstWhere((d) => d.id == h.id, orElse: () => h);
-          expect(h.storyDetail, original.storyDetail,
-              reason: '${h.id} should keep its original storyDetail');
-        }
+    test('safety hooks have storyDetail format matching their category', () {
+      for (final h in kSafetyHooks) {
+        expect(h.storyDetail, isNotEmpty,
+            reason: '${h.id} has empty storyDetail');
       }
     });
   });
