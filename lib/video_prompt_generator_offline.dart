@@ -54,12 +54,12 @@ class OfflineVideoPromptGenerator {
     required List<String> characters,
   }) {
     final partsCount = (totalSeconds / 10).round().clamp(2, 6);
-    final charBlock = _buildCharacterBlock(characters);
+    final charBlock = _buildCharacterBlock(characters, story.cast);
     final storyTitle = story.title;
     final storyFoundation = _buildFoundation(story, characters);
 
     final parts = <VideoPartPrompt>[];
-    String previousEndingState = 'opening scene';
+    String previousEndingState = 'still in the middle of it';
 
     final beats = _buildStoryBeats(story, partsCount);
 
@@ -69,35 +69,37 @@ class OfflineVideoPromptGenerator {
       final isLast = i == partsCount - 1;
 
       final purpose = isLast
-          ? 'Ending: Resolve the conflict with a warm moment and clear takeaway'
-          : 'Hook: Show the situation that every parent recognises';
+          ? 'Closing image only. Hold the frame. No lesson, no summary, no card text.'
+          : (i == 0
+              ? 'The moment itself, mid-action. No setup, no "one day", no context.'
+              : 'Escalation — the situation gets worse and stays worse.');
 
-      final setting = _buildSetting(partNumber);
+      final setting = _buildSetting(story, partNumber);
+
       final startingState = i == 0
-          ? 'Main characters in the center of the room, neutral expressions, ready to begin'
+          ? 'Action already in progress as the shot opens, nobody posed, '
+              'characters caught mid-movement'
           : previousEndingState;
 
-      final action04 = _buildActionForBeat(story, beat, 1);
-      final action48 = _buildActionForBeat(story, beat, 2);
+      final action04 = _buildActionForBeat(story, beat, 1, isLast, characters);
+      final action48 = _buildActionForBeat(story, beat, 2, isLast, characters);
       final action810 = isLast
-          ? _buildEndingActionFromBeat(beat, story, characters)
-          : _buildActionForBeat(story, beat, 3);
+          ? _buildEndingAction(story, characters)
+          : _buildActionForBeat(story, beat, 3, isLast, characters);
 
-      final dialogue = _buildDialogue(story, partNumber, partsCount, beat);
-      final endingState = _buildEndingState(beat, characters);
-      final textHook = generateHookText(story,
-          partNumber: partNumber, totalParts: partsCount);
+      final dialogue = _buildDialogue(story, partNumber, partsCount, beat, characters);
+      final endingState = _buildEndingState(story, isLast, characters);
       final continuityFrom = i == 0
           ? 'Opening scene'
           : 'Direct cut from Part $i, characters and setting in same positions as ending state';
       final continuityInto = isLast
-          ? 'Scene settles into closing card with lesson visible'
+          ? 'Hold on the closing image for the final beat. No card, no text, no lesson.'
           : 'Characters and setting hand off seamlessly to Part ${partNumber + 1}';
 
       final fullPrompt = _buildFullPrompt(
+        story,
         storyTitle,
         storyFoundation,
-        textHook,
         partNumber,
         partsCount,
         purpose,
@@ -110,12 +112,7 @@ class OfflineVideoPromptGenerator {
         dialogue,
         continuityFrom,
         continuityInto,
-        null,
-      );
-
-      assert(
-        !_containsForbiddenSubstring(fullPrompt),
-        'Generated prompt contains forbidden placeholder text for part $partNumber',
+        _buildSpecificNote(story, partNumber, isLast),
       );
 
       previousEndingState = endingState;
@@ -137,175 +134,198 @@ class OfflineVideoPromptGenerator {
   }
 
   List<String> _buildStoryBeats(GeneratedStory story, int partsCount) {
-    final hasMoments = story.setting.trim().isNotEmpty ||
-        story.sceneDetail.trim().isNotEmpty ||
-        story.dialogue.trim().isNotEmpty ||
-        story.mess.trim().isNotEmpty ||
-        story.innerThought.trim().isNotEmpty;
-
-    if (!hasMoments) {
-      if (partsCount <= 2) {
-        return ['problem', 'solution'];
-      } else if (partsCount == 3) {
-        return ['problem', 'twist', 'solution'];
-      }
-      return ['problem', 'twist', 'worse', 'solution', 'solution', 'solution']
-          .sublist(0, partsCount);
-    }
-
-    if (partsCount <= 2) {
-      return ['sceneDetail', 'endingBeat'];
-    } else if (partsCount == 3) {
-      return ['sceneDetail', 'dialogue', 'endingBeat'];
-    } else if (partsCount == 4) {
-      return ['sceneDetail', 'dialogue', 'mess', 'endingBeat'];
-    }
-    return ['sceneDetail', 'dialogue', 'mess', 'innerThought', 'endingBeat']
-        .sublist(0, partsCount);
+    if (partsCount <= 2) return ['problem', 'solution'];
+    if (partsCount == 3) return ['problem', 'worse', 'solution'];
+    if (partsCount == 4) return ['problem', 'twist', 'worse', 'solution'];
+    return ['problem', 'twist', 'worse', 'worse', 'solution', 'solution'];
   }
 
-  String _buildCharacterBlock(List<String> characters) {
+  String _buildSpecificNote(GeneratedStory story, int partNumber, bool isLast) {
+    final lines = <String>[];
+    if (story.setting.trim().isNotEmpty) {
+      lines.add('This happens here, not in a generic room: ${story.setting}');
+    }
+    if (story.sceneDetail.trim().isNotEmpty) {
+      lines.add('Keep this visible throughout: ${story.sceneDetail}');
+    }
+    if (partNumber == 1 && story.dialogue.trim().isNotEmpty) {
+      lines.add('The only spoken line in this part is: ${story.dialogue}');
+    }
+    if (story.innerThought.trim().isNotEmpty && !isLast) {
+      lines.add('Parent voiceover, one line, not lip-synced: '
+          '"${story.innerThought}" (leave a 1.5s gap in the mix for it)');
+    }
+    if (isLast && story.endingBeat.trim().isNotEmpty) {
+      lines.add('End on exactly this image and hold it: ${story.endingBeat}');
+    }
+    if (isLast) {
+      lines.add('Do NOT add a closing card, quote, moral or on-screen lesson text.');
+    }
+    return lines.isEmpty ? '' : '- ${lines.join('\n- ')}';
+  }
+
+  String _buildCharacterBlock(List<String> characters, List<String> castForStory) {
     final buffer = StringBuffer();
     for (final name in characters) {
       final desc = characterDescription(name);
+      final voice = characterVoice(name);
       buffer.writeln('- $name: $desc');
+      if (voice.isNotEmpty) {
+        buffer.writeln('  Voice: $voice');
+      }
     }
     return buffer.toString().trim();
   }
 
   String _buildFoundation(GeneratedStory story, List<String> characters) {
-    final who = characters.join(' and ');
-    var chars = who;
+    var chars = characters.join(' and ');
     if (characters.length == 1) chars = characters.first;
     if (characters.length > 2) {
       chars =
           '${characters.sublist(0, characters.length - 1).join(', ')} and ${characters.last}';
     }
 
-    return '$chars go through a small everyday moment that every parent '
-        'recognises. The story starts mid-action, builds gently, and ends '
-        'with a warm lesson that parents can relate to.\n\n'
-        'Story: ${story.problem}\n'
-        'Twist: ${story.twist}\n'
-        'Resolution: ${story.solution}\n'
-        'Lesson: ${story.moral}';
-  }
-
-  String _buildSetting(int partNumber) {
-    final settings = [
-      'Indian home interior, warm morning light, soft textures, cream background',
-      'Living room corner with toys scattered, afternoon sunlight through window',
-      'Kitchen counter area, morning light, family items within reach',
-      'Bedroom doorway, soft evening glow, toys on the floor',
-      'Dining area, golden hour light, family chairs around table',
-    ];
-    return settings[(partNumber - 1) % settings.length];
-  }
-
-  String _buildActionForBeat(GeneratedStory story, String beat, int segment) {
-    switch (beat) {
-      case 'sceneDetail':
-        switch (segment) {
-          case 1:
-            return story.sceneDetail.trim().isNotEmpty
-                ? story.sceneDetail
-                : 'The scene is set, characters in neutral positions';
-          case 2:
-            return story.setting.trim().isNotEmpty
-                ? '${story.setting} — the atmosphere is intimate'
-                : 'Camera captures the domestic detail';
-          case 3:
-            return 'Scene detail is established, tension builds naturally';
-        }
-        break;
-      case 'dialogue':
-        switch (segment) {
-          case 1:
-            return story.dialogue.trim().isNotEmpty
-                ? story.dialogue
-                : 'A child speaks, the moment begins';
-          case 2:
-            return 'Characters respond to each other, dialogue flows';
-          case 3:
-            return 'Dialogue reveals the underlying tension';
-        }
-        break;
-      case 'mess':
-        switch (segment) {
-          case 1:
-            return story.mess.trim().isNotEmpty
-                ? story.mess
-                : 'The situation gets more complicated';
-          case 2:
-            return 'Both characters are involved, each reacts differently';
-          case 3:
-            return 'Tension builds through actions, not dialogue';
-        }
-        break;
-      case 'innerThought':
-        switch (segment) {
-          case 1:
-            return story.innerThought.trim().isNotEmpty
-                ? story.innerThought
-                : 'A parent thinks quietly';
-          case 2:
-            return 'The inner thought shows a shift in perspective';
-          case 3:
-            return 'Realization begins to take hold';
-        }
-        break;
-    }
-    return 'Scene develops naturally with clear action and emotion';
-  }
-
-  String _buildEndingActionFromBeat(String beat, GeneratedStory story,
-      List<String> characters) {
+    final buffer = StringBuffer()
+      ..write('$chars go through one small everyday moment. The story starts '
+          'mid-action and does not tidy itself up by the end.\n\n')
+      ..write('Story: ${story.problem}\n')
+      ..write('Twist: ${story.twist}\n')
+      ..write('What goes wrong: ${story.mess.trim().isNotEmpty ? story.mess : story.worse}\n');
     if (story.endingBeat.trim().isNotEmpty) {
-      return story.endingBeat;
+      buffer.write('Closing image: ${story.endingBeat}\n');
     }
-    final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
-    final char2 = characters.length > 1 ? characters[1] : 'Rio';
-    return '$char1 and $char2 resolve the situation with a warm '
-        'moment, scene settling toward the closing card with lesson visible';
+    if (!story.moralHidden && story.moral.trim().isNotEmpty) {
+      buffer.write('Lesson (final end card only): ${story.moral}');
+    }
+    return buffer.toString();
+  }
+
+  String _buildSetting(GeneratedStory story, int partNumber) {
+    if (story.setting.trim().isNotEmpty) {
+      final detail = story.sceneDetail.trim().isNotEmpty
+          ? ' Keep this visible throughout: ${story.sceneDetail}'
+          : '';
+      return '${story.setting}.$detail';
+    }
+    return 'Indian home interior, warm natural light, soft textures';
+  }
+
+  String _buildActionForBeat(GeneratedStory story, String beat, int segment,
+      bool isLast, List<String> characters) {
+    final a = characters.isNotEmpty ? characters.first : 'Ria';
+    final b = characters.length > 1 ? characters[1] : a;
+
+    switch (beat) {
+      case 'problem':
+        switch (segment) {
+          case 1:
+            return '$a begins mid-action, already in it: ${story.problem}';
+          case 2:
+            return '$b reacts physically. Nothing is said here.';
+          case 3:
+            return 'The situation escalates on its own. Still unresolved.';
+        }
+        break;
+      case 'twist':
+        switch (segment) {
+          case 1:
+            return 'The obvious solution appears — $b brings it.';
+          case 2:
+            return '$a tries it. It does not work as expected.';
+          case 3:
+            return 'The attempt leaves them worse off than before they tried.';
+        }
+        break;
+      case 'worse':
+        switch (segment) {
+          case 1:
+            return 'Another attempt. It also fails.';
+          case 2:
+            final mess = story.mess.trim().isNotEmpty ? story.mess : story.worse;
+            return 'The situation gets worse and stays worse: $mess';
+          case 3:
+            return 'Tension builds through action, not dialogue. Nothing is fixed.';
+        }
+        break;
+      case 'solution':
+        switch (segment) {
+          case 1:
+            return isLast
+                ? '$a and $b do the one small thing that works — shown, not explained.'
+                : '$a tries one small thing. It is not enough yet.';
+          case 2:
+            return isLast
+                ? 'Both of them end up in the same frame, physically close, quiet.'
+                : '$b copies $a. It half-works, then slips again.';
+          case 3:
+            return isLast
+                ? 'Hold the final image. No new action, no realisation, no reaction shot.'
+                : 'Something small goes wrong again. No lesson attached.';
+        }
+        break;
+    }
+    return 'Scene continues with real physical action, no narration.';
+  }
+
+  String _buildEndingAction(GeneratedStory story, List<String> characters) {
+    final beat = story.endingBeat.trim().isNotEmpty
+        ? story.endingBeat.trim()
+        : (story.solution.trim().isNotEmpty ? story.solution.trim() : 'the room as it now is');
+    return 'End on exactly this image and hold it for the final beat: $beat. '
+        'Nobody explains it. Nobody looks at camera. No on-screen text.';
   }
 
   String _buildDialogue(GeneratedStory story, int partNumber, int totalParts,
-      String beat) {
-    if (story.dialogue.trim().isNotEmpty && beat == 'dialogue') {
-      return story.dialogue;
-    }
-    if (partNumber == 1) {
-      if (story.setting.trim().isNotEmpty) {
-        return story.setting;
-      }
-      final firstWord = story.problem.split(' ').where((w) => w.length > 3);
-      final subject = firstWord.isNotEmpty ? firstWord.first : 'something';
-      return 'Ria: "$subject dekho yeh kya hua!"\n'
-          'Rio: "Abhi thoda wait karo!"';
+      String beat, List<String> characters) {
+    final a = characters.isNotEmpty ? characters.first : 'Ria';
+
+    if (partNumber == 1 && story.dialogue.trim().isNotEmpty) {
+      final speaker = _speakerFor(story.dialogue, characters);
+      return '$speaker: "${story.dialogue.trim()}"';
     }
     if (partNumber == totalParts) {
-      if (story.endingBeat.trim().isNotEmpty) {
-        return story.endingBeat;
-      }
-      return 'Ria: "${story.endingLine}"\n'
-          'Rio: "Theek hai na Mama?"';
+      return 'No dialogue. Ambient room sound only.';
     }
-    return 'Ria: "Rio, dekho yeh kya hua!"\n'
-        'Rio: "Abhi nahi, thoda wait karo!"';
+    if (partNumber == 1) {
+      return '$a: "${_voiceHint(a)}"';
+    }
+    return '';
   }
 
-  String _buildEndingState(String beat, List<String> characters) {
-    final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
-    final char2 = characters.length > 1 ? characters[1] : 'Rio';
-    final char3 = characters.length > 2 ? characters[2] : 'Cuty';
-    return '$char1 and $char2 together, $char3 nearby, '
-        'expressions warm and resolved, scene settling';
+  String _speakerFor(String line, List<String> characters) {
+    for (final c in characters) {
+      if (line.toLowerCase().contains(c.toLowerCase())) return c;
+    }
+    return characters.isNotEmpty ? characters.first : 'Ria';
   }
 
-  String _buildFullPrompt(
+  String _voiceHint(String name) {
+    final v = characterVoice(name);
+    if (v.isEmpty) return 'Abhi nahi.';
+    final m = RegExp(r'Example:\s*"([^"]+)"').firstMatch(v);
+    return m?.group(1) ?? 'Abhi nahi.';
+  }
+
+  String _buildEndingState(
+      GeneratedStory story, bool isLast, List<String> characters) {
+    final names = characters.isEmpty ? <String>['Ria'] : characters;
+    final joined = names.length == 1
+        ? names.first
+        : '${names.sublist(0, names.length - 1).join(', ')} and ${names.last}';
+
+    if (isLast) {
+      final frame = story.endingBeat.trim().isNotEmpty
+          ? story.endingBeat.trim()
+          : 'the room as it now is';
+      return 'Camera holds on $frame, $joined in frame, nobody posed';
+    }
+    return '$joined still in the middle of it, expressions unresolved, same room as before';
+  }
+
+   String _buildFullPrompt(
+    GeneratedStory story,
     String title,
     String foundation,
-    String textHook,
     int partNumber,
     int totalParts,
     String purpose,
@@ -320,6 +340,12 @@ class OfflineVideoPromptGenerator {
     String continuityInto,
     String? additionalInstructions,
   ) {
+    final overlay = generateOnScreenText(story,
+        partNumber: partNumber, totalParts: totalParts);
+    final problems = overlayProblems(overlay, story);
+    assert(problems.isEmpty,
+        'Overlay problems for part $partNumber: ${problems.join(', ')}');
+
     final buffer = StringBuffer();
     buffer.writeln('TITLE: $title');
     buffer.writeln('PART $partNumber of $totalParts');
@@ -328,18 +354,14 @@ class OfflineVideoPromptGenerator {
     buffer.writeln();
     buffer.writeln('STORY CONTEXT: $foundation');
     buffer.writeln();
-    buffer.writeln('TEXT HOOK OVERLAY: $textHook');
+    buffer.writeln('ON-SCREEN TEXT OVERLAYS: ${overlayInstruction(overlay)}');
     buffer.writeln();
     buffer.writeln('THIS PART\'S PURPOSE: $purpose');
     buffer.writeln();
     buffer.writeln('CHARACTER LOCK:');
     buffer.writeln(charBlock);
     buffer.writeln();
-    buffer.writeln('STORY STRUCTURE RULES:');
-    buffer.writeln('- Ria and Rio NEVER wear glasses.');
-    buffer.writeln('- Cuty is ALWAYS a small white bunny with a pink bow.');
-    buffer.writeln('- Use the exact descriptions above for every part.');
-    buffer.writeln('- No duplicate characters, no identity changes.');
+    buffer.writeln(kStoryStructureRules);
     buffer.writeln();
     buffer.writeln('SCENE AND SETTING: $setting');
     buffer.writeln();
@@ -373,33 +395,40 @@ class OfflineVideoPromptGenerator {
 
   static GeneratedStory generateStoryFromHook(HookIdea hook,
       {required List<String> characters}) {
+    String detail(String label) =>
+        StoryGenerator.extractLine(hook.storyDetail, '$label:');
+    final resolution = detail('Resolution');
+
     return GeneratedStory(
       title: hook.cover,
-      hook: hook.cover,
+      hook: hook.opening.trim().isNotEmpty ? hook.opening.trim() : hook.cover,
       who: characters.join(', '),
-      where: 'at home',
-      problem: hook.problem,
-      twist: 'But then something unexpected happened.',
-      worse: 'It seemed like nothing could fix it.',
-      solution: hook.lesson,
-      endingLine: 'Now everyone knows what to do!',
-      moral: hook.lesson,
-      hookOptions: [],
+      where: hook.setting.trim().isNotEmpty
+          ? hook.setting
+          : (detail('Where').isNotEmpty ? detail('Where') : 'at home'),
+      problem: hook.problem.trim().isNotEmpty ? hook.problem : detail('Story'),
+      twist: detail('Twist'),
+      worse: hook.mess.trim().isNotEmpty
+          ? hook.mess
+          : (detail('Worse').isNotEmpty ? detail('Worse') : detail('Worse')),
+      solution: resolution.isNotEmpty
+          ? resolution
+          : (hook.endingBeat.isNotEmpty ? hook.endingBeat : hook.lesson),
+      endingLine: hook.endingBeat.trim().isNotEmpty
+          ? hook.endingBeat.trim()
+          : (detail('Ending').isNotEmpty ? detail('Ending') : resolution),
+      moral: hook.keepMoralOffScreen
+          ? ''
+          : (detail('Moral').isNotEmpty ? detail('Moral') : hook.lesson),
+      hookOptions: const [],
+      setting: hook.setting,
+      sceneDetail: hook.sceneDetail,
+      dialogue: hook.dialogue,
+      mess: hook.mess,
+      innerThought: hook.innerThought,
+      endingBeat: hook.endingBeat,
+      cast: hook.defaultCast,
+      moralHidden: hook.keepMoralOffScreen,
     );
-  }
-
-  static bool _containsForbiddenSubstring(String text) {
-    final forbidden = [
-      'filler',
-      'placeholder',
-      'lorem ipsum',
-      'TBD',
-      'TODO',
-      'generating',
-      'randomly selected',
-      '\u2026',
-    ];
-    final lower = text.toLowerCase();
-    return forbidden.any((f) => lower.contains(f.toLowerCase()));
   }
 }

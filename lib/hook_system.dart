@@ -1,155 +1,78 @@
-// Hook and on-screen text generation system.
+// Overlay text for generated video prompts.
 //
-// Generates text overlays that are specific to the story being told,
-// not generic templates. The hook system understands the difference
-// between formats (video, image, carousel) and produces appropriate text.
+// The video model must NOT draw text: it garbles Hinglish and the result
+// cannot be edited. Captions and the end card are drawn by the app
+// (caption_renderer.dart). This file only decides what that overlay says.
 
 import 'story_generator_offline.dart';
 
+/// Longest overlay, in words. Longer stops being a hook.
+const int kMaxOverlayWords = 5;
+
+enum OverlayPosition { top, middle, bottom }
+
+int overlayWordCount(String s) {
+  final t = s.trim();
+  return t.isEmpty ? 0 : t.split(RegExp(r'\s+')).length;
+}
+
+final RegExp _pictographs =
+    RegExp(r'[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE0F}]', unicode: true);
+
+String _plain(String s) => s.replaceAll(_pictographs, '').trim();
+
+/// The hook overlay: part 1 only, taken from the short cover title.
+/// Returns '' when there is nothing safe to show. Deterministic.
 String generateHookText(
   GeneratedStory story, {
   required int partNumber,
   required int totalParts,
   String? characterName,
 }) {
-  if (partNumber == 1) {
-    return _hookForFirstPart(story, characterName);
-  }
-  if (partNumber == totalParts) {
-    return _hookForLastPart(story);
-  }
-  return _hookForMiddlePart(story, partNumber, totalParts);
+  if (partNumber != 1) return '';
+  final cover = _plain(story.title);
+  if (cover.isEmpty || overlayWordCount(cover) > kMaxOverlayWords) return '';
+  return cover;
 }
 
-String _hookForFirstPart(GeneratedStory story, String? characterName) {
-  if (story.dialogue.trim().isNotEmpty) {
-    final words = story.dialogue.split(' ').take(5).join(' ');
-    return '$words!';
-  }
-  if (story.mess.trim().isNotEmpty) {
-    final words = story.mess.split(' ').take(5).join(' ');
-    return '$words!';
-  }
-  if (story.hook.trim().isNotEmpty) {
-    final words = story.hook.split(' ').take(5).join(' ');
-    return '$words!';
-  }
-  final hooks = [
-    "${characterName ?? 'Ria'} ka ye reaction dekho! 😲",
-    "${story.hook.split(' ').firstOrNull ?? 'Ek baat'} — kya hua? 😮",
-    "Jab ${characterName ?? 'Ria'} ne kaha — '${story.hook}'",
-    "POV: ${story.where} mein ye sab dekhkar... 🤭",
-    "${story.hook.split(' ').take(2).join(' ')} — starting soon! 👀",
-  ];
-  return _capOverlay(hooks[partNumberIndex()]);
-}
-
-String _hookForMiddlePart(GeneratedStory story, int partNumber, int totalParts) {
-  if (story.mess.trim().isNotEmpty) {
-    final words = story.mess.split(' ').take(5).join(' ');
-    return '$words...';
-  }
-  if (story.sceneDetail.trim().isNotEmpty) {
-    final words = story.sceneDetail.split(' ').take(5).join(' ');
-    return '$words!';
-  }
-  final hooks = [
-    "Toh phir kya hua? 🤔",
-    "Middle mein twist aane wala hai... ✨",
-    "Abhi tak theek tha... par ab? 😬",
-    "Rio aur Ria dono soch rahe the — '${story.problem}'",
-    "Scene badal raha hai... 🎭",
-  ];
-  return _capOverlay(hooks[partNumberIndex()]);
-}
-
-String _hookForLastPart(GeneratedStory story) {
-  if (story.endingBeat.trim().isNotEmpty) {
-    final words = story.endingBeat.split(' ').take(5).join(' ');
-    return '$words ✨';
-  }
-  if (!story.moralHidden && story.moral.trim().isNotEmpty) {
-    final words = story.moral.split(' ').take(5).join(' ');
-    return '$words ❤️';
-  }
-  final hooks = [
-    "Finally! ${story.endingLine} ✨",
-    "Mission accomplished! 👏",
-    "Theek hai na Mama? ✅",
-    "${story.moral} ❤️",
-    "Perfect ending! 🌟",
-  ];
-  return _capOverlay(hooks[partNumberIndex()]);
-}
-
-String _capOverlay(String text) {
-  final words = text.split(' ');
-  if (words.length <= 5) return text;
-  return words.take(5).join(' ');
-}
-
-bool _isForbiddenSubstring(String text) {
-  final forbidden = [
-    'filler',
-    'placeholder',
-    'lorem ipsum',
-    'TBD',
-    'TODO',
-    'generating',
-    'randomly selected',
-  ];
-  final lower = text.toLowerCase();
-  return forbidden.any((f) => lower.contains(f.toLowerCase()));
-}
-
+/// Returns the on-screen text for a given position.
+/// Only top is populated (part 1 cover); middle and bottom are always empty.
 String generateOnScreenText(
   GeneratedStory story, {
   required int partNumber,
   required int totalParts,
-  TextPosition position = TextPosition.top,
+  OverlayPosition position = OverlayPosition.top,
 }) {
-  final lines = _textForPart(story, partNumber, totalParts);
-  switch (position) {
-    case TextPosition.top:
-      return lines.isNotEmpty ? lines.first : '';
-    case TextPosition.middle:
-      return lines.length > 1 ? lines[1] : '';
-    case TextPosition.bottom:
-      return lines.length > 2 ? lines[2] : '';
-  }
+  if (position != OverlayPosition.top) return '';
+  return generateHookText(story,
+      partNumber: partNumber, totalParts: totalParts);
 }
 
-List<String> _textForPart(
-    GeneratedStory story, int partNumber, int totalParts) {
-  if (partNumber == 1) {
-    final top = _isForbiddenSubstring(story.dialogue)
-        ? _capOverlay(story.hook.split(' ').take(5).join(' '))
-        : _capOverlay(story.dialogue.isNotEmpty ? story.dialogue : story.sceneDetail);
-    return [
-      top.isNotEmpty ? '$top!' : '${story.hook.split(' ').take(3).join(' ')}! 🤔',
-      story.setting.isNotEmpty ? _capOverlay(story.setting) : 'Scene: ${story.where}',
-      'Part $partNumber of $totalParts',
-    ];
+/// The line for the "ON-SCREEN TEXT OVERLAYS" section of every video prompt.
+String overlayInstruction(String overlay) => overlay.isEmpty
+    ? 'None. No text of any kind appears in the frame.'
+    : 'Do NOT draw this in the video. The editor adds it later: "$overlay"';
+
+/// Reasons an overlay is unsafe to use. Empty list means fine.
+List<String> overlayProblems(String overlay, GeneratedStory story) {
+  final problems = <String>[];
+  final low = overlay.toLowerCase();
+  if (overlayWordCount(overlay) > kMaxOverlayWords) {
+    problems.add('longer than $kMaxOverlayWords words');
   }
-  if (partNumber == totalParts) {
-    final ending = _isForbiddenSubstring(story.endingBeat)
-        ? 'The big resolution! ✨'
-        : _capOverlay(story.endingBeat);
-    return [
-      ending.isNotEmpty ? ending : 'The big resolution! ✨',
-      story.moralHidden ? '' : story.moral,
-      'Part $partNumber of $totalParts — Done!',
-    ];
+  final moral = story.moral.trim().toLowerCase();
+  if (moral.isNotEmpty && low.contains(moral)) {
+    problems.add('contains the moral');
   }
-  return [
-    _capOverlay(story.mess.isNotEmpty ? story.mess : 'What happens next? 👀'),
-    'Part $partNumber of $totalParts',
-    '',
-  ];
+  for (final p in kBannedOverlayPhrases) {
+    if (low.contains(p.toLowerCase())) problems.add('contains "$p"');
+  }
+  return problems;
 }
 
-enum TextPosition { top, middle, bottom }
-
-int partNumberIndex() {
-  return DateTime.now().millisecond % 5;
-}
+/// Phrases that must never appear in an overlay.
+const List<String> kBannedOverlayPhrases = [
+  'part ', 'scene:', 'middle mein', 'starting soon', 'mission accomplished',
+  'perfect ending', 'the big resolution', 'finally!', 'what happens next',
+  'toh phir kya hua',
+];

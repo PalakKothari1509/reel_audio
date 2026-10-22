@@ -132,16 +132,7 @@ class StoryGenerator {
 
   Future<List<HookIdea>> _loadAvailable() async {
     final hooks = await HookStore.load();
-    return hooks
-        .where((h) => h.forApp)
-        .where((h) => h.storyDetail.trim().isNotEmpty ||
-            h.opening.trim().isNotEmpty ||
-            h.setting.trim().isNotEmpty ||
-            h.sceneDetail.trim().isNotEmpty ||
-            h.dialogue.trim().isNotEmpty ||
-            h.mess.trim().isNotEmpty ||
-            h.endingBeat.trim().isNotEmpty)
-        .toList();
+    return hooks.where((h) => h.forApp).toList();
   }
 
   static String extractLine(String detail, String label, [String? fallbackLabel]) {
@@ -160,14 +151,22 @@ class StoryGenerator {
 
   Future<GeneratedStory> generate({String? customProblem, String? customAge}) async {
     final hooks = await _loadAvailable();
+    if (hooks.isEmpty) {
+      throw StateError('No ideas in the library for offline generation.');
+    }
     final h = hooks[_rng.nextInt(hooks.length)];
     final who = h.defaultCast.isNotEmpty ? h.defaultCast.join(', ') : _selectCharacters();
 
-    // Use storyDetail as primary source when available
-    final hasStoryDetail = h.storyDetail.trim().isNotEmpty;
-    final problem = hasStoryDetail ? extractLine(h.storyDetail, 'Story:', 'PART 1:') : '';
-    final twist = hasStoryDetail ? extractLine(h.storyDetail, 'Twist:') : '';
-    final worse = hasStoryDetail ? extractLine(h.storyDetail, 'Resolution:') : '';
+    String d(String label, [String? alt]) =>
+        extractLine(h.storyDetail, '$label:', alt);
+
+    final problem = d('Story', 'PART 1:');
+    final where = d('Where');
+    final twist = d('Twist');
+    final worse = d('Worse');
+    final resolution = d('Resolution');
+    final ending = d('Ending', 'Ending image:');
+    final moral = d('Moral');
 
     final hookText = _buildHook(h, who);
     final hookOptions = _buildHookOptions(h, hookText);
@@ -176,13 +175,23 @@ class StoryGenerator {
       title: h.cover,
       hook: hookText,
       who: who,
-      where: h.setting.isNotEmpty ? h.setting : 'at home',
-      problem: hasStoryDetail && problem.isNotEmpty ? problem : h.problem,
-      twist: hasStoryDetail && twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
-      worse: hasStoryDetail && worse.isNotEmpty ? worse : (h.mess.isNotEmpty ? h.mess : _fallbackWorse(h.problem)),
-      solution: hasStoryDetail && h.endingBeat.isNotEmpty ? h.endingBeat : (h.endingBeat.isNotEmpty ? h.endingBeat : h.lesson),
-      endingLine: hasStoryDetail ? extractLine(h.storyDetail, 'Moral:') : '',
-      moral: h.keepMoralOffScreen ? '' : h.lesson,
+      where: h.setting.trim().isNotEmpty
+          ? h.setting
+          : (where.isNotEmpty ? where : 'at home'),
+      problem: h.problem.trim().isNotEmpty ? h.problem : problem,
+      twist: twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
+      worse: h.mess.trim().isNotEmpty
+          ? h.mess
+          : (worse.isNotEmpty ? worse : _fallbackWorse(h.problem)),
+      solution: resolution.isNotEmpty
+          ? resolution
+          : (h.endingBeat.isNotEmpty ? h.endingBeat : h.lesson),
+      endingLine: h.endingBeat.trim().isNotEmpty
+          ? h.endingBeat.trim()
+          : (ending.isNotEmpty ? ending : resolution),
+      moral: h.keepMoralOffScreen
+          ? ''
+          : (moral.isNotEmpty ? moral : h.lesson),
       hookOptions: hookOptions,
       setting: h.setting,
       sceneDetail: h.sceneDetail,
@@ -211,16 +220,10 @@ class StoryGenerator {
   }
 
   String _buildHook(HookIdea h, String who) {
-    if (h.opening.trim().isNotEmpty) {
-      return h.opening;
-    }
-    final hooks = [
-      '${h.cover} Ne Kya Dekha?!',
-      'Mumma Ne Kaha — ${h.cover}!',
-      '${who.split(", ").first} Ne ${h.problem.split(" ").first}!',
-      '${h.cover} — Phir Kya Hua?!',
-    ];
-    return hooks[_rng.nextInt(hooks.length)];
+    if (h.opening.trim().isNotEmpty) return h.opening;
+    if (h.dialogue.trim().isNotEmpty) return h.dialogue;
+    if (h.problem.trim().isNotEmpty) return h.problem;
+    return h.cover;
   }
 
   List<Map<String, String>> _buildHookOptions(HookIdea h, String hook) {
@@ -228,44 +231,45 @@ class StoryGenerator {
     final seen = <String>{};
     final options = <Map<String, String>>[];
 
-    final candidates = [
-      {'type': 'Curiosity', 'text': '${h.cover} Ne Kya Dekha?!'},
-      {'type': 'Parent relatable', 'text': base},
-      {'type': 'Situation', 'text': '${_firstWord(h.problem)} Toh Problem Ho Gayi!'},
-      {'type': 'Mystery', 'text': 'Phir Kya Hua?!'},
-      {'type': 'Emotional', 'text': 'Dekhte Hi ${_firstWord(h.problem)}...!'},
+    final momentFields = <String>[
+      if (h.dialogue.trim().isNotEmpty) h.dialogue,
+      if (h.mess.trim().isNotEmpty) h.mess,
+      if (h.endingBeat.trim().isNotEmpty) h.endingBeat,
+      if (h.innerThought.trim().isNotEmpty) h.innerThought,
+      if (h.sceneDetail.trim().isNotEmpty) h.sceneDetail,
     ];
 
-    for (final c in candidates) {
-      if (c['text']!.trim().isNotEmpty && seen.add(c['text']!.toLowerCase())) {
-        options.add(c);
+    final fieldTypes = [
+      'Dialogue', 'Situation', 'Emotional', 'Mystery', 'Curiosity'
+    ];
+
+    for (var i = 0; i < momentFields.length && options.length < 5; i++) {
+      final text = momentFields[i];
+      if (text.trim().isNotEmpty && seen.add(text.toLowerCase())) {
+        options.add({'type': fieldTypes[i % fieldTypes.length], 'text': text});
       }
     }
 
-    // Fill remaining slots with dialogue-based options when moment fields exist
-    if (h.dialogue.trim().isNotEmpty && options.length < 5) {
-      final dialogOption = {'type': 'Dialogue', 'text': h.dialogue};
-      if (seen.add(dialogOption['text']!.toLowerCase())) {
-        options.add(dialogOption);
-      }
+    if (options.length < 5 && base.trim().isNotEmpty && seen.add(base.toLowerCase())) {
+      options.add({'type': 'Parent relatable', 'text': base});
     }
 
-    while (options.length < 5 && _hookTypes.length > options.length) {
-      final idx = options.length;
-      final text = h.dialogue.trim().isNotEmpty && h.endingBeat.trim().isNotEmpty
-          ? '${h.dialogue} — ${h.endingBeat}'
-          : base;
-      options.add({
-        'type': _hookTypes[idx % _hookTypes.length],
-        'text': text,
-      });
+    final fallbackTexts = [
+      h.cover,
+      h.problem,
+      '${h.cover} — Phir Kya Hua?!',
+    ];
+    var fi = 0;
+    while (options.length < 5 && fi < fallbackTexts.length) {
+      final text = fallbackTexts[fi++];
+      if (text.trim().isNotEmpty && seen.add(text.toLowerCase())) {
+        options.add({'type': _hookTypes[options.length % _hookTypes.length], 'text': text});
+      }
     }
 
     return options.take(5).toList();
   }
-
-  String _firstWord(String s) => s.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
-}
+  }
 
 class StoryGeneratorScreen extends StatefulWidget {
   const StoryGeneratorScreen({super.key});

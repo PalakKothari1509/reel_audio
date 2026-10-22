@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -97,7 +95,9 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
         _selectedHookIdea = picked;
         _selectedChars
           ..clear()
-          ..addAll(['Ria', 'Rio', 'Cuty']);
+          ..addAll(picked.defaultCast.isNotEmpty
+              ? picked.defaultCast
+              : ['Ria', 'Rio', 'Cuty']);
       });
     }
   }
