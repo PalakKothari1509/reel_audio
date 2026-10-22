@@ -406,14 +406,19 @@ const kDefaultHooks = <HookIdea>[
     opening: 'Ria ne Mumma ka haath jhatak diya... joote khud pehnenge!',
     problem: 'Ria insists on putting her shoes on herself and pushes Mumma away',
     lesson: 'Thoda intezaar, aur bachcha khud seekh jaata hai',
-    forApp: true,
-    usedOn: '',
     storyDetail: '''
-Story: Mumma is running late; Ria plants her feet — "Main khud!" Shoe goes on the wrong foot, slips off, she tries again and nearly gives up.
-Twist: Mumma softly counts to five instead of grabbing the shoe. "Ek, do, teen, char, paanch…"
-Resolution: Ria turns the shoe the right way, gets it on, and beams: "Dekha? Shoe ko bhi direction chahiye thi!"
-Moral: A little patience and a count to five gives Ria a win she earned herself.
-''',
+Story: Mumma is running late. Ria plants her feet: "Main khud!" Shoe goes on the wrong foot, slips off. She tries again, nearly in tears.
+Twist: Mumma doesn't grab it. "Tumhe chahiye, Mumma dekh sakti hai." Ria's heel catches the doorframe. "Abhi nahi, 2 minute!"
+Resolution: Shoe goes on right. Ria beams: "Dekha? Shoe ko bhi direction chahiye thi!" Mumma: "Jab tak galat nahi hota, tab tak try hota."
+Moral: ''',
+    setting: 'Front door, shoes scattered, keys jangling in Mumma pocket',
+    sceneDetail: 'One shoe on wrong foot, heel caught on the doorframe',
+    dialogue: 'Main khud!',
+    mess: 'Ria keeps switching feet mid-step, shoe keeps slipping',
+    innerThought: 'Mumma jaldi karegi, but she is not moving, and I am almost done',
+    endingBeat: 'Shoe finally on right foot, both smiling at the near-miss',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'h02',
@@ -422,14 +427,19 @@ Moral: A little patience and a count to five gives Ria a win she earned herself.
     opening: 'Phone band hua... aur Ria ka rona shuru!',
     problem: 'Ria cries when cartoon ends mid-song without warning',
     lesson: 'Two-minute warning helps Ria choose a calm goodbye',
-    forApp: true,
-    usedOn: '',
     storyDetail: '''
-Story: Cartoon ends mid-song. Ria protests: "Bas five minute aur!" Mumma admits it was abrupt.
-Twist: Next time Mumma gives a two-minute warning. Ria chooses goodbye: wave or sing.
-Resolution: Ria waves at the screen, switches off, and asks Robot to draw the character.
-Moral: Transition works better with a warning — and letting the child pick the goodbye.
-''',
+Story: Credits roll mid-song. Ria plants herself: "Bas five minute aur!" Phone goes on the armrest.
+Twist: Mumma holds up two fingers: "Do minute." Ria negotiates: "Ek minute?" Mumma: "Ek minute theek hai, lekin ek hi episode."
+Resolution: Ria picks the goodbye — "Mujhe screen pe wave karoongi." Lights come on. She blows a kiss to the character.
+Moral: ''',
+    setting: 'Living room, late afternoon sun, phone on the armrest',
+    sceneDetail: 'TV credits rolling mid-song, phone face-down on the armrest',
+    dialogue: 'Bas five minute aur!',
+    mess: 'Screen is paused mid-song, credits still rolling in the background',
+    innerThought: 'Main kab tak ye gaana sun sakti hoon, until even the humming stops',
+    endingBeat: 'Ria blows a kiss at the TV, then lets the screen go dark',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'h03',
@@ -467,17 +477,22 @@ Moral: Ek chhota sa raasta bhi bada madad karta hai.
     id: 'h05',
     category: 'Relatable',
     cover: 'Ek Aur Paani!',
-    opening: 'Lights band... aur Ria ko phir se paani chahiye.',
+    opening: 'Lights band... aur Ria phir se paani maang rahi hai.',
     problem: 'Bedtime stretches on with one more water, one more story, one more hug',
-    lesson: 'Roz ek jaisa routine, neend jaldi aati hai',
-    forApp: true,
-    usedOn: '',
+    lesson: 'A small cup on the bedside table ends the loop',
     storyDetail: '''
-Story: Lights off. Ria calls out: "Mumma, ek aur paani!" Mumma brings it. Then Ria remembers: "Teddy ko blanket chahiye." Mumma brings that too. "Aur ek hug?" Planned hug. Ria snuggles in.
-Twist: Mumma pre-places a small cup and a hug-stuffed animal on the bedside table the next night.
-Resolution: When lights go off, Ria reaches for both. "Ab bas... unless Teddy ko paani chahiye."
-Moral: A little prep turns the endless loop into a quiet goodnight.
-''',
+Story: Lights off. "Maa, ek aur paani!" Mumma brings the cup. Ria sips. "Teddy ko pani do." Mumma: "Teddy toh nahi peeta beta." "Ek hug?" Mumma hugs her. "Goodnight." Ria: "Par kal subah mujhe kya dena padega?"
+Twist: Next night Mumma puts the cup and Teddy on the bedside table before lights out. Ria reaches, pats both.
+Resolution: "Par Kalia ka paani bhi toh do?" Mumma: "Kalia toh khaali hai. Teri nahi." Ria laughs. "Theek hai."
+Moral: ''',
+    setting: 'Bedroom nightstand, single bedside lamp on',
+    sceneDetail: 'Water cup and Teddy bear already on the nightstand',
+    dialogue: 'Maa, ek aur paani!',
+    mess: 'Ria keeps inventing things Teddy might need — blanket, spoon, story',
+    innerThought: 'Ek baar toh mujhe bhi sochne ka time milega, when does the asking stop',
+    endingBeat: 'Ria reaches for both cup and Teddy, then hugs them both',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'h06',
@@ -583,16 +598,23 @@ Moral: Toddler subtitles are fiction — but what they actually hear matters mor
     category: 'Relatable',
     forApp: true,
     usedOn: '',
-    storyDetail: '''
-Story: Mumma: "Abhi chocolate nahi." Three reactions in three seconds.
-Twist: Ria negotiates — "Bas ek piece, maine kal se diet shuru karungi!" Rio drops to the floor — "NO!" Cuty quietly munches a carrot.
-Resolution: Mumma: "Carrot nahi? Theek hai." She hands Cuty a cheese cube. Ria gets a story, Rio gets a countdown hug.
-Moral: One "no" can meet three different needs — see each before you solve.
-''',
+         storyDetail: '''
+Story: Mumma: "Chocolate nahi." Ria: "Bas ek piece!" Rio drops to the floor — "NO!" Cuty quietly chews a carrot.
+Twist: Mumma: "Ria, tumhara essay toh khatam nahi hua." Ria: "Par kal se diet!" Mumma: "Kal se diet? Start tomorrow then." Rio: "Mujhe bhi chocolate chahiye!" Mumma: "Tumhara turn kab hai?"
+Resolution: Mumma hands Cuty a cheese cube. Cuty trades it for a raisin. Ria watches. Rio's face falls. "Cuty got cheese, mujhe ghisse?" Mumma: "Cuty share karta hai toh tu bhi share karega na?"
+Moral: ''',
     cover: 'Three Kids, One No',
     opening: 'Ria protests, Rio refuses, Cuty quietly gives in.',
     problem: 'The same parent boundary can trigger three very different reactions',
     lesson: 'Kids react differently, but all of them need patience and clarity',
+    setting: 'Kitchen counter after lunch, afternoon light',
+    sceneDetail: 'Half-open chocolate bar on the counter, Cuty chewing a carrot',
+    dialogue: 'Bas ek piece!',
+    mess: 'Ria keeps negotiating ("diet shuru karungi"), Rio melts down',
+    innerThought: 'Ek nahi toh teen, when will the chocolate negotiation end',
+    endingBeat: 'Cuty trades cheese for raisin, Rio sees it and asks to share too',
+    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'pal04',
@@ -613,16 +635,23 @@ Story: (Merged into h02 — duplicate screen-time story)
     category: 'Relatable',
     forApp: true,
     usedOn: '',
-    storyDetail: '''
-Story: Rio: "Mujhe neend nahi aa rahi!" He sits bolt-upright, mid-story, mid-sentence, yawns so wide Mumma sees his toy car inside.
-Twist: His eyes start drooping — the car slips from his hand. "Evidence mil gaya."
-Resolution: Mumma quietly places a pillow under his arm, reads one more page, and by page three his breathing is even.
-Moral: Sometimes the loudest protest ends with the softest sleep.
-''',
+        storyDetail: '''
+Story: Ria: "Mujhe neend nahi!" She sits bolt-upright mid-story. Yawns so wide Mumma sees the toy car she swallowed at dinner.
+Twist: Halfway through page two, Ria's eye flutters. "Evidence mil gaya." She pats her chest where the car is. Mumma: "Car safa niklega kal subah."
+Resolution: Mumma tucks the blanket just around Ria's shoulders. By page three she's breathing even. The car stays inside.
+Moral: ''',
     cover: 'Neend Ka Evidence',
     opening: 'Rio kehte hain... "Mujhe neend nahi!" Tab tak jab tak nahi.',
     problem: 'Rio protests sleep loudly, then falls asleep mid-story',
     lesson: 'Protest ke baad bhi mamla sul jata hai',
+    setting: 'Living room couch, storybook on Mumma\'s lap, dim lamp',
+    sceneDetail: 'Half-read storybook, blanket half-draped, toy car visible through Ria\'s throat',
+    dialogue: 'Mujhe neend nahi!',
+    mess: 'Ria keeps restarting the story from page one, refusing to stay still',
+    innerThought: 'Agar main jaldi so jaoongi toh waktu kal subha uthne padega, and I will anyway',
+    endingBeat: 'Mumma tucks the blanket around just Ria\'s shoulders, both half-asleep by page three',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'pal06',
@@ -781,20 +810,27 @@ Moral: Ek chhota sa bargain sabke liye badi khushiyon ka source.
     lesson: 'One small bargain can turn "more" into "done"',
   ),
   HookIdea(
-     id: 'pal16',
+    id: 'pal16',
     category: 'Relatable',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Rio's vocabulary for the day is just "No!" "Mine!" "Why!" — three escalating moments when Ria tries to share, take, and explain.
-Twist: Everyone echoes "No! Mine! Why!" — Ria: "No, mujhe bhi!" — and Cuty gets confused: "Toh kya sabke paas ek hi jawaab hai?"
-Resolution: They count all the "no, mine, why" moments — and end with Rio handing Cuty the ball: "Tumhara bhi hai."
-Moral: One word can fill a whole day — and then just as quickly, it can end.
-''',
+Story: Ria: "Mujhe bhi!" Rio: "No!" He grabs the ball. "Mine!" Ria: "Why!" — not even asking, just echo.
+Twist: Mumma pretends to be a broken record: "No, Mine, Why" — three times, flat. Both kids stop. Ria: "Arey, that was me!"
+Resolution: Rio hands Cuty the ball: "Tumhara bhi." Cuty drops it immediately. Both kids stare. "Oops."
+Moral: ''',
     cover: 'No, Mine, Why!',
     opening: 'Rio kehte hain: No! Mine! Why!',
     problem: 'One word repeated drives parents to the edge of sanity',
     lesson: 'Lean into the word — count it, echo it, then watch it lose its power',
+    setting: 'Living room floor, toy ball between them',
+    sceneDetail: "Both kids' hands reaching for the same ball, Mumma half-hidden behind the couch",
+    dialogue: 'No! Mine! Why!',
+    mess: 'The three words repeat — louder, faster, until both kids are crying',
+    innerThought: 'Maine kya bigaada, when did my words become the only thing they hear',
+    endingBeat: 'Rio hands the ball to Cuty, Cuty drops it, both kids say "oops" at the same time',
+    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    keepMoralOffScreen: true,
   ),
   HookIdea(
     id: 'pal17',
