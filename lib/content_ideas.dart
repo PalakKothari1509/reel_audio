@@ -2109,6 +2109,111 @@ Resolution: Ria marks countries on her adventure map, trying one dish per day an
     Moral: The world is huge — best to explore it one bite at a time.
 ''',
   ),
+  HookIdea(
+    id: 'h22',
+    category: 'Relatable',
+    cover: 'Papa Jaldi Aao!',
+    opening: 'Phone uthate hue — "Papa jaldi aao, Mumma phone pe baat karti hai!"',
+    problem: 'Ria overhears a snippet of adult conversation and thinks it is an emergency',
+    lesson: 'Sometimes kids connect the dots and create the drama for us',
+    storyDetail: '''
+Story: Ria dials Papa at the office. "Papa jaldi aao, Mummy bahut pareshan hain!" Papa: "Kya hua beta?" Ria: "Mummy kehti hain phone pe — 'biwi change kar lo!' Papa crashes through the door — "Main hoon na!" Mumma: "Arre beta, woh toh Mummy ka meeting tha — client ka naam 'Biwi' hai."
+Twist: Ria: "Toh... aap change kar li?" Mumma: "Nahi beta, company change ki." Ria, relieved: "Mummy bhi toh change kar sakti hai na?" Both parents freeze.
+Resolution: Papa: "Kal subhi phir se kahoongi." Ria: "Theek hai, lekin Mummy kal subhi bhi kuch change karegi?" They all three stare. Papa: "Shayad."
+Moral: ''',
+    setting: 'Living room, afternoon light through the window',
+    sceneDetail: 'Phone on the coffee table, Ria standing on tiptoes to reach the receiver',
+    dialogue: 'Papa jaldi aao, Mumma phone pe baat karti hai!',
+    mess: 'Ria keeps adding details — "Mummy ro rahi thi!" "Mummy ne pani bhi nahi piya!" — each lie more dramatic',
+    innerThought: 'Agar main itni badi baat karoongi toh Papa mujhe believe karega and maybe Mumma too',
+    endingBeat: 'All three frozen in the doorway, nobody sure who is changing what',
+    defaultCast: ['Ria', 'Papa', 'Mumma'],
+    keepMoralOffScreen: true,
+  ),
+  HookIdea(
+    id: 'h23',
+    category: 'Relatable',
+    cover: 'Wohi Toh Tha!',
+    opening: 'Ria freezes mid-bite. "Arre... yehi toh tha jo tumne kaha tha!"',
+    problem: 'Rio copies Mumma exact words at the worst possible moment',
+    lesson: 'Toddlers are walking tape recorders — speak carefully',
+    storyDetail: '''
+Story: Mumma to Papa in the hallway: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio, eating breakfast, looks up. "Mummy ne kaha — aaj tak nahi dekhna." Papa: "Kya?" Mumma's face goes white.
+Twist: Mumma: "Maine kaha tha tumhe? Kisko bhi nahi kaha." Papa: "Tumne kaha tha — " Rio, matter-of-fact: "Mummy ne kaha tha tumhe — tumhare saath nahi dekhna."
+Resolution: Mumma pinches her own arm: "Rio, tumhara breakfast khatam karo." Rio: "Wohi toh tha jo tumne kaha!" Mumma: "Haan bhi kaha."
+Moral: ''',
+    setting: 'Kitchen, breakfast table, morning light',
+    sceneDetail: 'Half-eaten dosa on Rio\'s plate, Mumma\'s dupatta caught on the door handle',
+    dialogue: 'Wohi toh tha jo tumne kaha tha!',
+    mess: 'Rio keeps repeating "Mummy ne kaha" every time Mumma tries to backtrack',
+    innerThought: 'Maine kya bigaara, when did my offhand comment become a courtroom testimony',
+    endingBeat: 'Rio shrugs, takes another bite, and says "Bas yehi toh tha" for the last time',
+    defaultCast: ['Rio', 'Mumma', 'Papa'],
+    keepMoralOffScreen: true,
+  ),
+  HookIdea(
+    id: 'h24',
+    category: 'Relatable',
+    cover: 'Secret Agent Cuty',
+    opening: "Cuty trots between Mumma's legs, tail twitching — something is wrong.",
+    problem: 'Child misunderstands a private adult conversation about money',
+    lesson: "Overheard snippets become a child's own private soap opera",
+    storyDetail: '''
+Story: Mumma on the phone: "Nahi, yeh month toh budget mein nahi aayega." Ria: "Budget? Kya budget?" Mumma: "Apna ghar ka budget." Ria: "Ghar ka budget? Par main toh ghar ka part hoon!" Cuty sniffs Mumma's purse and trots away.
+Twist: Ria: "Toh kya main budget se bahar hoon?" Mumma: "Nahi beta..." Rio: "Main bhi budget se bahar hoon?" Mumma, defeated: "Sab koi budget ke andar hi hoon."
+Resolution: Cuty emerges with a single coin from the purse. Drops it at Ria's feet. Everyone stares at the coin.
+Moral: ''',
+    setting: 'Hallway outside the bedroom, morning',
+    sceneDetail: "Mumma's purse on the floor, single coin glinting",
+    dialogue: 'Par main toh ghar ka part hoon!',
+    mess: 'Ria keeps asking "kitna budget hai?" and "kiska share hai"',
+    innerThought: 'Agar main bahar hoon toh kya main free hoon, and then will they still love me',
+    endingBeat: 'Cuty drops the coin, everyone stares at it like it just solved everything',
+    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    keepMoralOffScreen: true,
+  ),
+  HookIdea(
+    id: 'h25',
+    category: 'Relatable',
+    cover: "Cuty's Investigation",
+    opening: 'Cuty stands on his hind legs, nose twitching like a tiny detective.',
+    problem: 'Child confidently "solves" a household mystery in the wrong way',
+    lesson: "Kids notice everything, even when adults think they haven't",
+    storyDetail: '''
+Story: Ria marches to the kitchen: "Cuty ne problem dhundh li!" She holds up a magnifying glass. "Kaunne ne Mumma ki favourite chappal girayi?" Cuty sits innocent. Ria: "Evidence hai — hair on the floor, scuff mark on the wall."
+Twist: Mumma: "Ria... maine khud hi toh girayi thi." Ria: "Phir bhi, koi aur problem hogi!" She points at the sink. "Dabbe nahi dhule — THAT is the mystery!"
+Resolution: Cuty trots over, picks up a single dirty spoon, drops it at Rio's feet. Rio: "Mein bhi madad kar sakta hoon?" Ria: "Detective Cuty ne kaha — team banao."
+Moral: ''',
+    setting: 'Kitchen floor, morning light through window',
+    sceneDetail: 'Magnifying glass on the counter, hair strand and scuff mark on the wall',
+    dialogue: 'Evidence hai — hair on the floor!',
+    mess: 'Ria keeps finding "clues" everywhere — missing spoon, untied shoelace, half-eaten breakfast',
+    innerThought: 'Maine kuchh bhi nahi kara par sabse badi investigation main hogi, when the adults are not looking',
+    endingBeat: "Cuty drops the spoon at Rio's feet, all three kids form a tiny detective team",
+    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    keepMoralOffScreen: true,
+  ),
+  HookIdea(
+    id: 'h26',
+    category: 'Relatable',
+    cover: 'Plan: Perfect!',
+    opening: 'Ria presents a crumpled blueprint: "Maine plan banaya hai!"',
+    problem: 'Child confidently solves a family problem in the wrong way',
+    lesson: "The child's solution is creative but completely misses the brief",
+    storyDetail: '''
+Story: Ria: "Dekho plan!" She unfolds a paper: "Step 1: Papa ko gulaab do." "Step 2: Mummy ko paani do." "Step 3: Rio ko TV chalu karo." "Step 4: Sab milke — PROBLEM SOLVED!" Mumma: "Ria beta, yeh kya plan hai?" Ria: "Galti kya hogi agar sabko pyaar milta hai?"
+Twist: Papa: "Beta, main gulaab se allergic hoon." Rio: "Main TV nahi dekhna chahta, book maanga hai." Mumma: "Main paani nahi peeti, darrakchunni hai."
+Resolution: Ria crumples the plan: "Toh... naya plan?" She draws a new one: "Step 1: Papa tofa mile." "Step 2: Mummy book mile." "Step 3: Rio dinosaur mile." "Step 4: Sab khush hain." Everyone laughs.
+Moral: ''',
+    setting: 'Living room floor, scattered toys, crumpled paper plan',
+    sceneDetail: "Ria's blueprint with \"STEP 4: PROBLEM SOLVED!\" in wobbly letters",
+    dialogue: 'Maine plan banaya hai!',
+    mess: 'Ria keeps adding steps — "Step 5: Cake cut" "Step 6: Everyone nap" — each more elaborate',
+    innerThought: 'Agar maine yeh plan suna toh sab theek ho jayega, why do adults always need to change it',
+    endingBeat: "Ria's new plan with everyone getting what they actually asked for — crumpled again",
+    defaultCast: ['Ria', 'Papa', 'Mumma', 'Rio'],
+    keepMoralOffScreen: true,
+  ),
   ...kSafetyHooks,
 ];
 
