@@ -93,7 +93,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(
-        find.textContaining('Main Khud Karungi'),
+        find.textContaining('Ek, do, teen, char, paanch'),
         findsOneWidget,
       );
     });

@@ -1506,16 +1506,16 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
                 Gap.m,
 
-                TextField(
+TextField(
                   controller: _descCtrl,
-                  maxLines: 10,
-                  minLines: 6,
+                  maxLines: null,
+                  minLines: 10,
                   style: AppText.body,
                   decoration: const InputDecoration(
-                    hintText:
-                        'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
-                        'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
-                        'neeche mil jaata hai. Sab hass padte hain.',
+                      hintText:
+                          'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
+                          'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
+                          'neeche mil jaata hai. Sab hass padte hain.',
                   ),
                 ),
                 Gap.s,
