@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'content_ideas.dart';
+import 'content_library_service.dart';
 import 'plan_data.dart';
 
 class GeneratedStory {
@@ -156,7 +157,10 @@ class StoryGenerator {
     }
     final h = hooks[_rng.nextInt(hooks.length)];
     final who = h.defaultCast.isNotEmpty ? h.defaultCast.join(', ') : _selectCharacters();
+    return _buildFromHook(h, who);
+  }
 
+  GeneratedStory _buildFromHook(HookIdea h, String who) {
     String d(String label, [String? alt]) =>
         extractLine(h.storyDetail, '$label:', alt);
 
@@ -202,6 +206,46 @@ class StoryGenerator {
       cast: h.defaultCast,
       moralHidden: h.keepMoralOffScreen,
     );
+  }
+
+  /// Generates a story from a specific [ContentIdea] rather than a random pick.
+  /// Looks up the source HookIdea from kDefaultHooksWithRewrite by ID.
+  GeneratedStory generateFromIdeaSync(ContentIdea idea) {
+    final hook = kDefaultHooksWithRewrite.firstWhere(
+      (h) => h.id == idea.id,
+      orElse: () => HookIdea(
+        id: idea.id,
+        category: idea.category,
+        cover: idea.title,
+        opening: idea.opening,
+        problem: idea.problem,
+        lesson: idea.lesson,
+        storyDetail: idea.storyDetail,
+      ),
+    );
+    final who = hook.defaultCast.isNotEmpty ? hook.defaultCast.join(', ') : 'Ria, Rio, Cuty';
+    return _buildFromHook(hook, who);
+  }
+
+  Future<GeneratedStory> generateFromIdea(ContentIdea idea) async {
+    final hooks = await HookStore.load();
+    final hook = hooks.firstWhere(
+      (h) => h.id == idea.id,
+      orElse: () => kDefaultHooksWithRewrite.firstWhere(
+        (h) => h.id == idea.id,
+        orElse: () => HookIdea(
+          id: idea.id,
+          category: idea.category,
+          cover: idea.title,
+          opening: idea.opening,
+          problem: idea.problem,
+          lesson: idea.lesson,
+          storyDetail: idea.storyDetail,
+        ),
+      ),
+    );
+    final who = hook.defaultCast.isNotEmpty ? hook.defaultCast.join(', ') : 'Ria, Rio, Cuty';
+    return _buildFromHook(hook, who);
   }
 
   String _fallbackTwist(String problem) {

@@ -27,12 +27,13 @@ Key APIs:
 - `CharacterLibrary` (in `lib/brand_system.dart`) — full character model with personality, appearance, and speech patterns for AI prompts
 
 ### 2. Ideas (source: `lib/content_ideas.dart`)
-- `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`
-- `kDefaultHooks` — ~140 built-in ideas across categories (Ria & Robot series, Navratri, Daily Life, Skill Building, Safety, etc.)
-- `kDefaultHooksWithRewrite` — built-in hooks with rewritten `storyDetail` applied
+- `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`, `setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`, `quote`, `detail`, `punchline`, `readyPrompt`
+- `kDefaultHooks` — ~99 built-in ideas including safety hooks (spread in via `...kSafetyHooks`)
+- `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline)
 - `kSafetyHooks` — 6 Kids Safety ideas (safety-good-touch, safety-stranger, safety-road, safety-emergency-number, safety-lost-crowd, safety-kitchen-line)
-- Categories in `kContentBuckets` (challenge, conversation, activity, humor, etc.)
-- `kRewrittenStories` — map of idea `id` → improved `storyDetail` text in Story/Twist/Resolution/Moral format
+- Categories in `kHookCategories`: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`
+- `readyPrompt` field contains pre-built viral prompts for select hooks (h01, h02, h05, pal03, pal05, pal16, and h27-h40)
+- `kRewrittenStories` and `kMomentUpgrades` were merged into inline `storyDetail` field (no longer separate maps)
 
 ### 3. Content Collections (source: `lib/content_collections.dart`)
 - 14 thematic collections for browsing: Ria & Robot, Festivals & Events, Morning & Bedtime Routines, Food & Mealtime, Tantrums & Big Feelings, Siblings & Sharing, Parent Moments, Warm Lessons, Play & Learning, Parent Guides, 7 Missions Week, Milestones & Community, Kids Safety, My Ideas
@@ -90,7 +91,7 @@ All persistent data is stored as JSON files in the app's documents directory, ba
 | `ContentLibraryStore` | `content_library.json` | `ContentLibraryItem` | All content packages with status flow |
 | `PromptVault` | `saved_prompts.json` | `SavedPrompt` | Versioned AI prompts |
 | `VideoLibrary` | `video_assets.json` | `VideoAsset` | Video metadata + file references |
-| `HookStore` | `hooks.json` | `HookIdea` | User-edited hooks + rewrites |
+| `HookStore` | `hooks.json` | `HookIdea` | User edits + custom hooks |
 | `ScheduleStore` | `schedule.json` | `PostSlot` | Posting schedule (7 slots) |
 | `PostLogStore` | `posts.json` | `PostRecord` | Posted content + performance |
 | `PromoCommentStore` | `promo_comments.json` | `PromoComment` | Engagement comment vault |
@@ -105,7 +106,9 @@ See DATA.md for full model field tables, methods, ID schemes, versioning, error 
 ```
 User selects idea from Content Library (kDefaultHooksWithRewrite)
     ↓
-If online: content_studio_service.dart → generateImagePrompt/generateCarouselPrompts/generateGeminiVideoPrompts
+If hook has a readyPrompt → GeminiVideoResult.parseReadyPrompt() splits into VideoPartPrompt parts (fast path, no API call)
+    ↓
+If online (no readyPrompt): content_studio_service.dart → generateImagePrompt/generateCarouselPrompts/generateGeminiVideoPrompts
     → Auto-saves prompt to PromptVault
     → Auto-saves production plan to VideoProductionPlan store
     ↓
@@ -184,7 +187,7 @@ The app is organized into six connected modules for managing content from idea t
 
 1. **Single source of truth** — Characters defined in `characters.dart`, prompts in `master_prompt.dart` and `gemini_video_master_prompt.dart`, ideas in `content_ideas.dart`, collections in `content_collections.dart`
 2. **No duplication** — All generators import and reference the shared sources
-3. **Rewrite layer** — `kRewrittenStories` and `kSafetyHooks` allow improving scripts without changing the const `kDefaultHooks` list; `HookStore.load()` applies rewrites while preserving user edits
+3. **Rewrite layer** — Rewrites are now embedded inline in `storyDetail` fields directly. `kDefaultHooksWithRewrite` is an alias to `kDefaultHooks`; user edits are preserved via `HookStore.load()` while custom hooks are appended at runtime
 4. **Collection grouping** — Ideas are grouped into 14 thematic collections via `collectionOf()`; the vault groups by `sourceIdeaId`
 5. **Automatic offline fallback** — `content_studio_screens.dart` detects Gemini errors (429/400/503) and switches to offline mode
 6. **Deterministic offline** — Uses `dart:math` seeded random for reproducible output
@@ -195,19 +198,21 @@ The app is organized into six connected modules for managing content from idea t
 11. **Version history** — Prompts and videos retain version history; new versions don't overwrite old ones
 12. **Quality checks with severity** — Critical/Major/Minor/Suggestion severity levels; reports tied to asset version
 13. **Content-level tracking** — `QualityReport2` has both `contentId` and `assetId` for flexible querying; `AssetCompletenessService` aggregates across all stores
-14. **Navigation hub** — Home screen has nav cards for Content Library, My Content, Prompt Vault, and Video Library
+14. **Navigation hub** — Home screen has nav cards for Content Library and Settings
 
 ## Key files to modify
-- `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kRewrittenStories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite)
+- `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kHookCategories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite — alias to kDefaultHooks)
 - `lib/hook_templates.dart` — 12 hook templates, HookGenerator class, power words lists
 - `lib/content_collections.dart` — Add/edit collection mappings
 - `lib/characters.dart` — Update character descriptions (kCharacterOptions, kCharacterNames, kCharacterDescriptions)
 - `lib/story_generator_offline.dart` — Add/edit story templates
 - `lib/master_prompt.dart` — Update brand rules
-- `lib/plan_data.dart` — HookStore, ScheduleStore, PostLogStore; HookStore.load() applies kRewrittenStories
+- `lib/plan_data.dart` — HookStore, ScheduleStore, PostLogStore; HookStore.load() merges user edits with default hooks
 - `lib/prompt_vault.dart` — SavedPrompt model and PromptVault store
-- `lib/gemini_video_master_prompt.dart` — VideoProductionPlan template and renderer
-- `lib/video_production_plan.dart` — VideoProductionPlan and ClipPlan models
+- `lib/content_studio_service.dart` — GeminiVideoResult.parseReadyPrompt() for readyPrompt fast-path
+- `lib/content_studio_service.dart` — Gemini API calls & readyPrompt parsing
+- `lib/content_studio_screens.dart` — IdeaInputScreen, IdeaReviewScreen, GeminiVideoScreen, CarouselPromptsScreen, ImagePromptScreen
+- `lib/video_production_plan.dart` — VideoProductionPlan and ClipPlan models, GeminiVideoResult, VideoPartPrompt
 - `lib/video_library.dart` — VideoAsset model and VideoStatus enum
 - `lib/video_library_store.dart` — VideoLibrary store
 - `lib/json_file_store.dart` — Base class for all JSON stores (path resolution, test seam, per-row decoding)

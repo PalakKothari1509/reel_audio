@@ -1,8 +1,14 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'content_axes.dart';
 import 'content_library_service.dart';
+import 'prompt_vault.dart';
+import 'quality_check_center.dart';
+import 'story_generator_offline.dart';
 import 'theme.dart';
+import 'video_library.dart';
+import 'video_library_store.dart';
 
 /// Shows a single idea in readable sections, with actions to edit, create content,
 /// view saved prompts, run quality check, etc.
@@ -22,6 +28,9 @@ class ReviewIdeaScreen extends StatefulWidget {
 class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   ContentIdea? _idea;
   bool _loading = true;
+  String? _generatedScript;
+  bool _isGeneratingScript = false;
+  String _status = '';
 
   @override
   void initState() {
@@ -45,7 +54,16 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
         title: const Text('Review Idea'),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Center(child: CircularProgressIndicator()),
+                if (_status.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(_status, style: AppText.hint),
+                ],
+              ],
+            )
           : _idea == null
               ? const Center(child: Text('Idea not found'))
               : _buildContent(_idea!),
@@ -138,7 +156,6 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   Widget _buildStatusSummary(ContentIdea idea) {
     final hasStory = idea.storyDetail.trim().isNotEmpty;
     final hasScript = idea.status.index >= IdeaStatus.scripted.index;
-    final hasPrompts = false;
     final hasVideo = idea.status.index >= IdeaStatus.generated.index;
     final hasQualityReport = idea.status.index >= IdeaStatus.approved.index;
     final hasPosting = idea.status == IdeaStatus.posted;
@@ -148,7 +165,7 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       children: [
         _statusRow('Script', hasScript, hasScript ? 'Generated' : 'Not yet'),
         _statusRow('Story Details', hasStory, hasStory ? 'Available' : 'Missing'),
-        _statusRow('Video Prompts', hasPrompts, hasPrompts ? 'Generated' : 'Not yet'),
+         _statusRow('Video Prompts', true, 'See Prompt Vault'),
         _statusRow('Finished Video', hasVideo, hasVideo ? 'Uploaded' : 'Not uploaded'),
         _statusRow('Quality Report', hasQualityReport, hasQualityReport ? 'Checked' : 'Pending'),
         _statusRow('Posting Status', hasPosting, hasPosting ? 'Posted' : 'Not posted'),
@@ -181,12 +198,7 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       icon: Icons.edit_outlined,
       label: 'Edit Idea',
       color: AppColors.primary,
-      onTap: () {
-        // TODO: open edit form
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Edit form coming soon')),
-        );
-      },
+      onTap: () => _showEditDialog(idea),
     ));
 
     actions.add(_actionButton(
@@ -213,44 +225,37 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       icon: Icons.description_outlined,
       label: 'Generate Script',
       color: AppColors.warning,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Script generator coming soon')),
-        );
-      },
+      onTap: _isGeneratingScript ? null : () { _generateScript(idea); },
     ));
+
+    if (_generatedScript != null && _generatedScript!.isNotEmpty) {
+      actions.add(_actionButton(
+        icon: Icons.visibility_outlined,
+        label: 'View Script',
+        color: AppColors.warning,
+        onTap: () => _showScriptDialog(),
+      ));
+    }
 
     actions.add(_actionButton(
       icon: Icons.visibility_outlined,
       label: 'View Saved Prompts',
       color: AppColors.textSoft,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Prompt viewer coming soon')),
-        );
-      },
+      onTap: () => _viewSavedPrompts(idea.id),
     ));
 
     actions.add(_actionButton(
       icon: Icons.videocam_outlined,
       label: 'View Video',
       color: AppColors.textSoft,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Video viewer coming soon')),
-        );
-      },
+      onTap: () => _viewVideo(idea.id),
     ));
 
     actions.add(_actionButton(
       icon: Icons.shield_outlined,
       label: 'Run Quality Check',
       color: AppColors.danger,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Quality checker coming soon')),
-        );
-      },
+      onTap: () => _runQualityCheck(idea),
     ));
 
     return Wrap(
@@ -260,11 +265,289 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
     );
   }
 
+  void _showEditDialog(ContentIdea idea) {
+    final titleCtrl = TextEditingController(text: idea.title);
+    final notesCtrl = TextEditingController(text: idea.notes);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Idea'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                decoration: const InputDecoration(labelText: 'Title'),
+              ),
+              TextField(
+                controller: notesCtrl,
+                decoration: const InputDecoration(labelText: 'Notes'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final updated = idea.copyWith(
+                title: titleCtrl.text.trim(),
+                notes: notesCtrl.text.trim(),
+              );
+              await ContentLibraryService.instance.updateIdea(updated);
+              setState(() => _idea = updated);
+              if (!ctx.mounted) return;
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                const SnackBar(content: Text('Idea updated')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _generateScript(ContentIdea idea) async {
+    setState(() {
+      _isGeneratingScript = true;
+      _status = 'Generating script...';
+    });
+    try {
+      final generator = StoryGenerator();
+      final story = await generator.generateFromIdea(idea);
+      final script = _formatScript(story);
+      setState(() {
+        _generatedScript = script;
+        _isGeneratingScript = false;
+        _status = '';
+      });
+      if (!mounted) return;
+      _showScriptDialog();
+    } catch (e) {
+      setState(() {
+        _isGeneratingScript = false;
+        _status = '❌ $e';
+      });
+    }
+  }
+
+  String _formatScript(GeneratedStory story) {
+    final buffer = StringBuffer();
+    buffer.writeln('Title: ${story.title}');
+    buffer.writeln('Hook: ${story.hook}');
+    buffer.writeln('Characters: ${story.cast.join(', ')}');
+    buffer.writeln('Setting: ${story.setting}');
+    buffer.writeln();
+    buffer.writeln('Problem: ${story.problem}');
+    buffer.writeln('Twist: ${story.twist}');
+    buffer.writeln('Worse: ${story.worse}');
+    buffer.writeln('Solution: ${story.solution}');
+    buffer.writeln('Ending: ${story.endingLine}');
+    buffer.writeln('Moral: ${story.moral}');
+    return buffer.toString();
+  }
+
+  void _showScriptDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Generated Script'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: SingleChildScrollView(
+            child: Text(
+              _generatedScript ?? '',
+              style: const TextStyle(fontSize: 13, height: 1.5),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: _generatedScript ?? ''));
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Script copied')),
+              );
+            },
+            child: const Text('Copy'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _viewSavedPrompts(String contentId) async {
+    final prompts = await PromptVault.getByContentId(contentId);
+    if (prompts.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No saved prompts for this idea')),
+      );
+      return;
+    }
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Saved Prompts'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: ListView.separated(
+            itemCount: prompts.length,
+            separatorBuilder: (_, _) => const Divider(height: 1),
+            itemBuilder: (ctx, i) {
+              final p = prompts[i];
+              return ListTile(
+                title: Text(p.title, style: const TextStyle(fontSize: 13)),
+                subtitle: Text('${p.type.name} • v${p.version}'),
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: p.promptText));
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(content: Text('Prompt copied')),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _viewVideo(String contentId) async {
+    final videos = await VideoLibrary.getByContentId(contentId);
+    if (videos.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No videos saved for this idea')),
+      );
+      return;
+    }
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Videos'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 300,
+          child: ListView.separated(
+            itemCount: videos.length,
+            separatorBuilder: (_, _) => const Divider(height: 1),
+            itemBuilder: (ctx, i) {
+              final v = videos[i];
+              return ListTile(
+                leading: const Icon(Icons.videocam_outlined, size: 28),
+                title: Text(v.title, style: const TextStyle(fontSize: 13)),
+                subtitle: Text('${v.status.label} • v${v.version} • ${v.aspectRatio}'),
+                trailing: Text(
+                  v.uploadedAt != null
+                      ? 'Uploaded'
+                      : v.postedAt != null
+                          ? 'Posted'
+                          : 'Draft',
+                  style: const TextStyle(fontSize: 11),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _runQualityCheck(ContentIdea idea) async {
+    setState(() {
+      _loading = true;
+      _status = 'Running quality check...';
+    });
+    try {
+      final report = QualityCheckCenter.checkScript(
+        contentId: idea.id,
+        version: 1,
+        title: idea.title,
+        scriptText: idea.storyDetail,
+      );
+      await QualityCheckCenter.save(report);
+      setState(() => _loading = false);
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Row(
+            children: [
+              Text(report.overallStatus),
+              const SizedBox(width: 8),
+              Text(
+                '${report.passCount}/${report.findings.length} passed',
+                style: const TextStyle(fontSize: 14, color: AppColors.textSoft),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: ListView.builder(
+              itemCount: report.findings.length,
+              itemBuilder: (ctx, i) {
+                final f = report.findings[i];
+                return ListTile(
+                  leading: Icon(
+                    f.passed ? Icons.check_circle : Icons.warning,
+                    color: f.passed ? AppColors.success : _severityColor(f.severity),
+                    size: 20,
+                  ),
+                  title: Text(f.checkName, style: const TextStyle(fontSize: 13)),
+                  subtitle: Text(f.message, style: const TextStyle(fontSize: 11)),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+          ],
+        ),
+      );
+    } catch (e) {
+      setState(() => _loading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Quality check failed: $e')),
+      );
+    }
+  }
+
+  Color _severityColor(FindingSeverity s) {
+    return switch (s) {
+      FindingSeverity.critical => AppColors.danger,
+      FindingSeverity.major => AppColors.warning,
+      FindingSeverity.minor => AppColors.textSoft,
+      FindingSeverity.suggestion => AppColors.accent,
+    };
+  }
+
   Widget _actionButton({
     required IconData icon,
     required String label,
     required Color color,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
   }) {
     return SizedBox(
       width: 140,
