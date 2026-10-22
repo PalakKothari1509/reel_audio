@@ -84,6 +84,9 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       _selectedHook = hook;
       _ideaCtrl.text = '${hook.cover}\n\n${hook.opening}\n\n'
           'Problem: ${hook.problem}\nLesson: ${hook.lesson}';
+      if (hook.storyDetail.trim().isNotEmpty) {
+        _ideaCtrl.text += '\n\n${hook.storyDetail.trim()}';
+      }
       if (hook.defaultCast.isNotEmpty) {
         _selectedChars
           ..clear()
