@@ -62,8 +62,8 @@ class HookStore {
       }
     } catch (_) {}
 
-    final defaults = {
-      for (final d in kDefaultHooksWithRewrite) d.id: d,
+    final originalDefaults = {
+      for (final d in kDefaultHooks) d.id: d,
     };
 
     return [
@@ -72,11 +72,11 @@ class HookStore {
         if (savedHook == null) return d;
         // If this built-in hook is in kRewrittenStories, the rewrite is only
         // overridden when the user has explicitly edited its story. We detect
-        // that by checking whether the saved storyDetail is non-empty and
-        // differs from the original built-in value.
+        // that by checking whether the saved storyDetail differs from the
+        // ORIGINAL built-in value (not the rewritten one).
         if (kRewrittenStories.containsKey(d.id) &&
             savedHook.storyDetail.trim().isNotEmpty &&
-            savedHook.storyDetail != defaults[d.id]!.storyDetail) {
+            savedHook.storyDetail != originalDefaults[d.id]!.storyDetail) {
           return savedHook;
         }
         // Otherwise apply the rewrite to the saved hook.

@@ -19,6 +19,16 @@ class GeneratedStory {
   final String moral;
   final List<Map<String, String>> hookOptions;
 
+  // NEW FIELDS
+  final String setting;
+  final String sceneDetail;
+  final String dialogue;
+  final String mess;
+  final String innerThought;
+  final String endingBeat;
+  final List<String> cast;
+  final bool moralHidden;
+
   GeneratedStory({
     required this.title,
     required this.hook,
@@ -31,6 +41,14 @@ class GeneratedStory {
     required this.endingLine,
     required this.moral,
     required this.hookOptions,
+    this.setting = '',
+    this.sceneDetail = '',
+    this.dialogue = '',
+    this.mess = '',
+    this.innerThought = '',
+    this.endingBeat = '',
+    this.cast = const ['Ria', 'Rio', 'Cuty'],
+    this.moralHidden = true,
   });
 
   GeneratedStory copyWith({
@@ -45,6 +63,14 @@ class GeneratedStory {
     String? endingLine,
     String? moral,
     List<Map<String, String>>? hookOptions,
+    String? setting,
+    String? sceneDetail,
+    String? dialogue,
+    String? mess,
+    String? innerThought,
+    String? endingBeat,
+    List<String>? cast,
+    bool? moralHidden,
   }) =>
       GeneratedStory(
         title: title ?? this.title,
@@ -58,6 +84,14 @@ class GeneratedStory {
         endingLine: endingLine ?? this.endingLine,
         moral: moral ?? this.moral,
         hookOptions: hookOptions ?? this.hookOptions,
+        setting: setting ?? this.setting,
+        sceneDetail: sceneDetail ?? this.sceneDetail,
+        dialogue: dialogue ?? this.dialogue,
+        mess: mess ?? this.mess,
+        innerThought: innerThought ?? this.innerThought,
+        endingBeat: endingBeat ?? this.endingBeat,
+        cast: cast ?? this.cast,
+        moralHidden: moralHidden ?? this.moralHidden,
       );
 
   Map<String, dynamic> toJson() => {
@@ -72,6 +106,14 @@ class GeneratedStory {
     'ending_line': endingLine,
     'moral': moral,
     'hook_options': hookOptions,
+    'setting': setting,
+    'sceneDetail': sceneDetail,
+    'dialogue': dialogue,
+    'mess': mess,
+    'innerThought': innerThought,
+    'endingBeat': endingBeat,
+    'cast': cast,
+    'moralHidden': moralHidden,
   };
 }
 
@@ -110,7 +152,7 @@ class StoryGenerator {
   Future<GeneratedStory> generate({String? customProblem, String? customAge}) async {
     final hooks = await _loadAvailable();
     final h = hooks[_rng.nextInt(hooks.length)];
-    final who = _selectCharacters();
+    final who = h.defaultCast.isNotEmpty ? h.defaultCast.join(', ') : _selectCharacters();
     final problem = extractLine(h.storyDetail, 'Story:', 'PART 1:');
     final twist = extractLine(h.storyDetail, 'Twist:');
     final worse = extractLine(h.storyDetail, 'Resolution:');
@@ -121,14 +163,22 @@ class StoryGenerator {
       title: h.cover,
       hook: hookText,
       who: who,
-      where: 'at home',
+      where: h.setting.isNotEmpty ? h.setting : 'at home',
       problem: problem.isNotEmpty ? problem : h.problem,
       twist: twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
-      worse: worse.isNotEmpty ? worse : _fallbackWorse(h.problem),
-      solution: h.lesson,
+      worse: h.mess.isNotEmpty ? h.mess : (worse.isNotEmpty ? worse : _fallbackWorse(h.problem)),
+      solution: h.endingBeat.isNotEmpty ? h.endingBeat : h.lesson,
       endingLine: extractLine(h.storyDetail, 'Moral:'),
-      moral: h.lesson,
+      moral: h.keepMoralOffScreen ? '' : h.lesson,
       hookOptions: hookOptions,
+      setting: h.setting,
+      sceneDetail: h.sceneDetail,
+      dialogue: h.dialogue,
+      mess: h.mess,
+      innerThought: h.innerThought,
+      endingBeat: h.endingBeat,
+      cast: h.defaultCast,
+      moralHidden: h.keepMoralOffScreen,
     );
   }
 

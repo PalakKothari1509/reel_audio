@@ -247,3 +247,27 @@ const Map<String, String> kCharacterDescriptions = {
 
 String characterDescription(String name) =>
     kCharacterDescriptions[name] ?? 'standard character appearance';
+
+/// Speech quirks per character — used by the generator so each person
+/// actually sounds like themselves, not like one narrator.
+const Map<String, String> kCharacterVoices = {
+  'Mumma': 'Short Hinglish commands, counts instead of shouting. '
+      'Example: "Ek. Do. Teesra bolungi toh rone lagega."',
+  'Papa': 'Over-promises, fixes nothing today. '
+      'Example: "Kal subah main theek kar dunga."',
+  'Daadi': 'Narrates in third person, compares to Papa\'s childhood. '
+      'Example: "Papa bhi aise hi the. Poore ghar mein atta tha."',
+  'Teacher': 'Uses "Friends", "in our class", full sentences. '
+      'Example: "Friends, kya hum ek ek karke try karein?"',
+  'Ria': 'Full sentences, negotiates, keeps score. '
+      'Example: "Main pehle thi. Toh main aakhir mein bhi thi."',
+  'Rio': 'Two-word demands, loud, refuses once then gives in. '
+      'Example: "Mera car. Abhi."',
+  'Cuty': 'Repeats adult words wrongly. '
+      'Example: "Gaana khallaam? Phir tumhaari baari."',
+  'Robot': 'Literal, helpful, slightly robotic phrasing. '
+      'Example: "I have calculated the optimal solution: share."',
+};
+
+/// Returns a voice hint for the given character name, or empty string.
+String characterVoice(String name) => kCharacterVoices[name] ?? '';

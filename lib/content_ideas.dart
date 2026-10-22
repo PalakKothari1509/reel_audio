@@ -69,6 +69,16 @@ class HookIdea {
   /// offline generator should derive prompts from the story template fields.
   final String storyDetail;
 
+  // NEW FIELDS for specificity & anti-AI-smell
+  final String setting;        // where/when, Indian-home specific
+  final String sceneDetail;    // one physical, imperfect detail
+  final String dialogue;       // the line somebody actually says
+  final String mess;           // what goes wrong and stays wrong
+  final String innerThought;   // what the parent thinks but doesn't say
+  final String endingBeat;     // closing image; replaces spoken moral
+  final List<String> defaultCast;   // 2–3 max, not all 7
+  final bool keepMoralOffScreen;
+
   const HookIdea({
     required this.id,
     required this.category,
@@ -85,6 +95,14 @@ class HookIdea {
     this.custom = false,
     this.archived = false,
     this.storyDetail = '',
+    this.setting = '',
+    this.sceneDetail = '',
+    this.dialogue = '',
+    this.mess = '',
+    this.innerThought = '',
+    this.endingBeat = '',
+    this.defaultCast = const ['Ria', 'Rio', 'Cuty'],
+    this.keepMoralOffScreen = false,
   });
 
   HookIdea copyWith({
@@ -103,6 +121,14 @@ class HookIdea {
     bool? custom,
     bool? archived,
     String? storyDetail,
+    String? setting,
+    String? sceneDetail,
+    String? dialogue,
+    String? mess,
+    String? innerThought,
+    String? endingBeat,
+    List<String>? defaultCast,
+    bool? keepMoralOffScreen,
   }) =>
       HookIdea(
         id: id ?? this.id,
@@ -120,6 +146,14 @@ class HookIdea {
         custom: custom ?? this.custom,
         archived: archived ?? this.archived,
         storyDetail: storyDetail ?? this.storyDetail,
+        setting: setting ?? this.setting,
+        sceneDetail: sceneDetail ?? this.sceneDetail,
+        dialogue: dialogue ?? this.dialogue,
+        mess: mess ?? this.mess,
+        innerThought: innerThought ?? this.innerThought,
+        endingBeat: endingBeat ?? this.endingBeat,
+        defaultCast: defaultCast ?? this.defaultCast,
+        keepMoralOffScreen: keepMoralOffScreen ?? this.keepMoralOffScreen,
       );
 
   Map<String, dynamic> toJson() => {
@@ -138,6 +172,14 @@ class HookIdea {
         'caption': caption,
         'pinnedComment': pinnedComment,
         'storyDetail': storyDetail,
+        'setting': setting,
+        'sceneDetail': sceneDetail,
+        'dialogue': dialogue,
+        'mess': mess,
+        'innerThought': innerThought,
+        'endingBeat': endingBeat,
+        'defaultCast': defaultCast,
+        'keepMoralOffScreen': keepMoralOffScreen,
       };
 
   factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
@@ -156,24 +198,33 @@ class HookIdea {
         custom: j['custom'] as bool? ?? false,
         archived: j['archived'] as bool? ?? false,
         storyDetail: j['storyDetail'] as String? ?? '',
+        setting: j['setting'] as String? ?? '',
+        sceneDetail: j['sceneDetail'] as String? ?? '',
+        dialogue: j['dialogue'] as String? ?? '',
+        mess: j['mess'] as String? ?? '',
+        innerThought: j['innerThought'] as String? ?? '',
+        endingBeat: j['endingBeat'] as String? ?? '',
+        defaultCast: (j['defaultCast'] as List?)?.map((e) => e as String).toList() ?? ['Ria', 'Rio', 'Cuty'],
+        keepMoralOffScreen: j['keepMoralOffScreen'] as bool? ?? true,
       );
 
   /// Laid out as the story form, ready for Write the script.
   String asStoryText() => 'Cover hook: $cover\n'
       'Hook: $opening\n'
-      'Who: Ria, Rio, Cuty\n'
-      'Where: A warm, familiar family home\n'
+      'Who: ${defaultCast.join(", ")}\n'
+      'Where: $setting\n'
       'What starts it: $problem\n'
-      'What goes wrong: The small problem turns into funny family chaos\n'
-      'How it gets worse: Each character reacts in their own way\n'
-      'How it is solved: They listen, help one another, and try again\n'
-      'Ending line: That is how one little moment becomes a big family memory\n'
-      'Moral: $lesson\n'
+      'Scene detail: $sceneDetail\n'
+      'Dialogue: $dialogue\n'
+      'What goes wrong: $mess\n'
+      'Parent inner thought: $innerThought\n'
+      'How it is solved: $endingBeat\n'
+      'Moral (off-screen): ${keepMoralOffScreen ? "(not spoken)" : lesson}\n'
       'Post format: $postFormat\n'
       'Strategy: $strategy\n'
       'Caption: $caption\n'
       'Pinned comment: $pinnedComment\n'
-      '${storyDetail.isNotEmpty ? '$storyDetail\n' : ''}'
+      '${storyDetail.isNotEmpty ? "$storyDetail\n" : ""}'
       'Status: ${usedOn.isEmpty ? "New" : usedOn}';
 }
 
@@ -1378,83 +1429,143 @@ Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega.
   ),
   HookIdea(
     id: 'the-toy-car-share',
-    category: 'Relatable',
-    cover: 'The Toy Car Share',
-    opening: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions.',
-    problem: 'Ria and Rio both grabbed the same red-yellow toy car and tugged in opposite directions on the living room rug.',
-    lesson: 'Sharing something means twice the fun, not twice the fight.',
+    category: 'Sharing',
+    cover: 'He grabbed her car.',
+    opening: '"Yeh mera hai!" — and the whole park turns around to look at me.',
+    problem: 'Sunday morning, society park. Rio pulls the red car out of Ria\'s hand mid-race. Ria screams. Four mothers turn around.',
+    lesson: 'Turn-taking needs a handle the child can hold — a timer, a song, a hand.',
+    postFormat: 'Reel',
+    strategy: 'Public-meltdown shame hook',
+    caption: 'The car has one broken wheel, so it always veers left. So do most of my parenting solutions.',
+    pinnedComment: '"Gaana khatam hone tak" is the only line that has ever worked in this house. What\'s yours?',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-PART 1: Ria and Rio both grab the same red-yellow toy car and tug in opposite directions on the living room rug. The car wobbles between them.
-Twist: When Mummy hands it to one, the other grabs it too — and the car goes flying toward the kitchen doorway.
-Resolution: They take a breath, look at each other, and agree to roll the car right down the middle together.
-Moral: Sharing something means twice the fun, not twice the fight.
+Story: Sunday morning, society park. Rio pulls the red car out of Ria's hand mid-race. Ria screams. Four mothers turn around.
+Twist: Mumma steps in: "Gaana khatam hone tak. Phir tumhari baari."
+Resolution: Ria still cries for another ten minutes. Mumma ends up holding one hand of each kid, standing between them.
+Moral: Turn-taking needs a handle the child can hold — a timer, a song, a hand.
 ''',
+    setting: 'Society park, Sunday, 8:40am, Ria on the last free swing',
+    sceneDetail: 'The car is missing one wheel, so it always veers left.',
+    dialogue: '"Gaana khatam hone tak. Phir tumhari baari."',
+    mess: 'Ria still cries for another ten minutes. Mumma ends up holding one hand of each kid, standing between them.',
+    innerThought: 'I want to just hand the car back and walk home.',
+    endingBeat: 'Both kids on the same swing, the car lying between them, nobody holding it.',
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
+    keepMoralOffScreen: false,
   ),
   HookIdea(
     id: 'the-block-tower',
-    category: 'Relatable',
-    cover: 'The Block Tower',
-    opening: 'Rio carefully balanced the final wooden block on a tall colorful tower.',
-    problem: 'Rio carefully balanced the final wooden block on a tall colorful tower while afternoon sun streamed through the window.',
-    lesson: 'A mistake is just a new game waiting to be named.',
+    category: 'Big feelings',
+    cover: 'It took her 9 minutes.',
+    opening: 'Nine minutes of building. Two seconds to fall.',
+    problem: 'Cuty stacks six blocks on the biscuit tin. Rio walks past and flattens it with one arm.',
+    lesson: 'Rebuilding together is sometimes the whole repair — the apology comes later.',
+    postFormat: 'Reel',
+    strategy: 'Countdown-to-disaster hook',
+    caption: 'The second crash was her own doing. I have stopped intervening in that one.',
+    pinnedComment: 'How many minutes does your child build before someone in the family destroys it? Ours is 9.',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-PART 1: Rio balances the final wooden block on a tall tower, proud of his creation.
-Twist: Ria toddles over for a better look and accidentally bumps the base with her shoe.
-Resolution: Blocks scatter, but Rio giggles — "Now we can build a flat playhouse!"
-Moral: A mistake is just a new game waiting to be named.
+Story: Cuty stacks six blocks on the biscuit tin. Rio walks past and flattens it with one arm.
+Twist: Cuty cries, then rebuilds it herself, then knocks it down herself and laughs. Everyone is confused. Papa gets blamed anyway.
+Resolution: Cuty sitting inside the collapsed pile of blocks, looking very proud.
+Moral: Rebuilding together is sometimes the whole repair — the apology comes later.
 ''',
+    setting: 'Hall floor, after lunch, TV off, Papa\'s socks on the sofa',
+    sceneDetail: 'The tower sits on the Britannia biscuit tin, so it wobbles before it even starts.',
+    dialogue: '"Ek... do... teen... RIOOO!"',
+    mess: 'Cuty cries, then rebuilds it herself, then knocks it down herself and laughs. Everyone is confused. Papa gets blamed anyway.',
+    innerThought: 'If I say one word right now, I become part of it.',
+    endingBeat: 'Cuty sitting inside the collapsed pile of blocks, looking very proud.',
+    defaultCast: ['Cuty', 'Rio', 'Papa'],
+    keepMoralOffScreen: false,
   ),
   HookIdea(
     id: 'the-snack-reach',
-    category: 'Relatable',
-    cover: 'The Snack Reach',
-    opening: 'Ria: "Mumma, bas ek aur chips!"',
-    problem: 'Ria wants one more snack — a spoken hook about wanting "just one more."',
-    lesson: 'Boundary offered, no pressure.',
+    category: 'Independence',
+    cover: 'She got the tin.',
+    opening: 'She climbed the stool, got the biscuit tin, and then could not get down.',
+    problem: 'Cuty wants the Parle-G tin kept on the top shelf. Nobody is in the kitchen. She drags the blue plastic stool over.',
+    lesson: 'The skill wasn\'t asking for help. It was staying calm while stuck.',
+    postFormat: 'Reel',
+    strategy: 'Half-success hook (child wins, then loses)',
+    caption: 'She was stuck for four minutes and never once called me. I am choosing to see that as growth.',
+    pinnedComment: 'What is the one shelf in your house that your child has conquered?',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria: "Mumma, bas ek aur chips!" She stretches toward the snack jar.
-Twist: Mumma: "Ek aur nahi, lekin kal subah ek extra milegi." Ria negotiates — "Ek poori teekha!"
-Resolution: Mumma offers: "Ek chips, phir brush." Ria grins: "Deal!" She eats it slowly, savoring.
-Moral: One chip with a condition feels like a win, not a battle.
+Story: Cuty wants the Parle-G tin kept on the top shelf. Nobody is in the kitchen. She drags the blue plastic stool over.
+Twist: She is stranded on the stool with the tin in one hand, too scared to climb down, and refuses to put it back.
+Resolution: Mumma's hand holding the tin; Cuty's legs still dangling off the stool.
+Moral: The skill wasn't asking for help. It was staying calm while stuck.
 ''',
+    setting: 'Kitchen, 5pm, atta still out from lunch, pressure cooker whistle in the background',
+    sceneDetail: 'The tin is one shelf higher than she can reach even standing on the stool.',
+    dialogue: '"Mumma! I got it MYSELF."',
+    mess: 'She is stranded on the stool with the tin in one hand, too scared to climb down, and refuses to put it back.',
+    innerThought: 'This is entirely my fault for moving the tin up last week.',
+    endingBeat: 'Mumma\'s hand holding the tin; Cuty\'s legs still dangling off the stool.',
+    defaultCast: ['Cuty', 'Mumma'],
+    keepMoralOffScreen: false,
   ),
   HookIdea(
     id: 'night-before-annual-day',
-    category: 'Relatable',
-    cover: 'Night Before Annual Day',
-    opening: 'At 9:30 PM, Ria dropped the bombshell — tomorrow was Annual Day!',
-    problem: 'At 9:30 PM, Ria casually dropped the bombshell — tomorrow was Annual Day and she needed a yellow costume and cardboard sunflower prop.',
-    lesson: 'Even the messiest all-nighter ends when everyone works as a team.',
+    category: 'Mom life',
+    cover: '11:40pm. Still stitching.',
+    opening: 'The costume is a bedsheet. Her annual day is in eight hours.',
+    problem: 'Ria announces at bedtime that she is a butterfly tomorrow and needs wings "in blue". The shops shut at 9.',
+    lesson: 'Sometimes the win is just that she walks in wearing something on her back.',
+    postFormat: 'Reel',
+    strategy: 'Deadline-panic hook (no resolution shown)',
+    caption: 'Every year I say I will prepare in advance. Every year it is a bedsheet, a safety pin, and me.',
+    pinnedComment: 'Annual day, fancy dress, Diwali function — which one has cost you the most sleep?',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-PART 1: At 9:30 PM, Ria drops the bombshell — Annual Day is tomorrow and she needs a costume.
-Twist: While Papa frantically glues cardboard petals at midnight, Mummy forgets all the dance steps during rehearsal.
-Resolution: By morning, the costume is perfect and the prop stands tall — and the kids take all the credit on stage.
-Moral: Even the messiest all-nighter ends when everyone works as a team.
+Story: Ria announces at bedtime that she is a butterfly tomorrow and needs wings "in blue". The shops shut at 9.
+Twist: The safety pin snaps halfway through the second wing. Ria, half asleep: "Mumma, blue neela nahi hota na?"
+Resolution: The wing is still unfinished at midnight. Ria is asleep. There is no stage shot, no proud moment, no payoff — the reel ends before the morning.
+Moral: Sometimes the win is just that she walks in wearing something on her back.
 ''',
+    setting: 'Bedroom, 11:40pm, one bedside lamp on, Ria asleep in the middle of the bed',
+    sceneDetail: 'The safety pin snaps halfway through the second wing.',
+    dialogue: 'Ria, half asleep: "Mumma, blue neela nahi hota na?"',
+    mess: 'The wing is still unfinished at midnight. Ria is asleep. There is no stage shot, no proud moment, no payoff — the reel ends before the morning.',
+    innerThought: 'I will fix this and she will not even remember it tomorrow.',
+    endingBeat: 'One wing finished on the chair, one still a bedsheet; phone alarm visible: 6:00am.',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: false,
   ),
   HookIdea(
     id: 'asmr-cleaning-reel',
-    category: 'Relatable',
-    cover: 'ASMR Cleaning Reel',
-    opening: 'Mummy found the living room in complete chaotic toddler disarray.',
-    problem: 'Mummy found the living room in complete chaotic toddler disarray — crayons, blocks, cushions, and snack bowls scattered everywhere.',
-    lesson: 'Ten minutes of peace and a lifetime of love — perfectly balanced.',
+    category: 'Real mess',
+    cover: 'She is "helping".',
+    opening: 'The atta was on the floor. She has now added water.',
+    problem: 'Cuty spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like.',
+    lesson: 'Toddler help is often just mess with better intentions.',
+    postFormat: 'Reel',
+    strategy: 'ASMR-hook inversion (calm setup, chaos payoff)',
+    caption: 'Sound on. The squelch at 0:06 is the reason I own a second mop.',
+    pinnedComment: 'What has your child "cleaned" for you this week? Be honest about the floor.',
     forApp: true,
     usedOn: '',
     storyDetail: '''
-PART 1: Mummy finds the living room in complete chaotic toddler disarray. She rolls up her sleeves and begins the satisfying deep clean.
-Twist: As she cleans, the soundscape fills with crisp latch clicks and block clatter — pure ASMR.
-Resolution: She sits back on the pristine sofa with her chai in pure bliss — then opens the bedroom door to a new storm.
-Moral: Ten minutes of peace and a lifetime of love — perfectly balanced.
+Story: Cuty spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like.
+Twist: The paste spreads. Cuty is now sitting in it. The floor becomes worse than it was, and Mumma starts laughing instead of scolding.
+Resolution: The paste-covered floor, with two small handprints in it.
+Moral: Toddler help is often just mess with better intentions.
 ''',
+    setting: 'Kitchen floor, right after rolling rotis, steel plate still on the counter',
+    sceneDetail: 'The atta was dry, sweepable, and is now a paste that has to be scraped.',
+    dialogue: '"Dekho Mumma, saaf!"',
+    mess: 'The paste spreads. Cuty is now sitting in it. The floor becomes worse than it was, and Mumma starts laughing instead of scolding.',
+    innerThought: 'My grandmother would have shouted. I am laughing because I have no other option left.',
+    endingBeat: 'The paste-covered floor, with two small handprints in it.',
+    defaultCast: ['Cuty', 'Mumma'],
+    keepMoralOffScreen: false,
   ),
   // ── New 30s Reel Stories ─────────────────────────────────────────────────────
   HookIdea(
