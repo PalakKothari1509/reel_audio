@@ -44,7 +44,6 @@ import 'production_adapter.dart';
 import 'production_adapter_impl.dart';
 import 'settings_screen.dart';
 import 'content_ideas.dart';
-import 'my_content_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
 
@@ -497,10 +496,6 @@ Future<void> main() async {
           MaterialPageRoute(
             builder: (_) => StoryScreen(ideaId: ideaId),
           ),
-        ),
-        onMyContent: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const MyContentScreen()),
         ),
         onSettings: () => Navigator.push(
           _appNavigatorKey.currentContext!,

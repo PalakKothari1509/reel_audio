@@ -12,7 +12,6 @@ typedef CreateCallback = void Function(String? ideaId);
 
 class ContentStudioHome extends StatefulWidget {
   final CreateCallback onCreateReel;
-  final NavCallback onMyContent;
   final NavCallback onSettings;
 
   /// New simplified callbacks.
@@ -32,7 +31,6 @@ class ContentStudioHome extends StatefulWidget {
   const ContentStudioHome({
     super.key,
     required this.onCreateReel,
-    required this.onMyContent,
     required this.onSettings,
     required this.onContentLibrary,
     this.onReviewAllIdeas,
@@ -141,17 +139,6 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         ),
       ]);
     }
-
-    goToActions.addAll([
-      const SizedBox(height: 10),
-      _NavCard(
-        icon: Icons.video_library_outlined,
-        iconColor: AppColors.accent,
-        title: 'My Videos',
-        subtitle: 'Upload, preview, and manage finished reels',
-        onTap: widget.onMyContent,
-      ),
-    ]);
 
     final children = <Widget>[
       const Text(

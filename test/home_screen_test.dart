@@ -28,9 +28,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: ContentStudioHome(
+          home:           ContentStudioHome(
             onCreateReel: (_) {},
-            onMyContent: () {},
             onSettings: () => settingsTapped = true,
             onContentLibrary: () => contentLibraryTapped = true,
           ),
@@ -41,7 +40,9 @@ void main() {
       expect(find.text('Good morning, Palak!'), findsOneWidget);
       expect(find.text('Create Content'), findsOneWidget);
       expect(find.text('Content Library'), findsOneWidget);
-      expect(find.text('My Videos'), findsOneWidget);
+      expect(find.text('Content Library'), findsOneWidget);
+      expect(find.text('Review All Ideas'), findsNothing);
+      expect(find.text('My Videos'), findsNothing);
 
       await tester.tap(find.byTooltip('Settings'));
       await tester.pumpAndSettle();
@@ -55,9 +56,8 @@ void main() {
     testWidgets('has no duplicate Create button', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: ContentStudioHome(
+          home:           ContentStudioHome(
             onCreateReel: (_) => {},
-            onMyContent: () {},
             onSettings: () {},
             onContentLibrary: () {},
           ),
@@ -74,7 +74,6 @@ void main() {
         MaterialApp(
           home: ContentStudioHome(
             onCreateReel: (_) => {},
-            onMyContent: () {},
             onSettings: () {},
             onContentLibrary: () {},
             onAddNewIdea: () {},
@@ -97,7 +96,6 @@ void main() {
         MaterialApp(
           home: ContentStudioHome(
             onCreateReel: (_) => {},
-            onMyContent: () {},
             onSettings: () {},
             onContentLibrary: () {},
           ),
@@ -111,7 +109,6 @@ void main() {
       expect(find.text('Carousel Generation'), findsNothing);
       expect(find.text('Gemini Story Video'), findsNothing);
       expect(find.text('Review All Ideas'), findsNothing);
-      expect(find.text('Video Library'), findsNothing);
     });
   });
 }
