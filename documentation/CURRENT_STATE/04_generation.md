@@ -216,3 +216,47 @@ All text generation calls from `content_studio_service.dart` go through `geminiP
 | Story expansion | `master_prompt.dart` |
 | Slide prompts | `slide_prompts.dart` |
 | AI content | `ai_content_service_impl.dart` |
+
+---
+
+## 6. Offline Generation (No API Required)
+
+When the app is offline or the user doesn't have API access, the app can generate content locally:
+
+### OfflineStoryGenerator (`lib/story_generator_offline.dart`)
+
+```dart
+GeneratedStory generate()
+```
+
+1. Loads all hooks from `kDefaultHooksWithRewrite` (via `HookStore.load()`)
+2. Picks a random hook
+3. Extracts story fields from the hook's moment fields (`setting`, `sceneDetail`,
+   `dialogue`, `mess`, `innerThought`, `endingBeat`) with `storyDetail` label
+   parsing as fallback
+4. Uses `hook.defaultCast` for characters, or falls back to a random selection
+5. Returns a `GeneratedStory` with all moment fields populated
+
+**Key rules:**
+- `_buildHook()` uses `hook.opening` deterministically — no random templates
+- `_buildHookOptions()` draws from real moment fields, not fabricated text
+- Labels are parsed literally: `Worse:` != `Resolution:`, `Ending:` != `Moral:`
+
+### OfflineVideoPromptGenerator (`lib/video_prompt_generator_offline.dart`)
+
+```dart
+GeminiVideoResult generateFromStory(GeneratedStory story, {
+  required int totalSeconds,
+  required List<String> characters,
+})
+```
+
+Produces 2-6 video part prompts (10s each) using beat remapping:
+`problem` -> `twist` -> `worse` -> `solution`
+
+- Part 1 purpose: "The moment itself, mid-action. No setup, no context."
+- Middle parts: "Escalation -- the situation gets worse and stays worse."
+- Last part: "Closing image only. Hold the frame. No lesson, no summary, no card text."
+
+Uses `generateOnScreenText()` from `hook_system.dart` for deterministic overlays
+(part 1 title only, 5-word cap, never drawn by the video model).

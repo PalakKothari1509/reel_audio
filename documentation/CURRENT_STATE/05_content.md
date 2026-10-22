@@ -31,27 +31,57 @@ class HookIdea {
   final bool forApp;        // False = needs screen recordings (not auto-generated)
   final String usedOn;      // Last used date (avoid repeats within a month)
   final bool custom;        // True = user-added (built-ins can be edited, not deleted)
-  final String storyDetail; // Full 4-part story: Story:/Twist:/Resolution:/Moral:
+  final String storyDetail; // Full story: Story:/Where:/Twist:/Worse:/Resolution:/Ending:/Moral:
+  final String setting;         // Specific location for the moment
+  final String sceneDetail;     // Visual details to preserve throughout
+  final String dialogue;        // The only spoken line (part 1 only)
+  final String mess;            // How the situation gets worse
+  final String innerThought;    // Parent voiceover (one line, not lip-synced)
+  final String endingBeat;      // The final image to hold
+  final bool keepMoralOffScreen;  // Moral not spoken or shown on screen
+  final List<String> defaultCast;  // Character list for this story
+  // Extra fields:
+  final String quote;      // Optional quote text
+  final String detail;     // Optional detail text
+  final String punchline;  // Optional punchline text
 }
 ```
+
+### Moment Fields
+
+The hook has 8 moment fields that define specific filmed moments instead of abstract narrative:
+
+| Field | Purpose | Video prompt usage |
+|-------|---------|-------------------|
+| `opening` | First 3 seconds, mid-action | Overlay text (part 1 only) |
+| `setting` | Where the moment takes place | SCENE AND SETTING |
+| `sceneDetail` | Visual details to preserve | SCENE AND SETTING + keep visible |
+| `dialogue` | Only spoken line | DIALOGUE AND AUDIO (part 1 only) |
+| `mess` | Situation gets worse | ACTION TIMELINE (beat 2-3) |
+| `innerThought` | Parent voiceover | DIALOGUE AND AUDIO (parent VO) |
+| `endingBeat` | Final image to hold | ENDING ACTION + closing frame |
+| `keepMoralOffScreen` | Moral not spoken/shown | Moral omitted from foundation |
 
 ### storyDetail Format
 
 Uses label-based parsing:
 ```
 Story: <problem narrative>
+Where: <location>
 Twist: <complication>
+Worse: <escalation>
 Resolution: <solution>
+Ending: <final image>
 Moral: <lesson>
 ```
 
-**Parser**: `StoryGenerator.extractLine(detail, 'Story:', 'PART 1:')` â€” accepts `PART 1:` as a fallback label for 11 hooks that use it instead of `Story:`.
+Labels are parsed literally — `Worse:` is the escalation (not aliased to `Resolution:`), and `Ending:` is the final image (not aliased to `Moral:`).
 
 ---
 
 ## 2. Built-in Constants (content_ideas.dart)
 
-### kDefaultHooks (~98 entries)
+### kDefaultHooks (93 entries)
 
 The master list of all built-in ideas. Categories:
 
@@ -61,15 +91,19 @@ The master list of all built-in ideas. Categories:
 | `Relatable` | 35 | Parent/child everyday moments | `h*`, `pal*` |
 | `Struggle first` | 6 | Challenge-before-resolution | `h*` |
 | `Surprising` | 7 | Unexpected twists | `h*` |
-| `Page & milestone` | 8 | Platform milestones | `p01`â€“`p08` |
+| `Page & milestone` | 8 | Platform milestones | `p01`–`p08` |
 | `Navratri` | 10 | Festival posts | `navratri-*`, `night-before-annual-day` |
 | `Series` | 20 | Robot series | `robot-01`..`robot-20` |
 
-**Total in kDefaultHooks**: 99 entries (including 6 safety hooks spread via `...kSafetyHooks`).
+**Total in kDefaultHooks**: 93 entries.
+
+### kMomentUpgrades (~78 entries)
+
+Applied to legacy hooks that haven't been fully migrated to the moment schema. Provides moment fields (`setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`).
 
 ### kSafetyHooks (6 entries, content_ideas.dart:184-262)
 
-**All category: `Warm lesson`**. Spread into `kDefaultHooks` via `...kSafetyHooks`:
+All category: `Warm lesson`. All have `keepMoralOffScreen: false`. Spread into `kDefaultHooks` via `...kSafetyHooks`:
 
 | ID | Opening (Hindi) | Cover (English + Hindi) | Topic |
 |----|-----------------|-------------------------|-------|
@@ -82,30 +116,24 @@ The master list of all built-in ideas. Categories:
 
 > **Note**: These are inside `kDefaultHooks` via the `...kSafetyHooks` spread at line 1916 â€” NOT a separate loss bug.
 
-### kRewrittenStories (14 entries)
+### kMomentUpgrades (~78 entries)
+
+Applied to legacy hooks that haven't been fully migrated to the moment schema. Provides moment fields (`setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`) extracted from the storyDetail text or crafted specifically.
+
+### kRewrittenStories (16 entries, content_ideas.dart:2000)
 
 Overrides for `storyDetail` at runtime. Applied by `kDefaultHooksWithRewrite`:
 
 ```dart
 const kRewrittenStories = <String, String>{
-  'h01': '...',
-  'h02': '...',
-  'h03': '...',
-  'h04': '...',
-  'h05': '...',
-  'h07': '...',
-  'h08': '...',
-  'h12': '...',
-  'h13': '...',
-  'h16': '...',
-  'h17': '...',
-  'h19': '...',
-  'pal03': '...',
+  'h01': '...', 'h02': '...', 'h03': '...', 'h04': '...', 'h05': '...',
+  'h07': '...', 'h08': '...', 'h12': '...', 'h13': '...', 'h14': '...',
+  'h15': '...', 'h16': '...', 'h17': '...', 'h19': '...', 'pal03': '...',
   'pal19': '...',
 };
 ```
 
-**Count**: 14 overrides. The `kDefaultHooksWithRewrite` maps over `kDefaultHooks` and replaces `storyDetail` for any id found in `kRewrittenStories`.
+**Count**: 16 overrides. Applied after `kMomentUpgrades` by `kDefaultHooksWithRewrite`.
 
 ### kDay14Posts (24 entries)
 
@@ -121,6 +149,22 @@ QuickIdea carousel posts for a "14-day challenge" that actually spans 24 day-pos
 
 ```dart
 final kDefaultHooksWithRewrite = kDefaultHooks.map((h) {
+  // 1. Apply kMomentUpgrades: moment fields (setting, sceneDetail, dialogue,
+  //    mess, innerThought, endingBeat, defaultCast, keepMoralOffScreen)
+  // 2. Apply kRewrittenStories: storyDetail override
+  final upgraded = kMomentUpgrades[h.id];
+  if (upgraded != null) {
+    h = h.copyWith(
+      setting: upgraded.setting,
+      sceneDetail: upgraded.sceneDetail,
+      dialogue: upgraded.dialogue,
+      mess: upgraded.mess,
+      innerThought: upgraded.innerThought,
+      endingBeat: upgraded.endingBeat,
+      defaultCast: upgraded.defaultCast,
+      keepMoralOffScreen: upgraded.keepMoralOffScreen,
+    );
+  }
   final rewritten = kRewrittenStories[h.id];
   if (rewritten != null) {
     return h.copyWith(storyDetail: rewritten);
@@ -129,7 +173,7 @@ final kDefaultHooksWithRewrite = kDefaultHooks.map((h) {
 }).toList();
 ```
 
-This is the **runtime canonical list**. All built-in ideas pass through this transformation before being used.
+This is the **runtime canonical list**. All built-in ideas pass through this transformation (moment upgrades first, then story detail rewrites) before being used.
 
 ---
 
@@ -338,7 +382,7 @@ All stores use `JsonFileStore<T>` as base, with:
 
 ## 9. Character Extraction
 
-Characters are not stored as a separate field â€” they are **inferred** from `storyDetail` text by `ContentLibraryService`:
+Characters can be inferred from `storyDetail` text by `ContentLibraryService`, or explicitly set via `hook.defaultCast`:
 
 ```dart
 final characters = extractCharacters(storyDetail);
@@ -346,8 +390,17 @@ final characters = extractCharacters(storyDetail);
 
 Inferred characters: `Ria`, `Rio`, `Cuty`, `Mumma`, `Papa`, `Daadi`, `Teacher`
 
-**Note**: `kDefaultCast` in `characters.dart:69` includes 8 characters (also `Robot`), and `CharOption` in `characters.dart:202` lists 8 (Ria, Rio, Cuty, Robot, Mumma, Papa, Daadi, Teacher). However, `StoryGenerator._characters` in `story_generator_offline.dart:80` only lists 7 (no Robot). This discrepancy appears intentional â€” the offline story generator doesn't use the Robot character.
+`kDefaultCast` in `characters.dart` includes 8 characters (Ria, Rio, Cuty, Robot, Mumma, Papa, Daadi, Teacher).
 
-These match the 7 character image assets in `pubspec.yaml`:
-`assets/characters/Ria.jpg` through `assets/characters/Teacher.jpg`
+**Note**: `StoryGenerator._characters` in `story_generator_offline.dart:80` only lists 7 (no Robot). The offline story generator doesn't use the Robot character for general hooks — Robot appears only in the `robot-01`..`robot-20` series where `defaultCast` is set explicitly.
+
+Character descriptions, voice patterns, and speech patterns are available via:
+```dart
+characterDescription(name)  // Full appearance description
+characterVoice(name)        // Voice pattern + example line
+speechPattern(name)         // Speech pattern string
+```
+
+These match the 8 character image assets in `pubspec.yaml`:
+`assets/characters/Ria.jpg` through `assets/characters/Robot.jpg`
 
