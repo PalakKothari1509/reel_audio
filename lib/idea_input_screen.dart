@@ -25,11 +25,13 @@ class IdeaInputScreen extends StatefulWidget {
   final ContentFeature feature;
 
   /// Called when the user taps Generate. Receives the idea text, selected
-  /// character names, and additional instructions.
+  /// character names, and additional instructions. If a hook with a
+  /// pre-built viral prompt was selected, [readyPrompt] contains it.
   final void Function({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
+    String? readyPrompt,
   }) onGenerate;
 
   /// Extra controls specific to the feature (e.g. slide count, duration).
@@ -55,6 +57,8 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
   final _instrCtrl = TextEditingController();
   final List<String> _selectedChars = ['ria', 'rio', 'cuty'];
 
+  HookIdea? _selectedHook;
+
   @override
   void initState() {
     super.initState();
@@ -77,8 +81,14 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
     );
     if (hook == null || !mounted) return;
     setState(() {
+      _selectedHook = hook;
       _ideaCtrl.text = '${hook.cover}\n\n${hook.opening}\n\n'
           'Problem: ${hook.problem}\nLesson: ${hook.lesson}';
+      if (hook.defaultCast.isNotEmpty) {
+        _selectedChars
+          ..clear()
+          ..addAll(hook.defaultCast.map((c) => c.toLowerCase()));
+      }
     });
   }
 
@@ -93,10 +103,12 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
     final chars = _selectedChars.isEmpty
         ? ['ria', 'rio', 'cuty']
         : List<String>.from(_selectedChars);
+    final readyPrompt = _selectedHook?.readyPrompt.trim() ?? '';
     widget.onGenerate(
       idea: idea,
       characters: chars,
       additionalInstructions: _instrCtrl.text.trim(),
+      readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
     );
   }
 
@@ -396,14 +408,23 @@ class _LibraryPickerState extends State<_LibraryPicker> {
   }
 
   Widget _ideaTile(BuildContext ctx, HookIdea h) {
+    final hasReadyPrompt = h.readyPrompt.trim().isNotEmpty;
     return ListTile(
       dense: true,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      title: Text(
-        h.cover,
-        style:
-            const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+      title: Row(
+        children: [
+          Text(
+            h.cover,
+            style:
+                const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          if (hasReadyPrompt) ...[
+            const SizedBox(width: 6),
+            const Icon(Icons.rocket_launch, size: 14, color: AppColors.accent),
+          ],
+        ],
       ),
       subtitle: Text(
         h.opening,
@@ -411,10 +432,21 @@ class _LibraryPickerState extends State<_LibraryPicker> {
         overflow: TextOverflow.ellipsis,
         style: AppText.small,
       ),
-      trailing: Text(
-        h.category,
-        style:
-            const TextStyle(fontSize: 11, color: AppColors.textFaint),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (hasReadyPrompt)
+            const Tooltip(
+              message: 'Ready-to-post viral prompt',
+              child: Icon(Icons.auto_awesome, size: 16, color: AppColors.accent),
+            ),
+          const SizedBox(width: 8),
+          Text(
+            h.category,
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textFaint),
+          ),
+        ],
       ),
       onTap: () => Navigator.pop(ctx, h),
     );

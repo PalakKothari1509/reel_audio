@@ -134,15 +134,18 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
   String _ideaText = '';
   List<String> _ideaChars = [];
   String _ideaInstructions = '';
+  String? _readyPrompt;
 
   Future<void> _evaluate({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
+    String? readyPrompt,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
     _ideaInstructions = additionalInstructions;
+    _readyPrompt = readyPrompt;
 
     setState(() {
       _loading = true;
@@ -298,7 +301,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       feature: ContentFeature.imagePrompt,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions}) {}
+          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
       extraControls: _loading
           ? _LoadingCard(message: _status)
@@ -329,6 +332,7 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
   String _ideaText = '';
   List<String> _ideaChars = [];
   String _ideaInstructions = '';
+  String? _readyPrompt;
   int _slideCount = 7;
 
   static const _slideCounts = [5, 6, 7, 8, 10];
@@ -337,10 +341,12 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
+    String? readyPrompt,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
     _ideaInstructions = additionalInstructions;
+    _readyPrompt = readyPrompt;
 
     setState(() {
       _loading = true;
@@ -503,7 +509,7 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       feature: ContentFeature.carouselPrompts,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions}) {}
+          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -717,6 +723,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   String _ideaText = '';
   List<String> _ideaChars = [];
   String _ideaInstructions = '';
+  String? _readyPrompt;
   int _totalSeconds = 30;
   String _lastIdea = '';
   List<String> _lastCharacters = [];
@@ -732,10 +739,12 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
+    String? readyPrompt,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
     _ideaInstructions = additionalInstructions;
+    _readyPrompt = readyPrompt;
 
     setState(() {
       _loading = true;
@@ -779,34 +788,42 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
           : _ideaText;
       GeminiVideoResult result;
       EngagementPackage? engagement;
-      try {
-        result = await generateGeminiVideoPrompts(
-          idea: idea,
-          totalSeconds: _totalSeconds,
-          characters: _ideaChars,
-          additionalInstructions: _ideaInstructions,
-          apiKey: widget.keyStore.getGeminiApiKey(),
-          onWait: (msg) {
-            if (mounted) setState(() => _status = msg);
-          },
+      if (_readyPrompt != null && _readyPrompt!.isNotEmpty) {
+        setState(() => _status = 'Using ready viral prompt...');
+        result = GeminiVideoResult.parseReadyPrompt(
+          _readyPrompt!,
+          hook?.text ?? 'Viral Reel',
         );
-        if (!mounted) return;
-        engagement = await generateEngagementPackage(
-          idea: _ideaText,
-          selectedHook: hook,
-          contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
-          apiKey: widget.keyStore.getGeminiApiKey(),
-          onWait: (msg) {
-            if (mounted) setState(() => _status = msg);
-          },
-        );
-      } catch (e) {
-        if (_isGeminiError(e)) {
-          setState(() => _status = 'Using offline video prompts...');
-          result = await _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
-        } else {
-          rethrow;
-        }
+      } else {
+        try {
+          result = await generateGeminiVideoPrompts(
+            idea: idea,
+            totalSeconds: _totalSeconds,
+            characters: _ideaChars,
+            additionalInstructions: _ideaInstructions,
+            apiKey: widget.keyStore.getGeminiApiKey(),
+            onWait: (msg) {
+              if (mounted) setState(() => _status = msg);
+            },
+          );
+          if (!mounted) return;
+          engagement = await generateEngagementPackage(
+            idea: _ideaText,
+            selectedHook: hook,
+            contentPurpose: _evaluation?.check.contentPurpose ?? 'RELATE',
+            apiKey: widget.keyStore.getGeminiApiKey(),
+            onWait: (msg) {
+              if (mounted) setState(() => _status = msg);
+            },
+          );
+        } catch (e) {
+          if (_isGeminiError(e)) {
+            setState(() => _status = 'Using offline video prompts...');
+            result = await _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
+          } else {
+            rethrow;
+          }
+          }
       }
       if (!mounted) return;
       setState(() {
@@ -926,7 +943,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       feature: ContentFeature.geminiVideo,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions}) {}
+          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

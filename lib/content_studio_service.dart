@@ -327,11 +327,15 @@ class VideoPartPrompt {
   final int totalParts;
   final String promptText;
   final String textOverlay;
+  final String purpose;
+  final String fullPrompt;
   const VideoPartPrompt({
     required this.partNumber,
     required this.totalParts,
     required this.promptText,
     this.textOverlay = '',
+    this.purpose = '',
+    this.fullPrompt = '',
   });
   String get title => 'Part $partNumber of $totalParts';
 }
@@ -345,6 +349,89 @@ class GeminiVideoResult {
     required this.storyFoundation,
     required this.parts,
   });
+
+  /// Parses a [HookIdea.readyPrompt] string into a [GeminiVideoResult].
+  /// The readyPrompt format is expected to have "Part 1" and "Part 2" sections.
+  static GeminiVideoResult parseReadyPrompt(String readyPrompt, String title) {
+    final lines = readyPrompt.split('\n');
+    String foundation = '';
+    final parts = <VideoPartPrompt>[];
+    String currentPart = '';
+    int partNumber = 0;
+
+    for (final line in lines) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('PROMPT:')) {
+        foundation = trimmed.substring(7).trim();
+      } else if (_isPartHeader(trimmed, 1)) {
+        if (partNumber == 1 && currentPart.isNotEmpty) {
+          parts.add(VideoPartPrompt(
+            partNumber: 1,
+            totalParts: 2,
+            promptText: currentPart.trim(),
+            purpose: 'Setup / Hook',
+            fullPrompt: currentPart.trim(),
+          ));
+        }
+        partNumber = 1;
+        currentPart = '';
+      } else if (_isPartHeader(trimmed, 2)) {
+        if (partNumber == 1 && currentPart.isNotEmpty) {
+          parts.add(VideoPartPrompt(
+            partNumber: 1,
+            totalParts: 2,
+            promptText: currentPart.trim(),
+            purpose: 'Setup / Hook',
+            fullPrompt: currentPart.trim(),
+          ));
+        }
+        partNumber = 2;
+        currentPart = '';
+      } else if (trimmed.startsWith('On-Screen Text:') ||
+          trimmed.startsWith('Audio/Dialogue')) {
+        // Skip these sections
+      } else {
+        if (partNumber > 0 && trimmed.isNotEmpty) {
+          currentPart += '$trimmed\n';
+        }
+      }
+    }
+
+    // Add the last part
+    if (partNumber == 2 && currentPart.trim().isNotEmpty) {
+      parts.add(VideoPartPrompt(
+        partNumber: 2,
+        totalParts: 2,
+        promptText: currentPart.trim(),
+        purpose: 'Payoff / Twist',
+        fullPrompt: currentPart.trim(),
+      ));
+    }
+
+    // If we didn't find structured parts, wrap the whole prompt
+    if (parts.isEmpty && foundation.isNotEmpty) {
+      parts.add(VideoPartPrompt(
+        partNumber: 1,
+        totalParts: 1,
+        promptText: foundation,
+        purpose: 'Full Prompt',
+        fullPrompt: foundation,
+      ));
+    }
+
+    return GeminiVideoResult(
+      storyTitle: title,
+      storyFoundation: foundation.isNotEmpty ? foundation : title,
+      parts: parts,
+    );
+  }
+
+  static bool _isPartHeader(String line, int part) {
+    final p = part.toString();
+    return line.contains('Part $p') ||
+        line.contains('### Part $p') ||
+        line.contains('Part $p (');
+  }
 }
 
 Future<GeminiVideoResult> generateGeminiVideoPrompts({

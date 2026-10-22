@@ -79,10 +79,14 @@ class HookIdea {
   final List<String> defaultCast;   // 2–3 max, not all 7
   final bool keepMoralOffScreen;
 
-  // Task 3: quote, detail, punchline
+   // Task 3: quote, detail, punchline
   final String quote;          // exact line of dialogue for the hook
   final String detail;         // one concrete sensory detail
   final String punchline;      // closing image/beat (alternative to endingBeat)
+
+  /// Ready-to-use 20-second viral Reel prompt (Part 1 + Part 2 + on-screen text).
+  /// Empty when the hook does not have a pre-built viral prompt.
+  final String readyPrompt;
 
   const HookIdea({
     required this.id,
@@ -111,6 +115,7 @@ class HookIdea {
     this.quote = '',
     this.detail = '',
     this.punchline = '',
+    this.readyPrompt = '',
   });
 
   HookIdea copyWith({
@@ -140,6 +145,7 @@ class HookIdea {
     String? quote,
     String? detail,
     String? punchline,
+    String? readyPrompt,
   }) =>
       HookIdea(
         id: id ?? this.id,
@@ -168,6 +174,7 @@ class HookIdea {
         quote: quote ?? this.quote,
         detail: detail ?? this.detail,
         punchline: punchline ?? this.punchline,
+        readyPrompt: readyPrompt ?? this.readyPrompt,
       );
 
   Map<String, dynamic> toJson() => {
@@ -197,6 +204,7 @@ class HookIdea {
         'quote': quote,
         'detail': detail,
         'punchline': punchline,
+        'readyPrompt': readyPrompt,
       };
 
 factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
@@ -226,6 +234,7 @@ factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
         quote: j['quote'] as String? ?? '',
         detail: j['detail'] as String? ?? '',
         punchline: j['punchline'] as String? ?? '',
+        readyPrompt: j['readyPrompt'] as String? ?? '',
       );
 
   /// Laid out as the story form, ready for Write the script.
@@ -419,6 +428,22 @@ Moral: ''',
     endingBeat: 'Shoe finally on right foot, both smiling at the near-miss',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16 aspect ratio. Living room hallway near the door, morning sunlight, shoes scattered. Ria in a sparkly pink star dress and pigtails stubbornly plants her feet, pushing Mumma"s hand away with a dramatic pout: "Main khud pehnungi!" Mumma (yellow embroidered kurti, top bun) sighs, steps back, and counts on her fingers: "1, 2, 3, 4, 5." Ria struggles, putting a sneaker on the wrong foot and waddling like a penguin, heel catching the frame. After a funny wiggle, she flips it onto the right foot, beams proudly, and points down: "Dekha? Direct fit!"
+
+On-Screen Text:
+- [0-3s]: "MAIN KHUD PEHNUNGI! 👟😤"
+- [3-7s]: "MOM PATIENCE LEVEL: 100 ⏳"
+- [7-10s]: "WRONG FOOT WADDLE 🐧😂"
+- [10-15s]: "MISSION ACCOMPLISHED! 🎉✨"
+- [15-20s]: "PROUD MOMENT 🥹❤️"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria in pink star dress pushes Mumma"s hand away at the front door, shouting "Main khud!" Text on screen: "MAIN KHUD! 👟😤" and "MOM PATIENCE LEVEL: 100 ⏳". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. Text on screen: "WRONG FOOT WADDLE 🐧😂" then "MISSION ACCOMPLISHED! 🎉✨". Ria stands tall showing both shoes tied, Mumma claps proudly. Energetic comedic payoff.
+
+Audio/Dialogue (Hinglish): Toddler girl sassy voice: "Mumma hato, main khud karungi!" Mumma laughs gently: "Achha baba, try karo!" Ria triumphant: "Told you! I am a big girl now!"
+''',
   ),
   HookIdea(
     id: 'h02',
@@ -440,6 +465,22 @@ Moral: ''',
     endingBeat: 'Ria blows a kiss at the TV, then lets the screen go dark',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room couch, afternoon light, cartoon paused mid-song. Ria (sparkly pink star dress, pigtails) suddenly collapses into tears, tiny fists shaking. Mumma (yellow kurti, top bun) looks up from her phone. Ria points at the silent screen: "Wapas! Wapas!" Text on screen: "PHONE BAND HUA..." then "😭 RONA SHURU!"
+
+On-Screen Text:
+- [0-3s]: "PHONE BAND HUA... 😭"
+- [3-7s]: "RONA SHURU! 💧💦"
+- [7-12s]: "MOM'S PHONE = EMOTIONAL SUPPORT 📱😢"
+- [12-16s]: "5-MINUTE-WARNING IS NOT IN THE SCRIPT SCRIPT 📜"
+- [16-20s]: "NEXT TIME: SET TIMER! ⏰⏰"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria melodramatically cries on the couch, tears like a water fountain, pointing at the paused TV. Text: "PHONE BAND HUA... 😭" "RONA SHURU! 💧💦". Mumma pretends to be surprised: "Arre, cartoon band ho gaya!" 
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma sits beside Ria, gives her a gentle hug. Text: "MOM'S PHONE = EMOTIONAL SUPPORT 📱" then "5-MINUTE-WARNING IS NOT IN THE SCRIPT". Ria's tears slow, she sniffs and gives the TV a tiny kiss. Text: "NEXT TIME: SET TIMER! ⏰".
+
+Audio/Dialogue (Hinglish): Ria wailing: "Nahi nahi! Wapas chahiye!" Mumma gently: "Beta, yeh episode kal bhi chalega." Ria still sniffling: "Par aaj nahi!" Mumma: "Theek hai, 5 minute warning se hi shuru karein ge."
+''',
   ),
   HookIdea(
     id: 'h03',
@@ -493,6 +534,22 @@ Moral: ''',
     endingBeat: 'Ria reaches for both cup and Teddy, then hugs them both',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Cozy bedroom, single lamp on nightstand, nighttime glow. Ria (pink star dress, pigtails in pajamas) sits bolt upright: "Maa, ek aur paani!" Mumma (yellow kurti, sleepy top bun) walks over with a tiny cup. Text on screen: "BEDTIME STRETCH 🤍" "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY"
+
+On-Screen Text:
+- [0-3s]: "BEDTIME STRETCH 🤍"
+- [3-7s]: "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY"
+- [7-10s]: "THE LOOP IS REAL 💧🔄"
+- [10-15s]: "PREVENTION > REACTION ✅"
+- [15-20s]: "TODDler PRO TIP: NIGHTSTAND PREP 🌙✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria asking for water in bed, Mumma bringing tiny cup. Ria finishes, pats Teddy: "Teddy ko pani do." Mumma: "Teddy toh nahi peeta beta." Ria: "Ek hug?" Mumma hugs her goodnight. Text: "BEDTIME STRETCH 🤍" "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY".
+
+Part 2 (10-20s): 3D Pixar style, 9:19. Next night: Mumma puts cup AND Teddy on nightstand before lights out. Ria reaches, pats both, hugs them, settles. Text: "PREVENTION > REACTION ✅" "TODDLER PRO TIP: NIGHTSTANK PREP 🌙✨". Ria whispers: "Goodnight Teddy. Goodnight paani."
+
+Audio/Dialogue (Hinglish): Ria sleepy: "Maa, ek aur paani please." Mumma gentle: "Thoda sa piya beta, ab so jao." Ria patting Teddy: "Teddy bhi pyaas lagi hai." Mumma smiling: "Teddy toh khaali hai, tu piya." Ria hugging both: "Par Kalia ka paani bhi do?" Mumma: "Kalia toh khaali hai." Ria giggling: "Theek hai, main khud karungi!"
+''',
   ),
   HookIdea(
     id: 'h06',
@@ -615,6 +672,23 @@ Moral: ''',
     endingBeat: 'Cuty trades cheese for raisin, Rio sees it and asks to share too',
     defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen counter, afternoon light, half-open chocolate bar. Mom: "No chocolate." Ria: "Bas ek piece!" Rio immediately drops to floor, "NO!" Cuty quietly chews a carrot. Text on screen: "THREE KIDS, ONE NO" "RIA PROTESTS • RIO REFUSES • CUTTY GIVES IN"
+
+On-Screen Text:
+- [0-3s]: "THREE KIDS, ONE NO 🍫❌"
+- [3-7s]: "RIAN PROTTS • RIO REFUSES • CUTTY GIVES IN"
+- [7-10s]: "NEGOTIATION STARTS: 'BAS EK PIECE!' 📿"
+- [10-14s]: "RI0 DRAMATIC: 'MUJHE BHI!' 💧"
+- [14-18s]: "CUTTY TRADE SECRET 🤫"
+- [18-20s]: "SHARE = TEAM SPORT ❤️"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mom at kitchen counter. Ria dramatically protests: "Bas ek piece!" Rio throws himself on the floor: "NO!" Cuty quietly chews carrot. Text: "THREE KIDS, ONE NO" "RIAN PROTTS • RIO REFUSES • CUTTY GIVES IN". 
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mom gives Cuty a cheese cube. Cuty trades it for a raisin. Rio sees this, face falls. Text: "CUTTY TRADE SECRET 🤫" then "SHARE = TEAM SPORT ❤️". Rio sniffles: "Mujhe bhi!" Mom: "Share karta hai toh tu bhi share karega na?"
+
+Audio/Dialogue (Hinglish): Mom firm: "Chocolate nahi beta." Ria pleading: "Bas ek piece, I promise!" Rio melodramatic: "NO! Main nahi khana!" Cuty quietly: "Carrot khaa sakti hoon." Mom to Rio: "Tumhara turn kab hai?" Cuty trading: "Raisin? Cheese?" Rio realizing: "Oh... share karte ho na?"
+''',
   ),
   HookIdea(
     id: 'pal04',
@@ -652,6 +726,22 @@ Moral: ''',
     endingBeat: 'Mumma tucks the blanket around just Ria\'s shoulders, both half-asleep by page three',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Cozy living room couch, dim lamp, half-read storybook on Mumma's lap. Ria (pajamas, hair messy) sits bolt upright: "Mujhe neend nahi!" Yawns comically wide, Mumma spots a toy car she swallowed at dinner. Text on screen: "NEEND KA EVIDENCE 🔍" "PROTEST • DETECT • RESOLVE"
+
+On-Screen Text:
+- [0-3s]: "NEEND KA EVIDENCE 🔍"
+- [3-8s]: "PROTEST: 'MUJHE NEEND NHI!' 🛏️"
+- [8-13s]: "DETECT: TOY CAR IN THROAT! 🚗👨‍⚕️"
+- [13-17s]: "RESOLVE: BLANKET TUCK STRATEGY ✨"
+- [17-20s]: "SLEEP HACKS > POWER STRUGGLES 💤"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria dramatically protests sleep, sits bolt upright mid-story, yawns so wide you can see the toy car. Mumma's eyes widen with realization. Text: "NEEND KA EVIDENCE 🔍" "PROTEST: 'MUJHE NEEND NHI!'". Ria: "Mujhe neend nahi!" Mumma: "Evidence mil gaya."
+
+Part 2 (10-20s): 3D Pixar style, 9:19. Mumma tucks blanket just around Ria's shoulders, continues story in a whisper. By page three, Ria is breathing even, half-asleep. Toy car safely inside. Text: "DETECT: TOY CAR IN THROAT! 🚗" "BANKET TUCK STRATEGY ✨" "SLEEP HACKS > POWER STRUGGLES". Ria asleep, Mumma smiling.
+
+Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma noticing: "Arre, woh toy car!" Ria patting chest: "Evidence mil gaya, Maa." Mumma calm: "Car safa niklega kal subah." Ria half-asleep: "Par story khatam karoongi na?" Mumma: "Jab tak tu so rahi hai, tab tak soch leti hun."
+''',
   ),
   HookIdea(
     id: 'pal06',
@@ -831,6 +921,22 @@ Moral: ''',
     endingBeat: 'Rio hands the ball to Cuty, Cuty drops it, both kids say "oops" at the same time',
     defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
     keepMoralOffScreen: true,
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, one ball between Ria, Rio, and Cuty. The three words echo like a broken record: "No! Mine! Why!" Each repeat faster, louder, both kids crying. Mumma (half-hidden behind couch) pretends to be a malfunctioning robot. Text on screen: "BROKEN RECORD MODE 🤖" "NO • MINE • WHY × 3"
+
+On-Screen Text:
+- [0-3s]: "BROKEN RECORD MODE 🤖"
+- [3-8s]: "NO • MINE • WHY × 3 🔄"
+- [8-13s]: "PARENT SANITY: CRITICAL ⚠️"
+- [13-16s]: "ECHO STRATEGY: DE-ESCALATE 💡"
+- [16-20s]: "DROPPED BALL SYNDROME 🏈😂"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria and Rio fighting over ball. "No! Mine! Why!" Repeats louder, faster, both crying. Mumma steps out from behind couch like a broken robot: "No. Mine. Why." Flat, robotic voice. Text: "BROKEN RECORD MODE 🤖" "NO • MINE • WHY × 3". Both kids stop mid-cry. Ria: "Arey, that was me!"
+
+Part 2 (10-20s): 3D Pixar style, 9:19. Rio hands ball to Cuty: "Tumhara bhi." Cuty drops it immediately. Both stare at the floor. "Oops." at the same time. Text: "PARENT SANITY: CRITICAL ⚠️" "ECHO STRATEGY" "DROPPED BALL SYNDROME 🏈". Both kids giggling now.
+
+Audio/Dialogue (Hinglish): Ria echoing: "Mujhe bhi!" Rio grabbing ball: "No! Mine!" Ria: "Why!" Mumma robot voice: "No. Mine. Why." (3x flat) Ria: "Arey, that was me!" Rio (surprised): "Haan... thoda maza aa gaya!" Cuty dropping ball: "Oops." Both together: "Oops."
+''',
   ),
   HookIdea(
     id: 'pal17',
@@ -2651,7 +2757,23 @@ const kMomentUpgrades = <String, Map<String, String>>{
     'mess': 'Rio repeats every command back but backwards, everyone laughs',
     'innerThought': 'He mimics me to delay, and it works every time.',
     'endingBeat': 'Rio finally puts shoes on correctly, grinning at his own echo.',
-    'cast': 'Rio|Ria|Mumma',
+    'cast': 'Ria|Mumma',
+    'readyPrompt': '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Morning living room, backpacks scattered by door, sunlight streaming in. Mumma (yellow kurti, top bun) rushing: "Joote pehno! Daudo mat! Bottle kahan hai? Idhar aao!" Every instruction echoes back from Rio (pajamas, hair sticking up in 3 directions). Text on screen: "MORNING MADNESS 📚" "MUMMA COMMAND CENTER"
+
+On-Screen Text:
+- [0-3s]: "MORNING MADNESS 📚"
+- [3-8s]: "MUMMA: COMMAND CENTER 🎮"
+- [8-14s]: "RIO: PARROT MODE 🦜"
+- [14-17s]: "MIMIC = DELAY TACTIC 💡"
+- [17-20s]: "MISSION: BACKPACK READY 🎒✅"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mumma rushing around getting ready, shouting instructions: "Joote pehno! Daudo mat! Bottle kahan hai?" Rio mimics every instruction back perfectly, causing everyone to pause. Text: "MORNING MADNESS 📚" "MUMMA: COMMAND CENTER" "RIO: PARROT MODE 🦜". Ria rolls eyes, Cuty hides behind sofa.
+
+Part 2 (10-20s): 3D Pixar style, 9:19. Mumma stops, looks at Rio. "Parrot mode band karo... thoda seriously bhi baat karo." Rio: "Haan Mummy!" puts shoes on properly. Text: "MIMIC = DELAY TACTIC 💡" "SHOE CHECK ✅" "MISSION: BACKPACK READY 🎒✅". Everyone laughs, backpacks grabbed, ready to go.
+
+Audio/Dialogue (Hinglish): Mumma rushing: "Joote pehno! Daudo mat! Bottle kahan hai? Idhar aao!" Rio echo: "Joote pehno! Daudo mat! Bottle kahan hai!" Mumma turning: "Rio, parrot band karo!" Rio: "Haan, serious mode!" Mumma laughing: "Mission accomplished, baby."
+''',
   },
   'pal20': {
     'setting': 'Car, stuck in traffic, afternoon sun slanting',
@@ -2759,6 +2881,22 @@ const kMomentUpgrades = <String, Map<String, String>>{
     'innerThought': 'He\'s faster than me, but safer with me.',
     'endingBeat': 'Both cross the road together, hand in hand.',
     'cast': 'Rio|Mumma',
+    'readyPrompt': '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Society parking lot, afternoon, red car stopped at crossing line. Ria (yellow sundress, pigtails, holding Mumma's hand) tugs toward the road. "Rio, meri ungli pakho!" Rio hesitates, looks back, grabs her hand. Text on screen: "PAHLI SUNGLOSS 🎵" "MAT BHAAGO vs UNGULI PAKHO"
+
+On-Screen Text:
+- [0-3s]: "ROAD SAFETY KI LINE 🎵"
+- [3-7s]: "MAT BHAJAO ❌ → UNGULI PAKHO ✅"
+- [7-12s]: "HAND HOLD TECHNIQUE 💪"
+- [12-16s]: "SMALL HANDS, BIG SAFETY 🌟"
+- [16-20s]: "CROSS TOGETHER, ALWAYS 🤝"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria at parking lot crossing, tugging Rio toward road. Cars rushing past. Text: "ROAD SAFETY KI LINE 🎵" "MAT BHAGA ❌ → UNGULI PAKHO ✅". Ria: "Rio, meri ungli pakho!" Rio stops, looks back, takes her hand. Comedic tension with fast cars approaching.
+
+Part 2 (10-20s): 3D Pixar style, 9:19. Both walk slowly, hand in hand, red car waiting. Text: "HAND HOLD TECHNIQUE 💪" "SMALL HANDS, BIG SAFETY 🌟" "CROSS TOGETHER, ALWAYS 🤝". Ria: "Theek hai, main tumhari saath hoon." Rio: "Haan, hum dono milke teerahon."
+
+Audio/Dialogue (Hinglish): Ria urgent: "Rio, meri ungli pakho!" Rio hesitant: "Par thoda maza aa raha tha..." Mumma: "Ruk jao beta, ek second." Ria reassuring: "Main tumhe saaf pakad hoon gi." Rio: "Haan, chalo... saath milkar." Both crossing: "Ek dusre ki ungli pakad ke chal rahe hain!"
+''',
   },
   'h20': {
     'setting': 'Kitchen, morning, breakfast bowls half-full',
@@ -3161,6 +3299,7 @@ final kDefaultHooksWithRewrite = kDefaultHooks
         endingBeat: upgrade['endingBeat'],
         defaultCast: upgrade['cast']!.split('|'),
         keepMoralOffScreen: upgrade['keepMoralOffScreen'] == 'true',
+        readyPrompt: upgrade['readyPrompt'],
       );
       // Then apply storyDetail rewrite if present
       if (kRewrittenStories.containsKey(h.id)) {
