@@ -79,6 +79,11 @@ class HookIdea {
   final List<String> defaultCast;   // 2–3 max, not all 7
   final bool keepMoralOffScreen;
 
+  // Task 3: quote, detail, punchline
+  final String quote;          // exact line of dialogue for the hook
+  final String detail;         // one concrete sensory detail
+  final String punchline;      // closing image/beat (alternative to endingBeat)
+
   const HookIdea({
     required this.id,
     required this.category,
@@ -103,6 +108,9 @@ class HookIdea {
     this.endingBeat = '',
     this.defaultCast = const ['Ria', 'Rio', 'Cuty'],
     this.keepMoralOffScreen = false,
+    this.quote = '',
+    this.detail = '',
+    this.punchline = '',
   });
 
   HookIdea copyWith({
@@ -129,6 +137,9 @@ class HookIdea {
     String? endingBeat,
     List<String>? defaultCast,
     bool? keepMoralOffScreen,
+    String? quote,
+    String? detail,
+    String? punchline,
   }) =>
       HookIdea(
         id: id ?? this.id,
@@ -154,6 +165,9 @@ class HookIdea {
         endingBeat: endingBeat ?? this.endingBeat,
         defaultCast: defaultCast ?? this.defaultCast,
         keepMoralOffScreen: keepMoralOffScreen ?? this.keepMoralOffScreen,
+        quote: quote ?? this.quote,
+        detail: detail ?? this.detail,
+        punchline: punchline ?? this.punchline,
       );
 
   Map<String, dynamic> toJson() => {
@@ -180,9 +194,12 @@ class HookIdea {
         'endingBeat': endingBeat,
         'defaultCast': defaultCast,
         'keepMoralOffScreen': keepMoralOffScreen,
+        'quote': quote,
+        'detail': detail,
+        'punchline': punchline,
       };
 
-  factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
+factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
         id: j['id'] as String? ?? '',
         category: j['category'] as String? ?? 'Relatable',
         cover: j['cover'] as String? ?? '',
@@ -205,27 +222,63 @@ class HookIdea {
         innerThought: j['innerThought'] as String? ?? '',
         endingBeat: j['endingBeat'] as String? ?? '',
         defaultCast: (j['defaultCast'] as List?)?.map((e) => e as String).toList() ?? ['Ria', 'Rio', 'Cuty'],
-        keepMoralOffScreen: j['keepMoralOffScreen'] as bool? ?? true,
+        keepMoralOffScreen: j['keepMoralOffScreen'] as bool? ?? false,
+        quote: j['quote'] as String? ?? '',
+        detail: j['detail'] as String? ?? '',
+        punchline: j['punchline'] as String? ?? '',
       );
 
   /// Laid out as the story form, ready for Write the script.
-  String asStoryText() => 'Cover hook: $cover\n'
-      'Hook: $opening\n'
-      'Who: ${defaultCast.join(", ")}\n'
-      'Where: $setting\n'
-      'What starts it: $problem\n'
-      'Scene detail: $sceneDetail\n'
-      'Dialogue: $dialogue\n'
-      'What goes wrong: $mess\n'
-      'Parent inner thought: $innerThought\n'
-      'How it is solved: $endingBeat\n'
-      'Moral (off-screen): ${keepMoralOffScreen ? "(not spoken)" : lesson}\n'
-      'Post format: $postFormat\n'
-      'Strategy: $strategy\n'
-      'Caption: $caption\n'
-      'Pinned comment: $pinnedComment\n'
-      '${storyDetail.isNotEmpty ? "$storyDetail\n" : ""}'
-      'Status: ${usedOn.isEmpty ? "New" : usedOn}';
+  /// If [storyDetail] is present, it is the primary source. Otherwise, falls back
+  /// to individual fields. If both are empty, marks the idea as "Draft".
+  String asStoryText() {
+    if (storyDetail.trim().isNotEmpty) {
+      return 'Cover hook: $cover\n'
+          'Hook: $opening\n'
+          'Who: ${defaultCast.join(", ")}\n'
+          'Where: $setting\n'
+          'What starts it: $problem\n'
+          'Scene detail: $sceneDetail\n'
+          'Dialogue: $dialogue\n'
+          'What goes wrong: $mess\n'
+          'Parent inner thought: $innerThought\n'
+          'How it is solved: $endingBeat\n'
+          'Moral (off-screen): ${keepMoralOffScreen ? "(not spoken)" : lesson}\n'
+          'Post format: $postFormat\n'
+          'Strategy: $strategy\n'
+          'Caption: $caption\n'
+          'Pinned comment: $pinnedComment\n'
+          '$storyDetail\n'
+          'Status: ${usedOn.isEmpty ? "New" : usedOn}';
+    }
+    // Fallback to individual fields, but mark as Draft if no real content
+    final hasContent = setting.isNotEmpty || sceneDetail.isNotEmpty || dialogue.isNotEmpty ||
+        mess.isNotEmpty || innerThought.isNotEmpty || endingBeat.isNotEmpty;
+    if (!hasContent) {
+      return 'Cover hook: $cover\n'
+          'Hook: $opening\n'
+          'Who: ${defaultCast.join(", ")}\n'
+          'Where: $setting\n'
+          'What starts it: $problem\n'
+          'Status: Draft\n';
+    }
+    return 'Cover hook: $cover\n'
+        'Hook: $opening\n'
+        'Who: ${defaultCast.join(", ")}\n'
+        'Where: $setting\n'
+        'What starts it: $problem\n'
+        'Scene detail: $sceneDetail\n'
+        'Dialogue: $dialogue\n'
+        'What goes wrong: $mess\n'
+        'Parent inner thought: $innerThought\n'
+        'How it is solved: $endingBeat\n'
+        'Moral (off-screen): ${keepMoralOffScreen ? "(not spoken)" : lesson}\n'
+        'Post format: $postFormat\n'
+        'Strategy: $strategy\n'
+        'Caption: $caption\n'
+        'Pinned comment: $pinnedComment\n'
+        'Status: ${usedOn.isEmpty ? "New" : usedOn}';
+  }
 }
 
 const kHookCategories = [

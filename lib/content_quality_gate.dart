@@ -1762,6 +1762,8 @@ class QualityGate {
      results.add(_checkHookClarity(reelData, c.contentType));
     results.add(_checkSoundOffReadability(reelData, c.contentType));
     results.add(_checkCharacterConsistency(reelData, c.contentType));
+    results.add(_checkBannedPhrases(reelData, c.contentType));
+    results.add(_checkFeelingsInDialogue(reelData, c.contentType));
 
     return results;
   }
@@ -2054,6 +2056,172 @@ class QualityGate {
       verdict: GateVerdict.unknown,
       reason: 'No character names found in script. '
           'Either no characters are in this scene, or text is missing.',
+    );
+  }
+
+  /// Checks for banned AI-generated phrases in script, narration, or dialogue.
+  static GateCheckResult _checkBannedPhrases(ReelCheckData? data, ContentType? contentType) {
+    final isReel = data?.isReel == true && contentType == ContentType.reel;
+    if (data == null || !isReel) {
+      return GateCheckResult(
+        id: 'creative.reel.banned_phrases',
+        name: 'No banned AI phrases',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Not a Reel — banned phrases check applies to Reels only.',
+      );
+    }
+
+    final script = data.script;
+    final narration = data.narration;
+    final dialogue = data.dialogue;
+    final combinedText = [script, narration, dialogue]
+        .where((t) => t != null && t.trim().isNotEmpty)
+        .join('\n')
+        .toLowerCase();
+
+    if (combinedText.trim().isEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.banned_phrases',
+        name: 'No banned AI phrases',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'No script, narration, or dialogue text provided.',
+      );
+    }
+
+    // List of banned phrases that indicate AI-generated content
+    const bannedPhrases = [
+      'sharing is caring',
+      'remember kids',
+      'always remember',
+      'in the end',
+      'teaches us',
+      'little ones learn',
+      'gentle reminder',
+      'valuable lesson',
+      'beautiful bond',
+      'such a sweet moment',
+      'and that\'s the magic of childhood',
+      'patience, kindness, and love',
+      'kindness, patience, and love',
+      'love, kindness, and patience',
+      'the magic of',
+      'heartwarming moment',
+      'precious moment',
+      'learning moment',
+      'teachable moment',
+    ];
+
+    final foundPhrases = <String>[];
+    for (final phrase in bannedPhrases) {
+      if (combinedText.contains(phrase)) {
+        foundPhrases.add(phrase);
+      }
+    }
+
+    if (foundPhrases.isNotEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.banned_phrases',
+        name: 'No banned AI phrases',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Banned phrases detected: ${foundPhrases.join(", ")}. These are AI fingerprints — rewrite with specific, filmed moments.',
+      );
+    }
+
+    return GateCheckResult(
+      id: 'creative.reel.banned_phrases',
+      name: 'No banned AI phrases',
+      dimension: QualityDimension.creative,
+      verdict: GateVerdict.pass,
+      reason: 'No banned AI phrases found in script, narration, or dialogue.',
+    );
+  }
+
+  /// Checks that characters don't explicitly name their feelings in dialogue.
+  /// Good dialogue shows feelings through action, not "I feel sad" / "I'm angry".
+  static GateCheckResult _checkFeelingsInDialogue(ReelCheckData? data, ContentType? contentType) {
+    final isReel = data?.isReel == true && contentType == ContentType.reel;
+    if (data == null || !isReel) {
+      return GateCheckResult(
+        id: 'creative.reel.feelings_in_dialogue',
+        name: 'Characters show, don\'t name feelings',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'Not a Reel — feelings-in-dialogue check applies to Reels only.',
+      );
+    }
+
+    final dialogue = data.dialogue;
+    if (dialogue == null || dialogue.trim().isEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.feelings_in_dialogue',
+        name: 'Characters show, don\'t name feelings',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.unknown,
+        reason: 'No dialogue provided to check.',
+      );
+    }
+
+    // Patterns where characters explicitly name their feelings
+    // Using case-insensitive matching
+    const feelingKeywords = [
+      'sad', 'angry', 'happy', 'scared', 'upset', 'frustrated',
+      'worried', 'nervous', 'excited', 'bored', 'lonely',
+      'jealous', 'proud', 'embarrassed', 'guilty', 'ashamed'
+    ];
+
+    final issues = <String>[];
+    final lowerDialogue = dialogue.toLowerCase();
+
+    // Check for "I feel X", "I am X", "I'm X"
+    for (final keyword in feelingKeywords) {
+      final patterns = [
+        'i feel $keyword',
+        'i am $keyword',
+        'i\'m $keyword',
+      ];
+      for (final p in patterns) {
+        if (lowerDialogue.contains(p)) {
+          issues.add(p);
+        }
+      }
+    }
+
+    // Check for "he/she/they feel(s)/is X"
+    for (final keyword in feelingKeywords) {
+      final patterns = [
+        'he feels $keyword',
+        'she feels $keyword',
+        'they feel $keyword',
+        'he is $keyword',
+        'she is $keyword',
+        'they are $keyword',
+      ];
+      for (final p in patterns) {
+        if (lowerDialogue.contains(p)) {
+          issues.add(p);
+        }
+      }
+    }
+
+    if (issues.isNotEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.feelings_in_dialogue',
+        name: 'Characters show, don\'t name feelings',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Characters explicitly name feelings in dialogue: ${issues.join(", ")}. Rewrite to show feelings through action, expression, or behavior instead.',
+      );
+    }
+
+    return GateCheckResult(
+      id: 'creative.reel.feelings_in_dialogue',
+      name: 'Characters show, don\'t name feelings',
+      dimension: QualityDimension.creative,
+      verdict: GateVerdict.pass,
+      reason: 'No explicit feeling-naming found in dialogue.',
     );
   }
 

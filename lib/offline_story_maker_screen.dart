@@ -107,19 +107,21 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
     final lesson = hook.lesson;
     final cover = hook.cover;
 
+    // If storyDetail is present, parse it and use as primary source
     final storyLines = _parseStoryDetail(hook.storyDetail);
+    final hasStoryDetail = hook.storyDetail.trim().isNotEmpty;
 
     return GeneratedStory(
       title: cover,
       hook: _buildHookText(hook, _selectedChars),
       who: _selectedChars.join(', '),
-      where: hook.setting.isNotEmpty ? hook.setting : (storyLines['where'] ?? _deriveWhere(problem)),
-      problem: storyLines['problem']?.isNotEmpty == true ? storyLines['problem']! : problem,
-      twist: storyLines['twist']?.isNotEmpty == true ? storyLines['twist']! : _deriveTwist(problem),
-      worse: hook.mess.isNotEmpty ? hook.mess : (storyLines['worse']?.isNotEmpty == true ? storyLines['worse']! : _deriveWorse(problem)),
-      solution: hook.endingBeat.isNotEmpty ? hook.endingBeat : (storyLines['resolution']?.isNotEmpty == true ? storyLines['resolution']! : lesson),
-      endingLine: storyLines['ending']?.isNotEmpty == true ? storyLines['ending']! : _deriveEndingLine(lesson, cover),
-      moral: hook.keepMoralOffScreen ? '' : (storyLines['moral']?.isNotEmpty == true ? storyLines['moral']! : lesson),
+      where: hook.setting.isNotEmpty ? hook.setting : (hasStoryDetail ? (storyLines['where'] ?? _deriveWhere(problem)) : _deriveWhere(problem)),
+      problem: hasStoryDetail && storyLines['problem']?.isNotEmpty == true ? storyLines['problem']! : problem,
+      twist: hasStoryDetail && storyLines['twist']?.isNotEmpty == true ? storyLines['twist']! : _deriveTwist(problem),
+      worse: hasStoryDetail && storyLines['worse']?.isNotEmpty == true ? storyLines['worse']! : (hook.mess.isNotEmpty ? hook.mess : _deriveWorse(problem)),
+      solution: hasStoryDetail && storyLines['resolution']?.isNotEmpty == true ? storyLines['resolution']! : (hook.endingBeat.isNotEmpty ? hook.endingBeat : lesson),
+      endingLine: hasStoryDetail && storyLines['ending']?.isNotEmpty == true ? storyLines['ending']! : _deriveEndingLine(lesson, cover),
+      moral: hook.keepMoralOffScreen ? '' : (hasStoryDetail && storyLines['moral']?.isNotEmpty == true ? storyLines['moral']! : lesson),
       hookOptions: _buildHookOptions(hook, cover),
       setting: hook.setting,
       sceneDetail: hook.sceneDetail,

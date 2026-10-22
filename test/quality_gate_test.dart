@@ -1105,7 +1105,7 @@ void main() {
       expect(hookCheck.verdict, GateVerdict.pass);
     });
 
-    test('evaluatePackage without ReelCheckData skips reel checks gracefully', () {
+test('evaluatePackage without ReelCheckData skips reel checks gracefully', () {
       final report = QualityGate.evaluatePackage(
         'test', 'test',
         classification: fullyApproved(
@@ -1115,6 +1115,190 @@ void main() {
       final hookCheck = report.checks
           .firstWhere((c) => c.id == 'creative.reel.hook_clarity');
       expect(hookCheck.verdict, GateVerdict.unknown);
+    });
+
+    // ── Banned Phrases Check ──────────────────────────────────────
+
+    test('banned phrases: AI fingerprint phrase fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Sharing is caring and that is the magic of childhood.',
+          narration: 'A beautiful bond forms.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.fail);
+      expect(bannedCheck.reason, contains('sharing is caring'));
+      expect(bannedCheck.reason, contains('the magic of'));
+    });
+
+    test('banned phrases: no banned phrases passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria grabs the red car. Rio screams. Mumma counts to five.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass);
+    });
+
+    test('banned phrases: non-Reel returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.carousel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Sharing is caring.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.unknown);
+      expect(bannedCheck.reason, contains('Not a Reel'));
+    });
+
+    // ── Feelings in Dialogue Check ────────────────────────────────
+
+    test('feelings in dialogue: explicit naming fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'Ria: "I feel sad because Rio took my car."',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.fail);
+      expect(feelingsCheck.reason, contains('i feel sad'));
+    });
+
+    test('feelings in dialogue: I am angry fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'Rio: "I am angry! Give it back!"',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.fail);
+      expect(feelingsCheck.reason, contains('i am angry'));
+    });
+
+    test('feelings in dialogue: I\'m frustrated fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'Ria: "I\'m frustrated with this puzzle."',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.fail);
+      expect(feelingsCheck.reason, contains("i'm frustrated"));
+    });
+
+    test('feelings in dialogue: third person naming fails', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'Mumma: "He feels jealous of his brother."',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.fail);
+      expect(feelingsCheck.reason, contains('he feels jealous'));
+    });
+
+    test('feelings in dialogue: no explicit naming passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'Ria: "Mumma, bas ek aur chips!" Rio: "Mera car. Abhi."',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.pass);
+    });
+
+    test('feelings in dialogue: non-Reel returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.carousel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          dialogue: 'I feel sad.',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.unknown);
+      expect(feelingsCheck.reason, contains('Not a Reel'));
+    });
+
+    test('feelings in dialogue: no dialogue returns unknown', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria grabs the car.',
+        ),
+      );
+      final feelingsCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.feelings_in_dialogue');
+      expect(feelingsCheck.verdict, GateVerdict.unknown);
+      expect(feelingsCheck.reason, contains('No dialogue'));
     });
   });
 }

@@ -153,9 +153,13 @@ class StoryGenerator {
     final hooks = await _loadAvailable();
     final h = hooks[_rng.nextInt(hooks.length)];
     final who = h.defaultCast.isNotEmpty ? h.defaultCast.join(', ') : _selectCharacters();
-    final problem = extractLine(h.storyDetail, 'Story:', 'PART 1:');
-    final twist = extractLine(h.storyDetail, 'Twist:');
-    final worse = extractLine(h.storyDetail, 'Resolution:');
+
+    // Use storyDetail as primary source when available
+    final hasStoryDetail = h.storyDetail.trim().isNotEmpty;
+    final problem = hasStoryDetail ? extractLine(h.storyDetail, 'Story:', 'PART 1:') : '';
+    final twist = hasStoryDetail ? extractLine(h.storyDetail, 'Twist:') : '';
+    final worse = hasStoryDetail ? extractLine(h.storyDetail, 'Resolution:') : '';
+
     final hookText = _buildHook(h, who);
     final hookOptions = _buildHookOptions(h, hookText);
 
@@ -164,11 +168,11 @@ class StoryGenerator {
       hook: hookText,
       who: who,
       where: h.setting.isNotEmpty ? h.setting : 'at home',
-      problem: problem.isNotEmpty ? problem : h.problem,
-      twist: twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
-      worse: h.mess.isNotEmpty ? h.mess : (worse.isNotEmpty ? worse : _fallbackWorse(h.problem)),
-      solution: h.endingBeat.isNotEmpty ? h.endingBeat : h.lesson,
-      endingLine: extractLine(h.storyDetail, 'Moral:'),
+      problem: hasStoryDetail && problem.isNotEmpty ? problem : h.problem,
+      twist: hasStoryDetail && twist.isNotEmpty ? twist : _fallbackTwist(h.problem),
+      worse: hasStoryDetail && worse.isNotEmpty ? worse : (h.mess.isNotEmpty ? h.mess : _fallbackWorse(h.problem)),
+      solution: hasStoryDetail && h.endingBeat.isNotEmpty ? h.endingBeat : (h.endingBeat.isNotEmpty ? h.endingBeat : h.lesson),
+      endingLine: hasStoryDetail ? extractLine(h.storyDetail, 'Moral:') : '',
       moral: h.keepMoralOffScreen ? '' : h.lesson,
       hookOptions: hookOptions,
       setting: h.setting,
