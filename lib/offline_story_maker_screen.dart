@@ -103,94 +103,125 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
   }
 
   GeneratedStory _storyFromHook(HookIdea hook) {
-    final problem = hook.problem;
-    final lesson = hook.lesson;
-    final cover = hook.cover;
+    final lines = _parseStoryDetail(hook.storyDetail);
+    final hasDetail = hook.storyDetail.trim().isNotEmpty;
 
-    // If storyDetail is present, parse it and use as primary source
-    final storyLines = _parseStoryDetail(hook.storyDetail);
-    final hasStoryDetail = hook.storyDetail.trim().isNotEmpty;
+    String fromDetail(String key) {
+      final v = lines[key]?.trim() ?? '';
+      return (hasDetail && v.isNotEmpty) ? v : '';
+    }
+
+    // Precedence: the hook's own moment fields win. storyDetail is the
+    // fallback for ideas that have not been migrated to the moment schema yet.
+    final setting = hook.setting.trim().isNotEmpty
+        ? hook.setting.trim()
+        : (fromDetail('where').isNotEmpty
+            ? fromDetail('where')
+            : _deriveWhere(hook.problem));
+
+    final problem =
+        hook.problem.trim().isNotEmpty ? hook.problem.trim() : fromDetail('problem');
+
+    final resolution = fromDetail('resolution');
+
+    final escalation = hook.mess.trim().isNotEmpty
+        ? hook.mess.trim()
+        : (fromDetail('worse').isNotEmpty
+            ? fromDetail('worse')
+            : (fromDetail('twist').isNotEmpty
+                ? fromDetail('twist')
+                : _firstSentence(resolution)));
+
+    final beat = hook.endingBeat.trim().isNotEmpty
+        ? hook.endingBeat.trim()
+        : (fromDetail('ending').isNotEmpty ? fromDetail('ending') : resolution);
 
     return GeneratedStory(
-      title: cover,
-      hook: _buildHookText(hook, _selectedChars),
+      title: hook.cover,
+      hook: _buildHookText(hook),
       who: _selectedChars.join(', '),
-      where: hook.setting.isNotEmpty ? hook.setting : (hasStoryDetail ? (storyLines['where'] ?? _deriveWhere(problem)) : _deriveWhere(problem)),
-      problem: hasStoryDetail && storyLines['problem']?.isNotEmpty == true ? storyLines['problem']! : problem,
-      twist: hasStoryDetail && storyLines['twist']?.isNotEmpty == true ? storyLines['twist']! : _deriveTwist(problem),
-      worse: hasStoryDetail && storyLines['worse']?.isNotEmpty == true ? storyLines['worse']! : (hook.mess.isNotEmpty ? hook.mess : _deriveWorse(problem)),
-      solution: hasStoryDetail && storyLines['resolution']?.isNotEmpty == true ? storyLines['resolution']! : (hook.endingBeat.isNotEmpty ? hook.endingBeat : lesson),
-      endingLine: hasStoryDetail && storyLines['ending']?.isNotEmpty == true ? storyLines['ending']! : _deriveEndingLine(lesson, cover),
-      moral: hook.keepMoralOffScreen ? '' : (hasStoryDetail && storyLines['moral']?.isNotEmpty == true ? storyLines['moral']! : lesson),
-      hookOptions: _buildHookOptions(hook, cover),
-      setting: hook.setting,
+      where: setting,
+      problem: problem,
+      twist: fromDetail('twist').isNotEmpty ? fromDetail('twist') : escalation,
+      worse: escalation,
+      solution: resolution.isNotEmpty ? resolution : beat,
+      endingLine: beat,
+      moral: hook.keepMoralOffScreen
+          ? ''
+          : (fromDetail('moral').isNotEmpty ? fromDetail('moral') : hook.lesson),
+      hookOptions: _buildHookOptions(hook),
+      setting: setting,
       sceneDetail: hook.sceneDetail,
       dialogue: hook.dialogue,
-      mess: hook.mess,
+      mess: hook.mess.trim().isNotEmpty ? hook.mess.trim() : escalation,
       innerThought: hook.innerThought,
-      endingBeat: hook.endingBeat,
+      endingBeat: beat,
       cast: hook.defaultCast,
       moralHidden: hook.keepMoralOffScreen,
     );
   }
 
+  /// First sentence of a resolution, used as a fallback escalation so the app
+  /// never has to mint boilerplate like "everything fell apart at once".
+  String _firstSentence(String text) {
+    final match = RegExp(r'^[^.!?]*[.!?]').firstMatch(text.trim());
+    return match == null ? text.trim() : match.group(0)!.trim();
+  }
+
+  /// Parses the Story:/Where:/Twist:/Worse:/Resolution:/Ending:/Moral: labels.
+  /// Nothing is aliased any more — 'worse' is NOT the resolution, and 'ending'
+  /// is NOT the moral. That aliasing is what put the moral on screen as the
+  /// closing beat of every legacy idea.
   Map<String, String> _parseStoryDetail(String detail) {
     final result = <String, String>{};
     if (detail.trim().isEmpty) return result;
+
     for (final line in detail.split('\n')) {
       final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+
+      String valueAfter(String label) => trimmed.substring(label.length).trim();
+
       if (trimmed.startsWith('Story:') || trimmed.startsWith('PART 1:')) {
         result['problem'] = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+      } else if (trimmed.startsWith('Where:')) {
+        result['where'] = valueAfter('Where:');
       } else if (trimmed.startsWith('Twist:')) {
-        result['twist'] = trimmed.substring('Twist:'.length).trim();
+        result['twist'] = valueAfter('Twist:');
+      } else if (trimmed.startsWith('Worse:')) {
+        result['worse'] = valueAfter('Worse:');
       } else if (trimmed.startsWith('Resolution:')) {
-        result['resolution'] = trimmed.substring('Resolution:'.length).trim();
-        result['worse'] = result['resolution']!;
+        result['resolution'] = valueAfter('Resolution:');
+      } else if (trimmed.startsWith('Ending:') ||
+          trimmed.startsWith('Ending image:')) {
+        result['ending'] = trimmed.substring(trimmed.indexOf(':') + 1).trim();
       } else if (trimmed.startsWith('Moral:')) {
-        result['moral'] = trimmed.substring('Moral:'.length).trim();
-        result['ending'] = result['moral']!;
+        result['moral'] = valueAfter('Moral:');
       }
     }
     return result;
   }
 
-  String _buildHookText(HookIdea hook, List<String> chars) {
-    final hooks = [
-      '${hook.cover} Ne Kya Dekha?!',
-      'Mumma Ne Kaha — ${hook.cover}!',
-      '${chars.first} Ne ${hook.problem.split(" ").first}!',
-      '${hook.cover} — Phir Kya Hua?!',
+  /// The opening is the first three seconds. If the idea has one, say it —
+  /// never mint one at random. Deterministic, so regenerating shows the same text.
+  String _buildHookText(HookIdea hook) {
+    if (hook.opening.trim().isNotEmpty) return hook.opening.trim();
+    if (hook.cover.trim().isNotEmpty) return hook.cover.trim();
+    return '';
+  }
+
+  List<Map<String, String>> _buildHookOptions(HookIdea hook) {
+    final options = <Map<String, String>>[
+      if (hook.opening.trim().isNotEmpty)
+        {'type': 'Opening line', 'text': hook.opening.trim()},
+      if (hook.cover.trim().isNotEmpty) {'type': 'Cover', 'text': hook.cover.trim()},
+      if (hook.dialogue.trim().isNotEmpty)
+        {'type': 'Dialogue', 'text': hook.dialogue.trim()},
+      if (hook.innerThought.trim().isNotEmpty)
+        {'type': 'Parent thought', 'text': hook.innerThought.trim()},
     ];
-    final rng = Random();
-    return hooks[rng.nextInt(hooks.length)];
-  }
-
-  List<Map<String, String>> _buildHookOptions(HookIdea hook, String cover) {
-    final firstWord = hook.problem.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Something');
-    final candidates = [
-      {'type': 'Curiosity', 'text': '$cover Ne Kya Dekha?!'},
-      {'type': 'Parent relatable', 'text': cover},
-      {'type': 'Situation', 'text': '$firstWord Toh Problem Ho Gayi!'},
-      {'type': 'Mystery', 'text': 'Phir Kya Hua?!'},
-      {'type': 'Emotional', 'text': 'Dekhte Hi $firstWord...!'},
-    ];
-    return candidates.map((c) => Map<String, String>.from(c)).toList();
-  }
-
-  String _deriveTwist(String problem) {
-    final chars = ['Ria', 'Rio', 'Cuty', 'Mumma'];
-    final rng = Random();
-    final name = chars[rng.nextInt(chars.length)];
-    return "But then $name's reaction made it even harder.";
-  }
-
-  String _deriveWorse(String problem) {
-    return "Just when it seemed like it could work, everything fell apart at once.";
-  }
-
-  String _deriveEndingLine(String lesson, String cover) {
-    final key = lesson.split(' ').firstWhere((w) => w.length > 3, orElse: () => 'Everything');
-    return "$key — that's what made all the difference!";
+    if (options.isEmpty) options.add({'type': 'Cover', 'text': hook.cover});
+    return options;
   }
 
   String _deriveWhere(String problem) {
@@ -429,6 +460,15 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
   }
 
   Widget _buildStoryCard(GeneratedStory story) {
+    List<InlineSpan> _row(String label, String value) {
+      if (value.trim().isEmpty) return const [];
+      return [
+        TextSpan(
+            text: '$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+        TextSpan(text: '$value\n\n'),
+      ];
+    }
+
     return Card(
       color: AppColors.accentSoft,
       shape: RoundedRectangleBorder(
@@ -450,30 +490,16 @@ class _OfflineStoryMakerScreenState extends State<OfflineStoryMakerScreen> {
               text: TextSpan(
                 style: const TextStyle(fontSize: 13, height: 1.5),
                 children: [
-                  const TextSpan(
-                      text: 'Title: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: story.title),
-                  const TextSpan(text: '\n\n'),
-                  const TextSpan(
-                      text: 'Hook: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: story.hook),
-                  const TextSpan(text: '\n\n'),
-                  const TextSpan(
-                      text: 'Problem: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: story.problem),
-                  const TextSpan(text: '\n\n'),
-                  const TextSpan(
-                      text: 'Ending: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: story.endingLine),
-                  const TextSpan(text: '\n\n'),
-                  const TextSpan(
-                      text: 'Moral: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: story.moral),
+                  ..._row('Title', story.title),
+                  ..._row('Hook', story.hook),
+                  ..._row('Where', story.setting),
+                  ..._row('What starts it', story.problem),
+                  ..._row('Scene detail', story.sceneDetail),
+                  ..._row('Dialogue', story.dialogue),
+                  ..._row('What goes wrong', story.mess),
+                  ..._row('Parent thought', story.innerThought),
+                  ..._row('Ending image', story.endingBeat),
+                  if (!story.moralHidden) ..._row('Moral (spoken)', story.moral),
                 ],
               ),
             ),
@@ -695,6 +721,9 @@ class _LibraryPickerState extends State<_LibraryPicker> {
             _filter.isEmpty ||
             h.cover.toLowerCase().contains(_filter) ||
             h.problem.toLowerCase().contains(_filter) ||
+            h.setting.toLowerCase().contains(_filter) ||
+            h.dialogue.toLowerCase().contains(_filter) ||
+            h.sceneDetail.toLowerCase().contains(_filter) ||
             h.category.toLowerCase().contains(_filter))
         .toList();
 

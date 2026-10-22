@@ -22,6 +22,18 @@ String generateHookText(
 }
 
 String _hookForFirstPart(GeneratedStory story, String? characterName) {
+  if (story.dialogue.trim().isNotEmpty) {
+    final words = story.dialogue.split(' ').take(5).join(' ');
+    return '$words!';
+  }
+  if (story.mess.trim().isNotEmpty) {
+    final words = story.mess.split(' ').take(5).join(' ');
+    return '$words!';
+  }
+  if (story.hook.trim().isNotEmpty) {
+    final words = story.hook.split(' ').take(5).join(' ');
+    return '$words!';
+  }
   final hooks = [
     "${characterName ?? 'Ria'} ka ye reaction dekho! 😲",
     "${story.hook.split(' ').firstOrNull ?? 'Ek baat'} — kya hua? 😮",
@@ -29,10 +41,18 @@ String _hookForFirstPart(GeneratedStory story, String? characterName) {
     "POV: ${story.where} mein ye sab dekhkar... 🤭",
     "${story.hook.split(' ').take(2).join(' ')} — starting soon! 👀",
   ];
-  return hooks[partNumberIndex()];
+  return _capOverlay(hooks[partNumberIndex()]);
 }
 
 String _hookForMiddlePart(GeneratedStory story, int partNumber, int totalParts) {
+  if (story.mess.trim().isNotEmpty) {
+    final words = story.mess.split(' ').take(5).join(' ');
+    return '$words...';
+  }
+  if (story.sceneDetail.trim().isNotEmpty) {
+    final words = story.sceneDetail.split(' ').take(5).join(' ');
+    return '$words!';
+  }
   final hooks = [
     "Toh phir kya hua? 🤔",
     "Middle mein twist aane wala hai... ✨",
@@ -40,10 +60,18 @@ String _hookForMiddlePart(GeneratedStory story, int partNumber, int totalParts) 
     "Rio aur Ria dono soch rahe the — '${story.problem}'",
     "Scene badal raha hai... 🎭",
   ];
-  return hooks[partNumberIndex()];
+  return _capOverlay(hooks[partNumberIndex()]);
 }
 
 String _hookForLastPart(GeneratedStory story) {
+  if (story.endingBeat.trim().isNotEmpty) {
+    final words = story.endingBeat.split(' ').take(5).join(' ');
+    return '$words ✨';
+  }
+  if (!story.moralHidden && story.moral.trim().isNotEmpty) {
+    final words = story.moral.split(' ').take(5).join(' ');
+    return '$words ❤️';
+  }
   final hooks = [
     "Finally! ${story.endingLine} ✨",
     "Mission accomplished! 👏",
@@ -51,7 +79,27 @@ String _hookForLastPart(GeneratedStory story) {
     "${story.moral} ❤️",
     "Perfect ending! 🌟",
   ];
-  return hooks[partNumberIndex()];
+  return _capOverlay(hooks[partNumberIndex()]);
+}
+
+String _capOverlay(String text) {
+  final words = text.split(' ');
+  if (words.length <= 5) return text;
+  return words.take(5).join(' ');
+}
+
+bool _isForbiddenSubstring(String text) {
+  final forbidden = [
+    'filler',
+    'placeholder',
+    'lorem ipsum',
+    'TBD',
+    'TODO',
+    'generating',
+    'randomly selected',
+  ];
+  final lower = text.toLowerCase();
+  return forbidden.any((f) => lower.contains(f.toLowerCase()));
 }
 
 String generateOnScreenText(
@@ -74,23 +122,29 @@ String generateOnScreenText(
 List<String> _textForPart(
     GeneratedStory story, int partNumber, int totalParts) {
   if (partNumber == 1) {
+    final top = _isForbiddenSubstring(story.dialogue)
+        ? _capOverlay(story.hook.split(' ').take(5).join(' '))
+        : _capOverlay(story.dialogue.isNotEmpty ? story.dialogue : story.sceneDetail);
     return [
-      "${story.hook.split(' ').take(3).join(' ')}! 🤔",
-      "Scene: ${story.where}",
+      top.isNotEmpty ? '$top!' : '${story.hook.split(' ').take(3).join(' ')}! 🤔',
+      story.setting.isNotEmpty ? _capOverlay(story.setting) : 'Scene: ${story.where}',
       'Part $partNumber of $totalParts',
     ];
   }
   if (partNumber == totalParts) {
+    final ending = _isForbiddenSubstring(story.endingBeat)
+        ? 'The big resolution! ✨'
+        : _capOverlay(story.endingBeat);
     return [
-      'The big resolution! ✨',
-      story.moral,
+      ending.isNotEmpty ? ending : 'The big resolution! ✨',
+      story.moralHidden ? '' : story.moral,
       'Part $partNumber of $totalParts — Done!',
     ];
   }
   return [
-    "What happens next? 👀",
-    "Part $partNumber of $totalParts",
-      '',
+    _capOverlay(story.mess.isNotEmpty ? story.mess : 'What happens next? 👀'),
+    'Part $partNumber of $totalParts',
+    '',
   ];
 }
 

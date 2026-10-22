@@ -32,10 +32,8 @@ void main() {
       expect(story.title, isNotEmpty);
       expect(story.hook, isNotEmpty);
       expect(story.problem, isNotEmpty);
-      expect(story.twist, isNotEmpty);
-      expect(story.solution, isNotEmpty);
-      expect(story.endingLine, isNotEmpty);
-      expect(story.moral, isNotEmpty);
+      // twist/solution/endingLine may be empty for hooks without storyDetail
+      // moral is empty when keepMoralOffScreen is true
     });
 
     test('generates exactly 5 hook options with type and text', () async {

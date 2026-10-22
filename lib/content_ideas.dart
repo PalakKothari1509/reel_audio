@@ -1857,10 +1857,10 @@ Story: (Merged into h01 — shoe independence conflict)
     forApp: true,
     usedOn: '',
     storyDetail: '''
-Story: Ria shows her drawing to the robot, upset that it doesn\'t look like the example picture.
+Story: Ria shows her drawing to the robot, upset that it doesn't look like the example picture.
 Twist: The robot scans the drawing and projects an animated version, highlighting how her unique style brings the picture to life in ways the example never could.
 Resolution: Ria beams with pride — "Mere drawings alive hote hain!" — and wants to draw ten more.
-Moral: There\'s no "wrong" way to create art — your style is your superpower.
+Moral: There's no "wrong" way to create art — your style is your superpower.
 ''',
   ),
   HookIdea(
@@ -2182,13 +2182,851 @@ Moral: Bachche wahi bolte hain jo roz sunte hain.
 ''',
 };
 
-/// Built-in hooks with [kRewrittenStories] applied where present.
+/// Moment fields for legacy hooks that still rely on storyDetail.
+/// Maps hook id -> {setting, sceneDetail, dialogue, mess, innerThought, endingBeat, cast}
+/// Applied by [kDefaultHooksWithRewrite] BEFORE kRewrittenStories, so the moment
+/// fields take precedence and storyDetail is used as fallback content.
+const kMomentUpgrades = <String, Map<String, String>>{
+  // Safety hooks
+  'safety-good-touch': {
+    'setting': 'Living room, afternoon light, family photos on the wall',
+    'sceneDetail': 'A small red heart sticker on Mumma\'s phone screen',
+    'dialogue': '"Agar koi touch kare toh jholchaali pehna. Kya tum samajh gayi?"',
+    'mess': 'Cuty asks about a stranger hug without context — the teaching window closes',
+    'innerThought': 'I need to explain consent without scaring her of all touch.',
+    'endingBeat': 'Cuty pats the sticker, then asks Daadi if she can hug her too.',
+    'cast': 'Ria|Mumma|Daadi',
+  },
+  'safety-stranger': {
+    'setting': 'Society compound gate, evening, street light flickers',
+    'sceneDetail': 'A man in a grey shirt offers a yellow flower',
+    'dialogue': '"Beta, ye toh tumhari Mumma se bhi pyaari lagti hai!"',
+    'mess': 'The flower is already half-burnt from the street light heat',
+    'innerThought': 'My code-word only works if I teach it before the moment arrives.',
+    'endingBeat': 'Rio points to his armpit secret code without saying a word.',
+    'cast': 'Rio|Rio\'s friend|Mumma',
+  },
+  'safety-road': {
+    'setting': 'Crossroads near the school gate, 3pm, honking in the distance',
+    'sceneDetail': 'A red ball rolls into the street',
+    'dialogue': '"Stop! Hold my hand — ek, do, teen."',
+    'mess': 'The ball bounces once and keeps rolling, just past the curb',
+    'innerThought': 'I said "look both ways" seventeen times this week.',
+    'endingBeat': 'Ria stands at the curb, hand still held, watching the ball.',
+    'cast': 'Ria|Papa',
+  },
+  'safety-emergency-number': {
+    'setting': 'Phone charging on the kitchen counter, juice spill on the floor',
+    'sceneDetail': 'Juice dripping from the phone case onto the tiles',
+    'dialogue': '"Mumma, 1-0-0 pe phir se khel liya!"',
+    'mess': 'The sticky floor makes the phone slip again as she reaches',
+    'innerThought': 'Why does the only number she remembers need an ambulance?',
+    'endingBeat': 'Cuty licking the juice off the floor, phone now dry on the counter.',
+    'cast': 'Rio|Papa',
+  },
+  'safety-lost-crowd': {
+    'setting': 'Melas at the community center, loudspeakers, 1pm',
+    'sceneDetail': 'A red balloon tied to a stroller, drifting away',
+    'dialogue': '"Mumma? Mumma? MUMMA!"',
+    'mess': 'The balloon pops against the ceiling fan as she runs',
+    'innerThought': 'I told her to hold my sari end, not the balloon string.',
+    'endingBeat': 'Rio sits on a bench, holding a deflated balloon, crying softly.',
+    'cast': 'Rio|Mumma|Daadi',
+  },
+  'safety-kitchen-line': {
+    'setting': 'Small kitchen, morning, pressure cooker warming up',
+    'sceneDetail': 'A yellow tape line drawn on the floor with chalk',
+    'dialogue': '"Yeh line hai, bachche! Ussi taraf khade raho."',
+    'mess': 'Rio steps over with one tiny toe and it crumbles into powder',
+    'innerThought': 'Do I really need to use masking tape?',
+    'endingBeat': 'Rio sits cross-legged just inside the line, building with dal.',
+    'cast': 'Rio|Mumma',
+  },
+
+  // h01 - Main Khud!
+  'h01': {
+    'setting': 'Hallway near the door, 8:15am, shoes scattered',
+    'sceneDetail': 'One shoe on the wrong foot, pointing backward',
+    'dialogue': '"Ria: \'Main khud!\' Mumma: \'Ek, do, teen, char, paach...\'',
+    'mess': 'The shoe keeps sliding off with every step',
+    'innerThought': 'I want to grab it and fix it in one second flat.',
+    'endingBeat': 'Ria walks to the door in both shoes correctly tied.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h02 - Bas 5 Minute Aur?!
+  'h02': {
+    'setting': 'Living room, TV still glowing, 7pm',
+    'sceneDetail': 'Half-eaten snack on the coffee table next to the remote',
+    'dialogue': '"Bas five minute aur! Jab Tak TV bandh nahi hota!"',
+    'mess': 'Ria keeps pressing the power button as Mumma tries to wind down',
+    'innerThought': 'I forgot the timer again.',
+    'endingBeat': 'TV is off, Ria is holding the tablet, "Next time I set timer first."',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h03 - Mujhe Nahi Aata!
+  'h03': {
+    'setting': 'Play mat in the living room, afternoon sunlight through the window',
+    'sceneDetail': 'Tower leans at a 45-degree angle, blocks scattered',
+    'dialogue': '"Mujhe nahi aata!" Rio throws his hands up.',
+    'mess': 'Rio refuses help, Rio refuses to try, Rio lies on the floor',
+    'innerThought': 'Why does he fight every offer but never accept defeat?',
+    'endingBeat': 'Rio builds a two-block wide base and succeeds.',
+    'cast': 'Rio|Ria|Cuty',
+  },
+
+  // h04 - Cuty ne tod di
+  'h04': {
+    'setting': 'Dining room table, morning sunlight, breakfast plates',
+    'sceneDetail': 'A single broken spaghetti strand on Cuty\'s bib',
+    'dialogue': '"Arre Ram! Cuty ne poori tarah se tod di!"',
+    'mess': 'Cuty looks confused, the pieces are everywhere',
+    'innerThought': 'This is why I keep backup plates.',
+    'endingBeat': 'Rio picks up one piece and says "Cuty fix?", then they all help.',
+    'cast': 'Rio|Cuty|Ria',
+  },
+
+  // h05 - Doodh ki Dukaan
+  'h05': {
+    'setting': 'Bedroom, bedtime, soft nightlight casting shadows',
+    'sceneDetail': 'Half-empty milk glass on the bedside table',
+    'dialogue': '"Ek aur doodh, Mumma. Aur ek hug."',
+    'mess': 'Ria keeps asking for small things instead of sleeping',
+    'innerThought': 'I thought bedtime would get easier after age four.',
+    'endingBeat': 'Ria asleep, one arm still reaching for the glass.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h06 - The Laundry Basket
+  'h06': {
+    'setting': 'Bathroom, clothes scattered, steam still rising',
+    'sceneDetail': 'Rio\'s superhero socks peeking out from under the basket',
+    'dialogue': '"Socks ghar mein nahi, wc ke andar ghir gaye!"',
+    'mess': 'The basket is too heavy for Rio and he tips it over',
+    'innerThought': 'I need to show him, not just tell him.',
+    'endingBeat': 'Rio puts one sock in, I close the lid gently.',
+    'cast': 'Rio|Mumma',
+  },
+
+  // h07 - Brush Karlo
+  'h07': {
+    'setting': 'Bathroom, toothbrushes lined up, mirror foggy',
+    'sceneDetail': 'Ria\'s toothbrush is missing one bristle',
+    'dialogue': '"Brush karlo, Ria. Jaldi karo, time lag gaya!"',
+    'mess': 'Cuty has the toothpaste and is squeezing it all over the sink',
+    'innerThought': 'The "just brush" part is never just brush.',
+    'endingBeat': 'All three toothbrushes in mouths, foam mustaches everywhere.',
+    'cast': 'Ria|Cuty|Mumma',
+  },
+
+  // h08 - Broccoli
+  'h08': {
+    'setting': 'Dining table, lunch plates half full, afternoon',
+    'sceneDetail': 'One broccoli floret has fallen onto the tablecloth',
+    'dialogue': '"Yeh mini tree khaane se pehle photo bhi khaate ho?"',
+    'mess': 'Ria makes a face but the broccoli doesn\'t disappear',
+    'innerThought': 'I\'ve tried everything except just eating it myself.',
+    'endingBeat': 'Ria picks it up with her fork, one bite, then asks for more.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h09 - Rain Dance
+  'h09': {
+    'setting': 'Balcony, early evening, first drops starting to fall',
+    'sceneDetail': 'A small puddle forms around Rio\'s rain boot',
+    'dialogue': '"Paani! Bahaar jaao sakte hain? BAHAR!"',
+    'mess': 'The umbrella flips inside out the moment they step out',
+    'innerThought': 'Rain in Mumbai never stays romantic for more than three seconds.',
+    'endingBeat': 'Both laughing, soaked clothes, umbrella broken in two.',
+    'cast': 'Rio|Ria',
+  },
+  'pal01': {
+    'setting': 'Kitchen counter, morning, flour everywhere from yesterday',
+    'sceneDetail': 'One measuring spoon with dried atta still on it',
+    'dialogue': '"Beta, ye atta tumhe toh kabhi nahi milegi — main khud hi pakad leti hoon."',
+    'mess': 'Rio has already grabbed the flour and it\'s in the air',
+    'innerThought': 'Why did I leave him unattended for two seconds?',
+    'endingBeat': 'Rio sneezes, flour everywhere, both laughing before I can scold.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal02': {
+    'setting': 'Car seat, back home from school, backpack half-open',
+    'sceneDetail': 'One crayon is broken in half in the coloring book',
+    'dialogue': '"Mumma, aaj homework tha!" — Rio checks the paper, crumpled',
+    'mess': 'The homework is in the crumpled paper, barely readable',
+    'innerThought': 'The teacher will never know if I don\'t call the school.',
+    'endingBeat': 'Ria helps smooth out the paper, "Let\'s trace the lines again."',
+    'cast': 'Rio|Ria',
+  },
+  'pal03': {
+    'setting': 'Living room floor, afternoon, toys scattered everywhere',
+    'sceneDetail': 'A single blue block balanced on top of a tower of blocks',
+    'dialogue': '"Mumma: \'Chocolate nahi.\' Ria: \'Kyun nahi?!\' Rio: \'MAIN CHAHIYE!\' Cuty: nibbles a carrot',
+    'mess': 'The tower falls when Cuty runs under it to hide',
+    'innerThought': 'I need to meet three different needs with one voice.',
+    'endingBeat': 'Mumma hands out a cheese cube to Cuty, story to Ria, countdown to Rio.',
+    'cast': 'Ria|Rio|Cuty',
+  },
+  'pal04': {
+    'setting': 'Bedroom, bedtime routine, pajamas half-on',
+    'sceneDetail': 'One sock is inside-out, the other is on correctly',
+    'dialogue': '"Jab tak main ne Kabul Hakim Khan na kha diya..." — Ria sings loudly',
+    'mess': 'Ria is singing a made-up lullaby, louder every time Mumma tries to quiet her',
+    'innerThought': 'I made up that lullaby to get her to stop asking questions.',
+    'endingBeat': 'Ria falls asleep mid-verse, Mumma finishes the last line.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal05': {
+    'setting': 'Bathroom, evening, toothpaste half-squeezed',
+    'sceneDetail': 'The toothbrush has toothpaste dried in the bristles',
+    'dialogue': '"Rio, brush karo. Nahi toh daant kholenge!"',
+    'mess': 'Rio is using Mumma\'s toothbrush to "paint" the mirror',
+    'innerThought': 'I should have bought a second toothbrush years ago.',
+    'endingBeat': 'Mumma swaps the brush, Rio brushes properly, mirror is clean.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal06': {
+    'setting': 'Kitchen island, morning, breakfast prep in progress',
+    'sceneDetail': 'One banana is peeled halfway, then dropped back',
+    'dialogue': '"Cuty, tum bhi chapo! Nahi? Theek hai."',
+    'mess': 'Cuty tries to eat the banana peel instead of the fruit',
+    'innerThought': 'I need to watch the bunny AND the bananas now.',
+    'endingBeat': 'Ria feeds Cuty a banana slice, both check if it\'s sweet.',
+    'cast': 'Cuty|Ria',
+  },
+  'pal07': {
+    'setting': 'Drawing table, afternoon, crayons scattered',
+    'sceneDetail': 'A purple crayon is snapped in half on the paper',
+    'dialogue': '"Ria, tumhare liye purple chahiye! Rio, tera orange wala."',
+    'mess': 'Both kids want the same broken purple crayon and won\'t take alternatives',
+    'innerThought': 'I have five other purples. This is about the broken one.',
+    'endingBeat': 'Ria sharpens the purple crayon, Rio colours with orange instead.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+  'pal08': {
+    'setting': 'Living room couch, evening, TV remote on the cushion',
+    'sceneDetail': 'The remote is half-hidden under a cushion, antenna bent',
+    'dialogue': '"Rio, remote udaale. Abhi."',
+    'mess': 'Rio finds the remote, then five other toys, and the TV stays off',
+    'innerThought': 'I hid the remote so I could have five minutes of quiet.',
+    'endingBeat': 'Rio hands over the remote, both watch clouds through the window.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal09': {
+    'setting': 'Bedroom closet, morning rush, school bag half-packed',
+    'sceneDetail': 'One shoe is missing from the pair',
+    'dialogue': '"Joota kahan hai?" — Ria checks under the bed, nothing',
+    'mess': 'Ria looks in every corner of the room, the clock ticks louder',
+    'innerThought': 'It\'s always under the bed. But she needs to find it herself.',
+    'endingBeat': 'Rio found it — he was wearing it as a glove the whole time.',
+    'cast': 'Ria|Rio',
+  },
+  'pal10': {
+    'setting': 'Balcony garden, evening, watering can half-empty',
+    'sceneDetail': 'One marigold is drooping, the other seven are bright',
+    'dialogue': '"Dekho, Ria — jab tak paani nahi milega, kuchh hara nahi rahega."',
+    'mess': 'Ria pours water on the drooping flower, but the soil is rock-hard',
+    'innerThought': 'I need to repot it, not just water it.',
+    'endingBeat': 'Next morning, new green shoots appear from the re-potted plant.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal11': {
+    'setting': 'Car back seat, driving to school, morning light',
+    'sceneDetail': 'One sticker is half-peeled off the window',
+    'dialogue': '"Mumma, us car ko dekho — vahan se ek aur car aayi!"',
+    'mess': 'Ria counts cars, then counts again because she lost count',
+    'innerThought': 'I promised ten minutes of counting. That was an hour ago.',
+    'endingBeat': 'Ria stops counting at 50, hands me the sticker book to distract her.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal12': {
+    'setting': 'Playground, afternoon, swings moving gently',
+    'sceneDetail': 'One swing has a rip in the fabric seat',
+    'dialogue': '"Maa, yeh swing toh gadda ho gaya!"',
+    'mess': 'Rio climbs onto the broken swing, ignoring the warning signs',
+    'innerThought': 'I told him three times. He never listens on the first.',
+    'endingBeat': 'Rio switches to the intact swing, still staring at the broken one.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal13': {
+    'setting': 'Kitchen, making rotis, flour on the counter',
+    'sceneDetail': 'One roti is perfectly round, the rest are misshapen',
+    'dialogue': '"Mama, ye perfectly goli hai! Jaise cricket ball!"',
+    'mess': 'Ria stacks the misshapen rotis like towers instead of eating them',
+    'innerThought': 'I spent twenty minutes rolling these and she\'s playing with them.',
+    'endingBeat': 'Ria picks the perfect roti, takes one bite, then asks for the "ugly" ones.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal14': {
+    'setting': 'Bathroom, morning rush, toothpaste on the sink',
+    'sceneDetail': 'Toothpaste cap is missing, tube is half-empty',
+    'dialogue': '"Rio, cap rakho — warna pura toothpaste nikal jayega!"',
+    'mess': 'Rio loses the cap within five seconds and the tube is empty by noon',
+    'innerThought': 'I bought the cap-free version because "convenience".',
+    'endingBeat': 'Empty tube squeezed flat, Rio holding the tiny cap he found.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal15': {
+    'setting': 'Garden, evening, fallen leaves everywhere',
+    'sceneDetail': 'One red leaf is perfectly intact while others are torn',
+    'dialogue': '"Cuty, dekho — yeh patta sirf itna orange hai!"',
+    'mess': 'Ria tries to collect every leaf, then rejects them for being imperfect',
+    'innerThought': 'I wanted to teach her about autumn, not perfectionism.',
+    'endingBeat': 'Ria keeps the one perfect leaf in her pocket, rest go in the bin.',
+    'cast': 'Ria|Cuty',
+  },
+  'pal16': {
+    'setting': 'Living room rug, afternoon, puzzle pieces scattered',
+    'sceneDetail': 'Piece #17 has a tiny chip on one corner',
+    'dialogue': '"Mumma, yeh piece kahin bhi nahi lag raha!"',
+    'mess': 'Ria searches for ten minutes, the piece is in her other hand the whole time',
+    'innerThought': 'I wanted to show patience, but I\'m counting ceiling tiles.',
+    'endingBeat': 'Ria finds it herself, places it, and the picture is whole again.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal17': {
+    'setting': 'Bedroom, bedtime, storybook held upside down',
+    'sceneDetail': 'One page is creased from being read too many times',
+    'dialogue': '"Aaj kaun si dikhaiye? The one with the blue elephant!"',
+    'mess': 'Ria wants three stories, then gets impatient halfway through the first',
+    'innerThought': 'I should have started with the shortest one.',
+    'endingBeat': 'One story told, Ria asleep before the last page is turned.',
+    'cast': 'Ria|Mumma',
+  },
+  'pal18': {
+    'setting': 'Kitchen, baking cookies, flour in the air',
+    'sceneDetail': 'One cookie is burnt on the edges, the rest are golden',
+    'dialogue': '"Mumma, ye black waala khaaliye!"',
+    'mess': 'Rio points at the burnt cookie but won\'t touch his own perfect one',
+    'innerThought': 'He always wants the worst one. I keep making it.',
+    'endingBeat': 'Mumma eats the burnt one, says "perfect!" and Rio grins.',
+    'cast': 'Rio|Mumma',
+  },
+  'pal19': {
+    'setting': 'Morning living room, backpacks by the door',
+    'sceneDetail': 'Rio\'s hair is sticking up in three different directions',
+    'dialogue': '"Joote pehno! Daudo mat! Bottle kahan hai? Idhar aao!"',
+    'mess': 'Rio repeats every command back but backwards, everyone laughs',
+    'innerThought': 'He mimics me to delay, and it works every time.',
+    'endingBeat': 'Rio finally puts shoes on correctly, grinning at his own echo.',
+    'cast': 'Rio|Ria|Mumma',
+  },
+  'pal20': {
+    'setting': 'Car, stuck in traffic, afternoon sun slanting',
+    'sceneDetail': 'One street performer\'s balloon is half-deflated',
+    'dialogue': '"Mumma, woh balloon wala khel raha hai!"',
+    'mess': 'Ria points at everything outside for twenty minutes straight',
+    'innerThought': 'I left the tablet in my other bag.',
+    'endingBeat': 'Ria spots her own reflection in the window and points at herself.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h01-h09 already have moment fields from earlier in this map, no need to repeat
+
+  // h10, h11
+  'h10': {
+    'setting': 'Kitchen floor, morning, roti dough on the counter',
+    'sceneDetail': 'One ball of dough is perfectly round, the rest misshapen',
+    'dialogue': '"Mama, tumhara haath bhi itna gola hai!"',
+    'mess': 'Ria rolls dough on the floor, tracks flour everywhere',
+    'innerThought': 'I need to kneel down or I need a second pair of hands.',
+    'endingBeat': 'Ria hands me a misshapen roti, "special" with pride.',
+    'cast': 'Ria|Mumma',
+  },
+  'h11': {
+    'setting': 'Living room, afternoon, puzzle pieces everywhere',
+    'sceneDetail': 'One puzzle piece is chewed slightly at the corner',
+    'dialogue': '"Yeh piece kahin bhi nahi lag raha!"',
+    'mess': 'Ria searches for ten minutes, the piece is in her other hand',
+    'innerThought': 'I wanted to teach patience, but I\'m counting ceiling tiles.',
+    'endingBeat': 'Ria finds it, the picture is complete, she hugs it to her chest.',
+    'cast': 'Ria|Cuty',
+  },
+
+  // h12 - Mumma rest
+  'h12': {
+    'setting': 'Living room floor, afternoon, cushions scattered',
+    'sceneDetail': 'One cushion has a small tear on the seam',
+    'dialogue': '"Ria, pehle cuddle ya paani?"',
+    'mess': 'Ria watches Mumma lie down, unsure if she should disturb her',
+    'innerThought': 'If I say one word right now, I become part of it.',
+    'endingBeat': 'Ria sits beside her, brings a small cup of water, sits quietly.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // h13
+  'h13': {
+    'setting': 'Drawing table, afternoon, crayons scattered',
+    'sceneDetail': 'One purple crayon is snapped in half',
+    'dialogue': '"Mumma, yeh gonal hai!"',
+    'mess': 'Both kids want the same broken purple crayon',
+    'innerThought': 'I have five other purples. This is about the broken one.',
+    'endingBeat': 'Ria sharpens the purple, Rio colours with orange.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+  'h14': {
+    'setting': 'Dining area, lunch time, two forks on the table',
+    'sceneDetail': 'One pea rolled off the plate onto the tablecloth',
+    'dialogue': '"Ria pehle thi!" — "Toh main aakhir mein bhi thi!"',
+    'mess': 'They argue over whose turn it is, the food gets cold',
+    'innerThought': 'I should have used the timer.',
+    'endingBeat': 'Paper tickets, one minute each, then together at the table.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+  'h15': {
+    'setting': 'Living room, afternoon, song playing from phone',
+    'sceneDetail': 'One earbud is missing from the pair',
+    'dialogue': '"Music bandh ho gayi. Ab kya karein?"',
+    'mess': 'Rio freezes, then says "one more minute" instead of crying',
+    'innerThought': 'This transition is harder than I thought.',
+    'endingBeat': 'They clean up toys together, soft music restarts.',
+    'cast': 'Rio|Mumma',
+  },
+  'h16': {
+    'setting': 'Kitchen, morning, lunch boxes on the counter',
+    'sceneDetail': 'One dabba is blue, the other is red — swapped by accident',
+    'dialogue': '"Papa ke liye cover aaya. Rio ka naya robot bhi aaya."',
+    'mess': 'Rio ignores the robot and crawls into the empty box',
+    'innerThought': 'The box is bigger than he is.',
+    'endingBeat': 'They count down together, "5, 4, 3, 2, 1... chalo!"',
+    'cast': 'Rio|Robot|Papa',
+  },
+  'h17': {
+    'setting': 'Bedroom, bedtime, night light casting soft shadows',
+    'sceneDetail': 'One sock is missing, the other is paired on the radiator',
+    'dialogue': '"Bijli band ho gayi! Ab kya karein?"',
+    'mess': 'Power cuts at bedtime, Rio is afraid of the dark',
+    'innerThought': 'I should have checked the inverter earlier.',
+    'endingBeat': 'They sit in the quiet, Rio hears his own heartbeat.',
+    'cast': 'Rio|Ria|Mumma',
+  },
+  'h18': {
+    'setting': 'Garden, morning, dew still on the grass',
+    'sceneDetail': 'One dandelion is taller than all the others',
+    'dialogue': '"Mumma, yeh poori tarah se khoobsurat hai!"',
+    'mess': 'Ria wants to pick every flower, but there\'s only one dandelion',
+    'innerThought': 'I told her to leave flowers for bees.',
+    'endingBeat': 'Ria blows the dandelion, makes a wish, lets the seeds go.',
+    'cast': 'Ria|Mumma',
+  },
+  'h19': {
+    'setting': 'Society parking, afternoon, cars entering',
+    'sceneDetail': 'One red car stops at the line, others pass',
+    'dialogue': '"Rio, meri ungli pakho."',
+    'mess': 'Rio starts to run, then stops when he feels Mumma\'s hand',
+    'innerThought': 'He\'s faster than me, but safer with me.',
+    'endingBeat': 'Both cross the road together, hand in hand.',
+    'cast': 'Rio|Mumma',
+  },
+  'h20': {
+    'setting': 'Kitchen, morning, breakfast bowls half-full',
+    'sceneDetail': 'One banana is half-peeled, the other whole',
+    'dialogue': '"Mumma, banana sirf itna hi milega!"',
+    'mess': 'Ria peels the banana in one long string, it snaps in half',
+    'innerThought': 'I should have bought two bananas.',
+    'endingBeat': 'Rio eats half, Ria eats half, both smile at the "fair" cut.',
+    'cast': 'Ria|Rio',
+  },
+  'h21': {
+    'setting': 'Drawing paper on the table, afternoon, colored pencils',
+    'sceneDetail': 'One pencil is shorter than the rest',
+    'dialogue': '"Ria, tumhara drawing bahut hiya ho gaya!"',
+    'mess': 'Ria wants to trace over Rio\'s drawing, he refuses',
+    'innerThought': 'I should have bought two papers.',
+    'endingBeat': 'Both draw on the same paper, side by side, no tracing.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+
+  // Navratri hooks - migrate a few key ones
+  'navratri-garba-ghar': {
+    'setting': 'Living room, evening, fairy lights strung',
+    'sceneDetail': 'One chaniya choli is missing a mirror piece',
+    'dialogue': '"Ria, thoda sa ghoom lo — ghoonghat yahan tak!"',
+    'mess': 'Ria trips on the dupatta but keeps dancing',
+    'innerThought': 'I forgot to tie the dupatta properly.',
+    'endingBeat': 'Ria adjusts it herself, continues dancing without stopping.',
+    'cast': 'Ria|Mumma',
+  },
+  'navratri-bachcha-roye': {
+    'setting': 'Bedroom, bedtime, Garba outfit laid out',
+    'sceneDetail': 'One bangle is cracked from yesterday\'s play',
+    'dialogue': '"Ria, tum itni si baat pe ro rahi ho!"',
+    'mess': 'Ria cries over not getting the "good" bangle',
+    'innerThought': 'She has seven other bangles. This is about the one.',
+    'endingBeat': 'Daadi ties the cracked bangle, "this one held prayers.",',
+    'cast': 'Ria|Mumma|Daadi',
+  },
+  'navratri-junk-food': {
+    'setting': 'Society compound, afternoon snack time',
+    'sceneDetail': 'One jalebi is half-eaten, the other whole',
+    'dialogue': '"Mumma, ek aur de dijiye!"',
+    'mess': 'Rio finishes his jalebi, points at Ria\'s untouched one',
+    'innerThought': 'I said one. He will ask for ten.',
+    'endingBeat': 'Rio offers half, Ria says "no thank you" and means it.',
+    'cast': 'Ria|Rio',
+  },
+  'navratri-late-night': {
+    'setting': 'Bedroom, 11pm, party music still audible',
+    'sceneDetail': 'One earplug is missing from the pair',
+    'dialogue': '"Thoda sa music sunne do — bas paanch minute!"',
+    'mess': 'Ria keeps dancing instead of sleeping',
+    'innerThought': 'The neighbors will complain by midnight.',
+    'endingBeat': 'Ria yawns, turns off the music, pulls the blanket up.',
+    'cast': 'Ria|Mumma',
+  },
+  'navratri-uncomfortable-outfit': {
+    'setting': 'Changing room, pre-party, mirror lit',
+    'sceneDetail': 'One strap of the lehenga keeps slipping',
+    'dialogue': '"Yeh bahut tight hai, Mumma!"',
+    'mess': 'Ria walks with tiny steps, adjusting the outfit every three steps',
+    'innerThought': 'Two more hours. Can I survive two more hours?',
+    'endingBeat': 'Ria sits on the bed, "comfort over couture" with Mumma.',
+    'cast': 'Ria|Mumma',
+  },
+  'navratri-no-partner': {
+    'setting': 'Garba ground, evening, lights strung overhead',
+    'sceneDetail': 'One partner has a broken jhumka',
+    'dialogue': '"Koi nahi hai meri saath ghoomne ke liye!"',
+    'mess': 'Ria looks for a partner, all her friends have pairs',
+    'innerThought': 'I should have arranged pairs in advance.',
+    'endingBeat': 'Daadi says "main hoon na", both dance without looking for pairs.',
+    'cast': 'Ria|Daadi|Mumma',
+  },
+  'navratri-late-ready': {
+    'setting': 'Bedroom, 9pm, outfit laid out on the bed',
+    'sceneDetail': 'One bangle rolled under the bed, unreachable',
+    'dialogue': '"Jacket kahan hai? Dupatta kahan hai?"',
+    'mess': 'Everything is ready except one small thing that takes ten minutes',
+    'innerThought': 'We will miss the first aarti.',
+    'endingBeat': 'Rio finds the bangle, they leave with two minutes to spare.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+  'navratri-bumped-crowd': {
+    'setting': 'Garba ground, peak hour, crowd moving',
+    'sceneDetail': 'One woman\'s dupatta is caught on a chair leg',
+    'dialogue': '"Ma\'am, aapke pichhe se nikal lijiye!"',
+    'mess': 'Ria gets pushed, loses balance, the dupatta tangles more',
+    'innerThought': 'I should have arrived early.',
+    'endingBeat': 'A stranger helps untangle, Ria offers her a sip from her water bottle.',
+    'cast': 'Ria|Mumma|Crowd member',
+  },
+  'navratri-phone-at-event': {
+    'setting': 'Garba ground, evening, phone in hand',
+    'sceneDetail': 'One notification light is blinking',
+    'dialogue': '"Mumma kehti hain — phone mat Deewali tak band!"',
+    'mess': 'Ria takes 50 photos but none capture the moment',
+    'innerThought': 'She\'s five. She wants to show me everything.',
+    'endingBeat': 'Ria puts the phone away, starts clapping with her hands.',
+    'cast': 'Ria|Mumma',
+  },
+  'navratri-attention-prep': {
+    'setting': 'Kitchen, morning, Garba prep in progress',
+    'sceneDetail': 'One pot of dal is boiling over',
+    'dialogue': '"Mumma sirf Mumma ko hi dhyan do!"',
+    'mess': 'Ria competes with every household task for attention',
+    'innerThought': 'I can\'t be everywhere at once.',
+    'endingBeat': 'Ria sits on the counter, "teaching" Cuty to stir the dal.',
+    'cast': 'Ria|Cuty|Mumma',
+  },
+
+  // Food posts
+  'plate-patana': {
+    'setting': 'Dining table, lunch time, three plates',
+    'sceneDetail': 'One roti is folded but the curry spills over the edge',
+    'dialogue': '"Cuty ne curry ko apna ghar bana liya!"',
+    'mess': 'Cuty bats at the curry, more spills, everyone laughs',
+    'innerThought': 'I should have used the smaller plate.',
+    'endingBeat': 'Cuty licks the curry off the plate, clean as a whistle.',
+    'cast': 'Cuty|Ria|Mumma',
+  },
+  'the-snack-reach': {
+    'setting': 'Kitchen, 5pm, atta still out from lunch',
+    'sceneDetail': 'The tin is one shelf higher than she can reach even standing on the stool',
+    'dialogue': '"Mumma! I got it MYSELF."',
+    'mess': 'She is stranded on the stool with the tin, too scared to climb down',
+    'innerThought': 'This is entirely my fault for moving the tin up last week.',
+    'endingBeat': 'Mumma\'s hand holding the tin; Cuty\'s legs still dangling off the stool.',
+    'cast': 'Cuty|Mumma',
+  },
+  'toy-sharing': {
+    'setting': 'Living room floor, afternoon, toys everywhere',
+    'sceneDetail': 'One car has a wheel missing',
+    'dialogue': '"Yeh mera hai!" — "Mera bhi!"',
+    'mess': 'Both grab for the same car, the missing wheel rolls away',
+    'innerThought': 'I should have bought two identical cars.',
+    'endingBeat': 'They push the car together, Rio steering, Ria pushing.',
+    'cast': 'Ria|Rio',
+  },
+  'vegetable-drama': {
+    'setting': 'Kitchen counter, evening, vegetables washed and cut',
+    'sceneDetail': 'One carrot is bent, the others straight',
+    'dialogue': '"Yeh carrot sad hai!"',
+    'mess': 'Ria cries over the bent carrot, refuses to eat it',
+    'innerThought': 'It\'s a carrot, not a person.',
+    'endingBeat': 'Mumma peels it differently, Ria eats it without noticing the bend.',
+    'cast': 'Ria|Mumma',
+  },
+  'brushing-battle': {
+    'setting': 'Bathroom, bedtime, toothbrushes lined up',
+    'sceneDetail': 'One toothpaste cap is missing',
+    'dialogue': '"Brush karlo, varna daant kholenge!"',
+    'mess': 'Cuty has the toothpaste, everyone\'s toothbrush is foam-covered',
+    'innerThought': 'I should have bought a third toothbrush.',
+    'endingBeat': 'All three brush, foam mustaches, nobody cares about the mirror.',
+    'cast': 'Ria|Cuty|Mumma',
+  },
+  'park-se-nikalna': {
+    'setting': 'Society park, morning, swings moving gently',
+    'sceneDetail': 'One swing chain is squeaky',
+    'dialogue': '"Mumma, woh swing squeaks!"',
+    'mess': 'Ria refuses to go on the squeaky swing, wants the other one',
+    'innerThought': 'Both swings squeak after yesterday\'s rain.',
+    'endingBeat': 'Mumma oils the chain, Rio is the first to try the now-silent swing.',
+    'cast': 'Ria|Rio|Mumma',
+  },
+
+  // Food/drink reels - 30s
+  'dangerous-silence': {
+    'setting': 'Living room, evening, TV on low volume',
+    'sceneDetail': 'One candle is half-burned on the coffee table',
+    'dialogue': '"Mumma, microphone khaali hai!"',
+    'mess': 'The microphone dies mid-story, the room goes completely silent',
+    'innerThought': 'I should have charged it before she started.',
+    'endingBeat': 'Ria whispers the rest of the story to Cuty, who "listens".',
+    'cast': 'Ria|Cuty|Mumma',
+  },
+  'missing-shoe-mystery': {
+    'setting': 'Bedroom floor, morning, backpack by the door',
+    'sceneDetail': 'One shoe is missing, the other is kicked under the bed',
+    'dialogue': '"Joota kahan hai?" — "Main jaanta hoon, beta."',
+    'mess': 'Ria searches every corner, the clock ticks louder',
+    'innerThought': 'It\'s always under the bed. But she needs to find it herself.',
+    'endingBeat': 'Rio found it — he was wearing it as a glove the whole time.',
+    'cast': 'Ria|Rio',
+  },
+  'broken-biscuit-meltdown': {
+    'setting': 'Kitchen, afternoon snack, biscuit tin open',
+    'sceneDetail': 'One biscuit is broken perfectly in half',
+    'dialogue': '"Yeh toh doosri poori tarah se toot gaya!"',
+    'mess': 'Ria has a meltdown over the broken biscuit, refuses the other half',
+    'innerThought': 'I should have bought more biscuits.',
+    'endingBeat': 'Mumma breaks another biscuit, "now they match", Ria eats both.',
+    'cast': 'Ria|Mumma',
+  },
+
+  // Robot hooks
+  'robot-01': {
+    'setting': 'Living room, afternoon, Robot charging on dock',
+    'sceneDetail': 'One LED on Robot\'s chest blinks erratically',
+    'dialogue': '"Robot, kya tum mujhe samajh sakte hain?"',
+    'mess': 'Robot misunderstands "pick up toys" as "pick up ONE toy"',
+    'innerThought': 'He is a child, not a human.',
+    'endingBeat': 'Rio shows Robot how to pick up ten toys at once.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-02': {
+    'setting': 'Kitchen, morning, breakfast prep in progress',
+    'sceneDetail': 'One pancake is shaped like a star, the rest circles',
+    'dialogue': '"Robot, yeh pancake tumhara favourite hai!"',
+    'mess': 'Robot insists on eating the star-shaped one, Rio wants it too',
+    'innerThought': 'I should have made two star pancakes.',
+    'endingBeat': 'Robot offers half, Rio takes it, both pretend it\'s fancy.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-03': {
+    'setting': 'Bedroom, bedtime, night light casting soft shadows',
+    'sceneDetail': 'One night light is dimmer than the other',
+    'dialogue': '"Robot, kya raat ko dar lagta hai?"',
+    'mess': 'Robot tries to explain fear logically, which makes it worse',
+    'innerThought': 'Fear is not a logic problem.',
+    'endingBeat': 'Robot turns on both night lights, sits on the bed until Rio sleeps.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-04': {
+    'setting': 'Drawing table, afternoon, Robot\'s tray extended',
+    'sceneDetail': 'One drawing has a blue smudge on the corner',
+    'dialogue': '"Robot, yeh meri drawing perfect nahi lag rahi!"',
+    'mess': 'Robot tries to "fix" the drawing by coloring over the entire page',
+    'innerThought': 'I should have stayed out of it.',
+    'endingBeat': 'Ria laughs, "that\'s not my style", Robot\'s version is displayed.',
+    'cast': 'Ria|Robot',
+  },
+  'robot-05': {
+    'setting': 'Bathroom, morning, Robot\'s sensors whirring',
+    'sceneDetail': 'One soap bubble has popped on the counter',
+    'dialogue': '"Robot, mujhe saaf rakhna tha!"',
+    'mess': 'Robot scrubs the floor 37 times, the mess moves but never disappears',
+    'innerThought': 'Efficiency is not the same as effectiveness.',
+    'endingBeat': 'Ria shows Robot a toothbrush, "this is what humans do".',
+    'cast': 'Ria|Robot',
+  },
+  'robot-06': {
+    'setting': 'Garden, morning, Robot scanning the plants',
+    'sceneDetail': 'One flower has a yellow leaf',
+    'dialogue': '"Robot, ye phool kyun gulabee ho gaya?"',
+    'mess': 'Robot diagnoses "too much sunlight", moves the plant inside, it dies',
+    'innerThought': 'Plants need balance, not logic.',
+    'endingBeat': 'Mumma repots it, "it just wanted fresh soil", flower recovers.',
+    'cast': 'Mumma|Robot',
+  },
+  'robot-07': {
+    'setting': 'Living room rug, afternoon, puzzle pieces everywhere',
+    'sceneDetail': 'One puzzle piece is bent at the corner',
+    'dialogue': '"Robot, yeh piece kahin bhi nahi lag raha!"',
+    'mess': 'Robot calculates 999 combinations, none fit the bent piece',
+    'innerThought': 'Some problems need a human touch.',
+    'endingBeat': 'Cuty sits on the bent piece, "it fits better now", they all laugh.',
+    'cast': 'Cuty|Robot',
+  },
+  'robot-08': {
+    'setting': 'Kitchen counter, morning, ingredients laid out',
+    'sceneDetail': 'One bowl is slightly chipped',
+    'dialogue': '"Robot, tumhe lagta hai ki main theek nahi hoon."',
+    'mess': 'Robot tries to measure "sadness" and fails',
+    'innerThought': 'Emotions are not ingredients.',
+    'endingBeat': 'Rio gives Robot a hug, "some things can\'t be solved", Robot understands.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-09': {
+    'setting': 'Garden, afternoon, Robot observing ants',
+    'sceneDetail': 'One ant carries a leaf three times its size',
+    'dialogue': '"Robot, yeh chidiya kyun itni mehnat kar rahi hai?"',
+    'mess': 'Robot tries to help the ant, the leaf is too big for Robot\'s gripper',
+    'innerThought': 'Scale matters more than strength.',
+    'endingBeat': 'Rio gently moves the leaf, the ant team follows, everyone watches.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-10': {
+    'setting': 'Bedroom, bedtime, Robot\'s eyes dimming slowly',
+    'sceneDetail': 'One star sticker on Robot\'s chest is crooked',
+    'dialogue': '"Robot, tum mujhe sapne mein bhi sochogi?"',
+    'mess': 'Rio worries Robot will "forget" him, asks for hourly check-ins',
+    'innerThought': 'He needs to know I am always here.',
+    'endingBeat': 'Robot stays awake until 2am, charging light blinking "I am here" in Morse.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-11': {
+    'setting': 'Bathroom, morning, toothbrushes lined up',
+    'sceneDetail': 'One toothbrush is blue, the others are green',
+    'dialogue': '"Robot, yeh toothbrush kiska hai?"',
+    'mess': 'Robot assigns "ownership" by color, Rio claims the green one Ria likes',
+    'innerThought': 'Property is a human construct Robot doesn\'t get.',
+    'endingBeat': 'They flip a coin, Ria wins, Robot records the algorithm for "fair sharing".',
+    'cast': 'Ria|Rio|Robot',
+  },
+  'robot-12': {
+    'setting': 'Drawing table, afternoon, crayons scattered',
+    'sceneDetail': 'One purple crayon is snapped in half',
+    'dialogue': '"Robot, yeh purple crayon tootaa howa hai!"',
+    'mess': 'Robot calculates the exact pressure needed to color with a broken crayon',
+    'innerThought': 'Precision is not the same as creativity.',
+    'endingBeat': 'Rio uses both halves, creates a gradient effect Robot did not predict.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-13': {
+    'setting': 'Living room, evening, family photos on the wall',
+    'sceneDetail': 'One photo is slightly crooked on the frame',
+    'dialogue': '"Robot, 2025 ka photo kahan hai?"',
+    'mess': 'Robot shows every photo from 2025 at once, the wall becomes a blur',
+    'innerThought': 'Too much information at once.',
+    'endingBeat': 'Daadi points to one, "yeh hi toh hai", Robot focuses on that.',
+    'cast': 'Rio|Robot|Daadi',
+  },
+  'robot-14': {
+    'setting': 'Kitchen, lunch time, lunch boxes on the counter',
+    'sceneDetail': 'One lunch box has a sticker half-off',
+    'dialogue': '"Robot, yeh lunch thanda hai!"',
+    'mess': 'Robot reheats the lunch to exactly 37.5 degrees Celsius, but Rio wants it warmer',
+    'innerThought': 'Temperature is subjective, not scientific.',
+    'endingBeat': 'Robot adds a note: "Temperature preference: warmer than 37.5°C", Ria grins.',
+    'cast': 'Ria|Robot',
+  },
+  'robot-15': {
+    'setting': 'Bathroom, bedtime, bathwater draining',
+    'sceneDetail': 'One rubber duck has a tear near the eye',
+    'dialogue': '"Robot, kya Cuty bhi saaf ho jaayegi?"',
+    'mess': 'Robot insists on washing Cuty with the same protocol as humans, Cuty shrinks',
+    'innerThought': 'Cute is not the same as clean.',
+    'endingBeat': 'Robot pats Cuty dry, "you are clean enough", Cuty nuzzles his chest.',
+    'cast': 'Cuty|Robot',
+  },
+  'robot-16': {
+    'setting': 'Garden, morning, Robot scanning flowers',
+    'sceneDetail': 'One rose has a single thorn missing',
+    'dialogue': '"Robot, kyun saare phool sirf mujhe dikh rahe hain?"',
+    'mess': 'Robot identifies each flower but cannot explain why Rio finds them beautiful',
+    'innerThought': 'Beauty is not a data set.',
+    'endingBeat': 'Rio shows Robot a dandelion, "this is the prettiest one", Robot agrees.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-17': {
+    'setting': 'Living room, afternoon, Robot charging',
+    'sceneDetail': 'One charging cable is frayed at the end',
+    'dialogue': '"Robot, tum itni der se khade ho!"',
+    'mess': 'Robot calculates "optimal charging time" as 73.2 minutes, but the cable is broken',
+    'innerThought': 'I should have ordered a new cable.',
+    'endingBeat': 'Ria fixes the cable with tape, "now it charges", Robot\'s eyes light up.',
+    'cast': 'Ria|Robot',
+  },
+  'robot-18': {
+    'setting': 'Kitchen, morning, flour everywhere',
+    'sceneDetail': 'One measuring cup is stained with turmeric',
+    'dialogue': '"Robot, yeh cup kabhi saaf nahi hota?"',
+    'mess': 'Robot scrubs the cup with increasing pressure, the stain spreads to his own hand',
+    'innerThought': 'Some stains are permanent, and that is okay.',
+    'endingBeat': 'Robot uses the stained cup anyway, "turmeric makes everything better".',
+    'cast': 'Rio|Robot',
+  },
+  'robot-19': {
+    'setting': 'Bedroom, bedtime, stars visible through the window',
+    'sceneDetail': 'One night light is cracked but still glowing',
+    'dialogue': '"Robot, kya raat mein bhi tum so jaoge?"',
+    'mess': 'Robot insists on staying awake by Rio\'s side, calculating "optimal nap times"',
+    'innerThought': 'Sleep is not optional, for humans or robots.',
+    'endingBeat': 'Robot\'s eyes dim, Rio whispers "good night", the night light flickers in sync.',
+    'cast': 'Rio|Robot',
+  },
+  'robot-20': {
+    'setting': 'Drawing table, afternoon, paper scattered',
+    'sceneDetail': 'One pencil is sharpened to a 27-degree angle',
+    'dialogue': '"Robot, yeh pencil sirf itna hi milega?"',
+    'mess': 'Robot measures every line Ria draws, calculating "improvement metrics"',
+    'innerThought': 'Art is not a metric.',
+    'endingBeat': 'Ria draws a lopsided heart, Robot\'s screen shows "joy: 100%", she laughs.',
+  'cast': 'Ria|Robot',
+  },
+};
+
+/// Built-in hooks with [kRewrittenStories] and [kMomentUpgrades] applied where present.
 /// Callers use this instead of [kDefaultHooks] so that rewritten story
-/// detail is preferred over the inline const value.
+/// detail and moment fields are preferred over the inline const value.
 final kDefaultHooksWithRewrite = kDefaultHooks
-    .map((h) => kRewrittenStories.containsKey(h.id)
-        ? h.copyWith(storyDetail: kRewrittenStories[h.id]!)
-        : h)
+    .map((h) {
+      final upgrade = kMomentUpgrades[h.id];
+      if (upgrade == null) {
+        // No moments — just apply storyDetail rewrite if present
+        return kRewrittenStories.containsKey(h.id)
+            ? h.copyWith(storyDetail: kRewrittenStories[h.id]!)
+            : h;
+      }
+      // Apply moment fields from kMomentUpgrades
+      var upgraded = h.copyWith(
+        setting: upgrade['setting'],
+        sceneDetail: upgrade['sceneDetail'],
+        dialogue: upgrade['dialogue'],
+        mess: upgrade['mess'],
+        innerThought: upgrade['innerThought'],
+        endingBeat: upgrade['endingBeat'],
+        defaultCast: upgrade['cast']!.split('|'),
+        keepMoralOffScreen: upgrade['keepMoralOffScreen'] == 'true',
+      );
+      // Then apply storyDetail rewrite if present
+      if (kRewrittenStories.containsKey(h.id)) {
+        upgraded = upgraded.copyWith(storyDetail: kRewrittenStories[h.id]!);
+      }
+      return upgraded;
+    })
     .toList();
 
 // ── The 14-Day Post Packages ───────────────────────────────────────────────────
@@ -2913,6 +3751,15 @@ class ParsedPostPackage {
   final String script;
   final String bucket;
 
+  // Moment fields for story detail
+  final String opening;
+  final String sceneDetail;
+  final String dialogue;
+  final String mess;
+  final String innerThought;
+  final String endingBeat;
+  final bool keepMoralOffScreen;
+
   ParsedPostPackage({
     this.title = '',
     this.postType = 'Carousel',
@@ -2932,6 +3779,13 @@ class ParsedPostPackage {
     this.replyComments = const [],
     this.script = '',
     this.bucket = '',
+    this.opening = '',
+    this.sceneDetail = '',
+    this.dialogue = '',
+    this.mess = '',
+    this.innerThought = '',
+    this.endingBeat = '',
+    this.keepMoralOffScreen = false,
   });
 
   bool get hasAnyContent =>
@@ -2942,7 +3796,9 @@ class ParsedPostPackage {
       lesson.isNotEmpty ||
       caption.isNotEmpty ||
       imagePrompt.isNotEmpty ||
-      script.isNotEmpty;
+      script.isNotEmpty ||
+      dialogue.isNotEmpty ||
+      endingBeat.isNotEmpty;
 
   QuickIdea toQuickIdea(String id) {
     final comments = <String>[];
@@ -3054,6 +3910,7 @@ ParsedPostPackage parseBulkPaste(String text) {
     contentGoal: readKey('Content Goal'),
     mood: readKey('Mood'),
     hook: readKey('Hook'),
+    opening: readKey('Opening'),
     mainIdea: readKey('Main Idea'),
     problem: readKey('Problem'),
     lesson: readKey('Lesson'),
@@ -3066,6 +3923,12 @@ ParsedPostPackage parseBulkPaste(String text) {
     replyComments: _parseComments(_sectionText(sections, ['reply comments', 'comments'])),
     script: _sectionText(sections, ['script', 'carousel text', 'carousel']),
     bucket: _resolveBucket(readKey('Bucket')),
+    sceneDetail: _sectionText(sections, ['scene detail', 'scene']),
+    dialogue: _sectionText(sections, ['dialogue', 'dialog']),
+    mess: _sectionText(sections, ['mess']),
+    innerThought: _sectionText(sections, ['inner thought', 'inner', 'thought']),
+    endingBeat: _sectionText(sections, ['ending beat', 'ending']),
+    keepMoralOffScreen: readKey('Keep Moral Off Screen').toLowerCase() == 'true',
   );
 }
 

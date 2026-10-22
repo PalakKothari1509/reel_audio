@@ -271,3 +271,21 @@ const Map<String, String> kCharacterVoices = {
 
 /// Returns a voice hint for the given character name, or empty string.
 String characterVoice(String name) => kCharacterVoices[name] ?? '';
+
+/// Short, one-line speech pattern used for prompt injection.
+/// This is distinct from [characterVoice]: it gives a 2-3 word
+/// speech style tag, while [characterVoice] gives a longer example.
+const Map<String, String> kSpeechPatterns = {
+  'Ria': 'Negotiates with questions.',
+  'Rio': 'Two-word demands, loud.',
+  'Cuty': 'Repeats adult words wrongly.',
+  'Robot': 'Literal, slightly robotic.',
+  'Mumma': 'Short Hinglish commands, counts.',
+  'Papa': 'Over-promises, fixes later.',
+  'Daadi': 'Third person, childhood comparisons.',
+  'Teacher': 'Classroom phrases, full sentences.',
+};
+
+/// Returns a short speech pattern tag for the given character name,
+/// or empty string when unknown.
+String speechPattern(String name) => kSpeechPatterns[name] ?? '';

@@ -132,7 +132,16 @@ class StoryGenerator {
 
   Future<List<HookIdea>> _loadAvailable() async {
     final hooks = await HookStore.load();
-    return hooks.where((h) => h.forApp && h.storyDetail.trim().isNotEmpty).toList();
+    return hooks
+        .where((h) => h.forApp)
+        .where((h) => h.storyDetail.trim().isNotEmpty ||
+            h.opening.trim().isNotEmpty ||
+            h.setting.trim().isNotEmpty ||
+            h.sceneDetail.trim().isNotEmpty ||
+            h.dialogue.trim().isNotEmpty ||
+            h.mess.trim().isNotEmpty ||
+            h.endingBeat.trim().isNotEmpty)
+        .toList();
   }
 
   static String extractLine(String detail, String label, [String? fallbackLabel]) {
@@ -202,6 +211,9 @@ class StoryGenerator {
   }
 
   String _buildHook(HookIdea h, String who) {
+    if (h.opening.trim().isNotEmpty) {
+      return h.opening;
+    }
     final hooks = [
       '${h.cover} Ne Kya Dekha?!',
       'Mumma Ne Kaha — ${h.cover}!',
@@ -230,11 +242,22 @@ class StoryGenerator {
       }
     }
 
+    // Fill remaining slots with dialogue-based options when moment fields exist
+    if (h.dialogue.trim().isNotEmpty && options.length < 5) {
+      final dialogOption = {'type': 'Dialogue', 'text': h.dialogue};
+      if (seen.add(dialogOption['text']!.toLowerCase())) {
+        options.add(dialogOption);
+      }
+    }
+
     while (options.length < 5 && _hookTypes.length > options.length) {
       final idx = options.length;
+      final text = h.dialogue.trim().isNotEmpty && h.endingBeat.trim().isNotEmpty
+          ? '${h.dialogue} — ${h.endingBeat}'
+          : base;
       options.add({
         'type': _hookTypes[idx % _hookTypes.length],
-        'text': base,
+        'text': text,
       });
     }
 

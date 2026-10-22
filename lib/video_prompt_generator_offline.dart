@@ -77,11 +77,11 @@ class OfflineVideoPromptGenerator {
           ? 'Main characters in the center of the room, neutral expressions, ready to begin'
           : previousEndingState;
 
-      final action04 = _buildActionForBeat(beat, 1);
-      final action48 = _buildActionForBeat(beat, 2);
+      final action04 = _buildActionForBeat(story, beat, 1);
+      final action48 = _buildActionForBeat(story, beat, 2);
       final action810 = isLast
-          ? _buildEndingAction(beat, characters)
-          : _buildActionForBeat(beat, 3);
+          ? _buildEndingActionFromBeat(beat, story, characters)
+          : _buildActionForBeat(story, beat, 3);
 
       final dialogue = _buildDialogue(story, partNumber, partsCount, beat);
       final endingState = _buildEndingState(beat, characters);
@@ -113,6 +113,11 @@ class OfflineVideoPromptGenerator {
         null,
       );
 
+      assert(
+        !_containsForbiddenSubstring(fullPrompt),
+        'Generated prompt contains forbidden placeholder text for part $partNumber',
+      );
+
       previousEndingState = endingState;
 
       parts.add(VideoPartPrompt(
@@ -132,29 +137,31 @@ class OfflineVideoPromptGenerator {
   }
 
   List<String> _buildStoryBeats(GeneratedStory story, int partsCount) {
-    final List<String> beats;
-    if (partsCount <= 2) {
-      beats = ['problem', 'solution'];
-    } else if (partsCount == 3) {
-      beats = ['problem', 'twist', 'solution'];
-    } else {
-      beats = [
-        'problem',
-        'twist',
-        'worse',
-        'solution',
-        'solution',
-        'solution',
-      ];
+    final hasMoments = story.setting.trim().isNotEmpty ||
+        story.sceneDetail.trim().isNotEmpty ||
+        story.dialogue.trim().isNotEmpty ||
+        story.mess.trim().isNotEmpty ||
+        story.innerThought.trim().isNotEmpty;
+
+    if (!hasMoments) {
+      if (partsCount <= 2) {
+        return ['problem', 'solution'];
+      } else if (partsCount == 3) {
+        return ['problem', 'twist', 'solution'];
+      }
+      return ['problem', 'twist', 'worse', 'solution', 'solution', 'solution']
+          .sublist(0, partsCount);
     }
 
-    if (beats.length > partsCount) {
-      return beats.sublist(0, partsCount);
+    if (partsCount <= 2) {
+      return ['sceneDetail', 'endingBeat'];
+    } else if (partsCount == 3) {
+      return ['sceneDetail', 'dialogue', 'endingBeat'];
+    } else if (partsCount == 4) {
+      return ['sceneDetail', 'dialogue', 'mess', 'endingBeat'];
     }
-    while (beats.length < partsCount) {
-      beats.insert(beats.length ~/ 2, 'solution');
-    }
-    return beats;
+    return ['sceneDetail', 'dialogue', 'mess', 'innerThought', 'endingBeat']
+        .sublist(0, partsCount);
   }
 
   String _buildCharacterBlock(List<String> characters) {
@@ -195,53 +202,67 @@ class OfflineVideoPromptGenerator {
     return settings[(partNumber - 1) % settings.length];
   }
 
-  String _buildActionForBeat(String beat, int segment) {
+  String _buildActionForBeat(GeneratedStory story, String beat, int segment) {
     switch (beat) {
-      case 'problem':
+      case 'sceneDetail':
         switch (segment) {
           case 1:
-            return 'Ria and Rio encounter the problem mid-action';
+            return story.sceneDetail.trim().isNotEmpty
+                ? story.sceneDetail
+                : 'The scene is set, characters in neutral positions';
           case 2:
-            return 'The situation becomes clear, characters react visibly';
+            return story.setting.trim().isNotEmpty
+                ? '${story.setting} — the atmosphere is intimate'
+                : 'Camera captures the domestic detail';
           case 3:
-            return 'Problem escalates slightly, building natural tension';
+            return 'Scene detail is established, tension builds naturally';
         }
         break;
-      case 'twist':
+      case 'dialogue':
         switch (segment) {
           case 1:
-            return 'Unexpected element enters the scene';
+            return story.dialogue.trim().isNotEmpty
+                ? story.dialogue
+                : 'A child speaks, the moment begins';
           case 2:
-            return 'Characters notice and respond to the change';
+            return 'Characters respond to each other, dialogue flows';
           case 3:
-            return 'Twist creates new dynamic, tension rises';
+            return 'Dialogue reveals the underlying tension';
         }
         break;
-      case 'worse':
+      case 'mess':
         switch (segment) {
           case 1:
-            return 'The problem gets worse, frustration shows';
+            return story.mess.trim().isNotEmpty
+                ? story.mess
+                : 'The situation gets more complicated';
           case 2:
             return 'Both characters are involved, each reacts differently';
           case 3:
             return 'Tension builds through actions, not dialogue';
         }
         break;
-      case 'solution':
+      case 'innerThought':
         switch (segment) {
           case 1:
-            return 'Small realization or change of approach begins';
+            return story.innerThought.trim().isNotEmpty
+                ? story.innerThought
+                : 'A parent thinks quietly';
           case 2:
-            return 'Cuty does something that shifts direction positively';
+            return 'The inner thought shows a shift in perspective';
           case 3:
-            return 'Characters start working together toward resolution';
+            return 'Realization begins to take hold';
         }
         break;
     }
     return 'Scene develops naturally with clear action and emotion';
   }
 
-  String _buildEndingAction(String beat, List<String> characters) {
+  String _buildEndingActionFromBeat(String beat, GeneratedStory story,
+      List<String> characters) {
+    if (story.endingBeat.trim().isNotEmpty) {
+      return story.endingBeat;
+    }
     final char1 = characters.isNotEmpty ? characters[0] : 'Ria';
     final char2 = characters.length > 1 ? characters[1] : 'Rio';
     return '$char1 and $char2 resolve the situation with a warm '
@@ -250,15 +271,22 @@ class OfflineVideoPromptGenerator {
 
   String _buildDialogue(GeneratedStory story, int partNumber, int totalParts,
       String beat) {
+    if (story.dialogue.trim().isNotEmpty && beat == 'dialogue') {
+      return story.dialogue;
+    }
     if (partNumber == 1) {
+      if (story.setting.trim().isNotEmpty) {
+        return story.setting;
+      }
       final firstWord = story.problem.split(' ').where((w) => w.length > 3);
-      final subject = firstWord.isNotEmpty
-          ? firstWord.first
-          : 'something';
+      final subject = firstWord.isNotEmpty ? firstWord.first : 'something';
       return 'Ria: "$subject dekho yeh kya hua!"\n'
           'Rio: "Abhi thoda wait karo!"';
     }
     if (partNumber == totalParts) {
+      if (story.endingBeat.trim().isNotEmpty) {
+        return story.endingBeat;
+      }
       return 'Ria: "${story.endingLine}"\n'
           'Rio: "Theek hai na Mama?"';
     }
@@ -358,5 +386,20 @@ class OfflineVideoPromptGenerator {
       moral: hook.lesson,
       hookOptions: [],
     );
+  }
+
+  static bool _containsForbiddenSubstring(String text) {
+    final forbidden = [
+      'filler',
+      'placeholder',
+      'lorem ipsum',
+      'TBD',
+      'TODO',
+      'generating',
+      'randomly selected',
+      '\u2026',
+    ];
+    final lower = text.toLowerCase();
+    return forbidden.any((f) => lower.contains(f.toLowerCase()));
   }
 }
