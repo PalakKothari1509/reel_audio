@@ -512,35 +512,35 @@ Moral: Mumma na dikhein toh bheed mein idhar-udhar mat bhaago. Safe help point p
     readyPrompt: '',
   ),
 
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-kitchen-line',
     category: 'Warm lesson',
-    cover: 'Laal Line Ke Peeche',
-    opening: 'Rasoi mein Ria ko aage jaana tha... par ek line thi.',
-    problem: 'A toddler keeps wandering into the kitchen while the stove is on',
-    lesson: 'Garam jagah ke liye ek clear line banao',
+    cover: 'Rasoi Mein Ruko, Ria!',
+    opening: 'Mumma gas par khana bana rahi thi… aur Ria apni car lekar rasoi mein aa gayi!',
+    problem: 'Ria wants to stay near Mumma and brings her toy into the kitchen while Mumma is cooking. Hot cookware and the active stove create a genuine hazard.',
+    lesson: 'Young children must stay out of the cooking area while cooking is underway. Floor markings are not a safety barrier. Adults must supervise children and prevent access to hot stoves, cookware, boiling liquids, and other kitchen hazards.',
     postFormat: 'Reel',
-    strategy: '',
-    caption: 'गर्म जगह के पास न जाना — लाल line हमेशा मानें। कभी घंटे में न जाएँ, बिना बुलाए मम्मी या पापा से पूछें। #KitchenSafety #ChildSafety #SafetyFirst #IndianParents #FunLearningWithPalak',
+    strategy: 'Shows the real danger of a child entering an active cooking area, a calm parent redirecting the child, and the practical solution of creating a safe play space away from the stove.',
+    caption: 'Bachche cooking area se door rahen jab gas chalu ho. Kitchen se door safe play space bana lo. Floor pe line kaafi nahi — bade ki supervision zaroori hai. #KitchenSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Gas jal rahi hai — Ria yahin rukegi. Mumma is cooking; Ria carries a toy car toward the stove.
-Twist: Mumma: "Gas jal rahi hai—Ria yahin rukegi." Ria stops where the red line is drawn.
-Resolution: Papa adds a floor marker the next day: "Laal line = safe boundary." Ria stays behind it, watching safely.
-Moral: Grown-up present, boundary clear — safety needs both.
+Story: Mumma is preparing lunch on the gas stove. Ria enters the kitchen with her toy car and asks to play beside Mumma.
+Twist: Mumma notices Ria near the cooking area, stops what she is doing when safe, and guides Ria out of the kitchen.
+Resolution: Mumma sets up a simple play activity in a safe area away from the kitchen. She explains gently, "Jab gas par khana banta hai, tum kitchen ke bahar khelo. Main tumhare paas aakar khelungi."
+Moral: Garam rasoi se door raho. Cooking ke waqt bade ki safety rules follow karo.
 ''',
-    setting: 'Small kitchen, morning, pressure cooker warming up',
-    sceneDetail: 'A yellow tape line drawn on the floor with chalk',
-    dialogue: '"Yeh line hai, bachche! Ussi taraf khade raho."',
-    mess: 'Rio steps over with one tiny toe and it crumbles into powder',
-    innerThought: 'Do I really need to use masking tape?',
-    endingBeat: 'Rio sits cross-legged just inside the line, building with dal.',
-    defaultCast: ['Rio', 'Mumma'],
+    setting: 'Kitchen, midday, gas stove with active cooking',
+    sceneDetail: 'Ria standing at the kitchen entrance with a toy car, Mumma at the stove with a pot simmering',
+    dialogue: '"Mumma, main bhi khelungi yahan!" "Ria, beta, kitchen mein gas chalu hai. Bahar khelo, main aati hoon."',
+    mess: 'Ria inches closer to the stove with her car, Mumma turns and sees her just before the hot zone',
+    innerThought: 'The kitchen feels warm and inviting, but the stove is no place for a toddler — even for a minute.',
+    endingBeat: 'Mumma lifts Ria out, sets up blocks in the living room, and joins her. "Yahan safe hai, Ria."',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
