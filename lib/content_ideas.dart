@@ -1077,6 +1077,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio waddles in wrong shoes. Ria: "Butterf
 
 Audio/Dialogue (Hinglish): Ria firm: "Nahi!" Rio: "Blue spoon hi chahiye!" Cuty: "Mumma!" *giggle drop* Rio penguin walk. Ria: "Mumma, butterfly taste with their feet!" Mumma tired: "Haan beta, sahi hai." All asleep: "The chaos is the childhood."
     ''',
+  ),
 
 HookIdea(
     id: 'pal03',
@@ -1178,6 +1179,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria's eyelids grow heavy, she pats the pi
 
 Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma smiling: "Ek aur page?" Ria sleepy: "Thoda aur?" Mumma whispering: "Jaane do beta, kal subah nayi kahani."
     ''',
+  ),
 
 HookIdea(
     id: 'pal06',
@@ -1228,6 +1230,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Next morning: Ria checks off sock ✅ shi
 
 Audio/Dialogue (Hinglish): Ria: "Mumma, maine hi girana diya!" Mumma: "Chalo checklist banate hain." Ria: "Sock, shirt, bottle, smile!" Next morning: Ria checks off: "Sock done! Shirt done! Bottle done! Smile done!" Mumma: "Morning sorted!"
     ''',
+  ),
 
 HookIdea(
     id: 'pal07',
@@ -1278,6 +1281,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria picks no-bow, helps Cuty with shoe. "
 
 Audio/Dialogue (Hinglish): Ria: "Ready Captain!" *changes clip* Rio: "Time khatam!" Ria sees Cuty struggle. Ria: "Team complete!" Helps Cuty. "Jab tak sabke saath, tab tak team complete." All walk out.
     ''',
+  ),
 
 HookIdea(
     id: 'pal08',
@@ -1328,6 +1332,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio mouth clean. Cuty paws have crumbs to
 
 Audio/Dialogue (Hinglish): Ria urgent: "Mumma, koi ne cookies khaaye! Rio!" Mumma calm: "Check karte hain." Wipes nose: "Cuty ke naak pe crumbs!" Ria giggles: "Innocent rabbit!" Rio grins: "Maine nahi khaya."
     ''',
+  ),
 
 HookIdea(
     id: 'pal10',
@@ -1378,6 +1383,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria whispers: "Mumma ne kaha tha!" Mumma 
 
 Audio/Dialogue (Hinglish): Mumma: "Aaj jaldi sona hai." Ria to Teddy: "Teddy, negotiation band." Mumma at door: *smiles* Ria whispers: "Mumma ne kaha tha!" Mumma hugs: "Haan beta, maine hi kaha tha."
     ''',
+  ),
 
 HookIdea(
     id: 'pal11',
@@ -1428,6 +1434,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. At checkout: Ria puts mangoes, Rio lifts 
 
 Audio/Dialogue (Hinglish): Mumma: "Ria, pick yellow fruit. Rio, cereal box. Cuty, guard list." Ria: "Mangoes!" Rio: "Big box!" Cuty: "Main rakwala!" At checkout: Ria: "Hamari team badhi achhi hai!" All laugh.
     ''',
+  ),
 
 HookIdea(
     id: 'pal13',
@@ -1478,6 +1485,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Both buckled — Ria in car seat, toy in 
 
 Audio/Dialogue (Hinglish): Ria: "Car bhi ghar chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye backpack!" Ria: "Lock hai!" Rio: "Donon safe!" All safe, ready for road trip.
     ''',
+  ),
 
 HookIdea(
     id: 'pal14',
@@ -1528,6 +1536,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. They make new drawing together: "Nayi shu
 
 Audio/Dialogue (Hinglish): Ria sobbing: "MERI drawing phaa gaya!" Mumma gentle: "Bada dukh hua na? Yeh drawing tumne pyaar se banayi thi." Ria nods. Mumma: "Chalo, nayi shuruaat karte hain." Together drawing: "Nayi shuruaat!" Ria giggles.
     ''',
+  ),
 
 HookIdea(
     id: 'pal15',
@@ -1578,6 +1587,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio eats bite, timer dings, puts on shoes
 
 Audio/Dialogue (Hinglish): Papa: "Do blocks, phir shoes." Rio: "Ab do aur do!" Papa: "Ek bite dal, phir do minute — phir shoes." Rio: "Theek hai!" Timer dings. Rio puts shoes on. "Bargain done!" High-five!
     ''',
+  ),
 
   HookIdea(
     id: 'pal16',
@@ -1679,6 +1689,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mumma applies colorful bandaid. Cuty sits
 
 Audio/Dialogue (Hinglish): Ria: "Ouch, bada dukh raha hai!" Mumma calm: "Pehle saaf karte hain, phir bandaid." Ria: "Cuty, tujhe pata hai?" Cuty: *nudges tissue* Mumma: "Good job, Cuty! No licking!" Ria: "Shukriya Mumma, shukriya Cuty!"
     ''',
+  ),
 
 HookIdea(
     id: 'pal18',
@@ -1729,6 +1740,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio finds shoes by door. Puts them on. Te
 
 Audio/Dialogue (Hinglish): Cuty: "Cuty brush kahaan hai?" Mumma: "Rio, yeh Cuty ka brush — daanton ke liye, baalon ke liye nahi!" Rio: "Haan, mazaak tha!" Finds shoes: "Mere shoes yahan the!" Mumma: "Brush daanton ke liye, shoes pairon ke liye!"
     ''',
+  ),
 
   HookIdea(
     id: 'pal19',
@@ -1831,6 +1843,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria puts bag on hook. They sit — tea fo
 Audio/Dialogue (Hinglish): Mumma tired: "Thak gayi..." Ria gentle: "Mumma, tum thak gayi ho." Mumma: "Beta, main saambhaal lungi." Ria: "Tum bahut thak gayi ho. Main rakh deti hoon." Both sit: "Shukriya beta." "Tumhara saath hi toh maza aata hai."
     ''',
 
+  ),
 
   // Struggle first: open on the moment it goes wrong.
   HookIdea(
