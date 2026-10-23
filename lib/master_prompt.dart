@@ -121,6 +121,8 @@ const List<String> kBannedStoryPhrases = [
   'teamwork makes the dream work',
   'little moments',
   'every child celebrates differently',
+  'sharing is caring',
+  'the magic of',
   'mission accomplished',
   'perfect ending',
   'something unexpected happened',

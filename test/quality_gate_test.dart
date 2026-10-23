@@ -1174,6 +1174,84 @@ test('evaluatePackage without ReelCheckData skips reel checks gracefully', () {
       expect(bannedCheck.reason, contains('Not a Reel'));
     });
 
+    test('banned phrases: case-insensitive matching detects uppercase', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'SHARING IS CARING — this is the magic of childhood.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.fail);
+    });
+
+    test('banned phrases: normal Hinglish dialogue passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria kehta hai: "Mujhe neend nahi!" Mumma gently tucks her in.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass);
+    });
+
+    test('known bad tokens: detects typos', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria plays with wieder toys all day.',
+        ),
+      );
+      final tokenCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_tokens', orElse: () {
+        return GateCheckResult(
+          id: 'not_found',
+          name: 'not_found',
+          dimension: QualityDimension.creative,
+          verdict: GateVerdict.fail,
+          reason: 'banned_tokens check not found',
+        );
+      });
+      expect(tokenCheck.verdict, GateVerdict.fail);
+      expect(tokenCheck.reason, contains('wieder'));
+    });
+
+    test('known bad tokens: normal text passes', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Ria and Rio play with their toys.',
+        ),
+      );
+      // No banned tokens found — the pass result uses the phrases check ID
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass);
+    });
+
     // ── Feelings in Dialogue Check ────────────────────────────────
 
     test('feelings in dialogue: explicit naming fails', () {

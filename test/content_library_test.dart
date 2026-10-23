@@ -200,4 +200,46 @@ void main() {
     final item = ContentLibraryItem.fromJson(json);
     expect(item.status, IdeaStatus.tested);
   });
+
+  test('QualitySeverity enum index is bounds-checked', () {
+    // Simulate corrupted data with an invalid severity index.
+    // Must not throw RangeError — the bounds check in _reportFromJson clamps it.
+    final json = {
+      'id': 'test-id',
+      'title': 'Test',
+      'topic': 'topic',
+      'bucket': 'challenge',
+      'format': 'reel',
+      'status': 'idea',
+      'formatOutputs': {},
+      'tags': [],
+      'createdAt': '2026-01-01T00:00:00',
+      'updatedAt': '2026-01-01T00:00:00',
+      'contentPackage': samplePackage().toJson(),
+      'qualityReport': {
+        'results': [
+          {
+            'ruleId': 'test-rule',
+            'ruleName': 'Test Rule',
+            'passed': false,
+            'description': 'details',
+            'severity': 99, // invalid index — must clamp
+            'message': 'Test message',
+          }
+        ],
+        'passCount': 0,
+        'warnCount': 0,
+        'failCount': 1,
+        'score': 0.5,
+        'isReadyToPost': false,
+        'checkedAt': '2026-01-01T00:00:00',
+      },
+      'performanceMetrics': {},
+      'reuseCount': 0,
+    };
+
+    final item = ContentLibraryItem.fromJson(json);
+    expect(item.qualityReport, isNotNull);
+    expect(item.qualityReport!.failCount, 1);
+  });
 }

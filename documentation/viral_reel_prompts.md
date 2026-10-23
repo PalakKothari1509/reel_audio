@@ -27,7 +27,7 @@ On-Screen Text (for editor overlay, not rendered by model):
 - [0-3s]: "MAIN KHUD PEHNUNGI! 👟😤"
 - [3-7s]: "MOM PATIENCE LEVEL: 100 ⏳"
 - [7-10s]: "WRONG FOOT WADDLE 🐧😂"
-- [10-15s]: "MISSION COMPLETE! 🎉✨"
+- [10-15s]: "SHOE ON RIGHT FOOT! 👟✨"
 - [15-20s]: "PROUD MOMENT 🥹❤️"
 
 Audio/Dialogue (Hinglish):
@@ -38,12 +38,12 @@ Ria triumphant: "Told you! I am a big girl now!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Ria in pink star dress pushes Mumma's hand away at the front door, shouting "Main khud!" On-Screen Text (editor overlay, not rendered by model): "MAIN KHUD! 👟😤", "MOM PATIENCE LEVEL: 100 ⏳", "WRONG FOOT WADDLE 🐧😂", "MISSION COMPLETE! 🎉✨". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
+3D Pixar style, 9:16. Ria in pink star dress pushes Mumma's hand away at the front door, shouting "Main khud!" On-Screen Text (editor overlay, not rendered by model): "MAIN KHUD! 👟😤", "MOM PATIENCE LEVEL: 100 ⏳", "WRONG FOOT WADDLE 🐧😂", "SHOE ON RIGHT FOOT! 👟✨". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Continuing from shoe struggle: Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. On-Screen Text (editor overlay, not rendered by model): "WRONG FOOT WADDLE 🐧😂", "MISSION COMPLETE! 🎉✨". Ria stands tall showing both shoes tied, Mumma claps proudly in background. Energetic comedic payoff.
+3D Pixar style, 9:16. Continuing from shoe struggle: Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. On-Screen Text (editor overlay, not rendered by model): "WRONG FOOT WADDLE 🐧😂", "SHOE ON RIGHT FOOT! 👟✨". Ria stands tall showing both shoes tied, Mumma claps proudly in background. Energetic comedic payoff.
 ```
 
 ---

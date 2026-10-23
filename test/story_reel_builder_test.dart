@@ -299,5 +299,39 @@ void main() {
       expect(prompt, contains('Scene 2'));
       expect(prompt, contains('OUTPUT JSON SCHEMA'));
     });
+
+    test('promptString with segmentCount=1 only has Scene 1', () {
+      final request = StoryReelRequest(
+        ideaId: 'N1',
+        title: 'Simple Story',
+        parentProblem: 'Small problem',
+        learningGoal: 'Small lesson',
+        hook: 'Hook here',
+        characters: ['mumma', 'ria'],
+        pillar: ContentPillar.play,
+        segmentCount: 1,
+      );
+      final prompt = request.toPromptString();
+      expect(prompt, contains('Scene 1'));
+      expect(prompt.contains('Scene 2'), isFalse);
+    });
+
+    test('promptString with segmentCount=3 has Scenes 1-3', () {
+      final request = StoryReelRequest(
+        ideaId: 'N1',
+        title: 'Three Scene Story',
+        parentProblem: 'Medium problem',
+        learningGoal: 'Medium lesson',
+        hook: 'Hook here',
+        characters: ['mumma', 'ria'],
+        pillar: ContentPillar.play,
+        segmentCount: 3,
+      );
+      final prompt = request.toPromptString();
+      expect(prompt, contains('Scene 1'));
+      expect(prompt, contains('Scene 2'));
+      expect(prompt, contains('Scene 3'));
+      expect(prompt.contains('Scene 4'), isFalse);
+    });
   });
 }

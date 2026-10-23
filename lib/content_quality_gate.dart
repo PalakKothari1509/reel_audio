@@ -2091,9 +2091,10 @@ class QualityGate {
       );
     }
 
+    final combinedLower = combinedText.toLowerCase();
     final foundPhrases = <String>[];
     for (final phrase in kBannedStoryPhrases) {
-      if (combinedText.contains(phrase)) {
+      if (combinedLower.contains(phrase.toLowerCase())) {
         foundPhrases.add(phrase);
       }
     }
@@ -2110,7 +2111,7 @@ class QualityGate {
 
     final foundTokens = <String>[];
     for (final token in kKnownBadTokens) {
-      if (combinedText.contains(token)) {
+      if (combinedLower.contains(token.toLowerCase())) {
         foundTokens.add(token);
       }
     }
