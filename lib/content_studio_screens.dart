@@ -67,7 +67,6 @@ Future<void> _saveVideoPromptsToVault(
 Future<IdeaEvaluation> _buildOfflineEvaluation(String idea) async {
   final story = await StoryGenerator().generate();
   final check = StoryCheck(
-    score: 8,
     good: ['Strong relatable hook', 'Clear character fit', 'Satisfying ending'],
     missing: ['Review originality and share value — online evaluation can do more'],
     verdict: 'Offline check passed — review suggestions to make it stronger',

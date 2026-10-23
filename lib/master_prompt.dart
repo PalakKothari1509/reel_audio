@@ -188,3 +188,35 @@ const List<String> kKnownBadTokens = [
   'khushboo mein latke',
   'chaddi',
 ];
+
+/// Checks if [text] contains any banned phrase from [bannedList] using
+/// word-boundary-aware matching (case-insensitive). Returns the first
+/// matching phrase, or null if none found.
+///
+/// Uses `\b` regex word boundaries to avoid false positives like
+/// "mission accomplished" matching "unaccomplished" or "sharing" matching
+/// "sharing is caring" partially.
+String? containsBannedPhrase(String text, List<String> bannedList) {
+  final lower = text.toLowerCase();
+  for (final phrase in bannedList) {
+    final pattern = RegExp(r'\b' + RegExp.escape(phrase.toLowerCase()) + r'\b');
+    if (pattern.hasMatch(lower)) {
+      return phrase;
+    }
+  }
+  return null;
+}
+
+/// Returns all banned phrases from [bannedList] found in [text] using
+/// word-boundary-aware matching (case-insensitive).
+List<String> findBannedPhrases(String text, List<String> bannedList) {
+  final lower = text.toLowerCase();
+  final found = <String>[];
+  for (final phrase in bannedList) {
+    final pattern = RegExp(r'\b' + RegExp.escape(phrase.toLowerCase()) + r'\b');
+    if (pattern.hasMatch(lower)) {
+      found.add(phrase);
+    }
+  }
+  return found;
+}

@@ -133,7 +133,6 @@ const kStoryChecks = [
 ];
 
 class StoryCheck {
-  final int score;
   /// What the story already does, so the check is not only a list of complaints.
   final List<String> good;
   /// What is weak, in the order worth fixing.
@@ -145,13 +144,16 @@ class StoryCheck {
   final List<HookChoice> hooks;
 
   const StoryCheck({
-    required this.score,
     required this.good,
     required this.missing,
     required this.verdict,
     this.rows = const [],
     this.hooks = const [],
   });
+
+  /// Score equals pass count, clamped to 1..10. Computed from rows so it
+  /// always reflects the actual pass/fail state.
+  int get score => rows.where((r) => r.pass).length.clamp(1, 10);
 
   /// Worked out here from the score rather than trusted from the model, so a 7 always
   /// means the same thing. Below 7 is not worth an evening of making pictures for.
@@ -301,7 +303,6 @@ rewordings of one line. The examples show the style only; write new ones for thi
   ];
 
   return StoryCheck(
-    score: rows.where((r) => r.pass).length.clamp(1, 10),
     good: list('good'),
     missing: list('missing'),
     verdict: (json['verdict'] as String?)?.trim() ?? '',

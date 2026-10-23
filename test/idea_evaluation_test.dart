@@ -129,7 +129,6 @@ void main() {
 
   group('IdeaEvaluation.copyWith', () {
     final check = StoryCheck(
-      score: 8,
       good: ['Good point one'],
       missing: ['Needs more emotion'],
       verdict: 'Improvement possible',
@@ -165,7 +164,6 @@ void main() {
         shareability: shareability,
       );
       final newCheck = StoryCheck(
-        score: 9,
         good: ['Better now'],
         missing: [],
         verdict: 'Strong story',
@@ -272,7 +270,6 @@ void main() {
   group('StoryCheck scoring (Phase 2.2)', () {
     test('score equals pass count, min 1', () {
       final allPass = StoryCheck(
-        score: 0,
         good: [],
         missing: [],
         verdict: '',
@@ -281,7 +278,6 @@ void main() {
       expect(allPass.score, equals(10));
 
       final allFail = StoryCheck(
-        score: 0,
         good: [],
         missing: [],
         verdict: '',
@@ -292,7 +288,6 @@ void main() {
 
     test('band is Ready when score >= 9 and no blockers', () {
       final check = StoryCheck(
-        score: 9,
         good: [],
         missing: [],
         verdict: '',
@@ -305,7 +300,6 @@ void main() {
       final rows = kStoryChecks.map((name) => CheckRow(name, true, '')).toList();
       rows[0] = CheckRow('Real-life problem', false, '');
       final check = StoryCheck(
-        score: 8,
         good: [],
         missing: [],
         verdict: '',
@@ -317,7 +311,6 @@ void main() {
     test('band is Rewrite when score < 7', () {
       final rows = kStoryChecks.map((name) => CheckRow(name, false, '')).toList();
       final check = StoryCheck(
-        score: 3,
         good: [],
         missing: [],
         verdict: '',
@@ -330,7 +323,6 @@ void main() {
       final rows = kStoryChecks.map((name) => CheckRow(name, true, '')).toList();
       rows[1] = CheckRow('Hook', false, '');
       final check = StoryCheck(
-        score: 9,
         good: [],
         missing: [],
         verdict: '',
@@ -343,7 +335,6 @@ void main() {
       final rows = kStoryChecks.map((name) => CheckRow(name, true, '')).toList();
       rows[0] = CheckRow('Real-life problem', false, '');
       final check = StoryCheck(
-        score: 10,
         good: [],
         missing: [],
         verdict: '',

@@ -1378,5 +1378,98 @@ test('evaluatePackage without ReelCheckData skips reel checks gracefully', () {
       expect(feelingsCheck.verdict, GateVerdict.unknown);
       expect(feelingsCheck.reason, contains('No dialogue'));
     });
+
+    // ── Banned Phrases Word Boundaries (False Positives) ─────────────
+
+    test('banned phrases: word boundaries prevent false positive "accomplished" in "unaccomplished"', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'The task was unaccomplished and frustrating.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass,
+          reason: 'Should not match "accomplished" inside "unaccomplished"');
+    });
+
+    test('banned phrases: word boundaries prevent false positive "sharing" in "unsharing"', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'The child was unsharing about the toys.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass,
+          reason: 'Should not match "sharing" inside "unsharing"');
+    });
+
+    test('banned phrases: word boundaries prevent false positive "caring" in "uncaring"', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'That was an uncaring remark from the sibling.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass,
+          reason: 'Should not match "caring" inside "uncaring"');
+    });
+
+    test('banned phrases: "mission complete" word boundary works', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'The mission completed successfully.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.pass,
+          reason: 'Should not match "completed" as "mission complete"');
+    });
+
+    test('banned phrases: exact phrase with punctuation still matches', () {
+      final report = QualityGate.evaluateIdea(
+        ideaId: 'test',
+        title: 'test',
+        classification: fullyApproved(
+          contentType: ContentType.reel,
+        ),
+        reelData: ReelCheckData(
+          isReel: true,
+          script: 'Sharing is caring! That is the magic of parenting.',
+        ),
+      );
+      final bannedCheck = report.checks
+          .firstWhere((c) => c.id == 'creative.reel.banned_phrases');
+      expect(bannedCheck.verdict, GateVerdict.fail);
+      expect(bannedCheck.reason, contains('sharing is caring'));
+      expect(bannedCheck.reason, contains('the magic of'));
+    });
   });
 }

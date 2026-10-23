@@ -65,8 +65,9 @@ List<String> overlayProblems(String overlay, GeneratedStory story) {
   if (moral.isNotEmpty && low.contains(moral)) {
     problems.add('contains the moral');
   }
-  for (final p in kBannedOverlayPhrases) {
-    if (low.contains(p.toLowerCase())) problems.add('contains "$p"');
+  final found = findBannedPhrases(low, kBannedOverlayPhrases);
+  for (final p in found) {
+    problems.add('contains "$p"');
   }
   return problems;
 }
