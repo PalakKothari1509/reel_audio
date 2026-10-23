@@ -473,34 +473,37 @@ Moral: Naam yaad karo, trusted adult ka number practise karo, aur bichhad jao to
     readyPrompt: '',
   ),
 
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-lost-crowd',
     category: 'Warm lesson',
-    cover: 'Mela Mein Kho Gayi',
-    opening: 'Bheed mein Mumma ka haath chhoot gaya... ab kya?',
-    problem: 'Ria loses her parents\' hand in a crowded fair',
-    lesson: 'Kho jao toh ruk jao, aur sahi insaan se madad maango',
+    cover: 'Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰',
+    opening: 'Bas ek beautiful outfit dekhne aage gayi thi Ria… phir Mumma nahi dikhi! 😰',
+    problem: 'During Diwali shopping, Ria spots a beautiful festive outfit displayed outside a clothing shop. While Mumma is busy checking prices and talking to the shopkeeper, Ria takes a few steps towards the display. When she turns around, she cannot see Mumma in the crowded market.',
+    lesson: 'If a child becomes separated from their parent in a crowded place, they should avoid wandering around searching. They should seek help at a designated, staffed help desk or an appropriate staffed shop counter and follow the family\'s safety plan.',
     postFormat: 'Reel',
-    strategy: '',
-    caption: 'खो जाओ तो रुक जाओ और सुरक्षित adult या मददगार से पूछो। #LostChild #CrowdSafety #ChildSafety #IndianParents #FunLearningWithPalak',
+    strategy: 'Uses a familiar festive-shopping distraction, an emotional turning point when Ria realizes Mumma is gone, and a practical safety lesson — seek help at a staffed help point instead of wandering.',
+    caption: 'Diwali shopping mein bachche beautiful outfits, toys, decorations dekhke distract ho sakte hain. Crowded market mein jaane se pehle unhe batao: "Mumma na dikhein toh safe jagah par ruko aur help maango." Ye simple plan ghar pe practise karo. #DiwaliShopping #ChildSafety #LostChild #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: At mela, Ria can't see Mumma. She stops near a help desk — stays put.
-Twist: A uniformed worker asks: "Kya tumhari mummy dhundh rahi ho?" Ria tells the helper her own name and where she was standing.
-Resolution: In minutes, Mumma rushes over. "Ria! Are you here?" Mumma hugs her tight. "Always hold my hand."
-Moral: Stop, stay, tell — and trust a uniformed helper. कभी स्ट्रेंजर से नहीं, हमेशा मददगार से पूछो।
+Story: Mumma and Ria are shopping in a busy Diwali market. Mumma is checking the price of diyas at a nearby stall. Ria notices a beautiful lehenga displayed at a clothing shop and takes a few steps closer to see its sparkling details. When she turns around, Mumma is no longer visible in the crowd.
+
+Twist: Ria becomes worried and starts looking around. She remembers Mumma's safety rule and stops instead of wandering through the market. She approaches a clearly marked help point or a staffed shop counter and asks for help.
+
+Resolution: The staff member follows the market's child-safety procedure and helps contact Mumma. Mumma reunites with Ria, comforts her, and calmly explains that they will practise their safety plan before future crowded outings.
+
+Moral: Mumma na dikhein toh bheed mein idhar-udhar mat bhaago. Safe help point par madad maango.
 ''',
-    setting: 'Melas at the community center, loudspeakers, 1pm',
-    sceneDetail: 'A red balloon tied to a stroller, drifting away',
-    dialogue: 'Ria tells the helper her own name and where she was standing.',
-    mess: 'The balloon pops against the ceiling fan as she runs',
-    innerThought: 'I told her to hold my sari end, not the balloon string.',
-    endingBeat: 'Ria is reunited with Mumma, says "Main kabhi sirf help desk ke paas rukti hoon."',
+    setting: 'A busy Indian Diwali market in the early evening, with festive clothing displays, shoppers, diya stalls, and warm decorative lights.',
+    sceneDetail: 'Ria admires a beautiful festive lehenga displayed outside a clothing shop while Mumma is briefly occupied at a nearby shopping stall. Ria turns around and realizes she cannot see Mumma.',
+    dialogue: '"Ria, beta, yahin mere paas rehna." "Mumma? Aap kahan ho?" "Mujhe Mumma nahi mil rahi. Please help kariye." "Ria, tum mil gayi! Dar gayi thi na? Chalo, hum apna safety plan phir se yaad karte hain."',
+    mess: 'Ria becomes distracted by the beautiful outfit, moves a few steps away, and then cannot see Mumma in the crowded market.',
+    innerThought: 'Woh bas outfit dekhne ruki thi… aur ab Mumma nazar nahi aa rahi!',
+    endingBeat: 'Ria reunites with Mumma at the designated meeting/help point. Mumma comforts her. End with a clear visual safety reminder: "Bheed mein bichhad jao toh safe jagah par ruko aur help maango."',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
