@@ -33,6 +33,7 @@
 
 import 'content_axes.dart';
 import 'format_handbook.dart';
+import 'master_prompt.dart';
 
   /// The resolution state of an axis, as known to the quality gate.
   ///
@@ -2090,31 +2091,8 @@ class QualityGate {
       );
     }
 
-    // List of banned phrases that indicate AI-generated content
-    const bannedPhrases = [
-      'sharing is caring',
-      'remember kids',
-      'always remember',
-      'in the end',
-      'teaches us',
-      'little ones learn',
-      'gentle reminder',
-      'valuable lesson',
-      'beautiful bond',
-      'such a sweet moment',
-      'and that\'s the magic of childhood',
-      'patience, kindness, and love',
-      'kindness, patience, and love',
-      'love, kindness, and patience',
-      'the magic of',
-      'heartwarming moment',
-      'precious moment',
-      'learning moment',
-      'teachable moment',
-    ];
-
     final foundPhrases = <String>[];
-    for (final phrase in bannedPhrases) {
+    for (final phrase in kBannedStoryPhrases) {
       if (combinedText.contains(phrase)) {
         foundPhrases.add(phrase);
       }
@@ -2127,6 +2105,23 @@ class QualityGate {
         dimension: QualityDimension.creative,
         verdict: GateVerdict.fail,
         reason: 'Banned phrases detected: ${foundPhrases.join(", ")}. These are AI fingerprints — rewrite with specific, filmed moments.',
+      );
+    }
+
+    final foundTokens = <String>[];
+    for (final token in kKnownBadTokens) {
+      if (combinedText.contains(token)) {
+        foundTokens.add(token);
+      }
+    }
+
+    if (foundTokens.isNotEmpty) {
+      return GateCheckResult(
+        id: 'creative.reel.banned_tokens',
+        name: 'No known bad tokens',
+        dimension: QualityDimension.creative,
+        verdict: GateVerdict.fail,
+        reason: 'Known bad tokens detected: ${foundTokens.join(", ")}. Remove typos and non-words.',
       );
     }
 

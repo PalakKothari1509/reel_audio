@@ -129,10 +129,16 @@ class StoryReelBuilder {
   }
 
   List<Character> _resolveCharacters(List<String> names) {
-    return names
+    final resolved = names
         .map((id) => CharacterLibrary.byId(id))
         .whereType<Character>()
         .toList();
+    if (resolved.isEmpty) {
+      return [CharacterLibrary.byId('ria'), CharacterLibrary.byId('rio')]
+          .whereType<Character>()
+          .toList();
+    }
+    return resolved;
   }
 
   ContentPackageV2 _convertToReelPackage(
@@ -236,6 +242,30 @@ String _buildReelPrompt({
   required int segmentCount,
 }) {
   final totalDuration = segmentDuration * segmentCount;
+  final sceneDescriptions = StringBuffer();
+  for (int i = 1; i <= segmentCount; i++) {
+    if (i == 1) {
+      sceneDescriptions.writeln('Scene 1 (${segmentDuration}s): Hook + relatable setup + the real struggle (show, don\'t tell)');
+    } else if (i == segmentCount) {
+      sceneDescriptions.writeln('Scene $i (${segmentDuration}s): The small practical jugaad/solution + warm takeaway');
+    } else {
+      sceneDescriptions.writeln('Scene $i (${segmentDuration}s): Escalation or bridge between struggle and solution');
+    }
+  }
+
+  final slideExamples = StringBuffer();
+  for (int i = 1; i <= segmentCount; i++) {
+    slideExamples.writeln('    {');
+    slideExamples.writeln('      "slideNumber": $i,');
+    slideExamples.writeln('      "headline": "Scene $i heading",');
+    slideExamples.writeln('      "body": "Scene $i content",');
+    slideExamples.writeln('      "imagePrompt": "Detailed visual: characters, action, expression, 3D Pixar style, cream background",');
+    slideExamples.writeln('      "overlayText": "Short overlay for scene $i",');
+    slideExamples.writeln('      "cta": "CTA for scene $i"');
+    slideExamples.write('    }');
+    if (i < segmentCount) slideExamples.writeln(',');
+  }
+
   return '''
 STORY REEL REQUEST:
 
@@ -251,9 +281,7 @@ Tone: $tone
 Format: Vertical 9:16 Reel, $totalDuration seconds total ($segmentCount scenes, each exactly $segmentDuration seconds)
 
 STRUCTURE:
-Scene 1 (${segmentDuration}s): Hook + relatable setup + the real struggle (show, don't tell)
-Scene 2 (${segmentDuration}s): The small practical jugaad/solution + warm takeaway
-
+$sceneDescriptions
 INSTRUCTIONS:
 - Show the real struggle first, then a small realistic adjustment that helps — never perfect parents who solve everything instantly
 - Narration: max 2 lines per scene, short on screen, easy to say in about $segmentDuration seconds
@@ -268,28 +296,13 @@ OUTPUT JSON SCHEMA:
   "bucket": "challenge",
   "hook": "$hook",
   "slides": [
-    {
-      "slideNumber": 1,
-      "headline": "Scene 1 heading",
-      "body": "Scene 1 content — the struggle",
-      "imagePrompt": "Detailed visual: characters, action, expression, 3D Pixar style, cream background",
-      "overlayText": "Short overlay for scene 1",
-      "cta": "CTA for scene 1"
-    },
-    {
-      "slideNumber": 2,
-      "headline": "Scene 2 heading",
-      "body": "Scene 2 content — the solution + takeaway",
-      "imagePrompt": "Detailed visual: characters, action, expression, 3D Pixar style, cream background",
-      "overlayText": "Short overlay for scene 2",
-      "cta": "CTA for scene 2"
-    }
+$slideExamples,
   ],
   "caption": "Hook + idea + CTA + exactly 5 hashtags",
   "hashtags": ["5hashtags", "max12chars", "each", "mixbrand", "bucket"],
   "pinnedComment": "Engagement-driving question",
   "replyComments": ["relatable parent response", "non-parent response", "emoji reaction", "validation", "CTA"],
-  "script": "Full narration for both scenes, timed to ${totalDuration}s total"
+  "script": "Full narration for all $segmentCount scenes, timed to ${totalDuration}s total"
 }
 ''';
 }

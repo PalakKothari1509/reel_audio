@@ -20,10 +20,7 @@ and what to learn from the result.
   left as is. `StoryScreen` includes character selection (chip selector,
   defaults to Ria/Rio/Cuty) passed to `generateEverything()`.
 - **Promotion Comments** — a vault of saved comment lines.
-- **Brand** — character lock for Ria, Rio, Cuty, Mumma, and Papa, with the
-  3D Pixar/Disney visual style injected into every prompt so a character
-  looks the same in every scene. Daadi and Teacher are referenced in ideas
-  but have no approved profiles yet.
+- **Brand** — character lock for eight characters: Ria (pigtails, pink star dress), Rio (blue kurta), Cuty (white bunny, pink bow), Robot (friendly AI), Mumma (yellow kurta, blue jeans), Papa (light blue kurta), Daadi (cream saree), and Teacher (blue kurta with book), with the 3D Pixar/Disney visual style injected into every prompt so characters look identical in every scene.
 
 Not built yet, deliberately: Calendar, Analytics, Experiments. They answer
 questions the data cannot yet support — see `REDESIGN_PLAN2.md`.
@@ -75,7 +72,7 @@ cp lib/secrets.example.dart lib/secrets.dart   # then fill in real keys
 ## Development
 
 ```bash
-flutter test                 # 412 tests
+flutter test                 # ~550 tests (505 unit + 44 widget)
 flutter analyze              # lib/ is clean; tool/ has known warnings
 dart run tool/check_formats.dart
 dart run tool/check_axes.dart

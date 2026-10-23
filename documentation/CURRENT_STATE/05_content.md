@@ -81,7 +81,7 @@ Labels are parsed literally — `Worse:` is the escalation (not aliased to `Reso
 
 ## 2. Built-in Constants (content_ideas.dart)
 
-### kDefaultHooks (93 entries)
+### kDefaultHooks (94 entries)
 
 The master list of all built-in ideas. Categories:
 
@@ -95,7 +95,7 @@ The master list of all built-in ideas. Categories:
 | `Navratri` | 10 | Festival posts | `navratri-*`, `night-before-annual-day` |
 | `Series` | 20 | Robot series | `robot-01`..`robot-20` |
 
-**Total in kDefaultHooks**: 93 entries.
+**Total in kDefaultHooks**: 94 entries (99 including 6 safety hooks via spread).
 
 ### kSafetyHooks (6 entries, content_ideas.dart:184-262)
 

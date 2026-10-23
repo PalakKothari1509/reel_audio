@@ -101,7 +101,10 @@ Video generator: {{VIDEO_GENERATOR}}
 Target duration of spoken narration: Three short narration sections
 that fit their respective 10-second clips.
 Text overlays: Short, readable, high-contrast text suitable for a mobile
-screen. Text is REQUIRED for engagement and sound-off viewing.
+screen. Each part MUST include an "on_screen_text" field specifying what text
+the editor will overlay for sound-off viewing. The video model itself must NOT
+render text — use the on_screen_text field only to inform the editor's
+post-generation overlay.
 
 STORYTELLING RULES:
 A. Start with a strong visual hook — the first three seconds must

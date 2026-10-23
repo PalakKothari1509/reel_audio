@@ -85,7 +85,7 @@ Tests call `setTestDirectory` to redirect all JSON I/O to a temp directory. Prod
 - `updateQualityReport(id, report)` — attaches a quality report
 - `getStatusCounts()` / `getBucketCounts()` — aggregate stats for dashboard
 
-**Quality report storage (legacy):** The `qualityReport` field stores serialized `QualityResult` entries (rule id/name, passed flag, severity index, message, details). On load, `_reportFromJson` rebuilds a `QualityReport` from the saved data, reusing the item's own `ContentPackage` and `formatOutputs` rather than storing them twice. If the report is corrupted, it is dropped rather than crashing the whole library.
+**Quality report storage (legacy):** The `qualityReport` field stores serialized `QualityResult` entries (rule id/name, passed flag, severity index, message, details). On load, `_reportFromJson` rebuilds a `QualityReport` from the saved data, reusing the item's own `ContentPackage` and `formatOutputs` rather than storing them twice. If the report is corrupted, it is dropped rather than crashing the whole library. Severity enum indices are bounds-checked with `clamp()` to prevent `RangeError` on malformed stored data.
 
 **Note:** This uses the old `QualityReport`/`QualityResult` model from `lib/quality_check.dart`, not the newer `QualityReport2` from `quality_check_center.dart`.
 

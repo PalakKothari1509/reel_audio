@@ -28,7 +28,7 @@ Key APIs:
 
 ### 2. Ideas (source: `lib/content_ideas.dart`)
 - `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`, `setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`, `quote`, `detail`, `punchline`, `readyPrompt`
-- `kDefaultHooks` — ~99 built-in ideas including safety hooks (spread in via `...kSafetyHooks`)
+- `kDefaultHooks` — 94 built-in ideas including 6 safety hooks (spread in via `...kSafetyHooks`)
 - `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline)
 - `kSafetyHooks` — 6 Kids Safety ideas (safety-good-touch, safety-stranger, safety-road, safety-emergency-number, safety-lost-crowd, safety-kitchen-line)
 - Categories in `kHookCategories`: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`

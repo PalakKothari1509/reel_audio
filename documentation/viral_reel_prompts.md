@@ -9,7 +9,7 @@ High-converting, viral Reels blueprint for the top 10 strongest story hooks from
 - **Format:** 2 parts of 10 seconds each (20-second combined)
 - **Visual:** 3D Pixar feature-film style
 - **Characters:** Ria (pigtails, pink star dress), Mumma (yellow kurti, jeans)
-- **Text:** High-contrast bold on-screen hooks throughout
+- **Text:** High-contrast bold text overlays are added by the editor after generation — the video model must NOT render text. Each part specifies an "On-Screen Text" section for post-generation overlay.
 
 ---
 
@@ -23,11 +23,11 @@ High-converting, viral Reels blueprint for the top 10 strongest story hooks from
 ```
 3D Pixar animation style, vertical 9:16 aspect ratio. Living room hallway near the door, morning sunlight, shoes scattered. Ria in a sparkly pink star dress and pigtails stubbornly plants her feet, pushing Mumma's hand away with a dramatic pout: "Main khud pehnungi!" Mumma (yellow embroidered kurti, top bun) sighs, steps back, and counts on her fingers: "1, 2, 3, 4, 5." Ria struggles, putting a sneaker on the wrong foot and waddling like a penguin, heel catching the frame. After a funny wiggle, she flips it onto the right foot, beams proudly, and points down: "Dekha? Direct fit!"
 
-On-Screen Text:
+On-Screen Text (for editor overlay, not rendered by model):
 - [0-3s]: "MAIN KHUD PEHNUNGI! 👟😤"
 - [3-7s]: "MOM PATIENCE LEVEL: 100 ⏳"
 - [7-10s]: "WRONG FOOT WADDLE 🐧😂"
-- [10-15s]: "MISSION ACCOMPLISHED! 🎉✨"
+- [10-15s]: "MISSION COMPLETE! 🎉✨"
 - [15-20s]: "PROUD MOMENT 🥹❤️"
 
 Audio/Dialogue (Hinglish):
@@ -38,12 +38,12 @@ Ria triumphant: "Told you! I am a big girl now!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Ria in pink star dress pushes Mumma's hand away at the front door, shouting "Main khud!" Text on screen: "MAIN KHUD! 👟😤" and "MOM PATIENCE LEVEL: 100 ⏳". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
+3D Pixar style, 9:16. Ria in pink star dress pushes Mumma's hand away at the front door, shouting "Main khud!" On-Screen Text (editor overlay, not rendered by model): "MAIN KHUD! 👟😤", "MOM PATIENCE LEVEL: 100 ⏳", "WRONG FOOT WADDLE 🐧😂", "MISSION COMPLETE! 🎉✨". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:9. Continuing from shoe struggle: Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. Text on screen: "WRONG FOOT WADDLE 🐧😂" then "MISSION ACCOMPLISHED! 🎉✨". Ria stands tall showing both shoes tied, Mumma claps proudly in background. Energetic comedic payoff.
+3D Pixar style, 9:16. Continuing from shoe struggle: Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. On-Screen Text (editor overlay, not rendered by model): "WRONG FOOT WADDLE 🐧😂", "MISSION COMPLETE! 🎉✨". Ria stands tall showing both shoes tied, Mumma claps proudly in background. Energetic comedic payoff.
 ```
 
 ---
@@ -73,12 +73,12 @@ Ria whispers: "Theek hai... bye bye cartoon!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Living room evening. TV suddenly shuts off mid-cartoon. Toddler Ria drops dramatically to her knees, hands on cheeks shouting "Bas 5 minute aur!". Text on screen: "TV BAND = DUNIYA KHATAM?! 📺😱" and "BAS 5 MINUTE AUR! 😭✋". Mumma on couch holds up two fingers calmly setting a timer. Hinglish dialogue.
+3D Pixar style, 9:16. Living room evening. TV suddenly shuts off mid-cartoon. Toddler Ria drops dramatically to her knees, hands on cheeks shouting "Bas 5 minute aur!". Text on screen (editor overlay, model does NOT render): "TV BAND = DUNIYA KHATAM?! 📺😱" and "BAS 5 MINUTE AUR! 😭✋". Mumma on couch holds up two fingers calmly setting a timer. Hinglish dialogue.
 ```
 
 ### Part 2 (0-20s)
 ```
-3D Pixar style, 9:16. Ria negotiates holding up 1 finger: "Sirf ek minute!". Text on screen: "NEGOTIATION MASTER 🧠🤝" then "THE TIMER TRICK ⏳". Ria watches the visual timer tick, blows a dramatic kiss to the TV, and hands remote to Mumma. Cute ending beat.
+3D Pixar style, 9:16. Ria negotiates holding up 1 finger: "Sirf ek minute!". Text on screen (editor overlay, model does NOT render): "NEGOTIATION MASTER 🧠🤝" then "THE TIMER TRICK ⏳". Ria watches the visual timer tick, blows a dramatic kiss to the TV, and hands remote to Mumma. Cute ending beat.
 ```
 
 ---
@@ -109,12 +109,12 @@ Soft cartoon crunching sounds from Cuty.
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Kitchen counter. Mumma holds chocolate away saying no. Ria instantly starts negotiating with hand gestures: "Kal se diet shuru!". Rio drops dramatically to the floor face-down. Text on screen: "MUMMA SAID NO! 🚨🙅‍♀️" and "THE NEGOTIATOR VS DRAMA KING 😂". Fast comedic cuts.
+3D Pixar style, 9:16. Kitchen counter. Mumma holds chocolate away saying no. Ria instantly starts negotiating with hand gestures: "Kal se diet shuru!". Rio drops dramatically to the floor face-down. Text on screen (editor overlay, model does NOT render): "MUMMA SAID NO! 🚨🙅‍♀️" and "THE NEGOTIATOR VS DRAMA KING 😂". Fast comedic cuts.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Close up of Cuty the white bunny unbothered, happily chewing a carrot while chaos surrounds him. Text on screen: "CUTY DOESN'T CARE 🐰🥕" then "WHICH KID IS YOURS? 👇😂". Mumma hugs both kids, handing an apple. Funny domestic family ending.
+3D Pixar style, 9:16. Close up of Cuty the white bunny unbothered, happily chewing a carrot while chaos surrounds him. Text on screen (editor overlay, model does NOT render): "CUTY DOESN'T CARE 🐰🥕" then "WHICH KID IS YOURS? 👇😂". Mumma hugs both kids, handing an apple. Funny domestic family ending.
 ```
 
 ---
@@ -143,12 +143,12 @@ Mumma sighing playfully: "Teddy paani nahi peeta beta!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Dim bedroom. Room lights go off. Ria pops out of the blanket holding empty tumbler: "Mumma, ek aur paani!". Text on screen: "LIGHTS OFF = EXCUSES 💡😴" and "MUMMA, EK AUR PAANI! 🥛👀". Mumma brings water, Ria sips then points to Teddy.
+3D Pixar style, 9:16. Dim bedroom. Room lights go off. Ria pops out of the blanket holding empty tumbler: "Mumma, ek aur paani!". Text on screen (editor overlay, model does NOT render): "LIGHTS OFF = EXCUSES 💡😴" and "MUMMA, EK AUR PAANI! 🥛👀". Mumma brings water, Ria sips then points to Teddy.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Ria dramatically pretends Teddy is asking for water and cuddles too. Text on screen: "TEDDY IS THIRSTY TOO?! 🧸" then "MOM WON THIS ROUND 🏆🛌". Mumma tucks both Ria and Teddy in with a bedside cup. Ria snuggles down to sleep.
+3D Pixar style, 9:16. Ria dramatically pretends Teddy is asking for water and cuddles too. Text on screen (editor overlay, model does NOT render): "TEDDY IS THIRSTY TOO?! 🧸" then "MOM WON THIS ROUND 🏆🛌". Mumma tucks both Ria and Teddy in with a bedside cup. Ria snuggles down to sleep.
 ```
 
 ---
@@ -179,12 +179,12 @@ Rio: "Magic finger!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Parking lot. Mumma calls "Rio, mat bhaago!". Rio sprints twice as fast with huge mischievous grin. Text on screen: "MOM: 'MAT BHAAGO!' 🏃💨" and "HE HEARD: RUN FASTER! 😂". Mumma realizes shouting isn't working and kneels down.
+3D Pixar style, 9:16. Parking lot. Mumma calls "Rio, mat bhaago!". Rio sprints twice as fast with huge mischievous grin. Text on screen (editor overlay, model does NOT render): "MOM: 'MAT BHAAGO!' 🏃💨" and "HE HEARD: RUN FASTER! 😂". Mumma realizes shouting isn't working and kneels down.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Mumma extends her finger calmly: "Rio, magic ungli pakdo!". Text on screen: "THE PARENTING HACK THAT WORKS 💡" then "'MERI UNGLI PAKDO' 🤝✨". Rio skids to a stop, trots back, grabs her finger and walks peacefully.
+3D Pixar style, 9:16. Mumma extends her finger calmly: "Rio, magic ungli pakdo!". Text on screen (editor overlay, model does NOT render): "THE PARENTING HACK THAT WORKS 💡" then "'MERI UNGLI PAKDO' 🤝✨". Rio skids to a stop, trots back, grabs her finger and walks peacefully.
 ```
 
 ---
@@ -215,12 +215,12 @@ Mumma gasps and laughs: "Hai Bhagwan!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Mumma enjoying tea in quiet living room. Clock ticks ominously. Text on screen: "2 MINUTES OF SILENCE... 🤫" then "EVERY MOM KNOWS THIS FEAR 😰". Mumma drops mug, spots white flour paw prints leading to kitchen, and creeps forward in suspense.
+3D Pixar style, 9:16. Mumma enjoying tea in quiet living room. Clock ticks ominously. Text on screen (editor overlay, model does NOT render): "2 MINUTES OF SILENCE... 🤫" then "EVERY MOM KNOWS THIS FEAR 😰". Mumma drops mug, spots white flour paw prints leading to kitchen, and creeps forward in suspense.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Kitchen reveal! Ria and Rio covered in white atta powder building an indoor flour snowman. Cuty dusted white like a powdered donut. Text on screen: "THE KITCHEN DISASTER! ⛄🍞" then "TAG A MOM WHO HAS LIVED THIS 😂". Mumma facepalms in hilarious disbelief.
+3D Pixar style, 9:16. Kitchen reveal! Ria and Rio covered in white atta powder building an indoor flour snowman. Cuty dusted white like a powdered donut. Text on screen (editor overlay, model does NOT render): "THE KITCHEN DISASTER! ⛄🍞" then "TAG A MOM WHO HAS LIVED THIS 😂". Mumma facepalms in hilarious disbelief.
 ```
 
 ---
@@ -252,12 +252,12 @@ Ria & Rio laughing hysterically.
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Mumma splits a cookie in half. Ria stares in horror with trembling lips, tears in eyes like world ended. Text on screen: "MUMMA BREAKS BISCUIT... 🍪💔" and "OSCAR LEVEL DRAMA 😭🎭". Rio steps in wearing plastic doctor stethoscope declaring he will fix it.
+3D Pixar style, 9:16. Mumma splits a cookie in half. Ria stares in horror with trembling lips, tears in eyes like world ended. Text on screen (editor overlay, model does NOT render): "MUMMA BREAKS BISCUIT... 🍪💔" and "OSCAR LEVEL DRAMA 😭🎭". Rio steps in wearing plastic doctor stethoscope declaring he will fix it.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Rio dips broken biscuit in warm milk trying to glue it together. Cuty hops over and munches the middle seam! Text on screen: "MILK GLUE JUGAAD 😂🥛" then "CUTY ATE THE FIX! 🐰". Both toddlers look stunned and erupt in pure joy and giggles.
+3D Pixar style, 9:16. Rio dips broken biscuit in warm milk trying to glue it together. Cuty hops over and munches the middle seam! Text on screen (editor overlay, model does NOT render): "MILK GLUE JUGAAD 😂🥛" then "CUTY ATE THE FIX! 🐰". Both toddlers look stunned and erupt in pure joy and giggles.
 ```
 
 ---
@@ -288,12 +288,12 @@ Ria smiles: "High-five!"
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Living room. Visiting relative asks for a forced hug. Ria frowns, stepping behind Mumma saying "Nahi chahiye". Text on screen: "'EK PAPPI DO BETA...' 🙅‍♀️❌" and "BACHCHE KO 'NO' BOLNE DO ✋". Mumma gently stands between them protecting Ria's comfort.
+3D Pixar style, 9:16. Living room. Visiting relative asks for a forced hug. Ria frowns, stepping behind Mumma saying "Nahi chahiye". Text on screen (editor overlay, model does NOT render): "'EK PAPPI DO BETA...' 🙅‍♀️❌" and "BACHCHE KO 'NO' BOLNE DO ✋". Mumma gently stands between them protecting Ria's comfort.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Mumma validates Ria: "High-five ya wave — tumhari marzi!". Text on screen: "OFFER OPTIONS: HIGH-FIVE! 🙏" then "RESPECT THEIR BOUNDARIES 🛡️❤️". Ria gives an energetic high-five, everyone smiles with mutual respect.
+3D Pixar style, 9:16. Mumma validates Ria: "High-five ya wave — tumhari marzi!". Text on screen (editor overlay, model does NOT render): "OFFER OPTIONS: HIGH-FIVE! 🙏" then "RESPECT THEIR BOUNDARIES 🛡️❤️". Ria gives an energetic high-five, everyone smiles with mutual respect.
 ```
 
 ---
@@ -323,12 +323,12 @@ Cute comedic baby shout.
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Comedic math equation cuts. Rio sits with chalkboard background. Holding 1 biscuit with poker face, then 2 biscuits looking even hungrier. Text on screen: "TODDLER MATH 101 📐🤓" then "1 BISCUIT = HUNGRY 🍪" and "2 BISCUITS = STILL HUNGRY 🍪🍪". Meme sound effects.
+3D Pixar style, 9:16. Comedic math equation cuts. Rio sits with chalkboard background. Holding 1 biscuit with poker face, then 2 biscuits looking even hungrier. Text on screen (editor overlay, model does NOT render): "TODDLER MATH 101 📐🤓" then "1 BISCUIT = HUNGRY 🍪" and "2 BISCUITS = STILL HUNGRY 🍪🍪". Meme sound effects.
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Rio throws his hands in the air screaming "MUMMA AUR CHAHIYE!". Text on screen: "3 BISCUITS = MUMMA MOOORE! 🚨😂" then "EXACT SCIENCE IN EVERY HOME 😭". Pan to Cuty the bunny chewing 1 carrot calmly. High replayability humor.
+3D Pixar style, 9:16. Rio throws his hands in the air screaming "MUMMA AUR CHAHIYE!". Text on screen (editor overlay, model does NOT render): "3 BISCUITS = MUMMA MOOORE! 🚨😂" then "EXACT SCIENCE IN EVERY HOME 😭". Pan to Cuty the bunny chewing 1 carrot calmly. High replayability humor.
 ```
 
 ---
@@ -358,12 +358,12 @@ Toddler giggles and footsteps running away.
 
 ### Part 1 (0-10s)
 ```
-3D Pixar style, 9:16. Quick relatable cuts. Mumma tells Ria to put shoes on; Ria says "coming!" while dancing barefoot. Cut to Mumma asking where the water bottle is while Rio sits directly on it. Text on screen: "MUMMA SAYS 100× A DAY 🗣️🔁" and "'PUT YOUR SHOES ON!' 👟 (STILL BAREFOOT)".
+3D Pixar style, 9:16. Quick relatable cuts. Mumma tells Ria to put shoes on; Ria says "coming!" while dancing barefoot. Cut to Mumma asking where the water bottle is while Rio sits directly on it. Text on screen (editor overlay, model does NOT render): "MUMMA SAYS 100× A DAY 🗣️🔁" and "'PUT YOUR SHOES ON!' 👟 (STILL BAREFOOT)".
 ```
 
 ### Part 2 (10-20s)
 ```
-3D Pixar style, 9:16. Mumma calls softly "Idhar aao beta..." — nothing. Mumma shouts playfully "COME HERE NOW!" — Ria and Rio zoom past like lightning bolts laughing. Text on screen: "'COME HERE!' ... 'COME HEREEE!' 🏃💨" then "TAG A MUMMA WHO GETS THIS 👇🤣". Relatable mom life ending.
+3D Pixar style, 9:16. Mumma calls softly "Idhar aao beta..." — nothing. Mumma shouts playfully "COME HERE NOW!" — Ria and Rio zoom past like lightning bolts laughing. Text on screen (editor overlay, model does NOT render): "'COME HERE!' ... 'COME HEREEE!' 🏃💨" then "TAG A MUMMA WHO GETS THIS 👇🤣". Relatable mom life ending.
 ```
 
 ---

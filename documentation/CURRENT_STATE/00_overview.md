@@ -27,7 +27,7 @@
 
 1. **Callback-driven shell**: `ContentStudioHome` (main navigation) delegates to `ContentStudioScreens` via callbacks (`onCreateReel`, `onContentLibrary`, `onAddNewIdea`, etc.). Screens don't know about each other.
 2. **Offline-first persistence**: All data via `JsonFileStore<T>` — generic JSON file store with per-row decoding and safe defaults. Files live in `getApplicationDocumentsDirectory()/content_library/`.
-3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 99 built-in ideas (including 6 safety hooks). `HookStore` merges user edits from `hooks.json`. Rewrites are embedded inline in `storyDetail` fields; `kRewrittenStories` and `kMomentUpgrades` have been merged into inline fields and deleted.
+3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 94 built-in ideas (including 6 safety hooks via `...kSafetyHooks` spread, totaling 100 entries). `HookStore` merges user edits from `hooks.json`. Rewrites are embedded inline in `storyDetail` fields; `kRewrittenStories` and `kMomentUpgrades` have been merged into inline fields and deleted.
 4. **Two Gemini paths**: Path A (`gemini_call.dart`) — raw HTTP with retry/fallback; Path B (`gemini_client.dart`) — SDK-based, no retry/fallback (see 04_generation.md §5)
 5. **Story label parsing**: `StoryGenerator.extractLine()` parses `Story:`, `Twist:`, `Resolution:`, `Moral:` labels (with `PART 1:` fallback).
 

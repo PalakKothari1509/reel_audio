@@ -182,7 +182,9 @@ class ContentLibraryItem {
             id: m['ruleId'] as String? ?? '',
             name: m['ruleName'] as String? ?? '',
             description: m['details'] as String? ?? '',
-            severity: QualitySeverity.values[(m['severity'] as num?)?.toInt() ?? 0],
+            severity: QualitySeverity.values.elementAt(
+              ((m['severity'] as num?)?.toInt() ?? 0).clamp(0, QualitySeverity.values.length - 1),
+            ),
             check: (_, _) => true,
             fixSuggestion: (_) => m['details'] as String?,
           ),

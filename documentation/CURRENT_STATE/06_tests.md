@@ -1,7 +1,6 @@
 # 06 — Tests
 
-Inventory of the 40 test files in `test/`. `flutter test` reports 499 tests passing
-(verified by running `flutter test`).
+Inventory of the 40 test files in `test/` (505 unit `test()` + 44 widget `testWidgets()` = ~549 total).
 
 ## Coverage map
 
