@@ -365,34 +365,34 @@ Moral: Body autonomy starts with a simple "no thank you" — and adults who resp
     readyPrompt: '',
   ),
 
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-stranger',
     category: 'Warm lesson',
-    cover: 'Chocolate Nahi!',
-    opening: 'Park mein aunty ne chocolate di... Ria ne kya kiya?',
-    problem: 'A person Ria does not know offers her a chocolate at the park',
-    lesson: 'Jo hume nahi jaanta, uske saath nahi jaate',
+    cover: 'Chocolate Ke Badle Kya? 🍫',
+    opening: 'Park mein ek anjaan aadmi ne Ria ko chocolate di… Ria kya karegi?',
+    problem: 'An unknown adult offers Ria chocolate and asks her to go with him for more, without Mumma\'s permission.',
+    lesson: 'Do not accept unexpected treats or go anywhere with someone without your trusted adult\'s permission. Say "Nahi, thank you" if safe. Move away and immediately tell a trusted adult. If the adult persists or you cannot find your trusted adult, seek help from a safe, staffed place or another trusted adult. Unsafe behaviour can come from familiar people too — not every stranger is dangerous, and not every familiar person is safe.',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'जो हम नहीं जानते, उनसे कुछ नहीं लेना सीखाएं। पहले हमेशा मम्मी या पापा के पास चले आओ। #StrangerSafety #ChildSafety #SafetyTips #IndianParents #FunLearningWithPalak',
+    caption: 'अनजान व्यक्ति chocolate देकर बुलाए तो "नहीं, पहले मम्मी से पूछूँगी" कहकर दूर हट जाओ। फ़ौरन मम्मी, पापा या टीचर को बताओ। कोई पीछा करे तो सुरक्षित जगह या दूसरे भरोसेमंद adult के पास जाओ। हर अनजान खतरनाक नहीं, पर हर जानकार भी सुरक्षित नहीं। #StrangerSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: At park, stranger offers Ria chocolate: "Mere saath chalo, aur milegi."
-Twist: Ria takes two steps back: "Mumma!" She runs to Mumma and tells her everything.
-Resolution: Mumma thanks Ria for telling her right away. They practice saying no to strangers.
-Moral: "Mere saath chalo" — but only with people you know and trust. पहले परिवार वालों को बताओ।
+Story: At the society park, a man Ria doesn't know offers her chocolate and says, "Mere saath chalo, aur chocolate milegi." Ria remembers Mumma's rule.
+Twist: Ria says, "Nahi, main Mumma se poochhe bina nahi loongi." She moves away instead of following him.
+Resolution: Ria goes straight to Mumma and explains what happened. Mumma praises her for coming to tell her and explains that she should never leave with anyone without permission, even if she knows that person.
+Moral: Pehle trusted adult se poochho. Unsafe lage toh door jao aur help maango.
 ''',
     setting: 'Society park, evening, strangers nearby',
     sceneDetail: 'A man offering a wrapped chocolate bar to Ria',
-    dialogue: '"Mere saath chalo, aur milegi."',
-    mess: 'The stranger persists, taking two steps closer as Ria looks for Mumma',
-    innerThought: 'My code-word only works if I teach it before the moment arrives.',
-    endingBeat: 'Ria runs to Mumma: "Mumma! Stranger ne chocolate di!"',
+    dialogue: '"Mere saath chalo, aur chocolate milegi." "Nahi, main Mumma se poochhe bina nahi loongi."',
+    mess: 'The man takes a step closer, waiting — Ria takes two steps back, looking toward Mumma',
+    innerThought: 'Ria remembers the rule: ask a trusted adult before taking anything or going anywhere.',
+    endingBeat: 'Ria runs to Mumma: "Mumma! Anjaan uncle ne chocolate di, maine mana kar diya." Mumma hugs her: "Bahut badhiya kiya beta."',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
