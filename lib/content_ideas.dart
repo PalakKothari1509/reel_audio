@@ -329,34 +329,34 @@ const kHookCategories = [
 /// Each carries a full storyDetail with the Story/Twist/Resolution/Moral
 /// labels the offline generator expects.
 const kSafetyHooks = <HookIdea>[
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-good-touch',
     category: 'Warm lesson',
     cover: 'Meri Marzi!',
-    opening: 'Uncle bole "Ek pappi do"... aur Ria ne bola nahi.',
-    problem: 'A relative asks for a hug and a kiss, and Ria does not want to',
-    lesson: 'Bachche ko "nahi" kehne ka haq hai, aur bade ko sunna chahiye',
+    opening: 'Ria ne sabke saamne Uncle ko mana kar diya! 😳',
+    problem: 'A relative insists on a hug and kiss, but Ria does not want to — and the adults are watching.',
+    lesson: 'Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai.',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत मम्मी या पापा के पास चला जाओ। पहले हमेशा परिवार वाले को बताओ। #ChildSafety #GoodTouchBadTouch #SafetyFirst #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत किसी भरोसेमंद adult (मम्मी, पापा, टीचर) के पास जाओ। अगर पहली बार कोई न सुने, तो दुबारा बोलो — तब तक बोलो जब तक कोई मदद न करे। #ChildSafety #GoodTouchBadTouch #BodyAutonomy #IndianParents #FunLearningWithPalak',
+    pinnedComment: 'क्या बाचों को relatives को hug करने के लिए force करना चाहिए?',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: At Daadi's house, an uncle opens his arms: "Ria, hug?" Ria hides behind Mumma: "Nahi, mujhe hug nahi chahiye."
-Twist: Mumma: "Theek hai. Wave, high-five, ya kuch bhi nahi—Ria choose karegi." Ria gives a small wave from beside Mumma.
-Resolution: Uncle smiles: "Wave bhi accha hai." End card: "Aap hug ke bina bhi pyaar dikha sakte ho."
-Moral: Body autonomy starts with a simple "no thank you."
+Story: At Daadi's house, relatives gather. Uncle opens his arms: "Ria, hug? Ek pappi toh banti hai!" Ria feels the pressure — everyone's eyes are on her. She steps back, hides behind Mumma: "Nahi, mujhe hug nahi chahiye."
+Twist: An aunt insists: "Arre beta, itna bhi kya sharm? Uncle pyaar karte hain!" Mumma steps in calmly: "Beta, Ria ne mana kiya. Uske liye kaafi hai." Mumma turns to Ria: "Wave, high-five, ya kuch bhi nahi — tum choose karo." Ria gives a small wave from beside Mumma, shoulders relaxing.
+Resolution: Uncle smiles: "Wave bhi accha hai." End card: "Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai."
+Moral: Body autonomy starts with a simple "no thank you" — and adults who respect it.
 ''',
-    setting: 'Daadi\'s living room, afternoon light streaming through the window',
-    sceneDetail: 'An uncle with open arms reaching toward Ria, who hides behind Mumma',
-    dialogue: '"Ria, hug?" "Nahi, mujhe hug nahi chahiye."',
-    mess: 'Ria shrinks back, uncle extends arms again — the moment hangs',
-    innerThought: 'I need to explain consent without scaring her of all touch.',
-    endingBeat: 'Uncle smiles: "Wave bhi accha hai." Ria waves timidly from beside Mumma.',
+    setting: 'Daadi\'s living room, afternoon light, family gathering',
+    sceneDetail: 'Uncle with open arms, Ria hiding behind Mumma\'s saree, aunt leaning in with expectant smile',
+    dialogue: '"Ria, hug? Ek pappi toh banti hai!" "Nahi, mujhe hug nahi chahiye."',
+    mess: 'Relatives keep insisting — "Arre beta, itna bhi kya sharm?" — the pressure builds',
+    innerThought: 'I need to show Ria that her "no" has power, without making her fear all touch.',
+    endingBeat: 'Uncle accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
     defaultCast: ['Ria', 'Mumma', 'Daadi', 'Uncle'],
     keepMoralOffScreen: false,
     quote: '',
