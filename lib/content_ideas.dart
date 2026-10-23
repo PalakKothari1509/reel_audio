@@ -313,7 +313,7 @@ const kSafetyHooks = <HookIdea>[
     lesson: 'Bachche ko "nahi" kehne ka haq hai, aur bade ko sunna chahiye',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत मम्मी या पापा के पास चला जाओ। Family code word तय करें — अगर कोई पूछे, तो कहें "मम्मी ने कहा था!" कभी भी अपना number न दिखाएं। #ChildSafety #GoodTouchBadTouch #SafetyFirst #IndianParents #FunLearningWithPalak',
+    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत मम्मी या पापा के पास चला जाओ। पहले हमेशा परिवार वाले को बताओ। #ChildSafety #GoodTouchBadTouch #SafetyFirst #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
@@ -348,7 +348,7 @@ Moral: Body autonomy starts with a simple "no thank you."
     lesson: 'Jo hume nahi jaanta, uske saath nahi jaate',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'जो हम नहीं जानते, उनसे कुछ नहीं लेना सीखाएं। Family code word: अगर कोई दावा करे या पूछे तो कोड शब्द बताओ। #StrangerSafety #ChildSafety #SafetyTips #IndianParents #FunLearningWithPalak',
+    caption: 'जो हम नहीं जानते, उनसे कुछ नहीं लेना सीखाएं। पहले हमेशा मम्मी या पापा के पास चले आओ। #StrangerSafety #ChildSafety #SafetyTips #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
@@ -356,9 +356,9 @@ Moral: Body autonomy starts with a simple "no thank you."
     archived: false,
     storyDetail: '''
 Story: At park, stranger offers Ria chocolate: "Mere saath chalo, aur milegi."
-Twist: Ria takes two steps back: "Mumma!" She remembers the family code word: "Mumma ne kaha tha!"
-Resolution: Mumma runs over. They practice saying no, staying with trusted adult. Code word confirmed.
-Moral: "Mere saath chalo" — but only with people you know and trust.
+Twist: Ria takes two steps back: "Mumma!" She runs to Mumma and tells her everything.
+Resolution: Mumma thanks Ria for telling her right away. They practice saying no to strangers.
+Moral: "Mere saath chalo" — but only with people you know and trust. पहले परिवार वालों को बताओ।
 ''',
     setting: 'Society compound gate, evening, street light flickers',
     sceneDetail: 'A man in a grey shirt offers a yellow flower',
@@ -383,7 +383,7 @@ Moral: "Mere saath chalo" — but only with people you know and trust.
     lesson: 'Red light, green light ka khel ghar par seekho',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'सड़क पार करते समय हमेशा adult के साथ चलें। Family code word: अगर कोई मदद पूछे तो कहें कोड शब्द। #RoadSafety #ChildSafety #CrossingSafety #IndianParents #FunLearningWithPalak',
+    caption: 'सड़क पार करते समय हमेशा adult के साथ चलें। कभी सड़क पर न जाएँ, बिना बुलाए। #RoadSafety #ChildSafety #CrossingSafety #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
@@ -418,7 +418,7 @@ Moral: Khel mein seekha — sadak par bhi kaam aayega.
     lesson: 'Gaane mein yaad karna aasaan hota hai',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'घर में एक family code word रखें — सिर्फ़ परिवार जानता है। कभी भी real emergency number न दिखाएं, बस code word से सुरक्षित रहें। #EmergencySafety #ChildSafety #SafetyTip #IndianParents #FunLearningWithPalak',
+    caption: 'अपना नाम और नंबर याद रखें — लेकिन कोई गुमनाम बातों में नम्बर न दें। हमेशा परिवार वाले या पुलिस के पास जाएं। #EmergencySafety #ChildSafety #SafetyTip #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
@@ -453,25 +453,25 @@ Moral: Name pehle, number baad mein — safety starts with identity.
     lesson: 'Kho jao toh ruk jao, aur sahi insaan se madad maango',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'खो जाओ तो रुक जाओ और सुरक्षित adult से मदद माँगो। Family code word: अगर कोई पूछे तो कहें "मम्मी ने सिखाया था!" #LostChild #CrowdSafety #ChildSafety #IndianParents #FunLearningWithPalak',
+    caption: 'खो जाओ तो रुक जाओ और सुरक्षित adult या मददगार से पूछो। हमेशा पूछें: "मम्मी मुझे ले आओंगी!" #LostChild #CrowdSafety #ChildSafety #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: At mela, Ria can't see Mumma. She stops near the help desk — stays put.
-Twist: She tells a uniformed worker: "Mera naam Ria hai. Mumma kho gayi hain." Worker nods, radios for help.
-Resolution: In minutes, Mumma rushes over. "Family code word?" Ria: "Chocolate!" Mumma hugs her.
-Moral: Stop, stay, tell — and trust a uniformed helper.
+Story: At mela, Ria can't see Mumma. She stops near a help desk — stays put.
+Twist: A uniformed worker asks: "Kya tumhari mummy dhundh rahi ho?" Ria: "Mera naam Ria hai, mummy kho gayi hain." Worker nods, radios for help.
+Resolution: In minutes, Mumma rushes over. "Ria! Are you here?" Mumma hugs her tight. "Always hold my hand."
+Moral: Stop, stay, tell — and trust a uniformed helper. कभी स्ट्रेंजर से नहीं, हमेशा मददगार से पूछो।
 ''',
     setting: 'Melas at the community center, loudspeakers, 1pm',
     sceneDetail: 'A red balloon tied to a stroller, drifting away',
     dialogue: '"Mumma? Mumma? MUMMA!"',
     mess: 'The balloon pops against the ceiling fan as she runs',
     innerThought: 'I told her to hold my sari end, not the balloon string.',
-    endingBeat: 'Rio sits on a bench, holding a deflated balloon, crying softly.',
-    defaultCast: ['Rio', 'Mumma', 'Daadi'],
+    endingBeat: 'Ria hugs Mumma tight, says "Main kabhi sirf help desk ke paas rukti hoon."',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -488,7 +488,7 @@ Moral: Stop, stay, tell — and trust a uniformed helper.
     lesson: 'Garam jagah ke liye ek clear line banao',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'गर्म जगह के पास न जाना — लाल line हमेशा मानें। Family code word: अगर कोई मदद करना चाहे तो कोड शब्द बताओ। #KitchenSafety #ChildSafety #SafetyFirst #IndianParents #FunLearningWithPalak',
+    caption: 'गर्म जगह के पास न जाना — लाल line हमेशा मानें। कभी घंटे में न जाएँ, बिना बुलाए मम्मी या पापा से पूछें। #KitchenSafety #ChildSafety #SafetyFirst #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
@@ -679,12 +679,12 @@ Twist: Ria makes a "Cuty rescue basket" — they clear just one path, then spot 
 Resolution: Rio whispers, "Hum poora room saaf karne aaye the?" Ria: "Shhh, patient so raha hai."
 Moral: Ek chhota sa raasta bhi bada madad karta hai.
 ''',
-    setting: 'Dining room table, morning sunlight, breakfast plates',
-    sceneDetail: 'A single broken spaghetti strand on Cuty\'s bib',
-    dialogue: '"Arre Ram! Cuty ne poori tarah se tod di!"',
-    mess: 'Cuty looks confused, the pieces are everywhere',
-    innerThought: 'This is why I keep backup plates.',
-    endingBeat: 'Rio picks up one piece and says "Cuty fix?", then they all help.',
+    setting: 'Living room floor, morning sunlight through window',
+    sceneDetail: 'Toys scattered everywhere, one clear path leads to the couch',
+    dialogue: '"Cuty kahan gaya?!" "Arre Ram! Yahan se kitna bhi ghusaaye..."',
+    mess: 'Rio starts playing with blocks mid-search, Ria redirects him to clearing one path',
+    innerThought: 'One path at a time — we can do this.',
+    endingBeat: 'Rio spots Cuty under a blanket, they both tiptoe to rescue her quietly.',
     defaultCast: ['Rio', 'Cuty', 'Ria'],
     keepMoralOffScreen: false,
     quote: '',
@@ -990,37 +990,37 @@ Audio/Dialogue (Hinglish): Mom firm: "Chocolate nahi beta." Ria pleading: "Bas e
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Ria: "Mujhe neend nahi!" She sits bolt-upright mid-story. Yawns so wide Mumma sees the toy car she swallowed at dinner.
-Twist: Halfway through page two, Ria's eye flutters. "Evidence mil gaya." She pats her chest where the car is. Mumma: "Car safa niklega kal subah."
-Resolution: Mumma tucks the blanket just around Ria's shoulders. By page three she's breathing even. The car stays inside.
-Moral:
+Story: "Mujhe neend nahi!" Ria sits bolt upright mid-storybook, legs kicking. "EK AUR PAGE!"
+Twist: Halfway through page two, her eyelids grow heavy. She pats the pillow: "Thoda aur?"
+Resolution: Mumma tucks the blanket just around Ria's shoulders. Ria finishes the last page snoring softly.
+Moral: Protest se pyaar milta hai, aur mamma ke saath kahani khatam hoti hai.
 ''',
-    setting: 'Bathroom, evening, toothpaste half-squeezed',
-    sceneDetail: 'The toothbrush has toothpaste dried in the bristles',
-    dialogue: '"Rio, brush karo. Nahi toh daant kholenge!"',
-    mess: 'Rio is using Mumma\'s toothbrush to "paint" the mirror',
-    innerThought: 'I should have bought a second toothbrush years ago.',
-    endingBeat: 'Mumma swaps the brush, Rio brushes properly, mirror is clean.',
-    defaultCast: ['Rio', 'Mumma'],
+    setting: 'Living room couch, evening, storybook on Mumma lap',
+    sceneDetail: 'Dim lamp casts warm glow, storybook half-open',
+    dialogue: '"Mujhe neend nahi!" "Ek aur page?"',
+    mess: 'Ria kicks blanket off, Mumma tucks it back three times',
+    innerThought: 'Five more minutes feels like five more worlds.',
+    endingBeat: 'Ria snuggles into Mumma, book still open, both quiet.',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
     punchline: '',
     readyPrompt: '''
-PROMPT: 3D Pixar animation style, vertical 9:16. Cozy living room couch, dim lamp, half-read storybook on Mumma's lap. Ria (pajamas, hair messy) sits bolt upright: "Mujhe neend nahi!" Yawns comically wide, Mumma spots a toy car she swallowed at dinner. Text on screen: "NEEND KA EVIDENCE 🔍" "PROTEST • DETECT • RESOLVE"
+PROMPT: 3D Pixar animation style, vertical 9:16. Cozy living room couch, dim lamp, half-read storybook on Mumma's lap. Ria (pajamas, hair messy) sits bolt upright: "Mujhe neend nahi!" Yawns, then pats the pillow: "Thoda aur?" Text on screen: "NEEND KA EVIDENCE" "PROTEST • DETECT • RESOLVE"
 
 On-Screen Text:
-- [0-3s]: "NEEND KA EVIDENCE 🔍"
+- [0-3s]: "NEEND KA EVIDENCE"
 - [3-8s]: "PROTEST: 'MUJHE NEEND NHI!' 🛏️"
-- [8-13s]: "DETECT: TOY CAR IN THROAT! 🚗👨‍⚕️"
+- [8-13s]: "DETECT: EYELIDS HEAVY 😴"
 - [13-17s]: "RESOLVE: BLANKET TUCK STRATEGY ✨"
 - [17-20s]: "SLEEP HACKS > POWER STRUGGLES 💤"
 
-Part 1 (0-10s): 3D Pixar style, 9:16. Ria dramatically protests sleep, sits bolt upright mid-story, yawns so wide you can see the toy car. Mumma's eyes widen with realization. Text: "NEEND KA EVIDENCE 🔍" "PROTEST: 'MUJHE NEEND NHI!'". Ria: "Mujhe neend nahi!" Mumma: "Evidence mil gaya."
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria dramatically protests sleep, sits bolt upright mid-story, kicks blanket off. Mumma's eyes twinkle with amusement. Text: "NEEND KA EVIDENCE" "PROTEST: 'MUJHE NEEND NHI!'". Ria: "Mujhe neend nahi!" Mumma: "Ek aur page?"
 
-Part 2 (10-20s): 3D Pixar style, 9:19. Mumma tucks blanket just around Ria's shoulders, continues story in a whisper. By page three, Ria is breathing even, half-asleep. Toy car safely inside. Text: "DETECT: TOY CAR IN THROAT! 🚗" "BANKET TUCK STRATEGY ✨" "SLEEP HACKS > POWER STRUGGLES". Ria asleep, Mumma smiling.
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria's eyelids grow heavy, she pats the pillow: "Thoda aur?" Mumma tucks blanket around Ria's shoulders, continues whispering the story. Ria snoring softly on Mumma's lap. Text: "DETECT: EYELIDS HEAVY" "BLANKET TUCK STRATEGY" "SLEEP HACKS".
 
-Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma noticing: "Arre, woh toy car!" Ria patting chest: "Evidence mil gaya, Maa." Mumma calm: "Car safa niklega kal subah." Ria half-asleep: "Par story khatam karoongi na?" Mumma: "Jab tak tu so rahi hai, tab tak soch leti hun."
+Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma smiling: "Ek aur page?" Ria sleepy: "Thoda aur?" Mumma whispering: "Jaane do beta, kal subah nayi kahani."
     ''',
   ),
 
