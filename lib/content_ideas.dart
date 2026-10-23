@@ -655,229 +655,310 @@ Audio/Dialogue (Hinglish): Ria wailing: "Nahi nahi! Wapas chahiye!" Mumma gently
     ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h03',
     category: 'Relatable',
-    cover: 'Mujhe Nahi Aata!',
-    opening: 'Rio ka tower teesri baar gira... aur usne haar maan li.',
-    problem: 'Rio gives up when his block tower keeps falling',
-    lesson: 'Galti se hi seekhte hain, phir se try karo',
+    cover: 'Mujhse Nahi Hoga!',
+    opening: 'Teesri baar tower gira… Rio bola, "Mujhse nahi hoga!"',
+    problem: 'Rio feels genuinely frustrated after his block tower falls repeatedly. He is not being naughty — he just cannot figure out why it keeps collapsing.',
+    lesson: 'When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Bachche ko frustration ho toh haath mat lagao — ek hint do, unhe khud dhundne do. Tower gira toh base bada karo. Seekhne ka maza usi mein hai. #Persistence #LearningThroughPlay #ToddlerPlay #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Rio ka tower teesri baar girta hai. Woh blocks se haath kash karke bolta hai: "Mujhe nahi aata!"
-Twist: Ria turant madad karne aati hai, lekin Rio uska haath hata deta hai: "Main karunga!" Ria samajh jaati hai ki madad karne ka matlab haath chhune se nahi, sochne se hai.
-Resolution: Ria chupchaap do bade blocks Rio ke paas rakhti hai: "Neece rakho, base bana ke dekho." Rio tower khada kar deta hai. "Dekho, khada hai!"
-Moral: Hint do, haath mat lagao — bachcha khud hi seekh jaata hai.
+Story: Rio builds a tower. It falls. He builds again — it falls again. Third time, he sits back, eyes welling up: "Mujhse nahi hoga!" He is not giving up to be difficult; he truly feels stuck.
+Twist: Ria watches quietly, then asks, "Ek idea try karein?" She does not touch the blocks. Instead, she points: "Neece ke blocks thode aur phailao, base bana ke dekho." Rio hesitates, then tries.
+Resolution: Rio tries a wider base. It still wobbles. He adjusts, adds one more block at the bottom. The tower stands. He looks up, surprised and proud: "Khada hai!" Ria smiles: "Tune khud kiya."
+Moral: Hint do, haath mat lagao. Bachcha khud seekhta hai — fail karke, try karke, phir safal hoke.
 ''',
     setting: 'Play mat in the living room, afternoon sunlight through the window',
-    sceneDetail: 'Tower leans at a 45-degree angle, blocks scattered',
-    dialogue: '"Mujhe nahi aata!" Rio throws his hands up.',
-    mess: 'Rio refuses help, Rio refuses to try, Rio lies on the floor',
-    innerThought: 'Why does he fight every offer but never accept defeat?',
-    endingBeat: 'Rio builds a two-block wide base and succeeds.',
+    sceneDetail: 'A collapsed tower, scattered blocks, Rio sitting with knees pulled up looking defeated',
+    dialogue: '"Mujhse nahi hoga!" "Ek idea try karein?" "Neece ke blocks thode phailao." "Khada hai!"',
+    mess: 'Rio tries the wider base, tower wobbles, he adjusts a block, tries again — frustration turning into focus',
+    innerThought: 'The hardest thing for a parent is watching them struggle without fixing it. But that is exactly what they need.',
+    endingBeat: 'Rio places the final block on his steady tower. Ria gives a small nod. Cuty hops over and nudges a block gently with her nose — the tower still stands.',
     defaultCast: ['Rio', 'Ria', 'Cuty'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Play mat in living room. Rio builds a tower — it collapses. He rebuilds — collapses again. Third time, he slumps: "Mujhse nahi hoga!" Text: "TEESRI BAAR GIRA 😔" "MUJHSE NAHI HOGA"
+
+On-Screen Text:
+- [0-3s]: "TEESRI BAAR GIRA 😔"
+- [3-6s]: "MUJHSE NAHI HOGA 😤"
+- [6-10s]: "EK IDEA? 💡"
+- [10-14s]: "BASE BADA KARO 🧱"
+- [14-18s]: "KHUD SEEKHA! 🎉"
+- [18-20s]: "HINT DO, HAATH MAT LAGAO 🌱"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio builds, tower falls. He tries again — falls. Third time, he gives up: "Mujhse nahi hoga!" Ria watches, then asks gently: "Ek idea try karein?" Points: "Neece ke blocks phailao." Text: "MUJHSE NAHI HOGA 😤" then "EK IDEA? 💡"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Rio tries wider base, wobbles, adjusts, adds block. Tower stands. Rio beams: "Khada hai!" Ria nods. Cuty hops over, nudges a block — tower holds. Text: "BASE BADA KARO 🧱" "KHUD SEEKHA! 🎉" "HINT DO, HAATH MAT LAGAO 🌱"
+
+Audio/Dialogue (Hinglish): Rio frustrated: "Mujhse nahi hoga!" Ria calm: "Ek idea try karein? Neece ke blocks thode phailao." Rio trying: "Hmm... base bada karo." Rio proud: "Khada hai!" Ria: "Tune khud kiya!" Cuty hops: *boop*
+    ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h04',
     category: 'Relatable',
-    cover: 'Cuty Kahan Gaya?!',
-    opening: 'Ria ki awaaz tezi — "Cuty kahan gaya?!"',
-    problem: 'Room so messy they keep getting distracted',
-    lesson: 'Clear one small path at a time',
+    cover: 'Cuty Gayab?! Toys Ke Jungle Mein Ria Bhi Confuse! 😱',
+    opening: 'Cuty gayab?! Toys ke jungle mein Ria bhi confuse! 😱',
+    problem: 'Cuty is missing in a living room buried under toys. Ria and Rio start searching, but Rio keeps getting distracted by every toy he picks up.',
+    lesson: 'When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Room messy ho toh Cuty bhi kho jata hai. Ek chhota area saaf karo, toys wapas rakho, aur milkar kaam karo. Cuty mil jayega! 🐰 #TidyUp #SiblingTeamwork #LostAndFound #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Ria shouts, "Cuty kahan gaya?!" The floor is a toy jungle. Every time Rio searches, he starts playing.
-Twist: Ria makes a "Cuty rescue basket" — they clear just one path, then spot Cuty asleep under a blanket.
-Resolution: Rio whispers, "Hum poora room saaf karne aaye the?" Ria: "Shhh, patient so raha hai."
-Moral: Ek chhota sa raasta bhi bada madad karta hai.
+Story: Ria gasps, "Cuty kahan gaya?!" The living room floor is a toy jungle — blocks, cars, plushies everywhere. Ria and Rio start searching. Rio picks up a car: "Arre, mera blue car!" and starts vrooming it. Ria sighs, picks up a doll: "Wait, I was looking for Cuty!" Rio picks up a block tower piece and starts stacking.
+Twist: Ria says firmly, "Ruko. Ek chhota area saaf karte hain. Toys wapas unke box mein, phir Cuty dhundhte hain." They clear one corner together, putting blocks in the block bin, cars in the car basket. Under the couch blanket, they spot Cuty's ears.
+Resolution: They whisper, "Shhh, Cuty so raha hai!" Gently cover Cuty back up. Then they finish tidying the rest of the room together — each toy finding its home.
+Moral: Ek area saaf karo, toys wapas rakho, milkar kaam karo. Clutter door hua toh khoi hui cheez bhi mil jayegi.
 ''',
-    setting: 'Living room floor, morning sunlight through window',
-    sceneDetail: 'Toys scattered everywhere, one clear path leads to the couch',
-    dialogue: '"Cuty kahan gaya?!" "Arre Ram! Yahan se kitna bhi ghusaaye..."',
-    mess: 'Rio starts playing with blocks mid-search, Ria redirects him to clearing one path',
-    innerThought: 'One path at a time — we can do this.',
-    endingBeat: 'Rio spots Cuty under a blanket, they both tiptoe to rescue her quietly.',
-    defaultCast: ['Rio', 'Cuty', 'Ria'],
+    setting: 'Living room floor, afternoon, toys scattered everywhere like a jungle',
+    sceneDetail: 'Blocks, cars, plushies covering the floor; Cuty hidden under a blanket near the couch',
+    dialogue: '"Cuty kahan gaya?!" "Arre, mera blue car!" "Ruko, ek area saaf karte hain pehle." "Shhh, Cuty so raha hai!"',
+    mess: 'Rio gets distracted by every toy he picks up — cars, blocks, dolls — while Ria tries to keep the search on track',
+    innerThought: 'The mess is the problem. Fix the mess, and the missing thing appears.',
+    endingBeat: 'They finish tidying together. Cuty wakes up, hops over, and nudges a block into the bin — helping too! Room clean, Cuty found.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room, toys everywhere like a jungle. Ria panics: "Cuty kahan gaya?!" Rio picks up a car, vrooms it. Ria: "Ruko, ek area saaf karte hain!" They clear one corner, toys go back in bins. Under a blanket near the couch — Cuty's ears peek out. They whisper: "Shhh, Cuty so raha hai!" Text: "CUTY GAYAB?! 😱" "EK AREA SAAF KARO 🧸" "TOYS WAPAS RAKHO 📦" "MILKAR KAAM KARO 🤝" "CUTY MIL GAYA! 🐰"
+
+On-Screen Text:
+- [0-3s]: "CUTY GAYAB?! 😱"
+- [3-6s]: "TOYS KE JUNGLE 🌴"
+- [6-10s]: "EK AREA SAAF KARO 🧸"
+- [10-14s]: "TOYS WAPAS RAKHO 📦"
+- [14-18s]: "MILKAR KAAM KARO 🤝"
+- [18-20s]: "CUTY MIL GAYA! 🐰"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria panics, room is a toy jungle. Rio distracted by car, vrooms it. Ria: "Ruko, ek area saaf karte hain!" They clear one corner. Text: "CUTY GAYAB?! 😱" "TOYS KE JUNGLE 🌴" "EK AREA SAAF KARO 🧸"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. They find Cuty under blanket, whisper "Shhh!" Finish tidying together. Cuty hops over, nudges block into bin. Text: "TOYS WAPAS RAKHO 📦" "MILKAR KAAM KARO 🤝" "CUTY MIL GAYA! 🐰"
+
+Audio/Dialogue (Hinglish): Ria urgent: "Cuty kahan gaya?!" Rio distracted: "Arre, mera blue car!" Ria firm: "Ruko, ek area saaf karte hain!" Both whisper: "Shhh, Cuty so raha hai!" Ria happy: "Room saaf, Cuty mil gaya!" Cuty hops: *boop*
+    ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h05',
     category: 'Relatable',
-    cover: 'Ek Aur Paani!',
-    opening: 'Lights band... aur Ria phir se paani maang rahi hai.',
-    problem: 'Bedtime stretches on with one more water, one more story, one more hug',
-    lesson: 'A small cup on the bedside table ends the loop',
+    cover: 'Lights Off… Aur Ria Ki Ek Aur Demand! 😴',
+    opening: 'Lights off… aur Ria ki ek aur demand! 😴',
+    problem: 'Preschool bedtime stretches on with one more water, Teddy needs a blanket, and one more hug — night after night.',
+    lesson: 'Predictable routines, preparation, affection, and consistent boundaries make bedtime calmer. Preparation helps, but it does not guarantee zero requests or tears.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Bedtime loop familiar hai? Pehle se paani, blanket, hug ready rakho. Routine banao, pyaar se boundary rakho. Rona kam hoga — khatam nahi hoga. 😴 #BedtimeRoutine #ToddlerSleep #ParentingHacks #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Lights off. Ria calls out: "Mumma, ek aur paani!" Mumma brings it. Then Ria remembers: "Teddy ko blanket chahiye." Then: "Aur ek hug?" Planned hug. Ria snuggles in.
-Twist: Mumma pre-places a small cup and a hug-stuffed animal on the bedside table the next night.
-Resolution: When lights go off, Ria reaches for both. "Ab bas... unless Teddy ko paani chahiye."
-Moral: Jo roz maanga jaata hai, pehle se rakh do — ek chhota routine, ek calmer bedtime.
+Story: Lights off. Ria calls out: "Mumma, ek aur paani!" Mumma brings a small, stable cup from the bedside table. Ria sips, then adds: "Teddy ko blanket chahiye." Mumma tucks Teddy in. Then: "Aur ek hug?" Mumma gives the planned goodnight hug.
+Twist: The next night, Mumma pre-places a child-safe water cup, Teddy's blanket, and sits ready with the goodnight hug. Ria still asks: "Ek aur story?" Mumma smiles: "Kal sunein, ab so jao." Ria snuggles in.
+Resolution: Ria settles with the cup nearby, Teddy tucked in, and the goodnight hug done. Bedtime is shorter, but Ria still tests the boundary — and Mumma holds it gently.
+Moral: Routine banao, prepare karo, pyaar se boundary rakho. Bedtime calm hota hai — perfect nahi hota.
 ''',
-    setting: 'Bedroom nightstand, single bedside lamp on',
-    sceneDetail: 'Water cup and Teddy bear already on the nightstand',
-    dialogue: 'Maa, ek aur paani!',
-    mess: 'Ria keeps inventing things Teddy might need — blanket, spoon, story',
-    innerThought: 'Ek baar toh mujhe bhi sochne ka time milega, when does the asking stop',
-    endingBeat: 'Ria reaches for both cup and Teddy, then hugs them both',
+    setting: 'Bedroom, night, single bedside lamp, bed with pillows',
+    sceneDetail: 'Stable child-safe water cup on nightstand, Teddy with small blanket beside pillow',
+    dialogue: '"Mumma, ek aur paani!" "Teddy ko blanket." "Aur ek hug?" "Ek aur story?" "Kal sunein, ab so jao."',
+    mess: 'Ria requests water, then blanket for Teddy, then hug — each request delaying sleep',
+    innerThought: 'Every night the same loop. If I prepare beforehand, maybe tonight ends sooner.',
+    endingBeat: 'Ria sips water, tucks Teddy, gets her goodnight hug. "Goodnight, Mumma." She settles. Mumma kisses her forehead. "Goodnight, beta."',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
     punchline: '',
     readyPrompt: '''
-PROMPT: 3D Pixar animation style, vertical 9:16. Cozy bedroom, single lamp on nightstand, nighttime glow. Ria (pink star dress, pigtails in pajamas) sits bolt upright: "Maa, ek aur paani!" Mumma (yellow kurti, sleepy top bun) walks over with a tiny cup. Text on screen: "BEDTIME STRETCH 🤍" "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY"
+PROMPT: 3D Pixar animation style, vertical 9:16. Cozy bedroom, single lamp, nighttime glow. Ria (pajamas, pigtails) sits up: "Mumma, ek aur paani!" Mumma (yellow kurti) brings pre-placed stable cup from nightstand. Text: "BEDTIME LOOP 🤍" "PAANI • BLANKET • HUG"
 
 On-Screen Text:
-- [0-3s]: "BEDTIME STRETCH 🤍"
-- [3-7s]: "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY"
-- [7-10s]: "THE LOOP IS REAL 💧🔄"
-- [10-15s]: "PREVENTION > REACTION ✅"
-- [15-20s]: "TODDLER PRO TIP: NIGHTSTAND PREP 🌙✨"
+- [0-3s]: "BEDTIME LOOP 🤍"
+- [3-6s]: "PAANI • BLANKET • HUG 💧🧸🤗"
+- [6-10s]: "PREP KARO, ROUTINE BANAO ✅"
+- [10-14s]: "BOUNDARY PYAAR SE 🌙"
+- [14-18s]: "CALMER, NOT PERFECT 🌱"
+- [18-20s]: "GOODNIGHT, BETA 🥹❤️"
 
-Part 1 (0-10s): 3D Pixar style, 9:16. Ria asking for water in bed, Mumma bringing tiny cup. Ria finishes, pats Teddy: "Teddy ko pani do." Mumma: "Teddy toh nahi peeta beta." Ria: "Ek hug?" Mumma hugs her goodnight. Text: "BEDTIME STRETCH 🤍" "1 MORE WATER • 1 MORE HUG • 1 MORE TEDDY".
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria in bed asks for water, Mumma brings stable cup from nightstand. Ria: "Teddy ko blanket." Mumma tucks Teddy. Ria: "Aur ek hug?" Mumma gives goodnight hug. Text: "BEDTIME LOOP 🤍" "PAANI • BLANKET • HUG 💧🧸🤗".
 
-Part 2 (10-20s): 3D Pixar style, 9:16. Next night: Mumma puts cup AND Teddy on nightstand before lights out. Ria reaches, pats both, hugs them, settles. Text: "PREVENTION > REACTION ✅" "TODDLER PRO TIP: NIGHTSTAND PREP 🌙✨". Ria whispers: "Goodnight Teddy. Goodnight paani."
+Part 2 (10-20s): 3D Pixar style, 9:16. Next night: Mumma pre-places cup, blanket, sits ready. Ria asks: "Ek aur story?" Mumma gentle: "Kal sunein, ab so jao." Ria snuggles, settles. Text: "PREP KARO, ROUTINE BANAO ✅" "BOUNDARY PYAAR SE 🌙" "CALMER, NOT PERFECT 🌱". Ria: "Goodnight, Mumma." Mumma: "Goodnight, beta."
 
-Audio/Dialogue (Hinglish): Ria sleepy: "Maa, ek aur paani please." Mumma gentle: "Thoda sa piya beta, ab so jao." Ria patting Teddy: "Teddy bhi pyaas lagi hai." Mumma smiling: "Teddy toh khaali hai, tu piya." Ria hugging both: "Par Kalia ka paani bhi do?" Mumma: "Kalia toh khaali hai." Ria giggling: "Theek hai, main khud karungi!"
+Audio/Dialogue (Hinglish): Ria sleepy: "Mumma, ek aur paani!" Mumma gentle: "Lo beta, ab so jao." Ria: "Teddy ko blanket." Mumma: "Haan, le lo." Ria: "Ek aur story?" Mumma: "Kal sunein, ab so jao." Ria: "Goodnight, Mumma." Mumma: "Goodnight, beta."
     ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h07',
     category: 'Relatable',
-    cover: 'Brush Nahi Karungi!',
-    opening: 'Ria kambal ke andar chhup gayi... brush ke dar se!',
-    problem: 'Ria hides under the blanket to avoid brushing her teeth',
-    lesson: 'Khel banao, zidd khud chali jaati hai',
+    cover: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
+    opening: 'Brush ka naam sunte hi Ria kambal mein gayab! 🪥',
+    problem: 'Ria resists toothbrushing and hides under the blanket. Mumma stays calm instead of rushing or scolding.',
+    lesson: 'Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Brush ke time pe Ria chhup gayi? Cuty ke daant brush karke dikhao, fir Ria khud try karegi. Pea-sized fluoride paste, bade ki supervision. 🪥 #BrushTime #ToddlerRoutine #ParentingHacks #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Ria refuses: "Brush nahi!" Mumma picks up Cuty's brush: "Pehle Cuty ki teeth clean karte hain."
-Twist: Tiny circles on Cuty's toy teeth. Ria watches, then grabs a brush. "Cuty ke teeth clean, ab mere!"
-Resolution: Mumma helps guide Ria's hand through the last stubborn spot. Ria spits, grins at her sparkly smile.
-Moral: Watching a friend get first makes the real thing feel less scary.
+Story: Mumma says, "Brush time, Ria!" Ria pulls the blanket over her head: "Nahi!" Mumma stays calm, sits on the floor, and says, "Theek hai. Pehle Cuty ke daant saaf karte hain."
+Twist: Mumma takes Cuty's toy teeth (plastic, no real toothbrush in mouth) and gently mimics brushing with a child-sized brush and a pea-sized dab of fluoride toothpaste. She narrates: "Upar, neeche, peeche — dhire dhire." Ria peeks out, curious.
+Resolution: Ria pulls the blanket down: "Mere daant bhi?" Mumma hands her a child-sized brush with a pea-sized amount of fluoride paste. "Dhire dhire, upar neeche." Ria brushes; Mumma guides her hand for the back teeth. Ria spits into the sink. "Ho gaya!"
+Moral: Khel-khel mein brush seekho. Bade ki madad se bachcha khud brush karta hai — par supervision zaroori hai.
 ''',
-    setting: 'Bathroom, toothbrushes lined up, mirror foggy',
-    sceneDetail: 'Ria\'s toothbrush is missing one bristle',
-    dialogue: '"Brush karlo, Ria. Jaldi karo, time lag gaya!"',
-    mess: 'Cuty has the toothpaste and is squeezing it all over the sink',
-    innerThought: 'The "just brush" part is never just brush.',
-    endingBeat: 'All three toothbrushes in mouths, foam mustaches everywhere.',
+    setting: 'Bathroom, morning, mirror at child height, toothbrushes and fluoride toothpaste on the counter',
+    sceneDetail: 'Ria peeking from under the blanket; Cuty sitting on the counter with toy teeth; child-sized brush and pea-sized fluoride paste ready',
+    dialogue: '"Brush time, Ria!" "Nahi!" "Theek hai, pehle Cuty ke daant." "Upar, neeche, peeche — dhire dhire." "Mere daant bhi?" "Dhire dhire, upar neeche, peeche." "Ho gaya!"',
+    mess: 'Ria hides under blanket, refuses brush. Mumma stays calm, demonstrates on Cuty\'s toy teeth. Ria watches, then asks to brush.',
+    innerThought: 'Scolding makes it worse. A calm demo on a toy makes it a game she wants to join.',
+    endingBeat: 'Ria spits, rinses, smiles at the mirror. Mumma wipes her chin. "Shining smile!" Cuty sits proudly on the counter.',
     defaultCast: ['Ria', 'Cuty', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Bathroom, child-height mirror. Ria under blanket: "Nahi!" Mumma calm on floor with Cuty. Demonstrates brushing on Cuty's toy teeth (plastic) with child brush, pea-sized fluoride paste. Narrates: "Upar, neeche, peeche." Ria peeks: "Mere daant bhi?" Text: "BRUSH KA NAAM... 🪥" "CUTY KE DAANT PEHLE 🦷" "AB MERI BAARI! 😁"
+
+On-Screen Text:
+- [0-3s]: "BRUSH TIME? CHHUPA GAYI! 😱"
+- [3-6s]: "CUTY KE DAANT PEHLE 🦷"
+- [6-10s]: "UPAR, NEECHE, PEECHE — DHEERE DHEERE 🪥"
+- [10-14s]: "AB MERI BAARI! 😁"
+- [14-18s]: "DHEERE DHEERE... SPIT! 💦"
+- [18-20s]: "SHINING SMILE! ✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria hides under blanket: "Nahi!" Mumma sits with Cuty, mimics brushing on toy teeth with child brush, pea-sized fluoride paste. Narrates: "Upar, neeche, peeche — dhire dhire." Ria peeks: "Mere daant bhi?" Text: "BRUSH TIME? CHHUPA GAYI! 😱" "CUTY KE DAANT PEHLE 🦷" "UPAR NEECHE PEECHE 🪥"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria gets child brush with pea-sized fluoride paste. "Dhire dhire, upar neeche." Mumma guides hand for back teeth. Ria spits, smiles at mirror. Text: "AB MERI BAARI! 😁" "DHEERE DHEERE... SPIT! 💦" "SHINING SMILE! ✨"
+
+Audio/Dialogue (Hinglish): Mumma gentle: "Brush time, Ria!" Ria: "Nahi!" Mumma calm: "Theek hai, pehle Cuty ke daant saaf karte hain." Mumma narrating: "Upar, neeche, peeche — dhire dhire." Ria curious: "Mere daant bhi?" Mumma: "Dhire dhire, upar neeche." Ria: "Ho gaya!" Mumma: "Shining smile!"
+    ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h08',
     category: 'Relatable',
-    cover: 'Broccoli? Bilkul Nahi!',
-    opening: 'Plate aage aayi... aur Ria ne haath baandh liye.',
-    problem: 'Ria refuses vegetables at the table',
-    lesson: 'Khud banaya khaana, khud khaane ka mann',
+    cover: 'Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦',
+    opening: 'Broccoli dekhte hi Ria ne plate se doori bana li! 🥦',
+    problem: 'Ria refuses the broccoli on her plate. She pushes the plate away and crosses her arms.',
+    lesson: 'Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Broccoli se Ria bhagi? Papa khud khake dikhaye, pressure nahi. Chhota piece offer kiya, Ria ne soongha, chhua — bite optional. Low-pressure exposure se familiarity aati hai. 🥦 #FoodExploration #PickyEater #ParentingHacks #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Papa holds up broccoli: "Dekho, mini tree!" He takes a dinosaur bite first.
-Twist: Then the real bite. Ria studies it. "Is tree ka taste kaisa?"
-Resolution: She decides — one small bite, then another. Or: "Thoda sa, phir dil se."
-Moral: A bite modeled first feels safe enough to try.
+Story: Lunch is served. Broccoli sits on Ria's plate. She makes a face, pushes the plate away: "Nahi chahiye!"
+Twist: Papa picks up a floret, takes a bite himself, and says naturally, "Crunchy hai, thoda kadwa bhi." He puts a small piece on the side of Ria's plate: "Chaho toh try karo, warna rehne do." No bargaining, no "ek bite toh lo."
+Resolution: Ria stares at the piece. She picks it up, turns it over, smells it. She touches it to her lips. Maybe she takes a tiny taste. Maybe she puts it back. Papa smiles: "Theek hai, kal phir try karenge."
+Moral: Dikhana, offer karna, pressure nahi. Baar baar dikhane se familiarity aati hai — swad badalne mein time lagta hai.
 ''',
-    setting: 'Dining table, lunch plates half full, afternoon',
-    sceneDetail: 'One broccoli floret has fallen onto the tablecloth',
-    dialogue: '"Yeh mini tree khaane se pehle photo bhi khaate ho?"',
-    mess: 'Ria makes a face but the broccoli doesn\'t disappear',
-    innerThought: 'I\'ve tried everything except just eating it myself.',
-    endingBeat: 'Ria picks it up with her fork, one bite, then asks for more.',
-    defaultCast: ['Ria', 'Mumma'],
+    setting: 'Dining table, lunch time, afternoon light',
+    sceneDetail: 'Ria\'s plate with broccoli florets; Papa\'s plate with a half-eaten floret; a small extra piece on the side of Ria\'s plate',
+    dialogue: '"Nahi chahiye!" "Crunchy hai, thoda kadwa bhi." "Chaho toh try karo, warna rehne do." "Theek hai, kal phir try karenge."',
+    mess: 'Ria refuses the broccoli, pushes plate away. Papa models eating without pressure. Ria explores the piece — looks, touches, smells — bite optional.',
+    innerThought: 'My job is to offer, not to force. Every exposure counts, even if she does not bite today.',
+    endingBeat: 'Ria puts the piece back or takes a tiny taste. Either way, Papa stays calm. "Kal phir try karenge." They continue eating together.',
+    defaultCast: ['Ria', 'Papa'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Dining table, lunch time. Ria pushes broccoli away: "Nahi chahiye!" Papa takes a bite: "Crunchy hai." Offers small piece: "Try karo, warna rehne do." No pressure. Text: "BROCCOLI? NAHI! 🥦" "PAPA KHAKE DIKHAYE 🍴" "PRESSURE NAHI 🚫"
+
+On-Screen Text:
+- [0-3s]: "BROCCOLI DEKHTE HI... 🥦"
+- [3-6s]: "RIA: NAHI CHAHIYE! 😤"
+- [6-10s]: "PAPA KHAKE DIKHAYE 🍴"
+- [10-14s]: "TRY KARO, WARNA REHNE DO 🤷‍♂️"
+- [14-18s]: "EXPLORE: LOOK, TOUCH, SMELL 👃"
+- [18-20s]: "PRESSURE NAHI, EXPOSURE HAAN ✅"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria pushes broccoli away: "Nahi chahiye!" Papa calmly eats a floret: "Crunchy hai, thoda kadwa." Places small piece on Ria's plate side: "Chaho toh try karo." Text: "BROCCOLI DEKHTE HI... 🥦" "RIA: NAHI CHAHIYE! 😤" "PAPA KHAKE DIKHAYE 🍴"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria looks at piece, touches, smells, maybe tiny taste or puts back. Papa calm: "Theek hai, kal phir try karenge." Text: "TRY KARO, WARNA REHNE DO 🤷‍♂️" "EXPLORE: LOOK, TOUCH, SMELL 👃" "PRESSURE NAHI, EXPOSURE HAAN ✅"
+
+Audio/Dialogue (Hinglish): Ria firm: "Nahi chahiye!" Papa natural: "Crunchy hai, thoda kadwa." Papa gentle: "Chaho toh try karo, warna rehne do." Ria curious: *sniffs, touches* Papa calm: "Theek hai, kal phir try karenge." Both eat together.
+    ''',
   ),
 
-  HookIdea(
+HookIdea(
     id: 'h09',
     category: 'Relatable',
-    cover: 'Half-Ready Hoon!',
-    opening: 'Joote pehenlo... park jaana hai. Rio ne ulta laga diya.',
-    problem: 'Ria wants to leave but Rio shoes are on wrong feet',
-    lesson: 'Chhote galtiyan, saath mein theek ban jaati hain',
+    cover: 'Park Ka Naam Sunti Hi Rio Ready… Par Shoes Ulte! 👟😂',
+    opening: 'Park ka naam sunte hi Rio ready… par shoes ulte! 👟😂',
+    problem: 'Rio excitedly puts on his shoes to go to the park, but both end up on the wrong feet.',
+    lesson: 'Patience, checking, and helping without taking over. Let the child try first; offer a small hint only if needed.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Rio khud try karta hai, Ria pyaar se check karti hai, Mumma hint deti hai. Shoes pehenna seekhna teamwork hai — koi bhi confused nahi. 👟 #ShoeTime #SiblingSupport #ToddlerIndependence #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: "Shoes pehen lo, park jaana hai." Ria: "Main half-ready hoon!" Rio sits with one shoe on, one off.
-Twist: Mumma: "Rio full-ready nahi, full-confused hai!" She kneels, points to toes.
-Resolution: They fix both shoes together. Ria helps Rio tie his lace. "Partner ban gayi!"
-Moral: Getting ready is faster when you help each other put things right.
+Story: "Park jaana hai!" Rio grabs his shoes and puts them on fast. He runs to the door, but walks funny — both shoes are on the wrong feet.
+Twist: Ria notices and smiles, "Rio, check karein, sahi pair hai?" Rio looks down, frowns, and tries to swap them himself. Mumma watches, steps in only when Rio hesitates: "Toe kis taraf? Bas seedha karo."
+Resolution: Rio fixes the left shoe, then the right. He stands up proud, "Ho gaya!" Ria high-fives him. "Chalo, park!"
+Moral: Khud try karo, pyaar se check karo, hint do — kaam karna seekhna, hasna nahi.
 ''',
-    setting: 'Front door, shoes scattered by the mat, park visible through the window',
-    sceneDetail: 'Rio sitting with one shoe on, one off — the left is on the right foot',
-    dialogue: '"Shoes pehen lo, park jaana hai." "Main half-ready hoon!"',
-    mess: 'Rio wiggles his feet, shoes keep slipping off as Ria tries to help',
-    innerThought: 'Getting ready is a team sport when laces fight back.',
-    endingBeat: 'They fix both shoes together, Ria helps Rio tie his lace — "Partner ban gayi!"',
+    setting: 'Front door area, morning, shoes by the mat, park visible through the window',
+    sceneDetail: 'Rio standing at the door with both shoes on wrong feet, Ria beside him pointing gently at his feet',
+    dialogue: '"Park jaana hai!" "Rio, check karein, sahi pair hai?" "Toe kis taraf? Bas seedha karo." "Ho gaya!"',
+    mess: 'Rio puts both shoes on wrong feet, walks awkwardly. Ria notices, asks him to check. Rio tries swapping them, hesitates on the second. Mumma gives a tiny hint.',
+    innerThought: 'The urge to just fix it is strong. But letting him try builds confidence — and a funny memory.',
+    endingBeat: 'Rio fixes both shoes, stands tall. Ria high-fives: "Partner ban gayi!" They run to the park together.',
     defaultCast: ['Rio', 'Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Front door area, morning light. Rio dashes to door, shoes on wrong feet, waddling. Ria smiles: "Rio, check karein, sahi pair hai?" Rio looks down, tries to swap. Mumma: "Toe kis taraf? Bas seedha karo." Rio fixes both, beams: "Ho gaya!" Text: "PARK JANA HAI! 🏃‍♂️" "SHOES ULTE! 👟😂" "CHECK KAREIN 👀" "HINT DO, KAAM KARNE DO 🤝" "HO GAYA! 🎉"
+
+On-Screen Text:
+- [0-3s]: "PARK JANA HAI! 🏃‍♂️"
+- [3-6s]: "SHOES ULTE! 👟😂"
+- [6-10s]: "CHECK KAREIN 👀"
+- [10-14s]: "HINT DO, KAAM KARNE DO 🤝"
+- [14-18s]: "HO GAYA! 🎉"
+- [18-20s]: "PATIENCE + HINT = CONFIDENCE 🌱"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio runs to door, shoes on wrong feet, waddling. Ria: "Rio, check karein, sahi pair hai?" Rio looks down, tries swapping. Text: "PARK JANA HAI! 🏃‍♂️" "SHOES ULTE! 👟😂" "CHECK KAREIN 👀"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Rio fixes left shoe, hesitates on right. Mumma: "Toe kis taraf? Bas seedha karo." Rio fixes it, stands proud: "Ho gaya!" Ria high-fives. Text: "HINT DO, KAAM KARNE DO 🤝" "HO GAYA! 🎉" "PATIENCE + HINT = CONFIDENCE 🌱"
+
+Audio/Dialogue (Hinglish): Rio excited: "Park jana hai!" Ria gentle: "Rio, check karein, sahi pair hai?" Rio trying: "Hmm..." Mumma calm: "Toe kis taraf? Bas seedha karo." Rio proud: "Ho gaya!" Ria: "Partner ban gayi!" Both run: "Chalo, park!"
+    ''',
   ),
 
 
