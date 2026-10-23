@@ -47,10 +47,10 @@ Key APIs:
 
 ### 5. Prompt System (source: `lib/master_prompt.dart`)
 ```dart
-kMasterPrompt             // Brand rules, audience, visual style
+kMasterPrompt             // Brand rules, audience, visual style, character lock, language & story quality
 kVisualStyle              // "Soft 3D Pixar-Disney animation style, vertical 9:16..."
-kNegativeInstructions     // "No duplicate characters, no identity changes..."
-kStoryStructureRules      // Character lock rules
+kNegativeInstructions     // "No duplicate characters, no identity changes, no on-screen text..."
+kStoryStructureRules      // Visual storytelling, structure, and text overlay guidance
 kRequiredPromptSections   // Sections every video prompt must include
 ```
 

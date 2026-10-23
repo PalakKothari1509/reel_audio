@@ -5,13 +5,13 @@
 All content generation (online and offline) uses these constants from `lib/master_prompt.dart`:
 
 ```
-kMasterPrompt            // Brand rules + visual style + audience context
+kMasterPrompt            // Brand rules + visual style + audience + character lock + language rules + story quality
 kVisualStyle            // "Soft 3D Pixar-Disney animation style, vertical 9:16..."
 kNegativeInstructions   // NO on-screen text of any kind, character rules, no distortions
 kCharacterRules         // Ria/Rio no glasses, Cuty always bunny, etc.
-kStoryStructureRules    // Alias for kCharacterRules
+kStoryStructureRules    // Visual storytelling, language, structure, and on-screen text guidance
 kRequiredPromptSections // Sections every video prompt must include
-kBannedStoryPhrases     // 12 phrases that make stories read as AI-written
+kBannedStoryPhrases     // 40+ phrases that make stories read as AI-written
 kBannedOverlayPhrases   // 12 phrases banned from overlays/dialogue
 kKnownBadTokens         // 8 typos/non-words to avoid
 ```
