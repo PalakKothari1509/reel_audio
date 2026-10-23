@@ -131,7 +131,7 @@ class ContentLibraryItem {
         ? ContentPackage.fromJson(Map<String, dynamic>.from(json['contentPackage']))
         : null;
     final formats = (json['formatOutputs'] as Map?)?.map((k, v) => MapEntry(
-          ContentFormat.values.byName(k as String),
+          enumByNameOr(ContentFormat.values, k as String, ContentFormat.carousel),
           FormatOutput.fromJson(Map<String, dynamic>.from(v as Map)),
         )) ??
         <ContentFormat, FormatOutput>{};
@@ -141,7 +141,7 @@ class ContentLibraryItem {
       title: json['title'] as String,
       topic: json['topic'] as String,
       bucket: BucketLibrary.byId(json['bucket'] as String? ?? '') ?? BucketLibrary.challenge,
-      format: ContentFormat.values.byName(json['format'] as String? ?? 'carousel'),
+      format: enumByNameOr(ContentFormat.values, json['format'] as String? ?? 'carousel', ContentFormat.carousel),
       status: IdeaStatus.fromLegacy(json['status'] as String? ?? 'idea'),
       contentPackage: package,
       formatOutputs: formats,

@@ -44,7 +44,10 @@ class StoryReelRequest {
     this.tone = 'warm, playful, parent-relatable',
     this.segmentDurationSeconds = 10,
     this.segmentCount = 2,
-  });
+  })  : assert(segmentCount >= 1 && segmentCount <= 10,
+            'segmentCount must be between 1 and 10'),
+        assert(segmentDurationSeconds >= 5 && segmentDurationSeconds <= 30,
+            'segmentDurationSeconds must be between 5 and 30');
 
   /// Total Reel duration.
   int get totalDurationSeconds => segmentDurationSeconds * segmentCount;

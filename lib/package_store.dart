@@ -7,6 +7,7 @@
 // This is the storage layer that sits between ProductionAdapter (which
 // produces media) and the UI (which needs to recall saved packages).
 
+import 'content_axes.dart';
 import 'content_package_v2.dart';
 
 /// Filters available for querying package stores.
@@ -245,8 +246,7 @@ class PackageMetadata {
   factory PackageMetadata.fromJson(Map<String, dynamic> json) => PackageMetadata(
         id: json['id'] as String? ?? '',
         ideaId: json['ideaId'] as String? ?? '',
-        status: PackageStatus.values.byName(
-            json['status'] as String? ?? 'generated'),
+        status: enumByNameOr(PackageStatus.values, json['status'] as String? ?? 'generated', PackageStatus.generated),
         createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
             DateTime.now(),
         updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ??

@@ -223,8 +223,7 @@ class ContentAuditItem {
         hashtags:
             (json['hashtags'] as List?)?.cast<String>() ?? const [],
         cta: json['cta'] as String? ?? '',
-        status: AuditStatus.values.byName(
-            json['status'] as String? ?? 'idea'),
+        status: enumByNameOr(AuditStatus.values, json['status'] as String? ?? 'idea', AuditStatus.idea),
         relatedContentIds:
             (json['relatedContentIds'] as List?)?.cast<String>() ?? const [],
         publishedUrl: json['publishedUrl'] as String?,

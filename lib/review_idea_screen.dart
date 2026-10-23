@@ -115,6 +115,12 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           const SizedBox(height: 8),
           _buildStatusSummary(idea),
 
+          // ── 6b. Hook Health Check ─────────────────────────────
+          const SizedBox(height: 24),
+          Text('7. Hook Health', style: AppText.section),
+          const SizedBox(height: 8),
+          _buildHealthCheck(idea),
+
           // ── Actions ────────────────────────────────────────────
           const SizedBox(height: 24),
           _buildActions(idea),
@@ -188,6 +194,12 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           Text(detail, style: AppText.hint),
         ],
       ),
+    );
+  }
+
+  Widget _buildHealthCheck(ContentIdea idea) {
+    return const Center(
+      child: Text('Health check requires HookIdea — see IdeaInputScreen'),
     );
   }
 

@@ -54,7 +54,7 @@ class ClassificationSnapshotV2 {
     AxisResolution? parseAxis(String? s) =>
         s == null || s == 'open'
             ? null
-            : AxisResolution.values.byName(s);
+            : enumByNameOr(AxisResolution.values, s, AxisResolution.needsReview);
     return ClassificationSnapshotV2(
       pillar: json['pillar'] != null
           ? ContentPillar.byLabel(json['pillar'] as String)
@@ -73,7 +73,7 @@ class ClassificationSnapshotV2 {
           ? ContentGoal.byLabel(json['goal'] as String)
           : null,
       status: json['status'] != null
-          ? IdeaStatus.values.byName(json['status'] as String)
+          ? enumByNameOr(IdeaStatus.values, json['status'] as String, IdeaStatus.idea)
           : IdeaStatus.idea,
       axisStates: (json['axisStates'] as Map?)?.map(
             (k, v) => MapEntry(k as String, parseAxis(v as String?)),
@@ -390,12 +390,11 @@ class ContentPackageV2 {
           ? ShareTrigger.fromJson(Map<String, dynamic>.from(json['shareTrigger'] as Map))
           : null,
       openLoop: json['openLoop'] as String?,
-      voiceMode: VoiceMode.values.byName(json['voiceMode'] as String),
+      voiceMode: enumByNameOr(VoiceMode.values, json['voiceMode'] as String, VoiceMode.optional),
       cta: json['cta'] as String,
-      reachCandidacy:
-          ReachCandidacy.values.byName(json['reachCandidacy'] as String),
-      productionCompatibility: ProductionCompatibility.values.byName(
-          json['productionCompatibility'] as String),
+      reachCandidacy: enumByNameOr(ReachCandidacy.values, json['reachCandidacy'] as String, ReachCandidacy.unknown),
+      productionCompatibility: enumByNameOr(ProductionCompatibility.values,
+          json['productionCompatibility'] as String, ProductionCompatibility.unknown),
       title: json['title'] as String,
       script: json['script'] as String,
       narration: json['narration'] as String,

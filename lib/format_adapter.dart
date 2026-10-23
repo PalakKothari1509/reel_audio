@@ -1,4 +1,5 @@
 import 'brand_system.dart';
+import 'content_axes.dart';
 import 'content_generator.dart';
 
 class FormatOutput {
@@ -28,7 +29,7 @@ class FormatOutput {
       };
 
   factory FormatOutput.fromJson(Map<String, dynamic> json) => FormatOutput(
-        format: ContentFormat.values.byName(json['format'] as String),
+        format: enumByNameOr(ContentFormat.values, json['format'] as String, ContentFormat.carousel),
         copyBlocks: (json['copyBlocks'] as List).cast<String>(),
         slides: (json['slides'] as List).map((s) => SlideContent.fromJson(s)).toList(),
         script: json['script'] as String,

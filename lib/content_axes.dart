@@ -546,3 +546,14 @@ class AxisValidator {
   int get errorCount => issues.where((i) => i.isError).length;
   int get warningCount => issues.where((i) => !i.isError).length;
 }
+
+/// Safely resolves an enum from a saved-JSON string, returning [fallback]
+/// instead of throwing when the value is unknown (e.g. from a stale or
+/// hand-edited save file).
+T enumByNameOr<T extends Enum>(Iterable<T> values, String name, T fallback) {
+  final normalized = name.trim();
+  for (final v in values) {
+    if (v.name == normalized) return v;
+  }
+  return fallback;
+}

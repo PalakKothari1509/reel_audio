@@ -6,6 +6,7 @@
 import 'dart:math';
 
 import 'brand_system.dart';
+import 'content_axes.dart';
 
 class ContentPackage {
   final String id;
@@ -72,14 +73,9 @@ class ContentPackage {
     final bucket = BucketLibrary.byId(json['bucket'] as String? ?? '') ??
         BucketLibrary.challenge;
 
-    // byName throws on anything it does not recognise, including a missing key.
-    ContentFormat format;
-    try {
-      format = ContentFormat.values.byName(json['format'] as String? ?? '');
-    } on ArgumentError {
-      format = ContentFormat.values.first;
-    }
-
+    // enumByNameOr returns a fallback instead of throwing on unknown format names.
+    final format = enumByNameOr(
+        ContentFormat.values, json['format'] as String? ?? '', ContentFormat.values.first);
     // byId is nullable, so a character id from an older save must not be forced.
     final chars = ((json['characters'] as List?) ?? const [])
         .map((id) => CharacterLibrary.byId('$id'))

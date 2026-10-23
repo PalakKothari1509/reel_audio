@@ -4,6 +4,7 @@
 // cannot be edited. Captions and the end card are drawn by the app
 // (caption_renderer.dart). This file only decides what that overlay says.
 
+import 'master_prompt.dart';
 import 'story_generator_offline.dart';
 
 /// Longest overlay, in words. Longer stops being a hook.
@@ -69,10 +70,3 @@ List<String> overlayProblems(String overlay, GeneratedStory story) {
   }
   return problems;
 }
-
-/// Phrases that must never appear in an overlay.
-const List<String> kBannedOverlayPhrases = [
-  'part ', 'scene:', 'middle mein', 'starting soon', 'mission accomplished',
-  'perfect ending', 'the big resolution', 'finally!', 'what happens next',
-  'toh phir kya hua',
-];
