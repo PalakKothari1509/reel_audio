@@ -555,59 +555,56 @@ Moral: Garam rasoi se door raho. Cooking ke waqt bade ki safety rules follow kar
 /// and several were written as "I" — a parent speaking — when the reels are told by a
 /// storyteller about Ria and Rio.
 const kDefaultHooks = <HookIdea>[
-
-  // Relatable: the child's own words, the thing every parent has heard this week.
+// Relatable: the child's own words, the thing every parent has heard this week.
   HookIdea(
     id: 'h01',
     category: 'Relatable',
-    cover: 'Main Khud!',
-    opening: 'Ria ne Mumma ka haath jhatak diya... joote khud pehnenge!',
-    problem: 'Ria insists on putting her shoes on herself and pushes Mumma away',
-    lesson: 'Thoda intezaar, aur bachcha khud seekh jaata hai',
+    cover: 'Main Khud! 👟',
+    opening: 'Mumma bas joota pehnane lagi… Ria boli, "MAIN KHUD!" 😤',
+    problem: 'Ria insists on wearing her shoes herself while the family is getting ready to leave.',
+    lesson: 'Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
+    caption: 'Preschool ke time pe bachche "main khud!" bolte hain toh dil khush bhi hota hai aur tension bhi hoti hai. Thoda time do, try karne do, zaroorat pade toh pyaar se help karo. 👟 #Independence #ToddlerLife #ParentingHacks #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Bus ka samay ho raha hai; Mumma jhukkar Ria ke joote pehnane lagti hai. Ria haath jhatak deti hai: "Main khud!" Joota ulte pairon lag jaata hai, Ria pengun ban kar chalti hai.
-
-Twist: Mumma apni taraf se koi madad nahi karti. Woh do second ke liye haath jodthi hai, phir kehti: "Ek, do, teen, char, paach."
-Resolution: Ria joota theek karti hai, sahi se bandh jaata hai. "Dekho!" Bus ka horn bajta hai, lekin Ria ab pakkar mehsoos karti hai.
-Moral: A little patience and a count to five gives Ria a win she earned herself.
+Story: It is time to leave for preschool. Mumma bends down to help Ria put on her shoes. Ria pulls her feet back and declares, "Main khud!"
+Twist: Ria tries to put on a shoe but gets confused about which foot it belongs on. Mumma starts to help, then pauses and asks, "Ek baar phir try karogi, ya meri help chahiye?"
+Resolution: Ria checks the shoes, corrects the mistake, and puts them on successfully. Mumma smiles: "Tumne khud try kiya! Shabash." They leave together.
+Moral: Khud try karne do. Zaroorat ho toh pyaar se help karo.
 ''',
-    setting: 'Front door, shoes scattered, keys jangling in Mumma pocket',
-    sceneDetail: 'One shoe on wrong foot, heel caught on the doorframe',
-    dialogue: 'Main khud!',
-    mess: 'Ria keeps switching feet mid-step, shoe keeps slipping',
-    innerThought: 'Mumma jaldi karegi, but she is not moving, and I am almost done',
-    endingBeat: 'Shoe finally on right foot, both smiling at the near-miss',
+    setting: 'Front door area, morning, shoes by the mat',
+    sceneDetail: 'A pair of small shoes by the door, Ria sitting down to put them on',
+    dialogue: '"Main khud!" "Ek baar phir try karogi, ya meri help chahiye?"',
+    mess: 'Ria puts a shoe on the wrong foot, pauses, then looks at the other shoe and self-corrects',
+    innerThought: 'Let her try. If she asks, I\'ll help. Either way, she learns.',
+    endingBeat: 'Ria puts on both shoes correctly, stands up proud. Mumma gives a quick hug. "Chalo, chalte hain."',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
     punchline: '',
     readyPrompt: '''
-PROMPT: 3D Pixar animation style, vertical 9:16 aspect ratio. Living room hallway near the door, morning sunlight, shoes scattered. Ria in a sparkly pink star dress and pigtails stubbornly plants her feet, pushing Mumma's hand away with a dramatic pout: "Main khud pehnungi!" Mumma (yellow embroidered kurti, top bun) sighs, steps back, and counts on her fingers: "1, 2, 3, 4, 5." Ria struggles, putting a sneaker on the wrong foot and waddling like a penguin, heel catching the frame. After a funny wiggle, she flips it onto the right foot, beams proudly, and points down: "Dekha? Direct fit!"
+PROMPT: 3D Pixar animation style, vertical 9:16. Front door area, morning light. Ria (pink star dress, pigtails) sitting by the door, determined: "Main khud!" Mumma (yellow kurti, top bun) starts to help, pauses, smiles: "Ek baar phir try karogi?" Ria looks at the shoes, realizes one is on the wrong foot, switches them, puts both on correctly. Text: "MAIN KHUD! 👟" "TRY KARNE DO" "SHABASH! 🥹❤️"
 
 On-Screen Text:
-- [0-3s]: "MAIN KHUD PEHNUNGI! 👟😤"
-- [3-7s]: "MOM PATIENCE LEVEL: 100 ⏳"
-- [7-10s]: "WRONG FOOT WADDLE 🐧😂"
-- [10-15s]: "JOOTAA TAYYAR! 🎉✨"
-- [15-20s]: "PROUD MOMENT 🥹❤️"
+- [0-3s]: "MAIN KHUD! 👟"
+- [3-7s]: "TRY KARNE DO ⏳"
+- [7-12s]: "SELF-CORRECT! 💡"
+- [12-17s]: "SHABASH! 🥹❤️"
+- [17-20s]: "PATIENCE + TRUST = GROWTH 🌱"
 
-Part 1 (0-10s): 3D Pixar style, 9:16. Ria in pink star dress pushes Mumma's hand away at the front door, shouting "Main khud!" Text on screen: "MAIN KHUD! 👟😤" and "MOM PATIENCE LEVEL: 100 ⏳". Mumma in yellow kurti counts on fingers while Ria tries to jam a shoe on the wrong foot and waddles like a penguin. Comedic Hinglish dubbed voice.
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria pushes Mumma's hand away at the door, "Main khud!" Mumma steps back, watches. Ria puts shoe on wrong foot, pauses, realizes, switches feet. Text: "MAIN KHUD! 👟" "TRY KARNE DO ⏳". Ria: "Main khud!" Mumma: "Ek baar phir try karogi?"
 
-Part 2 (10-20s): 3D Pixar style, 9:16. Ria wiggles her foot, flips the shoe onto the right foot with a triumphant grin. Text on screen: "WRONG FOOT WADDLE 🐧😂" then "JOOTAA TAYYAR! 🎉✨". Ria stands tall showing both shoes tied, Mumma claps proudly. Energetic comedic payoff.
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria corrects the shoe, puts both on right feet, beams with pride. Text: "SELF-CORRECT! 💡" "SHABASH! 🥹❤️". Mumma hugs: "Tumne khud try kiya! Shabash." Both walk out together.
 
-Audio/Dialogue (Hinglish): Toddler girl sassy voice: "Mumma hato, main khud karungi!" Mumma laughs gently: "Achha baba, try karo!" Ria triumphant: "Told you! I am a big girl now!"
+Audio/Dialogue (Hinglish): Ria determined: "Main khud!" Mumma gentle: "Ek baar phir try karogi?" Ria happy: "Ho gaya! Main khud pehen li!" Mumma proud: "Shabash beta!"
     ''',
   ),
-
   HookIdea(
     id: 'h02',
     category: 'Relatable',
