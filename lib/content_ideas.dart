@@ -401,35 +401,35 @@ Moral: Pehle trusted adult se poochho. Unsafe lage toh door jao aur help maango.
     readyPrompt: '',
   ),
 
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-road',
     category: 'Warm lesson',
-    cover: 'Ruko, Dekho, Chalo!',
-    opening: 'Zebra crossing par Rio ruk gaya... kisi ne bola nahi tha!',
-    problem: 'Toddlers run toward the road without stopping or looking',
-    lesson: 'Red light, green light ka khel ghar par seekho',
+    cover: 'Ruko, Dekho, Chalo! 🚦',
+    opening: 'Rio ki ball sadak ke paas chali gayi… kya woh uske peeche bhaagega?',
+    problem: 'Young children may impulsively chase a ball or toy toward a road without recognizing the danger.',
+    lesson: 'Never chase a ball into the road. Stop at a safe distance and immediately call a trusted adult. Young children must cross roads with an adult holding their hand, using a safe designated crossing when available. Looking both ways does not replace adult supervision.',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'सड़क पार करते समय हमेशा adult के साथ चलें। कभी सड़क पर न जाएँ, बिना बुलाए। #RoadSafety #ChildSafety #CrossingSafety #IndianParents #FunLearningWithPalak',
+    caption: 'कभी भी ball या toy ke peeche sadak par na bhaagen. Ruko, bade ko bulao, aur unka haath pakad kar hi road cross karo. Sadak cross karte waqt bade ka haath hamesha pakad kar rakho — signal green bhi ho toh bhi. #RoadSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Ball rolls toward the gate. Rio starts after it, takes two steps — "Ruko—road!"
-Twist: Mumma grabs his hand: "Stop, look, listen." They count cars together. "Ab green light?"
-Resolution: Mumma: "Jab grown-up kahe aur saaf ho." They hold hands and cross together.
-Moral: Khel mein seekha — sadak par bhi kaam aayega.
+Story: Rio and Papa are walking near a society park. Rio's ball rolls toward the roadside. Rio starts moving toward it but stops when Papa says, "Ruko, Rio! Road ke paas mat jao."
+Twist: Rio wants to retrieve the ball, but remembers to stay beside Papa and calls him instead.
+Resolution: Papa keeps Rio safely away from traffic and retrieves the ball only when safe. They practise stopping, holding hands, and crossing together at a designated crossing.
+Moral: Ball ke peeche sadak par nahi bhaagna. Road cross karte waqt bade ka haath pakadna.
 ''',
-    setting: 'Crossroads near the school gate, 3pm, honking in the distance',
-    sceneDetail: 'A red ball rolls into the street',
-    dialogue: '"Stop! Hold my hand — ek, do, teen."',
-    mess: 'The ball bounces once and keeps rolling, just past the curb',
-    innerThought: 'I said "look both ways" seventeen times this week.',
-    endingBeat: 'Ria stands at the curb, hand still held, watching the ball.',
-    defaultCast: ['Ria', 'Papa'],
+    setting: 'Society park footpath near a quiet road, late afternoon',
+    sceneDetail: 'A red ball resting on the grass verge, a few metres from the road edge',
+    dialogue: '"Ruko, Rio! Road ke paas mat jao." "Papa, ball!" "Main laata hoon, tum yahan rukho."',
+    mess: 'Rio steps toward the road edge but freezes when Papa calls out — the ball is just out of reach',
+    innerThought: 'One impulsive step toward the road can change everything. The habit of stopping must be stronger than the urge to chase.',
+    endingBeat: 'Papa retrieves the ball safely. Rio holds Papa\'s hand, they walk to the crossing together, and cross with Papa\'s hand firmly in his.',
+    defaultCast: ['Rio', 'Papa'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
