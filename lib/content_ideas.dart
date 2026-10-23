@@ -437,35 +437,35 @@ Moral: Ball ke peeche sadak par nahi bhaagna. Road cross karte waqt bade ka haat
     readyPrompt: '',
   ),
 
-  // NEEDS EXPERT REVIEW before posting
+// NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-emergency-number',
     category: 'Warm lesson',
-    cover: 'Mera Number Gaana',
-    opening: 'Ria ko Mumma ka number yaad nahi tha... phir gaana bana.',
-    problem: 'A preschooler cannot recall a parent\'s phone number when asked',
-    lesson: 'Gaane mein yaad karna aasaan hota hai',
+    cover: 'Ria Ka Safety Song 🎵',
+    opening: 'Agar Ria Mumma se bichhad jaaye, toh help kaise maangegi?',
+    problem: 'A preschooler may become confused when separated from a parent in a crowded public place.',
+    lesson: 'Practise the child\'s full name, a trusted parent\'s phone number, and how to seek help from a designated trusted adult. Children should not be expected to manage emergencies alone.',
     postFormat: 'Reel',
     strategy: '',
-    caption: 'अपना नाम और नंबर याद रखें — लेकिन कोई गुमनाम बातों में नम्बर न दें। हमेशा परिवार वाले या पुलिस के पास जाएं। #EmergencySafety #ChildSafety #SafetyTip #IndianParents #FunLearningWithPalak',
+    caption: 'बच्चों को अपना पूरा नाम, भरोसेमंद adult का नंबर और help kaise maangni hai, ye practise karayein. India ka emergency number 112 hai. Lost child plan ghar pe hi bana lo. #EmergencySafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
     pinnedComment: '',
     forApp: true,
     usedOn: '',
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Papa makes a clapping rhythm with family contact details — name first, number made of pretend digits on screen. Ria remembers her name first.
-Twist: The family practises: "Agar mummy nahi ho toh — Dada, ya neighbor?" Ria points to Dada.
-Resolution: "Pura number yaad rakho," Papa says, "lekin pehle apna naam bolo." Ria: "Main Ria hoon."
-Moral: Name pehle, number baad mein — safety starts with identity.
+Story: At home, Papa turns safety practice into a simple clapping song. Ria practises saying her full name and repeating a trusted parent's phone number with Papa's help.
+Twist: Papa asks, "Agar bheed mein Mumma dikhai na dein, toh kya karogi?" Ria answers, "Main yahin rukungi aur safe adult se help maangungi."
+Resolution: Papa explains the family's agreed safety plan, including which adults to approach and how to ask for help. They practise together.
+Moral: Naam yaad karo, trusted adult ka number practise karo, aur bichhad jao toh help maango.
 ''',
-    setting: 'Phone charging on the kitchen counter, juice spill on the floor',
-    sceneDetail: 'Juice dripping from the phone case onto the tiles',
-    dialogue: '"Mumma, 1-0-0 pe phir se khel liya!"',
-    mess: 'The sticky floor makes the phone slip again as she reaches',
-    innerThought: 'Why does the only number she remembers need an ambulance?',
-    endingBeat: 'Cuty licking the juice off the floor, phone now dry on the counter.',
-    defaultCast: ['Rio', 'Papa'],
+    setting: 'Living room, afternoon, Papa and Ria sitting together',
+    sceneDetail: 'Papa clapping a rhythm, Ria repeating her name and a pretend phone number',
+    dialogue: '"Ria, apna pura naam bolo." "Ria Sharma." "Aur Papa ka number?" "98765-43210."',
+    mess: 'Ria mixes up the digits at first, Papa gently corrects and they try again',
+    innerThought: 'The rhythm makes it stick — safety can be playful, not scary.',
+    endingBeat: 'Papa and Ria high-five after nailing the song twice. "Ab bichhad jao toh kya karogi?" "Rukungi, help maangungi."',
+    defaultCast: ['Ria', 'Papa'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
