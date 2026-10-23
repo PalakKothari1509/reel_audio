@@ -44,6 +44,7 @@ import 'production_adapter.dart';
 import 'production_adapter_impl.dart';
 import 'settings_screen.dart';
 import 'content_ideas.dart';
+import 'add_idea_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
 
@@ -489,8 +490,12 @@ Future<void> main() async {
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const ContentLibraryScreen()),
         ),
-        onAddNewIdea: () => ScaffoldMessenger.of(_appNavigatorKey.currentContext!)
-            .showSnackBar(const SnackBar(content: Text('Add Idea screen coming soon'))),
+        onAddNewIdea: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => const AddIdeaScreen(),
+          ),
+        ),
         onCreateContent: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(
