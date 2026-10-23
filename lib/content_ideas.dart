@@ -328,7 +328,7 @@ const kHookCategories = [
 /// Kids Safety hooks for the shield collection.
 /// Each carries a full storyDetail with the Story/Twist/Resolution/Moral
 /// labels the offline generator expects.
-const kSafetyHooks = <HookIdea>[
+final kSafetyHooks = <HookIdea>[
 // NEEDS EXPERT REVIEW before posting
   HookIdea(
     id: 'safety-good-touch',
@@ -554,9 +554,11 @@ Moral: Garam rasoi se door raho. Cooking ke waqt bade ki safety rules follow kar
 /// three problems (screen time, shoes, toy fights) appeared four or five times each,
 /// and several were written as "I" — a parent speaking — when the reels are told by a
 /// storyteller about Ria and Rio.
-const kDefaultHooks = <HookIdea>[
-// Relatable: the child's own words, the thing every parent has heard this week.
-  HookIdea(
+/// Combined hooks list with safety hooks appended.
+List<HookIdea> buildDefaultHooks() {
+  final list = <HookIdea>[
+    // Relatable: the child's own words, the thing every parent has heard this week.
+    HookIdea(
     id: 'h01',
     category: 'Relatable',
     cover: 'Main Khud! 👟',
@@ -4259,10 +4261,15 @@ Moral: Confidence grows in the soil of consistent small actions.
     punchline: 'Confidence = small steps, big heart!',
     readyPrompt: '',
   ),
-
-  // Safety hooks are spread in at the end.
-  ...kSafetyHooks,
 ];
+
+  // Safety hooks are appended at the end.
+  list.addAll(kSafetyHooks);
+  return list;
+}
+
+/// Combined hooks list with safety hooks appended.
+final kDefaultHooks = buildDefaultHooks();
 
 /// Built-in hooks with all rewrites and moments applied.
 /// Since [kRewrittenStories] and [kMomentUpgrades] have been merged
