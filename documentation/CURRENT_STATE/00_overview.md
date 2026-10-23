@@ -25,9 +25,9 @@
 
 ### Key Patterns
 
-1. **Callback-driven shell**: `ContentStudioHome` (main navigation) delegates to `ContentStudioScreens` via callbacks (`onCreateReel`, `onMyContent`, etc.). Screens don't know about each other.
+1. **Callback-driven shell**: `ContentStudioHome` (main navigation) delegates to `ContentStudioScreens` via callbacks (`onCreateReel`, `onContentLibrary`, `onAddNewIdea`, etc.). Screens don't know about each other.
 2. **Offline-first persistence**: All data via `JsonFileStore<T>` — generic JSON file store with per-row decoding and safe defaults. Files live in `getApplicationDocumentsDirectory()/content_library/`.
-3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 99 built-in ideas (including 6 safety hooks). `HookStore` merges user edits from `hooks.json`. `kRewrittenStories` overrides story details at runtime.
+3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 99 built-in ideas (including 6 safety hooks). `HookStore` merges user edits from `hooks.json`. Rewrites are embedded inline in `storyDetail` fields; `kRewrittenStories` and `kMomentUpgrades` have been merged into inline fields and deleted.
 4. **Two Gemini paths**: Path A (`gemini_call.dart`) — raw HTTP with retry/fallback; Path B (`gemini_client.dart`) — SDK-based, no retry/fallback (see 04_generation.md §5)
 5. **Story label parsing**: `StoryGenerator.extractLine()` parses `Story:`, `Twist:`, `Resolution:`, `Moral:` labels (with `PART 1:` fallback).
 
@@ -78,7 +78,7 @@ Full file listing with line counts:
 | 5100 | main.dart | App entry point, MaterialApp, routes |
 | 57 | master_prompt.dart | Master prompt definitions |
 | 70 | music.dart | Background music configuration |
-| 287 | my_content_screen.dart | My Content browsing screen |
+| 207 | add_idea_screen.dart | Custom idea creation form screen |
 | 169 | offline_engagement.dart | Offline engagement tracking |
 | 763 | offline_story_maker_screen.dart | Offline story maker UI |
 | 219 | models/quick_idea.dart | QuickIdea model + stores |
@@ -116,11 +116,9 @@ Full file listing with line counts:
 
 ### Key Constants (content_ideas.dart)
 
-- `kDefaultHooks`: ~98 built-in HookIdeas (includes `...kSafetyHooks` spread)
+- `kDefaultHooks`: 99 built-in HookIdeas (includes `...kSafetyHooks` spread)
 - `kSafetyHooks`: 6 safety concepts
-- `kRewrittenStories`: 14 improved storyDetail overrides (h01, h02, h03, h04, h05, h07, h08, h12, h13, h16, h17, h19, pal03, pal19)
-- `kDay14Posts`: 24 QuickIdea carousel posts (day2–day25)
-- `kDefaultHooksWithRewrite`: `kDefaultHooks` with rewrites applied (runtime canonical list)
+- `kDefaultHooksWithRewrite`: alias to `kDefaultHooks` (rewrites merged inline into storyDetail & moment fields, kRewrittenStories/kMomentUpgrades deleted)
 
 ## pubspec.yaml Dependencies
 

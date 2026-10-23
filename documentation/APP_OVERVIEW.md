@@ -181,7 +181,7 @@ The app is organized into six connected modules for managing content from idea t
 - **File**: `lib/dashboard_screen.dart` — Added Ready-to-Post checklist showing ready items and items needing attention
 - **File**: `lib/prompt_vault_screen.dart` — UI for browsing, searching, filtering, copying, and deleting saved prompts
 - **File**: `lib/video_library_screen.dart` — UI for listing, uploading, previewing videos; status management (quality check, approve, mark posted)
-- **File**: `lib/home_screen.dart` — Added nav cards for Prompt Vault and Video Library
+   - **File**: `lib/home_screen.dart` — Added nav cards for Content Library, Add New Idea, Prompt Vault, Video Library, and Settings
 
 ## Key design decisions
 
@@ -198,11 +198,12 @@ The app is organized into six connected modules for managing content from idea t
 11. **Version history** — Prompts and videos retain version history; new versions don't overwrite old ones
 12. **Quality checks with severity** — Critical/Major/Minor/Suggestion severity levels; reports tied to asset version
 13. **Content-level tracking** — `QualityReport2` has both `contentId` and `assetId` for flexible querying; `AssetCompletenessService` aggregates across all stores
-14. **Navigation hub** — Home screen has nav cards for Content Library and Settings
+14. **Navigation hub** — Home screen has nav cards for Content Library, Add New Idea, Prompt Vault, Video Library, and Settings
 
 ## Key files to modify
 - `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kHookCategories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite — alias to kDefaultHooks)
 - `lib/hook_templates.dart` — 12 hook templates, HookGenerator class, power words lists
+- `lib/add_idea_screen.dart` — Form for adding custom ideas to Content Library (title, bucket, format, characters, opening, problem, lesson, story details, notes); saves via ContentLibraryService.addIdea
 - `lib/content_collections.dart` — Add/edit collection mappings
 - `lib/characters.dart` — Update character descriptions (kCharacterOptions, kCharacterNames, kCharacterDescriptions)
 - `lib/story_generator_offline.dart` — Add/edit story templates

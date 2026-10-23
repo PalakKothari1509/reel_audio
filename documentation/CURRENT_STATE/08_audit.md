@@ -201,12 +201,12 @@ From `home_screen.dart:13`:
 | Callback | Status | main.dart:477 wiring |
 |----------|--------|--------------------|
 | `onCreateReel` | Required, wired → StoryScreen | ✓ |
-| `onMyContent` | Required, wired → MyContentScreen | ✓ |
+| `onContentLibrary` | Required, wired → ContentLibraryScreen | ✓ |
 | `onSettings` | Required, wired → SettingsScreen | ✓ |
 | `onContentLibrary` | Required, wired → ContentLibraryScreen | ✓ |
 | `onReviewAllIdeas` | Optional, wired → ContentLibraryScreen | ✓ |
 | `onCreateContent` | Optional, wired → StoryScreen | ✓ |
-| `onAddNewIdea` | Optional, "coming soon" snackbar | ⚠️ stub |
+| `onAddNewIdea` | Optional, wired → AddIdeaScreen | ✓ |
 | `onManageVideos` | Optional, **null** | Not passed (null) |
 | `onImagePrompt` | Optional, wired → ImagePromptScreen | ✓ |
 | `onCarouselPrompts` | Optional, wired → CarouselPromptsScreen | ✓ |

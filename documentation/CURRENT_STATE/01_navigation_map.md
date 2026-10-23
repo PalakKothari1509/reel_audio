@@ -21,10 +21,9 @@ callback or branch is inferred rather than seen, it is marked `UNVERIFIED`.
 ### ContentStudioHome (lib/home_screen.dart) — app home
 AppBar `Settings` → SettingsScreen
 - Create → **"Create Content"** → StoryScreen
-- (conditional, null in live wiring) "Add New Idea" → `ScaffoldMessenger` "coming soon" snackbar
+- "Add New Idea" → AddIdeaScreen (form → ContentLibraryService.addIdea → inbox store)
 - Go to → **"Content Library"** → ContentLibraryScreen
 - (conditional) "Review All Ideas" → ContentLibraryScreen
-- **"My Videos"** → MyContentScreen
 - (conditional, null in live wiring) "Video Library" → onManageVideos (UNVERIFIED; not wired)
 - (conditional) "Image Generation Prompt" → ImagePromptScreen
 - (conditional) "Carousel Generation" → CarouselPromptsScreen
@@ -69,7 +68,7 @@ AppBar: Restore from backup
 - Delete (per row) → confirmation → delete
 
 ### ContentLibraryScreen (lib/content_library_screen.dart)
-AppBar: Refresh; FAB "Add New Idea" (onAddNewIdea — null in live wiring)
+AppBar: Refresh; FAB "Add New Idea" → AddIdeaScreen (onAddNewIdea wired from main.dart)
 - Tap idea row → _IdeaCard actions:
   - Create Content → onCreateContent(idea.id) (null in live wiring)
   - Edit → `Navigator.pushNamed('/review-idea', arguments: idea.id)` → ReviewIdeaScreen
@@ -163,7 +162,7 @@ with Generate → offline story/prompts display.
 | CarouselPromptsScreen | yes (conditional) | home Carousel Generation |
 | GeminiVideoScreen | yes (conditional) | home Gemini Story Video |
 | OfflineStoryMakerScreen | yes (conditional) | home Offline Story Generator |
-| MyContentScreen | yes | home My Videos |
+| AddIdeaScreen | yes | home Add New Idea / ContentLibraryScreen FAB |
 | SettingsScreen | yes | home Settings |
 | StoryInputScreen | yes (old path) | StoryScreen "add voice" / HomeScreen |
 | PlanScreen, ShotPlannerScreen, PromptScreen, PostingPackScreen, PostingKit | yes | StoryScreen / TimedScriptScreen / SavedStories |
@@ -190,7 +189,7 @@ Below is every screen/widget class found during source inspection that builds a 
 10. `SettingsScreen` (`settings_screen.dart`) — app settings
 11. `ContentLibraryScreen` (`content_library_screen.dart`) — idea browsing
 12. `ReviewIdeaScreen` (`review_idea_screen.dart`) — single idea review (named route `/review-idea`)
-13. `MyContentScreen` (`my_content_screen.dart`) — video library browsing
+13. `AddIdeaScreen` (`add_idea_screen.dart`) — custom idea form
 14. `ImagePromptScreen` (`idea_input_screen.dart` or `main.dart`) — image prompt flow
 15. `CarouselPromptsScreen` (`story_ideas.dart` or `main.dart`) — carousel generation
 16. `GeminiVideoScreen` (`gemini_video_master_prompt.dart`) — Gemini video generation

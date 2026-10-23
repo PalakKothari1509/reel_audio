@@ -10,14 +10,14 @@ Inventory of the 40 test files in `test/`. `flutter test` reports 499 tests pass
 |------|-------|-------|
 | `home_screen_test.dart` | ContentStudioHome shell | Imports `CreatorHomeScreen` as a fixture; tests callback wiring. |
 | `dashboard_screen_test.dart` | DashboardScreen | Dashboard is not wired to the live home. |
-| `my_content_screen_test.dart` | MyContentScreen | Reachable screen widget test. |
+| `add_idea_screen_test.dart` | AddIdeaScreen | (Not yet — pending) Custom idea form widget test. |
 | `idea_review_screen_test.dart` | IdeaReviewScreen | Approval-gate / hook selection rendering. |
 | `offline_story_maker_test.dart` | OfflineStoryMakerScreen | Offline story + engagement + video-result pipeline. |
 | `widget_test.dart` | (smoke / misc) | Baseline Flutter driving test. |
 
 No widget tests exist for: StoryScreen, StoryInputScreen, HomeScreen (main.dart), TimedScriptScreen,
 PreviewMergedScreen, SavedStoriesScreen, PromptScreen/VideoPromptScreen, PlanScreen,
-ContentLibraryScreen, ImagePromptScreen, CarouselPromptsScreen, GeminiVideoScreen,
+ContentLibraryScreen, AddIdeaScreen, ImagePromptScreen, CarouselPromptsScreen, GeminiVideoScreen,
 QuickContentScreen/CarouselMaker/TrialReel/SingleImage/IdeaInbox/MultiFormat/QualityCheck,
 PromoCommentVaultScreen.
 

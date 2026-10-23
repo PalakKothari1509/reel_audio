@@ -216,11 +216,11 @@ Tests call `setTestDirectory` to redirect all JSON I/O to a temp directory. Prod
 | `usedOn` | `String?` | ISO timestamp of last use |
 
 **Methods:**
-- `load()` — **The key method.** Merges three layers: (1) built-in hooks from `kDefaultHooks`, (2) user edits saved in `hooks.json`, (3) rewrites from `kRewrittenStories`. Built-in hooks get rewrites applied via `kRewrittenStories` unless the user has explicitly edited them. Custom hooks appear at the end.
+- `load()` — **The key method.** Merges two layers: (1) built-in hooks from `kDefaultHooks` (which includes `...kSafetyHooks` inline), (2) user edits saved in `hooks.json`. Custom hooks appear at the end.
 - `save(hooks)` — writes all hooks to file
 - `markUsed(id)` — updates `usedOn` timestamp
 
-**Rewrite logic:** If a built-in hook's `storyDetail` in the saved file differs from the original built-in value, user edits are preserved. Otherwise, `kRewrittenStories` entries are applied. This is the fix for the safety hook loss bug (Q3) — `kSafetyHooks` are now included via `kDefaultHooksWithRewrite`.
+**Rewrite logic:** Rewrites are now embedded inline in `storyDetail` fields directly — `kRewrittenStories` and `kMomentUpgrades` have been merged into the `storyDetail` and moment fields of `kDefaultHooks` and deleted. If a built-in hook's `storyDetail` in the saved file differs from the original built-in value, user edits are preserved.
 
 **Backup integration:** `onPlanSaved` callback fires after any save — triggers Downloads backup.
 

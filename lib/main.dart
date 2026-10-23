@@ -484,11 +484,25 @@ Future<void> main() async {
         ),
         onContentLibrary: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const ContentLibraryScreen()),
+          MaterialPageRoute(
+            builder: (_) => ContentLibraryScreen(
+              onAddNewIdea: () => Navigator.push(
+                _appNavigatorKey.currentContext!,
+                MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
+              ),
+            ),
+          ),
         ),
         onReviewAllIdeas: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const ContentLibraryScreen()),
+          MaterialPageRoute(
+            builder: (_) => ContentLibraryScreen(
+              onAddNewIdea: () => Navigator.push(
+                _appNavigatorKey.currentContext!,
+                MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
+              ),
+            ),
+          ),
         ),
         onAddNewIdea: () => Navigator.push(
           _appNavigatorKey.currentContext!,

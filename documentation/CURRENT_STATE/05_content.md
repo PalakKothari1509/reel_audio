@@ -97,10 +97,6 @@ The master list of all built-in ideas. Categories:
 
 **Total in kDefaultHooks**: 93 entries.
 
-### kMomentUpgrades (~78 entries)
-
-Applied to legacy hooks that haven't been fully migrated to the moment schema. Provides moment fields (`setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`).
-
 ### kSafetyHooks (6 entries, content_ideas.dart:184-262)
 
 All category: `Warm lesson`. All have `keepMoralOffScreen: false`. Spread into `kDefaultHooks` via `...kSafetyHooks`:
@@ -114,66 +110,21 @@ All category: `Warm lesson`. All have `keepMoralOffScreen: false`. Spread into `
 | `safety-lost-crowd` | "Bheed mein Mumma ka haath chhoot gaya... ab kya?" | "Mela Mein Kho Gayi" | Lost in crowd |
 | `safety-kitchen-line` | "Rasoi mein Ria ko aage jaana tha... par ek line thi." | "Laal Line Ke Peeche" | Kitchen safety |
 
-> **Note**: These are inside `kDefaultHooks` via the `...kSafetyHooks` spread at line 1916 â€” NOT a separate loss bug.
+> **Note**: These are inside `kDefaultHooks` via the `...kSafetyHooks` spread — NOT a separate loss bug. Rewrites are now embedded inline in `storyDetail` and moment fields directly.
 
-### kMomentUpgrades (~78 entries)
+### kRewrittenStories / kMomentUpgrades (MERGED & DELETED)
 
-Applied to legacy hooks that haven't been fully migrated to the moment schema. Provides moment fields (`setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`) extracted from the storyDetail text or crafted specifically.
+**Merged** into inline `storyDetail` and moment fields in `kDefaultHooks` and **deleted**. Previously separate maps that are no longer used.
 
-### kRewrittenStories (16 entries, content_ideas.dart:2000)
+### kDefaultHooksWithRewrite (ALIAS)
 
-Overrides for `storyDetail` at runtime. Applied by `kDefaultHooksWithRewrite`:
-
-```dart
-const kRewrittenStories = <String, String>{
-  'h01': '...', 'h02': '...', 'h03': '...', 'h04': '...', 'h05': '...',
-  'h07': '...', 'h08': '...', 'h12': '...', 'h13': '...', 'h14': '...',
-  'h15': '...', 'h16': '...', 'h17': '...', 'h19': '...', 'pal03': '...',
-  'pal19': '...',
-};
-```
-
-**Count**: 16 overrides. Applied after `kMomentUpgrades` by `kDefaultHooksWithRewrite`.
-
-### kDay14Posts (24 entries)
-
-QuickIdea carousel posts for a "14-day challenge" that actually spans 24 day-posts:
-
-| ID Pattern | Count | Collections |
-|------------|-------|-------------|
-| `day2`â€“`day25` | 24 | `missions` (day15â€“25), `play` (day2,4,8,9,13), `guides` (day5,6,10,11), `parent` (day3,7), `milestones` (day14) |
-
----
-
-## 3. kDefaultHooksWithRewrite
+`kDefaultHooksWithRewrite` is now a simple alias to `kDefaultHooks` — rewrites and upgrades are embedded inline. User edits are preserved via `HookStore.load()`.
 
 ```dart
-final kDefaultHooksWithRewrite = kDefaultHooks.map((h) {
-  // 1. Apply kMomentUpgrades: moment fields (setting, sceneDetail, dialogue,
-  //    mess, innerThought, endingBeat, defaultCast, keepMoralOffScreen)
-  // 2. Apply kRewrittenStories: storyDetail override
-  final upgraded = kMomentUpgrades[h.id];
-  if (upgraded != null) {
-    h = h.copyWith(
-      setting: upgraded.setting,
-      sceneDetail: upgraded.sceneDetail,
-      dialogue: upgraded.dialogue,
-      mess: upgraded.mess,
-      innerThought: upgraded.innerThought,
-      endingBeat: upgraded.endingBeat,
-      defaultCast: upgraded.defaultCast,
-      keepMoralOffScreen: upgraded.keepMoralOffScreen,
-    );
-  }
-  final rewritten = kRewrittenStories[h.id];
-  if (rewritten != null) {
-    return h.copyWith(storyDetail: rewritten);
-  }
-  return h;
-}).toList();
+final kDefaultHooksWithRewrite = kDefaultHooks;
 ```
 
-This is the **runtime canonical list**. All built-in ideas pass through this transformation (moment upgrades first, then story detail rewrites) before being used.
+This is the **runtime canonical list**. All built-in ideas pass through this alias before being used.
 
 ---
 
@@ -228,7 +179,7 @@ class ContentIdea {
 ### Caching
 - 1-minute TTL cache
 - Invalidated on writes via `onPlanSaved` callback
-- `HookStore.load()` is async, loads from `hooks.json` + built-ins + rewrites
+   - `HookStore.load()` is async, loads from `hooks.json` + built-ins
 
 ---
 
@@ -237,7 +188,7 @@ class ContentIdea {
 ```dart
 class HookStore {
   static Future<List<HookIdea>> load() async {
-    // 1. Start with kDefaultHooksWithRewrite (built-ins + rewrites)
+     // 1. Start with kDefaultHooksWithRewrite (= kDefaultHooks alias)
     // 2. Merge user edits from hooks.json via JsonFileStore
     // 3. User edits take precedence when storyDetail differs
   }
@@ -368,7 +319,7 @@ All stores use `JsonFileStore<T>` as base, with:
 |-------|-----------|-------|---------|------------|
 | `HookStore` | `hooks.json` | `HookIdea` | `StoryGenerator`, `ContentLibraryService` | User edits in app |
 | `ContentLibraryStore` | `content_library.json` | `ContentLibraryItem` | `ContentLibraryScreen` | `ContentGenerator` (saved packages) |
-| `VideoLibrary` | `video_assets.json` | `VideoAsset` | `MyContentScreen` | After FFmpeg render |
+| `VideoLibrary` | `video_assets.json` | `VideoAsset` | `VideoLibraryScreen` | After FFmpeg render |
 | `QuickIdeaStore` | `quick_ideas.json` | `QuickIdea` | Quick content UI | User additions |
 | `QuickHistoryStore` | `quick_post_history.json` | `QuickIdea` | History UI | Posting actions |
 | `ScheduleStore` | `schedule.json` | `PostSlot` | `PlanScreen` | User scheduling |
