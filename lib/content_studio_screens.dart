@@ -363,13 +363,8 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (_isGeminiError(e)) {
-        setState(() => _status = 'Using offline idea evaluator...');
-        final evaluation = await _buildOfflineEvaluation(idea);
-        if (!mounted) return;
-        setState(() => _evaluation = evaluation);
-      } else if (mounted) {
-        setState(() => _status = '❌ $e');
+      if (mounted) {
+        setState(() => _status = '❌ Evaluation failed: $e\nPlease check your API key and internet connection.');
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -723,6 +718,8 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   List<String> _ideaChars = [];
   String _ideaInstructions = '';
   String? _readyPrompt;
+  String? _caption;
+  String? _pinnedComment;
   int _totalSeconds = 30;
   String _lastIdea = '';
   List<String> _lastCharacters = [];
@@ -734,16 +731,20 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
     (60, '60s — 6 parts'),
   ];
 
-  Future<void> _evaluate({
+Future<void> _evaluate({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
+    String? caption,
+    String? pinnedComment,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
     _ideaInstructions = additionalInstructions;
     _readyPrompt = readyPrompt;
+    _caption = caption;
+    _pinnedComment = pinnedComment;
 
     setState(() {
       _loading = true;
@@ -761,15 +762,8 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (widget.keyStore.hasCustomGeminiKey()) {
-        setState(() => _status = '❌ Gemini failed: $e');
-      } else if (_isGeminiError(e)) {
-        setState(() => _status = 'Using offline idea evaluator...');
-        final evaluation = await _buildOfflineEvaluation(idea);
-        if (!mounted) return;
-        setState(() => _evaluation = evaluation);
-      } else if (mounted) {
-        setState(() => _status = '❌ $e');
+      if (mounted) {
+        setState(() => _status = '❌ Evaluation failed: $e\nPlease check your API key and internet connection.');
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -863,6 +857,8 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
       return _VideoResultScreen(
         result: _result!,
         engagement: _engagement,
+        caption: _caption,
+        pinnedComment: _pinnedComment,
         onBack: () => setState(() {
           _result = null;
           _engagement = null;
@@ -997,12 +993,16 @@ class _VideoResultScreen extends StatelessWidget {
   final EngagementPackage? engagement;
   final VoidCallback onBack;
   final void Function(int partIndex) onRegeneratePart;
+  final String? caption;
+  final String? pinnedComment;
 
   const _VideoResultScreen({
     required this.result,
     required this.onBack,
     required this.onRegeneratePart,
     this.engagement,
+    this.caption,
+    this.pinnedComment,
   });
 
   @override
@@ -1074,7 +1074,96 @@ class _VideoResultScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _EngagementCard(engagement: engagement!),
           ],
+
+          // Caption card
+          if (caption != null && caption!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _CopyableFieldCard(
+              label: 'Caption',
+              value: caption!,
+              icon: Icons.text_fields,
+            ),
+          ],
+
+          // Pinned Comment card
+          if (pinnedComment != null && pinnedComment!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _CopyableFieldCard(
+              label: 'Pinned Comment',
+              value: pinnedComment!,
+              icon: Icons.push_pin_outlined,
+            ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+// ── Reusable copyable field card ───────────────────────────────────────────────
+
+class _CopyableFieldCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _CopyableFieldCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: AppColors.primary),
+                const SizedBox(width: 8),
+                Text(label,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary)),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  tooltip: 'Copy $label',
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: value));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$label copied')),
+                    );
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceAlt,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectableText(
+                value,
+                style: const TextStyle(
+                    fontSize: 12, color: AppColors.text, height: 1.5, fontFamily: 'monospace'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

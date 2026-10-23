@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'content_axes.dart';
+import 'content_ideas.dart';
 import 'content_library_service.dart';
 import 'prompt_vault.dart';
 import 'quality_check_center.dart';
@@ -27,6 +28,7 @@ class ReviewIdeaScreen extends StatefulWidget {
 
 class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   ContentIdea? _idea;
+  HookIdea? _hookIdea;
   bool _loading = true;
   String? _generatedScript;
   bool _isGeneratingScript = false;
@@ -41,8 +43,31 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   Future<void> _load() async {
     final idea = await ContentLibraryService.instance.getIdeaById(widget.ideaId);
     if (!mounted) return;
+    if (idea == null) {
+      setState(() {
+        _idea = null;
+        _loading = false;
+      });
+      return;
+    }
+    
+    HookIdea? hookIdea;
+    final sourceType = idea.sourceType;
+    final sourceIdeaId = idea.sourceIdeaId;
+    if (sourceType == 'HookIdea' && sourceIdeaId != null) {
+      // Try to find the original HookIdea from the built-in list
+      final allHooks = <HookIdea>[];
+      allHooks.addAll(kDefaultHooks);
+      try {
+        hookIdea = allHooks.firstWhere((h) => h.id == sourceIdeaId);
+      } catch (_) {
+        hookIdea = null;
+      }
+    }
+    
     setState(() {
       _idea = idea;
+      _hookIdea = hookIdea;
       _loading = false;
     });
   }
@@ -71,6 +96,7 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   }
 
   Widget _buildContent(ContentIdea idea) {
+    final hook = _hookIdea;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -94,28 +120,33 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           ),
           const SizedBox(height: 24),
 
-          // ── 1. Opening Hook ────────────────────────────────────
-          _section('1. Opening Hook', idea.opening),
+          // ── Original Idea Fields ───────────────────────────────
+          _section('Original Opening Hook', idea.opening),
+          _section('Real-Life Problem', idea.problem),
+          _section('Story Details', idea.storyDetail),
+          _section('Learning Outcome', idea.lesson),
+          if (idea.caption.isNotEmpty) _section('Caption', idea.caption),
 
-          // ── 2. Real-Life Problem ───────────────────────────────
-          _section('2. Real-Life Problem', idea.problem),
+          // ── Original HookIdea Cover Hook & Choices ──────────────
+          if (hook != null) ...[
+            const SizedBox(height: 24),
+            Text('Original HookIdea Cover & Choices', style: AppText.section),
+            const SizedBox(height: 8),
+            _section('Cover Hook', hook.cover),
+            _section('Opening', hook.opening),
+            _section('Problem', hook.problem),
+            _section('Lesson', hook.lesson),
+            if (hook.storyDetail.isNotEmpty) _section('Story Detail', hook.storyDetail),
+            if (hook.readyPrompt.isNotEmpty) _section('Ready Prompt', hook.readyPrompt),
+          ],
 
-          // ── 3. Story Details ───────────────────────────────────
-          _section('3. Story Details', idea.storyDetail),
-
-          // ── 4. Learning Outcome ────────────────────────────────
-          _section('4. Learning Outcome', idea.lesson),
-
-          // ── 5. Caption ─────────────────────────────────────────
-          if (idea.caption.isNotEmpty) _section('5. Caption', idea.caption),
-
-          // ── 6. Content Status ──────────────────────────────────
+          // ── Content Status ──────────────────────────────────────
           const SizedBox(height: 8),
           Text('6. Content Status', style: AppText.section),
           const SizedBox(height: 8),
           _buildStatusSummary(idea),
 
-          // ── 6b. Hook Health Check ─────────────────────────────
+          // ── Hook Health Check ──────────────────────────────────
           const SizedBox(height: 24),
           Text('7. Hook Health', style: AppText.section),
           const SizedBox(height: 8),
