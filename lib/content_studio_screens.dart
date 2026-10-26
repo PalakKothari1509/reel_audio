@@ -5,26 +5,11 @@ import 'api_key_store.dart';
 import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
 import 'idea_review_screen.dart';
-import 'offline_engagement.dart';
 import 'prompt_preview.dart';
 import 'prompt_vault.dart';
 import 'prompts.dart';
-import 'story_generator_offline.dart';
 import 'story_ideas.dart';
 import 'theme.dart';
-import 'video_prompt_generator_offline.dart'
-    hide GeminiVideoResult, VideoPartPrompt;
-
-bool _isGeminiError(Object e) {
-  final msg = e.toString().toLowerCase();
-  return msg.contains('gemini') ||
-      msg.contains('free') ||
-      msg.contains('429') ||
-      msg.contains('400') ||
-      msg.contains('503') ||
-      msg.contains('502') ||
-      msg.contains('timeout');
-}
 
 String _storyTitleFromIdea(String idea) {
   final words = idea.trim().split(' ').where((w) => w.length > 3).toList();
@@ -63,55 +48,6 @@ Future<void> _saveVideoPromptsToVault(
       metadata: {...metadata, 'partNumber': part.partNumber, 'textOverlay': part.textOverlay},
     );
   }
-}
-
-Future<IdeaEvaluation> _buildOfflineEvaluation(String idea) async {
-  final story = await StoryGenerator().generate();
-  final check = StoryCheck(
-    good: ['Strong relatable hook', 'Clear character fit', 'Satisfying ending'],
-    missing: ['Review originality and share value — online evaluation can do more'],
-    verdict: 'Offline check passed — review suggestions to make it stronger',
-    rows: kStoryChecks.map((name) => CheckRow(name, true, 'auto')).toList(),
-    hooks: story.hookOptions
-        .map((h) => HookChoice(h['type']!, h['text']!))
-        .toList(),
-  );
-  final shareability = ShareabilityAnalysis(
-    sender: 'Parent of a 3-year-old',
-    recipient: 'a parent facing the same situation',
-    reason: 'Relatable everyday moment every parent recognizes',
-    confidence: 'high',
-  );
-  return IdeaEvaluation(check: check, shareability: shareability);
-}
-
-Future<GeminiVideoResult> _buildOfflineVideoResult(String idea, int totalSeconds, List<String> chars) async {
-  final story = await StoryGenerator().generate();
-  final mergedStory = story.copyWith(
-    title: _storyTitleFromIdea(idea),
-    hook: idea,
-    problem: idea,
-    solution: 'Together they figured it out with teamwork.',
-    endingLine: 'Theek hai na Mama?',
-    moral: 'Working together makes everything better.',
-  );
-  final offlineResult = OfflineVideoPromptGenerator().generateFromStory(
-    mergedStory,
-    totalSeconds: totalSeconds,
-    characters: chars,
-  );
-  return GeminiVideoResult(
-    storyTitle: offlineResult.storyTitle,
-    storyFoundation: offlineResult.storyFoundation,
-    parts: offlineResult.parts
-        .map((p) => VideoPartPrompt(
-              partNumber: p.partNumber,
-              totalParts: p.totalParts,
-              promptText: p.promptText,
-              textOverlay: '',
-            ))
-        .toList(),
-  );
 }
 
 // ── Feature 2: Image Generation Prompt ───────────────────────────────────────
@@ -165,14 +101,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
     } catch (e) {
-      if (_isGeminiError(e)) {
-        setState(() => _status = 'Using offline idea evaluator...');
-        final evaluation = await _buildOfflineEvaluation(idea);
-        if (!mounted) return;
-        setState(() => _evaluation = evaluation);
-      } else if (mounted) {
-        setState(() => _status = '❌ $e');
-      }
+      rethrow;
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -193,7 +122,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
           idea: idea,
           characters: _ideaChars,
           additionalInstructions: _ideaInstructions,
-          apiKey: widget.keyStore.getGeminiApiKey(),
+apiKey: widget.keyStore.getGeminiApiKey(),
           onWait: (msg) {
             if (mounted) setState(() => _status = msg);
           },
@@ -201,15 +130,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
         if (!mounted) return;
         resultPrompt = result.prompt;
       } catch (e) {
-        if (_isGeminiError(e)) {
-          resultPrompt = buildOfflineImagePrompt(
-            idea: idea,
-            characters: _ideaChars,
-            additionalInstructions: _ideaInstructions,
-          );
-        } else {
-          rethrow;
-        }
+        rethrow;
       }
 
       EngagementPackage? engagement;
@@ -224,22 +145,7 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
           },
         );
       } catch (e) {
-        if (_isGeminiError(e)) {
-          final offlinePkg = OfflineEngagementGenerator()
-              .generate(storyMoral: _evaluation?.check.verdict ?? 'Shared moments matter');
-          engagement = EngagementPackage(
-            caption: offlinePkg.caption,
-            hashtags: offlinePkg.hashtags,
-            pinnedComment: offlinePkg.pinnedComment,
-            suggestedReplies: offlinePkg.suggestedReplies
-                .map((r) => SuggestedReply(
-                    r['situation'] ?? '', r['text'] ?? ''))
-                .toList(),
-            followReason: offlinePkg.followReason,
-          );
-        } else {
-          rethrow;
-        }
+        rethrow;
       }
       if (!mounted) return;
       setState(() {
@@ -413,7 +319,7 @@ CarouselPromptsResult result;
         result = await generateCarouselPromptsWithPreview(
           context: context,
           idea: idea,
-          slideCount: _slideCount,
+slideCount: _slideCount,
           characters: _ideaChars,
           additionalInstructions: _ideaInstructions,
           apiKey: widget.keyStore.getGeminiApiKey(),
@@ -422,24 +328,7 @@ CarouselPromptsResult result;
           },
         );
       } catch (e) {
-        if (_isGeminiError(e)) {
-          final offlineSlides = buildOfflineCarouselSlides(
-            idea: _ideaText,
-            characters: _ideaChars,
-            slideCount: _slideCount,
-          );
-          result = CarouselPromptsResult(
-            title: _storyTitleFromIdea(_ideaText),
-            slides: offlineSlides.map((s) => CarouselSlidePrompt(
-              slideNumber: int.parse(s['slideNumber']!),
-              purpose: s['purpose']!,
-              textOverlay: s['textOverlay']!,
-              prompt: s['prompt']!,
-            )).toList(),
-          );
-        } else {
-          rethrow;
-        }
+        rethrow;
       }
       if (!mounted) return;
       EngagementPackage? engagement;
@@ -454,22 +343,7 @@ CarouselPromptsResult result;
           },
         );
       } catch (e) {
-        if (_isGeminiError(e)) {
-          final offlinePkg = OfflineEngagementGenerator()
-              .generate(storyMoral: _evaluation?.check.verdict ?? 'Shared moments matter');
-          engagement = EngagementPackage(
-            caption: offlinePkg.caption,
-            hashtags: offlinePkg.hashtags,
-            pinnedComment: offlinePkg.pinnedComment,
-            suggestedReplies: offlinePkg.suggestedReplies
-                .map((r) => SuggestedReply(
-                    r['situation'] ?? '', r['text'] ?? ''))
-                .toList(),
-            followReason: offlinePkg.followReason,
-          );
-        } else {
-          rethrow;
-        }
+        rethrow;
       }
       if (!mounted) return;
       setState(() {
@@ -878,13 +752,8 @@ Future<void> _evaluate({
             },
           );
         } catch (e) {
-          if (_isGeminiError(e)) {
-            setState(() => _status = 'Using offline video prompts...');
-            result = await _buildOfflineVideoResult(_ideaText, _totalSeconds, _ideaChars);
-          } else {
-            rethrow;
-          }
-          }
+          rethrow;
+        }
       }
       if (!mounted) return;
       setState(() {
