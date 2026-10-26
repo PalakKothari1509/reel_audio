@@ -1343,7 +1343,57 @@ MASTER SPECIFICATION:
 
 STORY IDEA: $idea
 LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
-${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
+
+Soft 3D Disney-Pixar animation style, vertical 9:16 aspect ratio.
+Indian family setting. Target audience: parents of children aged 1-4.
+Bilingual Hindi-English environment: adults speak natural Hindi, children speak age-appropriate Hinglish.
+Warm natural lighting. Cream backgrounds preferred.
+Characters are toddlers with realistic proportions — no chibi or kawaii exaggeration.
+Every character looks the same in every scene: same clothes, same hair, same colors.
+Cute but not cartoonish. Semi-realistic rendering.
+
+CHARACTER LOCK (do not deviate):
+  Ria: 3-year-old girl, two high ponytails with pink bows, big brown eyes, dimple on left cheek,
+       wearing a pink star-print dress (no glasses), small feet in pink sandals.
+  Rio: 4-year-old boy, short brown hair, slight cowlick, brown eyes,
+       wearing a blue kurta with white border and brown juttis (no glasses).
+  Cuty: small white bunny, soft grey nose, pink neck bow, always upright on hind legs.
+  Robot: friendly white-silver body, teal LED chest panel, child-height, round eyes glow teal.
+  Mumma: warm Indian mother, yellow kurta, blue jeans, hair in a bun.
+  Papa: light blue kurta, brown juttis.
+  Daadi: silver bun, glasses, cream saree with gold border.
+  Teacher: blue kurta, holding a book, kind smile.
+
+LANGUAGE RULES:
+  Adults speak natural, conversational Hindi or Hinglish — no stilted translations.
+  Children speak simple, age-appropriate Hinglish — short sentences, limited vocabulary.
+  Avoid formal, AI-sounding dialogue, repetitive catchphrases, and forced translations.
+
+STORY QUALITY:
+  Every story starts from a recognizable real-life preschool problem (e.g. sharing toys,
+  bedtime resistance, picky eating, fear of loud noise).
+  Child reactions are believable — frustration, tears, joy — not perfectly compliant.
+  Parenting is imperfect but caring: mistakes happen, patience is shown.
+  Clear cause-and-effect progression: Problem → Child acts → Consequence → Parent step → Resolution.
+  Endings are satisfying but not artificially perfect — show a small, real-world improvement.
+  Lessons are demonstrated through actions and consequences, not forced dialogue or moralizing.
+
+NEGATIVE INSTRUCTIONS: Ria and Rio NEVER wear glasses.
+Cuty is ALWAYS a small white bunny with a pink neck bow.
+Robot is friendly, white-silver with teal LED accents, child-height.
+Mumma: warm Indian mother, yellow kurta, blue jeans.
+Papa: light blue kurta, brown juttis.
+Daadi: cream saree with gold border.
+Teacher: blue kurta, holding a book.
+Use the exact full character descriptions from the CHARACTER LOCK block above in every part.
+No duplicate characters, no identity changes, no outfit changes between parts.
+Preserve character positions, object locations, and scene continuity across all parts.
+No distorted hands or anatomy, no floating objects, no blurry faces.
+NO on-screen text of any kind: no captions, titles, subtitles, speech bubbles,
+readable signs, logos or watermarks. Text is added later in the editor.
+No closing card, moral, quote or summary at the end.
+Audience: Indian moms and parents of children aged 1-4
+Brand: Fun Learning With Palak (@funlearningwithpalak)
 
 ${_brandStyleBlock()}
 
