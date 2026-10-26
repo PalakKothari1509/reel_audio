@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'gemini_call.dart';
 import 'prompts.dart';
 import 'secrets.dart';
+import 'prompt_preview.dart';
 
 // ── Story ideas ───────────────────────────────────────────────────────────────
 //
@@ -181,21 +184,10 @@ class StoryCheck {
   }
 }
 
-/// Reads a story and says whether it will make a reel worth watching.
-///
-/// Worth doing before the script, not after: a weak story produces a weak script, a
-/// weak voiceover and seven weak pictures, and by then it has cost twenty minutes.
-/// Ten seconds here saves all of that.
-Future<StoryCheck> checkStory(String story,
-    {String? apiKey, void Function(String message)? onWait}) async {
-  if (story.trim().length < 15) {
-    throw Exception('Write a bit more of the story first.');
-  }
-
-  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
-
-  final prompt = '''
-Judge this story for a 30 second Instagram reel for Indian parents of preschoolers.
+/// Builds the checkStory prompt without sending it.
+/// Use with [showPromptPreview] to preview before sending.
+String buildCheckStoryPrompt(String story) {
+  return '''Judge this story for a 30 second Instagram reel for Indian parents of preschoolers.
 
 $story
 
@@ -241,6 +233,105 @@ rewordings of one line. The examples show the style only; write new ones for thi
 "score" is 1 to 10 and should roughly equal the number of checks passed. Be strict:
 9 or 10 means ready to make today.
 ''';
+}
+
+/// Generation config for checkStory
+const Map<String, dynamic> kCheckStoryGenConfig = {
+  'temperature': 0.3,
+  'maxOutputTokens': 2048,
+  'thinkingConfig': {'thinkingBudget': 0},
+  'responseMimeType': 'application/json',
+};
+
+/// Calls checkStory with a prompt preview dialog first.
+/// Returns the StoryCheck result after user confirms.
+Future<StoryCheck> checkStoryWithPreview({
+  required BuildContext context,
+  required String story,
+  String? apiKey,
+  void Function(String message)? onWait,
+  bool useSheet = false,
+}) async {
+  final prompt = buildCheckStoryPrompt(story);
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return prompt.withPromptPreview<StoryCheck>(
+    context: context,
+    title: 'Story Quality Check',
+    modelName: _lightModel,
+    generationConfig: kCheckStoryGenConfig,
+    useSheet: useSheet,
+    onSend: () async {
+      final response = await geminiPost(
+        model: _lightModel,
+        fallbackModel: _fullModel,
+        apiKey: key,
+        timeout: _timeout,
+        onWait: onWait,
+        body: jsonEncode({
+          'contents': [{'parts': [{'text': prompt}]}],
+          'generationConfig': kCheckStoryGenConfig,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(response.statusCode == 503 || response.statusCode == 429
+            ? geminiBusyMessage(response.statusCode, response.body)
+            : 'Gemini error ${response.statusCode}: ${response.body}');
+      }
+
+      final body = jsonDecode(response.body);
+      final text = body['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+      if (text.trim().isEmpty) throw Exception('Gemini returned no answer.');
+
+      final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(text.trim()) as Map<String, dynamic>;
+      } catch (_) {
+        throw Exception('Gemini did not return usable JSON.\n$text');
+      }
+
+      List<String> list(String key) => ((json[key] as List?) ?? const [])
+          .whereType<String>()
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      final rawChecks = ((json['checks'] as List?) ?? const [])
+          .whereType<Map<String, dynamic>>().toList();
+      final rows = <CheckRow>[
+        for (var i = 0; i < kStoryChecks.length && i < rawChecks.length; i++)
+          CheckRow(
+            kStoryChecks[i],
+            rawChecks[i]['pass'] == true,
+            (rawChecks[i]['note'] as String?)?.trim() ?? ''),
+      ];
+
+      return StoryCheck(
+        good: list('good'),
+        missing: list('missing'),
+        verdict: (json['verdict'] as String?)?.trim() ?? '',
+        rows: rows,
+        hooks: hookChoicesFrom(json['hook_options']),
+      );
+    },
+  );
+}
+
+/// Reads a story and says whether it will make a reel worth watching.
+///
+/// Worth doing before the script, not after: a weak story produces a weak script, a
+/// weak voiceover and seven weak pictures, and by then it has cost twenty minutes.
+/// Ten seconds here saves all of that.
+Future<StoryCheck> checkStory(String story,
+    {String? apiKey, void Function(String message)? onWait}) async {
+  if (story.trim().length < 15) {
+    throw Exception('Write a bit more of the story first.');
+  }
+
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  final prompt = buildCheckStoryPrompt(story);
 
   final response = await geminiPost(
     model: _lightModel,
@@ -250,18 +341,7 @@ rewordings of one line. The examples show the style only; write new ones for thi
     onWait: onWait,
     body: jsonEncode({
       'contents': [{'parts': [{'text': prompt}]}],
-      'generationConfig': {
-        // Low: a critique should be the same twice for the same story, or it is
-        // not a judgement, it is a mood.
-'temperature': 0.3,
-          'maxOutputTokens': 2048,
-          // The model spends thinking tokens out of the same budget, and a reply
-          // cut off mid-JSON will not parse. Measured on this key: with thinking
-          // on, a 1024 budget went 981 tokens to thinking and returned
-          // MAX_TOKENS with a truncated body. None of these three calls needs it.
-          'thinkingConfig': {'thinkingBudget': 0},
-          'responseMimeType': 'application/json',
-      },
+      'generationConfig': kCheckStoryGenConfig,
     }),
   );
 

@@ -6,6 +6,7 @@ import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
 import 'idea_review_screen.dart';
 import 'offline_engagement.dart';
+import 'prompt_preview.dart';
 import 'prompt_vault.dart';
 import 'prompts.dart';
 import 'story_generator_offline.dart';
@@ -152,12 +153,14 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
       _evaluation = null;
     });
     try {
-      final evaluation = await evaluateIdea(
+      final evaluation = await evaluateIdeaWithPreview(
+        context: context,
         idea: idea,
         apiKey: widget.keyStore.getGeminiApiKey(),
         onWait: (msg) {
           if (mounted) setState(() => _status = msg);
         },
+        useSheet: true,
       );
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
@@ -260,6 +263,28 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
     );
   }
 
+  
+Future<void> _showEvaluationPromptOnly({
+    required String idea,
+    required List<String> characters,
+    required String additionalInstructions,
+  }) async {
+    final prompt = buildCheckStoryPrompt(idea);
+    if (!mounted) return;
+    await prompt.showPromptOnly(
+      context: context,
+      title: 'Story Quality Check Prompt',
+      modelName: 'gemini-3.5-flash',
+      generationConfig: {
+        'temperature': 0.3,
+        'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+useSheet: true,
+    );
+  }
+
   void _handleBack() {
     setState(() {
       _evaluation = null;
@@ -296,12 +321,13 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
         onEditIdea: _handleBack,
       );
     }
-    return IdeaInputScreen(
+return IdeaInputScreen(
       feature: ContentFeature.imagePrompt,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
+      onGeneratePromptOnly: _showEvaluationPromptOnly,
       extraControls: _loading
           ? _LoadingCard(message: _status)
           : _status.isNotEmpty
@@ -353,12 +379,14 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       _evaluation = null;
     });
     try {
-      final evaluation = await evaluateIdea(
+      final evaluation = await evaluateIdeaWithPreview(
+        context: context,
         idea: idea,
         apiKey: widget.keyStore.getGeminiApiKey(),
         onWait: (msg) {
           if (mounted) setState(() => _status = msg);
         },
+        useSheet: true,
       );
       if (!mounted) return;
       setState(() => _evaluation = evaluation);
@@ -380,9 +408,10 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       final idea = hook != null
           ? 'Cover hook: ${hook.text}\n\n$_ideaText'
           : _ideaText;
-      CarouselPromptsResult result;
+CarouselPromptsResult result;
       try {
-        result = await generateCarouselPrompts(
+        result = await generateCarouselPromptsWithPreview(
+          context: context,
           idea: idea,
           slideCount: _slideCount,
           characters: _ideaChars,
@@ -464,6 +493,27 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
     );
   }
 
+  
+  Future<void> _showEvaluationPromptOnly({
+    required String idea,
+    required List<String> characters,
+    required String additionalInstructions,
+  }) async {
+    final prompt = buildCheckStoryPrompt(idea);
+    if (!mounted) return;
+    await prompt.showPromptOnly(
+      context: context,
+      title: 'Story Quality Check Prompt',
+      modelName: 'gemini-3.5-flash',
+      generationConfig: {
+        'temperature': 0.3,
+        'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+      useSheet: true,
+    );
+  }
   void _handleBack() {
     setState(() {
       _evaluation = null;
@@ -499,12 +549,13 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
       );
     }
 
-    return IdeaInputScreen(
+return IdeaInputScreen(
       feature: ContentFeature.carouselPrompts,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
+      onGeneratePromptOnly: _showEvaluationPromptOnly,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -787,18 +838,35 @@ Future<void> _evaluate({
           _readyPrompt!,
           hook?.text ?? 'Viral Reel',
         );
-      } else {
+} else {
         try {
-          result = await generateGeminiVideoPrompts(
-            idea: idea,
-            totalSeconds: _totalSeconds,
-            characters: _ideaChars,
-            additionalInstructions: _ideaInstructions,
-            apiKey: widget.keyStore.getGeminiApiKey(),
-            onWait: (msg) {
-              if (mounted) setState(() => _status = msg);
-            },
-          );
+          // Use Master Reel prompt for 30-second videos (3 clips)
+          if (_totalSeconds == 30) {
+            result = await generateMasterReelPromptsWithPreview(
+              context: context,
+              idea: idea,
+              characters: _ideaChars,
+              additionalInstructions: _ideaInstructions,
+              apiKey: widget.keyStore.getGeminiApiKey(),
+              onWait: (msg) {
+                if (mounted) setState(() => _status = msg);
+              },
+              useSheet: true,
+            );
+          } else {
+            result = await generateGeminiVideoPromptsWithPreview(
+              context: context,
+              idea: idea,
+              totalSeconds: _totalSeconds,
+              characters: _ideaChars,
+              additionalInstructions: _ideaInstructions,
+              apiKey: widget.keyStore.getGeminiApiKey(),
+              onWait: (msg) {
+                if (mounted) setState(() => _status = msg);
+              },
+              useSheet: true,
+            );
+          }
           if (!mounted) return;
           engagement = await generateEngagementPackage(
             idea: _ideaText,
@@ -840,6 +908,52 @@ Future<void> _evaluate({
       idea: _ideaText,
       characters: _ideaChars,
       additionalInstructions: _ideaInstructions,
+    );
+  }
+
+  
+  Future<void> _showEvaluationPromptOnly({
+    required String idea,
+    required List<String> characters,
+    required String additionalInstructions,
+  }) async {
+    final prompt = buildCheckStoryPrompt(idea);
+    if (!mounted) return;
+    await prompt.showPromptOnly(
+      context: context,
+      title: 'Story Quality Check Prompt',
+      modelName: 'gemini-3.5-flash',
+      generationConfig: {
+        'temperature': 0.3,
+        'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+      useSheet: true,
+    );
+  }  
+  Future<void> _showMasterReelPromptOnly({
+    required String idea,
+    required List<String> characters,
+    required String additionalInstructions,
+  }) async {
+    final prompt = buildMasterReelPrompt(
+      idea: idea,
+      characters: characters,
+      additionalInstructions: additionalInstructions,
+    );
+    if (!mounted) return;
+    await prompt.showPromptOnly(
+      context: context,
+      title: 'Master 30-Second Reel Prompt (3 Clips)',
+      modelName: 'gemini-3.8-flash',
+      generationConfig: {
+        'temperature': 0.7,
+        'maxOutputTokens': 8192,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+      useSheet: true,
     );
   }
 
@@ -934,12 +1048,15 @@ Future<void> _evaluate({
         onEditIdea: _handleBack,
       );
     }
-    return IdeaInputScreen(
+return IdeaInputScreen(
       feature: ContentFeature.geminiVideo,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
           ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
           : _evaluate,
+      onGeneratePromptOnly: _totalSeconds == 30
+          ? _showMasterReelPromptOnly
+          : _showEvaluationPromptOnly,
       extraControls: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1531,3 +1648,10 @@ class _EngagementCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+

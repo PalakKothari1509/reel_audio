@@ -34,6 +34,14 @@ class IdeaInputScreen extends StatefulWidget {
     String? readyPrompt,
   }) onGenerate;
 
+  /// Optional: called when user taps "Show Prompt Only" — builds and displays
+  /// the prompt without sending to Gemini.
+  final void Function({
+    required String idea,
+    required List<String> characters,
+    required String additionalInstructions,
+  })? onGeneratePromptOnly;
+
   /// Extra controls specific to the feature (e.g. slide count, duration).
   final Widget? extraControls;
 
@@ -44,6 +52,7 @@ class IdeaInputScreen extends StatefulWidget {
     super.key,
     required this.feature,
     required this.onGenerate,
+    this.onGeneratePromptOnly,
     this.extraControls,
     this.initialText,
   });
@@ -112,6 +121,25 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       characters: chars,
       additionalInstructions: _instrCtrl.text.trim(),
       readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
+    );
+  }
+
+  void _showPromptOnly() {
+    if (widget.onGeneratePromptOnly == null) return;
+    final idea = _ideaCtrl.text.trim();
+    if (idea.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter or select an idea first.')),
+      );
+      return;
+    }
+    final chars = _selectedChars.isEmpty
+        ? ['ria', 'rio', 'cuty']
+        : List<String>.from(_selectedChars);
+    widget.onGeneratePromptOnly!(
+      idea: idea,
+      characters: chars,
+      additionalInstructions: _instrCtrl.text.trim(),
     );
   }
 
@@ -233,10 +261,22 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
               color: AppColors.bg,
               border: Border(top: BorderSide(color: AppColors.border)),
             ),
-            child: PrimaryButton(
-              label: 'Generate',
-              icon: Icons.auto_awesome,
-              onPressed: _generate,
+            child: Column(
+              children: [
+                PrimaryButton(
+                  label: 'Generate',
+                  icon: Icons.auto_awesome,
+                  onPressed: _generate,
+                ),
+                if (widget.onGeneratePromptOnly != null) ...[
+                  const SizedBox(height: 8),
+                  SecondaryButton(
+                    label: 'Show Prompt Only',
+                    icon: Icons.description,
+                    onPressed: _showPromptOnly,
+                  ),
+                ],
+              ],
             ),
           ),
         ],

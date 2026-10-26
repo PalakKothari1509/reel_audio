@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'brand_system.dart';
 import 'characters.dart';
 import 'gemini_call.dart';
@@ -7,6 +9,7 @@ import 'master_prompt.dart';
 import 'secrets.dart';
 import 'prompts.dart';
 import 'story_ideas.dart';
+import 'prompt_preview.dart';
 
 // ── Shared brand-aware prompt generation service ──────────────────────────────
 //
@@ -16,6 +19,9 @@ import 'story_ideas.dart';
 // output for each requested deliverable.
 
 const _model = 'gemini-3.8-flash';
+// Light model for quick calls (checkStory, analyzeShareability, generateStoryIdea)
+// Separate quota from the main model
+const _lightModel = 'gemini-3.5-flash';
 // Gemini 3.8 Flash supports thinkingConfig.thinkingBudget (lite models do not),
 // and its 20/day quota gives the app headroom before hitting free-tier limits.
 // See the quota table in documentation/app_overview.md.
@@ -996,5 +1002,659 @@ RULES:
   }
 
   return result;
+}
+
+/// ============================================================================
+/// PROMPT PREVIEW WRAPPERS
+/// ============================================================================
+///
+/// These functions show the exact prompt before sending to Gemini.
+/// Import 'prompt_preview.dart' and call these from UI code with a BuildContext.
+
+/// Builds the analyzeShareability prompt without sending.
+String buildAnalyzeShareabilityPrompt(String idea) {
+  return '''You are analyzing content for "${BrandDefaults.name}", an Indian kids' education
+Instagram page. The audience is Indian moms and parents of children aged 1-4.
+
+Analyze the shareability of this story idea:
+
+IDEA: $idea
+
+Answer these exact questions in JSON:
+1. SENDER — which specific parent archetype would send this?
+   e.g. "Mumma of a 3-year-old who refuses vegetables"
+2. RECIPIENT — who would they send it to?
+   e.g. "a parent whose child also pushes food away"
+3. REASON — why would they send it? One specific, actionable sentence.
+4. CONFIDENCE — how confident are you this will be shared?
+   (high, medium, or low)
+5. NOTE — one practical tip to strengthen the shareability, or empty string.
+
+Return ONLY valid JSON:
+{
+  "sender": "specific parent who would send this",
+  "recipient": "who they would send it to",
+  "reason": "why they would send it — specific and actionable",
+  "confidence": "high",
+  "note": "practical tip or empty string"
+}
+
+Be honest: a share is worth more than a view, and a post that cannot name a
+specific sender and recipient is not ready.
+''';
+}
+
+const Map<String, dynamic> kShareabilityGenConfig = {
+  'temperature': 0.3,
+  'maxOutputTokens': 2048,
+  'thinkingConfig': {'thinkingBudget': 0},
+  'responseMimeType': 'application/json',
+};
+
+/// Calls analyzeShareability with a prompt preview dialog first.
+Future<ShareabilityAnalysis> analyzeShareabilityWithPreview({
+  required BuildContext context,
+  required String idea,
+  String? apiKey,
+  void Function(String)? onWait,
+  bool useSheet = false,
+}) async {
+  final prompt = buildAnalyzeShareabilityPrompt(idea);
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return prompt.withPromptPreview<ShareabilityAnalysis>(
+    context: context,
+    title: 'Shareability Analysis',
+    modelName: _model,
+    generationConfig: kShareabilityGenConfig,
+    useSheet: useSheet,
+    onSend: () async {
+      final text = await _geminiText(
+        prompt, apiKey: key, maxTokens: 2048, temperature: 0.3, onWait: onWait);
+      if (text.trim().isEmpty) {
+        throw Exception('Gemini returned no shareability analysis.');
+      }
+
+      final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(text.trim()) as Map<String, dynamic>;
+      } catch (_) {
+        throw Exception('Gemini did not return usable JSON for shareability.');
+      }
+
+      if ((json['sender'] as String? ?? '').trim().isEmpty &&
+          (json['recipient'] as String? ?? '').trim().isEmpty) {
+        throw Exception(
+            'Shareability analysis was empty — try rewording the idea.');
+      }
+
+      return ShareabilityAnalysis.fromJson(json);
+    },
+  );
+}
+
+/// Builds the generateCarouselPrompts prompt without sending.
+String buildCarouselPromptsPrompt({
+  required String idea,
+  required int slideCount,
+  required List<String> characters,
+  String contentTheme = '',
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+}) {
+  final charBlock = _characterBlock(characters);
+  final count = slideCount.clamp(3, 12);
+
+  return '''You are a creative director for "${BrandDefaults.name}", an Indian kids' education Instagram page.
+
+Generate a complete $count-slide carousel with one detailed image-generation prompt per slide.
+
+IDEA: $idea
+${contentTheme.trim().isEmpty ? '' : 'CONTENT THEME: $contentTheme'}
+LANGUAGE: $language
+${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
+
+${_brandStyleBlock()}
+
+CHARACTERS:
+$charBlock
+
+CHARACTER CONSISTENCY RULES:
+- Use the exact descriptions above. Do not paraphrase.
+- Ria and Rio NEVER wear glasses.
+- Cuty is ALWAYS a small white bunny with a pink bow.
+- Only the listed characters may appear.
+- Keep faces, hair, outfits and proportions IDENTICAL across all slides.
+
+CAROUSEL STRUCTURE (adapt to the idea):
+- Slide 1: Cover and hook — the most eye-catching image
+- Middle slides: Story progression or educational content
+- Last slide: Resolution, lesson or call to action
+
+Return ONLY valid JSON:
+
+{
+  "title": "carousel title",
+  "slides": [
+    {
+      "slide_number": 1,
+      "purpose": "Cover and hook",
+      "text_overlay": "Exact text to display on this slide",
+      "characters_present": "Which characters appear",
+      "scene": "Location and background",
+      "action": "What each character is doing",
+      "expressions": "Facial expressions and body language",
+      "composition": "Framing and camera angle",
+      "lighting": "Lighting and atmosphere",
+      "continuity_note": "How this slide connects to the next",
+      "negative_prompt": "What to avoid",
+      "full_prompt": "Complete copy-paste-ready image generation prompt for this slide"
+    }
+  ]
+}
+
+RULES:
+- Return exactly $count slides.
+- Every "full_prompt" must be self-contained: include style, characters with exact descriptions, scene, action, expressions, composition, lighting, aspect ratio (square 1:1 for carousel), and negative prompt.
+- All slides must look like parts of the same carousel: consistent characters, consistent visual style, consistent colour palette.
+- Text overlays should be in $language.
+- Never generate only an outline. Every slide must have a complete, copy-paste-ready prompt.
+''';
+}
+
+const Map<String, dynamic> kCarouselGenConfig = {
+  'temperature': 0.7,
+  'maxOutputTokens': 8192,
+  'thinkingConfig': {'thinkingBudget': 0},
+  'responseMimeType': 'application/json',
+};
+
+/// Calls generateCarouselPrompts with a prompt preview dialog first.
+Future<CarouselPromptsResult> generateCarouselPromptsWithPreview({
+  required BuildContext context,
+  required String idea,
+  required int slideCount,
+  required List<String> characters,
+  String contentTheme = '',
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+  String? apiKey,
+  void Function(String)? onWait,
+  bool useSheet = false,
+}) async {
+  final prompt = buildCarouselPromptsPrompt(
+    idea: idea,
+    slideCount: slideCount,
+    characters: characters,
+    contentTheme: contentTheme,
+    language: language,
+    additionalInstructions: additionalInstructions,
+  );
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return prompt.withPromptPreview<CarouselPromptsResult>(
+    context: context,
+    title: 'Carousel Prompts Generation',
+    modelName: _model,
+    generationConfig: kCarouselGenConfig,
+    useSheet: useSheet,
+    onSend: () async {
+      final text = await _geminiText(prompt, apiKey: key, onWait: onWait);
+
+      final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(text.trim()) as Map<String, dynamic>;
+      } catch (_) {
+        throw Exception('Gemini did not return usable JSON.');
+      }
+
+      final title = (json['title'] as String?)?.trim() ?? idea;
+      final rawSlides = (json['slides'] as List?) ?? [];
+      final slides = rawSlides.whereType<Map<String, dynamic>>().map((s) {
+        return CarouselSlidePrompt(
+          slideNumber: (s['slide_number'] as num?)?.toInt() ?? 0,
+          purpose: (s['purpose'] as String?)?.trim() ?? '',
+          textOverlay: (s['text_overlay'] as String?)?.trim() ?? '',
+          prompt: (s['full_prompt'] as String?)?.trim() ?? '',
+        );
+      }).where((s) => s.prompt.isNotEmpty).toList();
+
+      if (slides.isEmpty) throw Exception('Gemini returned no slide prompts.');
+      return CarouselPromptsResult(title: title, slides: slides);
+    },
+  );
+}
+
+/// Builds the generateGeminiVideoPrompts prompt without sending.
+String buildGeminiVideoPrompt({
+  required String idea,
+  required int totalSeconds,
+  required List<String> characters,
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+}) {
+  final parts = (totalSeconds / 10).round().clamp(2, 6);
+  final charBlock = _characterBlock(characters);
+
+  return '''You are a video content creator for "${BrandDefaults.name}", an Indian kids' education Instagram page.
+
+Convert this story idea into $parts connected 10-second video prompts for Gemini video generation.
+
+IDEA: $idea
+TOTAL DURATION: ${totalSeconds}s ($parts parts × 10 seconds each)
+LANGUAGE: $language
+${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
+
+${_brandStyleBlock()}
+
+CHARACTERS:
+$charBlock
+
+CHARACTER CONSISTENCY RULES:
+- Use the exact descriptions above for every part. Do not paraphrase.
+- Ria and Rio NEVER wear glasses.
+- Cuty is ALWAYS a small white bunny with a pink bow.
+- Only the listed characters may appear. Never duplicate any character.
+- Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
+- All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
+
+STORY STRUCTURE:
+- Part 1: Establish the problem/situation
+- Middle parts: Develop the conflict or action
+- Last part: Resolution and payoff
+- Each part must have ONE clear purpose. Do not compress the whole story into one part.
+
+CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
+The ending state of each part becomes the starting state of the next.
+
+LANGUAGE RULES:
+- All dialogue must be in $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!").
+- All on-screen text overlays must be in $language — short, readable, max 2 lines.
+- Do not write in pure English or pure Hindi. Mix naturally, the way Indian parents actually speak.
+
+Return ONLY valid JSON:
+
+{
+  "story_title": "short title",
+  "story_foundation": "2-3 sentences describing the complete story arc, characters, setting and lesson",
+  "parts": [
+    {
+      "part_number": 1,
+      "purpose": "What story beat this part communicates",
+      "setting": "Exact location, background, lighting, props",
+      "starting_state": "Exact character positions, expressions, prop positions at the START of this clip",
+      "action_0_4s": "Specific visually clear action in first 4 seconds",
+      "action_4_8s": "Continuation of action in seconds 4-8",
+      "action_8_10s": "Complete this beat and establish transition to next part",
+      "dialogue": "Exact dialogue if required, assigned to correct character, or empty string",
+       "text_overlay": "On-screen text for sound-off viewers, max 2 short lines",
+       "ending_state": "Exact character positions, expressions, props at the END of this clip",
+       "continuity_from": "For Part 1: opening scene. For later parts: describe previous clip ending state",
+       "continuity_into": "Exact ending positions and environment the next part must continue from",
+       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
+      "full_prompt": "Complete copy-paste-ready video generation prompt for this part"
+    }
+  ]
+}
+
+RULES FOR full_prompt:
+Each "full_prompt" must be completely self-contained and include:
+- TITLE, PART number, DURATION (exactly 10 seconds), FORMAT (vertical 9:16)
+- STORY CONTEXT (brief explanation of the complete story)
+- THIS PART'S PURPOSE
+- CHARACTER LOCK with exact descriptions from above
+- SCENE AND SETTING
+- STARTING STATE
+- CAMERA (opening framing, movement, ending framing)
+- ACTION TIMELINE (0-4s, 4-8s, 8-10s)
+- DIALOGUE AND AUDIO
+- ON-SCREEN TEXT OVERLAYS (max 2 short lines, readable, for sound-off viewing)
+- CONTINUITY FROM PREVIOUS PART
+- CONTINUITY INTO NEXT PART
+- VISUAL STYLE
+- NEGATIVE INSTRUCTIONS
+
+Return exactly $parts parts.
+''';
+}
+
+/// Builds the MASTER 30-SECOND REEL prompt following the specification.
+/// Generates 3 connected clips (0-10s, 10-20s, 20-30s) with full continuity.
+String buildMasterReelPrompt({
+  required String idea,
+  required List<String> characters,
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+}) {
+  final charBlock = _characterBlock(characters);
+  final parts = 3; // Fixed 30-second = 3 × 10s clips
+
+  return '''You are a senior video director for "${BrandDefaults.name}", creating viral 30-second Instagram Reels (9:16 vertical) for Indian parents of preschoolers.
+
+PRODUCE A COMPLETE 30-SECOND REEL IN 3 CONNECTED 10-SECOND CLIPS.
+
+MASTER SPECIFICATION:
+- Ratio & Format: 9:16 Vertical Video (Reels / Shorts)
+- Visual Aesthetic: Soft 3D Disney/Pixar animation, warm pastel cream backdrop, expressive character animation, clear cinematic lighting. No eyeglasses on children.
+- Characters: 
+  - Ria (preschool girl, pigtails with pink bows, energetic, expressive brown eyes)
+  - Rio (toddler boy, blue-grey t-shirt, playful, curious brown eyes)
+  - Cuty (fluffy little white bunny with a pink bow, calm, adorable)
+
+STORY IDEA: $idea
+LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
+${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
+
+${_brandStyleBlock()}
+
+CHARACTERS IN THIS REEL:
+$charBlock
+
+CHARACTER CONSISTENCY RULES (STRICT - APPLY TO ALL 3 CLIPS):
+- Use the EXACT descriptions above. Do not paraphrase.
+- Ria and Rio NEVER wear glasses.
+- Cuty is ALWAYS a small white bunny with a pink bow.
+- Only the listed characters may appear. Never duplicate any character.
+- Preserve each character's face, age, hair, outfit, colours and proportions across ALL 3 clips.
+- All dialogue and text_overlay must be in $language.
+- SAME lighting, color palette, art style across all clips.
+
+CLIP STRUCTURE (MANDATORY - FOLLOW EXACTLY):
+
+CLIP 1 (0–10s): THE HOOK & PROBLEM
+- Visual Action: [Direct physical action demonstrating the struggle or situation]
+- Camera Work: Slow push-in at child eye-level.
+- On-Screen Text: 
+  - 0s–3s: [Bold Hook Headline - max 3 words, Hinglish]
+  - 4s–7s: [Context Text - max 5 words, Hinglish]
+- AI Video Generator Prompt: "Vibrant 3D Pixar-style vertical 9:16 animation. [Character] is [exact physical action]. Warm ambient room lighting, cream and pastel tones. Smooth eye-level slow push-in. Character shows dramatic, cute facial expression of [emotion]. At the 10-second mark, [character] freezes in posture, holding [object], facing [direction]."
+
+CLIP 2 (10–20s): THE TWIST & ESCALATION
+- Visual Action: [Unexpected turn, sibling joins, or humorous complication]
+- Camera Work: Steady medium tracking shot.
+- On-Screen Text: 
+  - 11s–15s: [Relatable Parent Insight - max 5 words, Hinglish]
+  - 16s–20s: [Tension / Anticipation Text - max 5 words, Hinglish]
+- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 1. Vibrant 3D Pixar-style vertical 9:16 animation. [Character] maintains identical clothing and hairstyle. Suddenly, [second character/parent] steps in and [subtle action]. Fluid motion, consistent soft warm lighting. At the 20-second mark, [exact end pose]."
+
+CLIP 3 (20–30s): THE RESOLUTION & MORAL
+- Visual Action: [Gentle solution, teamwork, parent hug, or funny Cuty reaction]
+- Camera Work: Slow pull-back to wide warm family shot.
+- On-Screen Text: 
+  - 21s–26s: [The Moral / Takeaway - max 5 words, Hinglish]
+  - 27s–30s: [Call to Action: 'Save this for later ❤️']
+- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 2. Vibrant 3D Pixar-style vertical 9:16 animation. Identical character models and lighting. [Characters] smile and [final resolution action]. Cuty the bunny hops forward happily. The scene resolves into a warm, joyful family tableau. Steady hold for smooth loop at second 30."
+
+CONTINUITY REQUIREMENTS (CRITICAL):
+- Clip 2 MUST start from the EXACT ending_state of Clip 1 (same character positions, props, lighting)
+- Clip 3 MUST start from the EXACT ending_state of Clip 2
+- The "AI Video Generator Prompt" for each clip must be copy-paste ready for Veo/Runway/Sora
+- Each clip's prompt must be self-contained but reference the previous clip's end frame
+
+Return ONLY valid JSON:
+
+{
+  "story_title": "Short Hinglish title with emoji",
+  "story_foundation": "2-3 sentences describing the complete 30s story arc, characters, setting and moral",
+  "parts": [
+    {
+      "part_number": 1,
+      "purpose": "Hook & Problem - Establish the relatable struggle",
+      "setting": "Exact location, background, lighting, props for Clip 1",
+      "starting_state": "Exact character positions, expressions, prop positions at 0s",
+      "action_0_4s": "Specific visually clear action in first 4 seconds",
+      "action_4_8s": "Continuation of action in seconds 4-8",
+      "action_8_10s": "Complete this beat and establish transition to Clip 2",
+      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
+      "text_overlay": "Two lines max: Line 1 (0-3s hook), Line 2 (4-7s context)",
+      "ending_state": "EXACT character positions, expressions, props at 10s - Clip 2 continues from HERE",
+      "continuity_from": "Opening scene - establish the world",
+      "continuity_into": "Describe the exact 10s frame that Clip 2 must continue from",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 1 (0-10s) following the specification format above",
+      "on_screen_text": {
+        "line_1_0_3s": "Hook headline (max 3 words)",
+        "line_2_4_7s": "Context text (max 5 words)"
+      }
+    },
+    {
+      "part_number": 2,
+      "purpose": "Twist & Escalation - Complicate the situation",
+      "setting": "Exact location, background, lighting, props for Clip 2 (same as Clip 1 unless changed)",
+      "starting_state": "MUST match Clip 1 ending_state exactly",
+      "action_0_4s": "Specific visually clear action in seconds 10-14",
+      "action_4_8s": "Continuation in seconds 14-18",
+      "action_8_10s": "Complete this beat and establish transition to Clip 3",
+      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
+      "text_overlay": "Two lines max: Line 1 (11-15s insight), Line 2 (16-20s tension)",
+      "ending_state": "EXACT character positions, expressions, props at 20s - Clip 3 continues from HERE",
+      "continuity_from": "Clip 1 ended with [describe exact 10s frame]",
+      "continuity_into": "Describe the exact 20s frame that Clip 3 must continue from",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 2 (10-20s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 1'",
+      "on_screen_text": {
+        "line_1_11_15s": "Parent insight (max 5 words)",
+        "line_2_16_20s": "Tension text (max 5 words)"
+      }
+    },
+    {
+      "part_number": 3,
+      "purpose": "Resolution & Moral - Heartwarming payoff",
+      "setting": "Exact location, background, lighting, props for Clip 3",
+      "starting_state": "MUST match Clip 2 ending_state exactly",
+      "action_0_4s": "Specific visually clear action in seconds 20-24",
+      "action_4_8s": "Continuation in seconds 24-28",
+      "action_8_10s": "Final resolution, warm hold for loop",
+      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
+      "text_overlay": "Two lines max: Line 1 (21-26s moral), Line 2 (27-30s CTA: 'Save this for later ❤️')",
+      "ending_state": "Final warm family tableau at 30s, ready for smooth loop",
+      "continuity_from": "Clip 2 ended with [describe exact 20s frame]",
+      "continuity_into": "Final frame - loops back to beginning vibe",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 3 (20-30s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 2'",
+      "on_screen_text": {
+        "line_1_21_26s": "Moral/takeaway (max 5 words)",
+        "line_2_27_30s": "Save this for later ❤️"
+      }
+    }
+  ]
+}
+
+RULES:
+- Return exactly 3 parts.
+- Every "visual_prompt" must be completely self-contained and follow the AI Video Generator Prompt format in the specification.
+- All on_screen_text must be in $language (Hinglish).
+- The story must be specific to an Indian household with relatable preschool moments.
+- Character actions must be physically clear and animation-friendly.
+- Cuty the bunny must appear in at least 2 clips as the emotional anchor.
+''';
+}
+
+const Map<String, dynamic> kVideoGenConfig = {
+  'temperature': 0.7,
+  'maxOutputTokens': 8192,
+  'thinkingConfig': {'thinkingBudget': 0},
+  'responseMimeType': 'application/json',
+};
+
+/// Calls generateGeminiVideoPrompts with a prompt preview dialog first.
+Future<GeminiVideoResult> generateGeminiVideoPromptsWithPreview({
+  required BuildContext context,
+  required String idea,
+  required int totalSeconds,
+  required List<String> characters,
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+  String? apiKey,
+  void Function(String)? onWait,
+  bool useSheet = false,
+}) async {
+  final parts = (totalSeconds / 10).round().clamp(2, 6);
+  final prompt = buildGeminiVideoPrompt(
+    idea: idea,
+    totalSeconds: totalSeconds,
+    characters: characters,
+    language: language,
+    additionalInstructions: additionalInstructions,
+  );
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return prompt.withPromptPreview<GeminiVideoResult>(
+    context: context,
+    title: 'Gemini Video Prompts Generation',
+    modelName: _model,
+    generationConfig: kVideoGenConfig,
+    useSheet: useSheet,
+    onSend: () async {
+      final text = await _geminiText(prompt, apiKey: key, onWait: onWait);
+
+      final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(text.trim()) as Map<String, dynamic>;
+      } catch (_) {
+        throw Exception('Gemini did not return usable JSON.');
+      }
+
+      final title = (json['story_title'] as String?)?.trim() ?? idea;
+      final foundation = (json['story_foundation'] as String?)?.trim() ?? '';
+      final rawParts = (json['parts'] as List?) ?? [];
+
+      final videoparts = rawParts.whereType<Map<String, dynamic>>().map((p) {
+        return VideoPartPrompt(
+          partNumber: (p['part_number'] as num?)?.toInt() ?? 0,
+          totalParts: parts,
+          promptText: (p['full_prompt'] as String?)?.trim() ?? '',
+          textOverlay: (p['text_overlay'] as String?)?.trim() ?? '',
+        );
+      }).where((p) => p.promptText.isNotEmpty).toList();
+
+      if (videoparts.isEmpty) throw Exception('Gemini returned no video prompts.');
+      return GeminiVideoResult(
+        storyTitle: title,
+        storyFoundation: foundation,
+        parts: videoparts,
+      );
+    },
+  );
+}
+
+/// Calls the MASTER 30-SECOND REEL prompt with preview dialog.
+/// Uses the new specification format with 3 connected clips (0-10s, 10-20s, 20-30s).
+Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
+  required BuildContext context,
+  required String idea,
+  required List<String> characters,
+  String language = 'Hinglish',
+  String additionalInstructions = '',
+  String? apiKey,
+  void Function(String)? onWait,
+  bool useSheet = true,
+}) async {
+  final prompt = buildMasterReelPrompt(
+    idea: idea,
+    characters: characters,
+    language: language,
+    additionalInstructions: additionalInstructions,
+  );
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return prompt.withPromptPreview<GeminiVideoResult>(
+    context: context,
+    title: 'Master 30-Second Reel (3 Clips)',
+    modelName: _model,
+    generationConfig: kVideoGenConfig,
+    useSheet: useSheet,
+    onSend: () async {
+      final text = await _geminiText(prompt, apiKey: key, onWait: onWait);
+
+      final Map<String, dynamic> json;
+      try {
+        json = jsonDecode(text.trim()) as Map<String, dynamic>;
+      } catch (_) {
+        throw Exception('Gemini did not return usable JSON.');
+      }
+
+      final title = (json['story_title'] as String?)?.trim() ?? idea;
+      final foundation = (json['story_foundation'] as String?)?.trim() ?? '';
+      final rawParts = (json['parts'] as List?) ?? [];
+
+      final videoparts = rawParts.whereType<Map<String, dynamic>>().map((p) {
+        // Use visual_prompt from new format, fallback to full_prompt
+        final visualPrompt = (p['visual_prompt'] as String?)?.trim() ?? '';
+        final fullPrompt = (p['full_prompt'] as String?)?.trim() ?? '';
+        final promptText = visualPrompt.isNotEmpty ? visualPrompt : fullPrompt;
+        
+        // Use on_screen_text from new format
+        final onScreenText = (p['on_screen_text'] as Map?) ?? {};
+        final textOverlay = [
+          onScreenText['line_1_0_3s'] ?? onScreenText['line_1_11_15s'] ?? onScreenText['line_1_21_26s'] ?? '',
+          onScreenText['line_2_4_7s'] ?? onScreenText['line_2_16_20s'] ?? onScreenText['line_2_27_30s'] ?? '',
+        ].where((s) => s.isNotEmpty).join(' | ');
+
+        return VideoPartPrompt(
+          partNumber: (p['part_number'] as num?)?.toInt() ?? 0,
+          totalParts: 3,
+          promptText: promptText,
+          textOverlay: textOverlay,
+        );
+      }).where((p) => p.promptText.isNotEmpty).toList();
+
+      if (videoparts.isEmpty) throw Exception('Gemini returned no video prompts.');
+      return GeminiVideoResult(
+        storyTitle: title,
+        storyFoundation: foundation,
+        parts: videoparts,
+      );
+    },
+  );
+}
+
+/// Builds the evaluateIdea prompt (combines checkStory + analyzeShareability)
+String buildEvaluateIdeaPrompt(String idea) {
+  return '''${buildCheckStoryPrompt(idea)}
+
+---
+
+${buildAnalyzeShareabilityPrompt(idea)}''';
+}
+
+/// Calls evaluateIdea with a prompt preview dialog first.
+/// Note: This shows both prompts (checkStory + analyzeShareability) in one dialog.
+Future<IdeaEvaluation> evaluateIdeaWithPreview({
+  required BuildContext context,
+  required String idea,
+  String? apiKey,
+  void Function(String)? onWait,
+  bool useSheet = false,
+}) async {
+  // For evaluateIdea, we show a combined preview of both calls
+  final checkPrompt = buildCheckStoryPrompt(idea);
+  final sharePrompt = buildAnalyzeShareabilityPrompt(idea);
+  final combinedPrompt = '$checkPrompt\n\n---\n\n$sharePrompt';
+  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
+
+  return combinedPrompt.withPromptPreview<IdeaEvaluation>(
+    context: context,
+    title: 'Idea Evaluation (Quality + Shareability)',
+    modelName: '$_lightModel + $_model',
+    generationConfig: {'note': 'Two separate calls: checkStory (temp 0.3) + analyzeShareability (temp 0.3)'},
+    useSheet: useSheet,
+    onSend: () async {
+      onWait?.call('Checking story quality...');
+      final check = await checkStory(idea, apiKey: apiKey, onWait: onWait);
+
+      onWait?.call('Analyzing shareability...');
+      final shareability = await analyzeShareability(
+        idea: idea,
+        apiKey: apiKey,
+        onWait: onWait,
+      );
+
+      return IdeaEvaluation(
+        check: check,
+        shareability: shareability,
+      );
+    },
+  );
 }
 

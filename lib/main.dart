@@ -25,6 +25,7 @@ import 'posting_kit.dart';
 import 'projects.dart';
 import 'prompt_builder.dart';
 import 'prompts.dart';
+import 'prompt_preview.dart';
 import 'prompt_screen.dart';
 import 'caption_renderer.dart';
 import 'story_ideas.dart';
@@ -892,12 +893,14 @@ class _StoryScreenState extends State<StoryScreen> {
     });
 
     try {
-      final check = await checkStory(
-        _descCtrl.text,
+      final check = await checkStoryWithPreview(
+        context: context,
+        story: _descCtrl.text,
         apiKey: _keyStore?.getGeminiApiKey(),
         onWait: (message) {
           if (mounted) setState(() => _status = message);
         },
+        useSheet: true,
       );
       if (!mounted) return;
       setState(() => _isGenerating = false);
@@ -1106,6 +1109,30 @@ class _StoryScreenState extends State<StoryScreen> {
           _status = '❌ $e';
         });
     }
+  }
+
+  /// Shows the story quality check prompt without sending to Gemini.
+  Future<void> _showStoryCheckPromptOnly() async {
+    final story = _descCtrl.text.trim();
+    if (story.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a story first.')),
+      );
+      return;
+    }
+    final prompt = buildCheckStoryPrompt(story);
+    await prompt.showPromptOnly(
+      context: context,
+      title: 'Story Quality Check Prompt',
+      modelName: 'gemini-3.5-flash',
+      generationConfig: {
+        'temperature': 0.3,
+        'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
+        'responseMimeType': 'application/json',
+      },
+      useSheet: true,
+    );
   }
 
   /// Asks for a story idea: pick an age and a problem, get one written up.
@@ -1553,6 +1580,14 @@ TextField(
                         label: 'Check',
                         icon: Icons.fact_check_outlined,
                         onPressed: _isGenerating ? null : _checkStory,
+                      ),
+                    ),
+                    Gap.wS,
+                    Expanded(
+                      child: SecondaryButton(
+                        label: 'Show Prompt',
+                        icon: Icons.description,
+                        onPressed: _isGenerating ? null : _showStoryCheckPromptOnly,
                       ),
                     ),
                     Gap.wS,
