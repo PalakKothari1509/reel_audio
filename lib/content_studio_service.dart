@@ -455,9 +455,17 @@ class GeminiVideoResult {
       parts.add(VideoPartPrompt(
         partNumber: 1,
         totalParts: 1,
-        promptText: foundation,
+        promptText: foundation.isNotEmpty
+            ? foundation
+            : readyPrompt.trim().isNotEmpty
+                ? readyPrompt.trim()
+                : title,
         purpose: 'Full Prompt',
-        fullPrompt: foundation,
+        fullPrompt: foundation.isNotEmpty
+            ? foundation
+            : readyPrompt.trim().isNotEmpty
+                ? readyPrompt.trim()
+                : title,
       ));
     }
 
