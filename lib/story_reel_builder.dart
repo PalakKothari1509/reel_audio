@@ -290,7 +290,7 @@ INSTRUCTIONS:
 - Narration: max 2 lines per scene, short on screen, easy to say in about $segmentDuration seconds
 - Each scene needs: title, body (max 160 chars), visualPrompt, overlayText (max 40 chars), cta (max 60 chars)
 - Visual style: Soft 3D Pixar/Disney-style render, cream backgrounds, characters $characters
-- Character lock: Ria and Rio NEVER wear glasses; Cuty is ALWAYS a small white bunny with pink bow
+- Use the exact character descriptions from the CHARACTER LOCK as the authoritative references. Only characters in that lock may appear.
 - Output valid JSON matching the schema with exactly $segmentCount slides
 
 OUTPUT JSON SCHEMA:
@@ -473,7 +473,7 @@ SIZE: Vertical 9:16 (1080x1920). Keep characters centred and leave the bottom
 ${CharacterLibrary.characterLockFor(cast)}
 
 Only the characters named above may appear. Do not introduce background
-characters, bystanders, extras or mascots. Ria and Rio must never wear glasses.
+characters, bystanders, extras or mascots.
 
 SETTING: ${beats.where}
 

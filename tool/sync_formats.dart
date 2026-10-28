@@ -55,8 +55,8 @@ String buildRegistry(String markdown) {
 
     buffer.writeln('  // -- ${pad2(index)} $name ${dashes(name.length + 7)}');
     buffer.writeln('  static const FormatSpec $fieldName = FormatSpec(');
-    buffer.writeln("    id: '$id',");
-    buffer.writeln("    name: '$name',");
+    buffer.writeln("    id: '${dartString(id)}',");
+    buffer.writeln("    name: '${dartString(name)}',");
     buffer.writeln('    definition:');
     buffer.writeln("        '${dartString(definition)}',");
     buffer.writeln('    structure: [');

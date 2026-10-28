@@ -10,6 +10,7 @@ class VideoPromptVariables {
   final String overallTone;
   final String videoGenerator;
   final String language;
+  final bool hasReferenceImages;
 
   VideoPromptVariables({
     required this.storyTitle,
@@ -21,6 +22,7 @@ class VideoPromptVariables {
     required this.overallTone,
     this.videoGenerator = 'Runway Gen-2 / Kling / Luma',
     this.language = 'Hinglish',
+    this.hasReferenceImages = false,
   });
 
   String get characterDescriptions {
@@ -68,11 +70,11 @@ Brand name: Fun Learning With Palak
 Brand tagline: Little stories, big lessons.
 Characters available: {{SELECTED_CHARACTERS}}
 
-Character descriptions:
-{{CHARACTER_DESCRIPTIONS}}
+{{CHARACTER_DESC_SECTION}}
+{{REF_IMAGE_INSTRUCTION}}
 
 Character consistency rules:
-1. Use the supplied character descriptions as the authoritative references.
+1. Use the supplied references as the authoritative source for character identity.
 2. Preserve each character's appearance, clothing, colors, hairstyle,
    proportions, and distinguishing features across all three clips.
 3. Do not invent new character appearances or change established designs.
@@ -82,9 +84,9 @@ Character consistency rules:
    suitable for preschool storytelling.
 7. If a character appears in multiple clips, maintain the same identity
    and appearance.
-8. Never add glasses to Ria or Rio unless the supplied character
-   specification explicitly changes this rule.
-9. Robot, when selected, must follow its supplied character description.
+8. Apply any character-specific physical details (e.g. glasses, distinctive marks)
+   only when they are part of that character's supplied description — do not invent
+   or remove them based on the default cast.
 
 PRODUCTION SETTINGS:
 Video format: 9:16 vertical.
@@ -186,13 +188,22 @@ Return exactly 3 parts.
 
 /// Renders the master prompt by replacing {{...}} placeholders.
 String renderVideoMasterPrompt(VideoPromptVariables vars) {
+  final charDescSection = vars.hasReferenceImages
+      ? ''
+      : 'Character descriptions:\n${vars.characterDescriptions}';
+
+  final refImageInstruction = vars.hasReferenceImages
+      ? 'Use the attached reference images as the definitive character references. Preserve each character\'s exact face, identity, hairstyle, clothing, colours, and proportions. Do not redesign or replace characters.'
+      : 'Use the supplied character descriptions as the authoritative references.';
+
   return kGeminiVideoMasterPrompt
       .replaceAll('{{STORY_TITLE}}', vars.storyTitle)
       .replaceAll('{{STORY_IDEA}}', vars.storyIdea)
       .replaceAll('{{REAL_LIFE_PROBLEM}}', vars.realLifeProblem)
       .replaceAll('{{LEARNING_OUTCOME}}', vars.learningOutcome)
       .replaceAll('{{SELECTED_CHARACTERS}}', vars.selectedCharacters.join(', '))
-      .replaceAll('{{CHARACTER_DESCRIPTIONS}}', vars.characterDescriptions)
+      .replaceAll('{{CHARACTER_DESC_SECTION}}', charDescSection)
+      .replaceAll('{{REF_IMAGE_INSTRUCTION}}', refImageInstruction)
       .replaceAll('{{VISUAL_STYLE}}', vars.visualStyle)
       .replaceAll('{{OVERALL_TONE}}', vars.overallTone)
       .replaceAll('{{VIDEO_GENERATOR}}', vars.videoGenerator)

@@ -21,11 +21,11 @@ void check(String label, bool passed, [String detail = '']) {
 
 void main() {
   stdout.writeln('Registry');
-  check('16 formats registered', FormatLibrary.all.length == 16,
+  check('50 formats registered', FormatLibrary.all.length == 50,
       'got ${FormatLibrary.all.length}');
+  
   check('ids are unique',
-      FormatLibrary.all.map((f) => f.id).toSet().length == 16);
-
+      FormatLibrary.all.map((f) => f.id).toSet().length == 50);
   for (final f in FormatLibrary.all) {
     check('${f.id} has beats', f.structure.isNotEmpty);
     check('${f.id} has rules', f.generationRules.isNotEmpty);

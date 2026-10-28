@@ -6,6 +6,10 @@
 // constants so that prompts never drift between formats.
 
 /// The shared brand and style context injected at the top of every prompt.
+/// Character descriptions are NOT included here — each generation path injects
+/// the selected cast dynamically via its own character block, so stories starring
+/// a different cast (e.g. Priya, Daadi, Ria) are not constrained by the default
+/// Ria/Rio/Cuty descriptions.
 const String kMasterPrompt = '''
 Soft 3D Disney-Pixar animation style, vertical 9:16 aspect ratio.
 Indian family setting. Target audience: parents of children aged 1-4.
@@ -15,17 +19,8 @@ Characters are toddlers with realistic proportions — no chibi or kawaii exagge
 Every character looks the same in every scene: same clothes, same hair, same colors.
 Cute but not cartoonish. Semi-realistic rendering.
 
-CHARACTER LOCK (do not deviate):
-  Ria: 3-year-old girl, two high ponytails with pink bows, big brown eyes, dimple on left cheek,
-       wearing a pink star-print dress (no glasses), small feet in pink sandals.
-  Rio: 4-year-old boy, short brown hair, slight cowlick, brown eyes,
-       wearing a blue kurta with white border and brown juttis (no glasses).
-  Cuty: small white bunny, soft grey nose, pink neck bow, always upright on hind legs.
-  Robot: friendly white-silver body, teal LED chest panel, child-height, round eyes glow teal.
-  Mumma: warm Indian mother, yellow kurta, blue jeans, hair in a bun.
-  Papa: light blue kurta, brown juttis.
-  Daadi: silver bun, glasses, cream saree with gold border.
-  Teacher: blue kurta, holding a book, kind smile.
+Use the character descriptions from the CHARACTER LOCK section below — only
+the listed characters may appear, with the exact wording provided.
 
 LANGUAGE RULES:
   Adults speak natural, conversational Hindi or Hinglish — no stilted translations.
@@ -47,14 +42,12 @@ const String kVisualStyle =
     'warm natural lighting, semi-realistic quality, cream background';
 
 /// Character appearance rules that must never change between parts.
+///
+/// Uses generics ("child characters") rather than hardcoded names so that
+/// stories starring different casts (e.g. Priya, Daadi, Ria) receive the
+/// correct continuity rules without irrelevant constraints from the default cast.
 const String kCharacterRules = '''
-Ria and Rio NEVER wear glasses.
-Cuty is ALWAYS a small white bunny with a pink neck bow.
-Robot is friendly, white-silver with teal LED accents, child-height.
-Mumma: warm Indian mother, yellow kurta, blue jeans.
-Papa: light blue kurta, brown juttis.
-Daadi: cream saree with gold border.
-Teacher: blue kurta, holding a book.
+Only characters from the CHARACTER LOCK block above may appear — never invent new characters.
 Use the exact full character descriptions from the CHARACTER LOCK block above in every part.
 No duplicate characters, no identity changes, no outfit changes between parts.
 Preserve character positions, object locations, and scene continuity across all parts.''';

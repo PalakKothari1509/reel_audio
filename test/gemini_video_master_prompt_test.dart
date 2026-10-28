@@ -67,5 +67,69 @@ void main() {
       expect(rendered, contains('ON-SCREEN TEXT OVERLAYS'));
       expect(rendered, contains('sound-off'));
     });
+
+    test('does not hardcode "Never add glasses to Ria or Rio"', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Mumma', 'Papa'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+      ));
+
+      expect(rendered, isNot(contains('Never add glasses to Ria or Rio')));
+    });
+
+    test('uses generic character consistency rules', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Ria', 'Mumma'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+      ));
+
+      expect(rendered, contains('Character consistency rules'));
+      expect(rendered, isNot(contains('Ria or Rio')));
+      expect(rendered, isNot(contains('Robot, when selected')));
+    });
+
+    test('uses reference image instruction when hasReferenceImages is true', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Mumma'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+        hasReferenceImages: true,
+      ));
+
+      expect(rendered, contains('Use the attached reference images as the definitive character references'));
+      expect(rendered, isNot(contains('Character descriptions:')));
+      expect(rendered, isNot(contains(characterDescription('Mumma'))));
+    });
+
+    test('includes character descriptions when hasReferenceImages is false', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Mumma'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+        hasReferenceImages: false,
+      ));
+
+      expect(rendered, contains('Character descriptions:'));
+      expect(rendered, contains(characterDescription('Mumma')));
+      expect(rendered, contains('Use the supplied character descriptions as the authoritative references'));
+    });
   });
 }

@@ -87,13 +87,18 @@ void main() {
       expect(CharacterLibrary.byId('nonexistent'), isNull);
     });
 
-    test('characterLockBlock includes all characters', () {
+    test('characterLockBlock includes all characters with default cast', () {
       final lock = CharacterLibrary.characterLockBlock;
       expect(lock, contains('Ria'));
       expect(lock, contains('Rio'));
       expect(lock, contains('Cuty'));
-      expect(lock, contains('Ria and Rio NEVER wear glasses'));
-      expect(lock, contains('Cuty is ALWAYS a small white bunny with a pink bow'));
+    });
+
+    test('characterLockFor excludes rules for absent characters', () {
+      final mummaOnly = CharacterLibrary.characterLockFor([CharacterLibrary.mumma]);
+      expect(mummaOnly, contains('Mumma'));
+      expect(mummaOnly, isNot(contains('Ria and Rio')));
+      expect(mummaOnly, isNot(contains('Cuty')));
     });
   });
 

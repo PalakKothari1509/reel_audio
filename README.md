@@ -27,7 +27,7 @@ questions the data cannot yet support — see `REDESIGN_PLAN2.md`.
 
 ## Content system
 
-- `content_formats.md` — source of truth for the 16 narrative formats.
+- `content_formats.md` — source of truth for the 50 narrative formats (16 verified, 34 app-authored).
   `lib/format_handbook.dart` is generated from it:
   `dart run tool/sync_formats.dart`
 - `content_ideas.md` — the hand-authored idea library. Never edited by a tool

@@ -721,6 +721,7 @@ Future<void> _evaluate({
               idea: idea,
               characters: _ideaChars,
               additionalInstructions: _ideaInstructions,
+              hasReferenceImages: true,
               apiKey: widget.keyStore.getGeminiApiKey(),
               onWait: (msg) {
                 if (mounted) setState(() => _status = msg);
@@ -734,6 +735,7 @@ Future<void> _evaluate({
               totalSeconds: _totalSeconds,
               characters: _ideaChars,
               additionalInstructions: _ideaInstructions,
+              hasReferenceImages: true,
               apiKey: widget.keyStore.getGeminiApiKey(),
               onWait: (msg) {
                 if (mounted) setState(() => _status = msg);

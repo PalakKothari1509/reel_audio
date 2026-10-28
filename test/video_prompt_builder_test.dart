@@ -132,8 +132,7 @@ void main() {
         // The character lock block lists the cast on its own line.
         expect(p.promptText, contains('Ria, Rio, Cuty'));
         // Mumma and Papa are not in this beat sheet and must not appear as
-        // cast members. The fixed "Ria and Rio NEVER wear glasses" rule is
-        // allowed to name them — that rule is about what they must NOT wear.
+        // cast members in the character lock block.
         final lockStart = p.promptText.indexOf('CHARACTER LOCK');
         final lockEnd = p.promptText.indexOf('RULES:');
         final lockBlock = p.promptText.substring(lockStart, lockEnd);
@@ -171,14 +170,27 @@ void main() {
     });
   });
 
-  group('glasses restriction', () {
-    test('every part explicitly bans glasses on Ria and Rio', () {
-      for (final seconds in [20, 30, 40, 60]) {
-        final prompts = buildVideoPrompts(beats: beats, seconds: seconds);
-        for (final p in prompts) {
-          expect(p.promptText,
-              contains('Ria and Rio must never wear glasses'));
-        }
+  group('character-specific rules', () {
+    test('no hardcoded character rules when different cast is selected', () {
+      const mummaOnly = BeatSheet(
+        id: 'mumma-only',
+        title: 'Mumma alone',
+        characters: ['mumma'],
+        where: 'Kitchen',
+        hook: 'hook',
+        beat1Setup: 'setup',
+        beat2Problem: 'problem',
+        beat3Escalation: 'escalation',
+        beat4Turn: 'turn',
+        beat5Payoff: 'payoff',
+        endingLine: 'ending',
+        closingCta: 'cta',
+      );
+      final prompts = buildVideoPrompts(beats: mummaOnly, seconds: 20);
+      for (final p in prompts) {
+        // Must not contain hardcoded rules for Ria/Rio/Cuty
+        expect(p.promptText, isNot(contains('Ria and Rio must never wear glasses')));
+        expect(p.promptText, isNot(contains('Cuty is ALWAYS')));
       }
     });
   });

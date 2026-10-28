@@ -192,14 +192,19 @@ class CharacterLibrary {
   /// does not carry Ria, Rio and Cuty into the frame.
   static String characterLockFor([List<Character>? characters]) {
     final cast = (characters == null || characters.isEmpty) ? all : characters;
+    final hasRiaOrRio = cast.any((c) => c.name == 'Ria' || c.name == 'Rio');
+    final hasCuty = cast.any((c) => c.name == 'Cuty');
+    final charSpecificRules = [
+      if (hasRiaOrRio) '- Ria and Rio NEVER wear glasses.',
+      if (hasCuty) '- Cuty is ALWAYS a small white bunny with a pink bow.',
+    ].join('\n');
     return '''
 CHARACTER LOCK — Use the attached reference images for exact face/hair/outfit matching.
 
 ${cast.map((c) => c.name).join(', ')}
 
 RULES:
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
+$charSpecificRules
 - Only the characters listed above may appear in this post.
 - Outfits may change per scene but hair/eyes/face stay consistent.
 

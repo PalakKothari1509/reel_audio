@@ -1,4 +1,4 @@
-// Format Handbook - the 12 registered content FORMATS.
+// Format Handbook - the 50 registered content FORMATS.
 //
 // GENERATED FROM content_formats.md. Edit that file, then run:
 //     dart run tool/sync_formats.dart
@@ -222,7 +222,7 @@ class FormatLibrary {
     ],
     bestFor:
         'A feeling the viewer recognises in under two seconds. Works because the viewer supplies the story, so no exposition is needed.',
-    bestContentTypes: ['reel', 'trialReel'],
+    bestContentTypes: ['trialReel', 'reel'],
     bestGoals: ['nonFollowerReach', 'relatability', 'shares', 'comments'],
     defaultFor: ['reel', 'trialReel'],
     example:
@@ -264,10 +264,10 @@ class FormatLibrary {
     ],
   );
 
-  // -- 03 Mistakes List ------------------------------------------------
+  // -- 03 Mistake List -------------------------------------------------
   static const FormatSpec mistakesList = FormatSpec(
     id: 'mistakesList',
-    name: 'Mistakes List',
+    name: 'Mistake List',
     definition:
         'The errors the target parent is making, named honestly, then fixed.',
     structure: [
@@ -340,7 +340,7 @@ class FormatLibrary {
     bestContentTypes: ['carousel', 'staticImage', 'imageSlideshowReel'],
     bestGoals: ['saves', 'shares', 'authority', 'follows'],
     example:
-        '"What to say when Ria hits Rio." Instead of "don\'t hit", Mumma says *"Aap usko hurt kar rahe ho, rokao mujhe batana."* Rio responds by showing his hand. Variation for a repeat: name the rule, then the consequence, in two short sentences.',
+        '"What to say when Ria hits Rio." Instead of "don\'t hit", Mumma says *"Aap usko hurt kar rahe ho, rokao mujhe batana."* Rio responds by showing his hand. Variation for repeat: name the rule, then the consequence, in two short sentences.',
     generationRules: [
       'The script must be quotable word for word. No paraphrasing in the on-screen text.',
       '8 to 12 words per quoted line. Longer is not memorised.',
@@ -565,7 +565,7 @@ class FormatLibrary {
       'The result, immediate',
     ],
     bestFor:
-        'A single ₹0 activity or technique a parent can try today. This format owns **activity demonstrations**: water pouring, dal-chawal sensory play, tape pulling, spoon transfer, two-bowl sorting, and the rest of that family.',
+        'A single free activity or technique a parent can try today. This format owns **activity demonstrations**: water pouring, dal-chawal sensory play, tape pulling, spoon transfer, two-bowl sorting, and the rest of that family.',
     bestContentTypes: ['reel', 'trialReel', 'imageSlideshowReel'],
     bestGoals: ['nonFollowerReach', 'saves', 'shares'],
     example:
@@ -573,7 +573,7 @@ class FormatLibrary {
     generationRules: [
       'Exactly one technique. Not a list.',
       'The technique uses something already in the house. Zero purchases.',
-      '**Activity demonstrations belong here.** A setup → play → result beat sequence is not a failure to match another shape; it is this shape. The handbook previously had no format for "show the activity", so six real ideas — water pouring, dal chawal, tape pull, spoon transfer, pouring, simple sorting — matched nothing at all and were reported as unresolvable. Widening this format\'s stated scope is cheaper and more honest than inventing an Activity Demonstration format to absorb them.',
+      '**Activity demonstrations belong here.** A setup then play then result beat sequence is not a failure to match another shape; it is this shape. The handbook previously had no format for "show the activity", so six real ideas — water pouring, dal chawal, tape pull, spoon transfer, pouring, simple sorting — matched nothing at all and were reported as unresolvable. Widening this format\'s stated scope is cheaper and more honest than inventing an Activity Demonstration format to absorb them.',
       'No explanation of why the child behaves this way. The technique speaks.',
       'On-screen text max 8 words. The visual is the hook.',
       'Duration 10-15 seconds if Reel/Trial Reel.',
@@ -588,7 +588,7 @@ class FormatLibrary {
         'A short narrative with a clear beginning, middle and end, told through Ria/Rio/Cuty.',
     structure: [
       'The setup — character wants something',
-      'The obstacle — it doesn\'t go smoothly',
+      'The obstacle — it does not go smoothly',
       'The turning point — a small intervention or discovery',
       'The resolution — character succeeds or learns',
       'The parent takeaway, one line',
@@ -665,6 +665,958 @@ class FormatLibrary {
     ],
   );
 
+  // -- 17 Mistake → Recovery -------------------------------------------
+  static const FormatSpec mistakeToRecovery = FormatSpec(
+    id: 'mistakeToRecovery',
+    name: 'Mistake → Recovery',
+    definition:
+        'A single mistake the author made, the immediate consequence, and the recovery that worked.',
+    structure: [
+      'The mistake, stated plainly',
+      'The consequence, shown',
+      'The recovery, step by step',
+      'What I do now to prevent it',
+      'The takeaway, one line to the viewer',
+    ],
+    bestFor:
+        'Building trust through vulnerability. A recovery that worked is more valuable than a perfect example.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage'],
+    bestGoals: ['authority', 'relatability', 'saves'],
+    example:
+        '"I raised my voice and Ria flinched." Rio started crying. I knelt down: "Mumma is cross, not gone." I counted to five, apologized, hugged. Now I keep my voice low and warn: "I am getting frustrated — I need a moment." Takeaway: "The repair is the relationship."',
+    generationRules: [
+      'The mistake must be something a loving parent does. Never negligence.',
+      'The recovery must be specific and repeatable. No generic "I\'m sorry."',
+      'No product or service as the fix. Free only.',
+      'The prevention step must be doable in under 30 seconds.',
+      'Beat 5 addresses the viewer as a peer.',
+    ],
+  );
+
+  // -- 18 Two Truths and a Lie: Parenting ------------------------------
+  static const FormatSpec twoTruthsAndALieParenting = FormatSpec(
+    id: 'twoTruthsAndALieParenting',
+    name: 'Two Truths and a Lie: Parenting',
+    definition:
+        'Three statements about parenting, one false — the viewer guesses which.',
+    structure: [
+      'Statement 1, plausible',
+      'Statement 2, equally plausible',
+      'Statement 3, the lie',
+      'The reveal',
+      'Why the lie sounded true',
+    ],
+    bestFor:
+        'Comments and shares. Interaction without argument.',
+    bestContentTypes: ['reel', 'carousel', 'story'],
+    bestGoals: ['comments', 'shares', 'relatability'],
+    example:
+        '"1: Ria hides under the table when she\'s shy. 2: Rio counts every spoon before eating. 3: Cuty asks for help with homework." The lie? Cuty is three. She does not do homework. But isn\'t it convincing?',
+    generationRules: [
+      'All three statements must be specific to this brand\'s children.',
+      'The lie must be believable to another parent.',
+      'No lie may be harmful or shameful.',
+      'The reveal is text-only, no dramatic music.',
+      'The "why it sounded true" is mandatory.',
+    ],
+  );
+
+  // -- 19 My Mistake Monday --------------------------------------------
+  static const FormatSpec myMistakeMonday = FormatSpec(
+    id: 'myMistakeMonday',
+    name: 'My Mistake Monday',
+    definition:
+        'A weekly series where the author names one mistake and the lesson, posted consistently.',
+    structure: [
+      'The day, stated as "Monday, week 3"',
+      'The mistake, one line',
+      'What I thought was happening',
+      'What was actually happening',
+      'The fix I will try this week',
+    ],
+    bestFor:
+        'Series consistency and follow building. The weekly cadence turns accountability into habit.',
+    bestContentTypes: ['reel', 'carousel', 'story'],
+    bestGoals: ['follows', 'relatability', 'comments'],
+    example:
+        '"Monday, week 3: I stopped Cuty from climbing." I thought she was being reckless. She was practicing spatial reasoning on the sofa. The fix: give her a safe climbing spot and redirect.',
+    generationRules: [
+      'Must be first person. Always.',
+      'The mistake must not involve child safety directly.',
+      'The fix must be free and doable by any parent.',
+      'Posted every Monday without fail.',
+      'The week number is always stated.',
+    ],
+  );
+
+  // -- 20 Child Quote --------------------------------------------------
+  static const FormatSpec childQuote = FormatSpec(
+    id: 'childQuote',
+    name: 'Child Quote',
+    definition:
+        'A real thing a child said, set on screen with the context that makes it land.',
+    structure: [
+      'The quote, exact words',
+      'The situation, one line',
+      'The parent\'s internal reaction',
+      'Why it is memorable',
+      'The takeaway, one line',
+    ],
+    bestFor:
+        'Relatability and saves. Parents save these because they are universal.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage', 'story'],
+    bestGoals: ['relatability', 'saves', 'shares'],
+    example:
+        '"Ria: \'Mama, your saree is dancing!\'" Mumma walked fast. Ria giggled. That is what it looks like through her eyes. Takeaway: "They see everything — and they see the magic."',
+    generationRules: [
+      'Quotes must be verbatim. No paraphrasing.',
+      'The child must be named.',
+      'No quote may be embarrassing or shameful.',
+      'The context is shown, not described.',
+      'On-screen text max 6 words per card.',
+    ],
+  );
+
+  // -- 21 Show Don't Tell ----------------------------------------------
+  static const FormatSpec showDontTell = FormatSpec(
+    id: 'showDontTell',
+    name: 'Show Don\'t Tell',
+    definition:
+        'A parenting principle demonstrated visually rather than explained.',
+    structure: [
+      'The principle, named',
+      'What telling looks like',
+      'What showing looks like instead',
+      'The result, visual',
+      'The takeaway, one line',
+    ],
+    bestFor:
+        'Authority and saves. Parents remember what they see, not what they read.',
+    bestContentTypes: ['reel', 'imageSlideshowReel', 'carousel'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Stay calm." Telling: "Ria, calm down!" Showing: Mumma\'s hand stays steady while she waits out the tantrum. Ria mirrors. Takeaway: "Your calm is contagious — yours, not theirs."',
+    generationRules: [
+      'The principle must be named in beat 1.',
+      'The "telling" version must be a real parent phrase.',
+      'The "showing" version must be a physical action, not body language advice.',
+      'No voiceover. Visuals only.',
+      'Beat 5 is always the takeaway to the parent.',
+    ],
+  );
+
+  // -- 22 One Thing Better ---------------------------------------------
+  static const FormatSpec oneThingBetter = FormatSpec(
+    id: 'oneThingBetter',
+    name: 'One Thing Better',
+    definition:
+        'One thing the parent can improve, stated as a small upgrade not a fix.',
+    structure: [
+      'The current thing, shown',
+      'The thing that already works about it',
+      'The one upgrade, small',
+      'The upgrade in action',
+      'The result, subtle but real',
+    ],
+    bestFor:
+        'Non-shaming improvement. Parents resist big fixes; small upgrades feel kind.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage'],
+    bestGoals: ['saves', 'relatability', 'authority'],
+    example:
+        '"Your evening rush." It works because you get dinner on the table. The upgrade: Ria sets the table while you stir. She feels involved, you feel less alone.',
+    generationRules: [
+      'The upgrade must be doable in under 2 minutes.',
+      'Never shame the current version. Name what works first.',
+      'The upgrade uses something already in the house.',
+      'Show the result, do not describe it.',
+      'End on the parent feeling capable, not guilty.',
+    ],
+  );
+
+  // -- 23 The Switch ---------------------------------------------------
+  static const FormatSpec theSwitch = FormatSpec(
+    id: 'theSwitch',
+    name: 'The Switch',
+    definition:
+        'The exact moment a parent realizes they need to change tactics, and the new one.',
+    structure: [
+      'The old tactic, shown failing',
+      'The parent\'s realisation, one line',
+      'The internal choice: continue or switch',
+      'The new tactic, in action',
+      'The result, immediately visible',
+    ],
+    bestFor:
+        'Comments and shares. The "switch" moment is a hook every parent recognises.',
+    bestContentTypes: ['reel', 'trialReel', 'carousel'],
+    bestGoals: ['comments', 'shares', 'relatability'],
+    example:
+        '"Chasing Ria to get dressed." She runs every morning. I realise: I am playing chase, not dressing. I stop, sit on the bed, start singing the toothbrush song. She peeks, joins in. Takeaway: "Stop playing their game."',
+    generationRules: [
+      'The old tactic must fail visually, not verbally.',
+      'The realisation is one line, no internal monologue.',
+      'The new tactic must cost nothing and use nothing bought.',
+      'The result shows within 3 seconds of the switch.',
+      'No voiceover — only text and sound.',
+    ],
+  );
+
+  // -- 24 Parent Math --------------------------------------------------
+  static const FormatSpec parentMath = FormatSpec(
+    id: 'parentMath',
+    name: 'Parent Math',
+    definition:
+        'A calculation the parent is doing in their head, made visible.',
+    structure: [
+      'The math, stated',
+      'The variables, shown',
+      'The calculation, visual',
+      'The result, unexpected',
+      'The takeaway, one line',
+    ],
+    bestFor:
+        'Humour and relatability. Every parent has done this exact arithmetic.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage'],
+    bestGoals: ['relatability', 'shares', 'comments'],
+    example:
+        '"6am wake = 2 snooze = 4 shower = 8 feed = 15 leave. But Ria needs 20 hugs each morning. 15 + 20 = running late. Solution: start hugging at 6."',
+    generationRules: [
+      'The math must be something real parents actually do.',
+      'Numbers must be concrete, not abstract.',
+      'The visual must show the calculation, not just text.',
+      'No mockery of the parent\'s arithmetic.',
+      'Beat 5 is a tip, not a punchline.',
+    ],
+  );
+
+  // -- 25 Yes And ------------------------------------------------------
+  static const FormatSpec yesAnd = FormatSpec(
+    id: 'yesAnd',
+    name: 'Yes And',
+    definition:
+        'Accepting the child\'s lead and building on it rather than redirecting.',
+    structure: [
+      'The child\'s offer, stated',
+      'The parent\'s impulse to redirect',
+      'The choice to say "yes and"',
+      'What grows from it',
+      'The takeaway, one line',
+    ],
+    bestFor:
+        'Relationship building and creativity. Children who feel heard cooperate more.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['relatability', 'saves', 'authority'],
+    example:
+        '"Rio wants to wear a raincoat inside." Instead of \'no\', I say \'yes and\' — he can be a dinosaur with the coat as a tail. He plays for 10 minutes. I get dinner started. Takeaway: "Yes and" is a parent superpower.',
+    generationRules: [
+      'The impulse to redirect must be shown, not just stated.',
+      'The "yes and" must add structure, not just approval.',
+      'What grows from it must be visible, not described.',
+      'No scenario where saying yes creates danger.',
+      'Beat 5 addresses the viewer directly.',
+    ],
+  );
+
+  // -- 26 The Pause ----------------------------------------------------
+  static const FormatSpec thePause = FormatSpec(
+    id: 'thePause',
+    name: 'The Pause',
+    definition:
+        'The power of the pause before responding to a child\'s demand or outburst.',
+    structure: [
+      'The moment that triggers a reaction',
+      'The parent\'s instinct to react immediately',
+      'The deliberate pause',
+      'The response chosen after the pause',
+      'The result, calmer',
+    ],
+    bestFor:
+        'Authority and saves. The pause is a skill every parent can learn.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel', 'staticImage'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Ria throws her plate." My hand shoots up to speak. I stop. One count. "Ria, you are cross that lunch is over. Tell me." She sniffles: "I wanted more roti." I get another piece. Takeaway: "The pause is not delay. It is calibration."',
+    generationRules: [
+      'The trigger must be shown, not described.',
+      'The instinct to react must be physical, visible.',
+      'The pause is at least one full second.',
+      'The response must be different from the instinctive one.',
+      'No voiceover. Text and sound only.',
+    ],
+  );
+
+  // -- 27 What They See ------------------------------------------------
+  static const FormatSpec whatTheySee = FormatSpec(
+    id: 'whatTheySee',
+    name: 'What They See',
+    definition:
+        'How the parent appears through the child\'s eyes, not the parent\'s own lens.',
+    structure: [
+      'The parent\'s view of the moment',
+      'The child\'s view, shown',
+      'The gap between them',
+      'The parent\'s adjustment',
+      'The result, in the child\'s behaviour',
+    ],
+    bestFor:
+        'Empathy and relatability. Parents forget children are small people with their own perspective.',
+    bestContentTypes: ['reel', 'imageSlideshowReel', 'carousel'],
+    bestGoals: ['relatability', 'shares', 'comments'],
+    example:
+        '"I was busy." Mumma thought: I am cooking, this is normal. Ria saw: Mumma\'s back is turned, I do not exist. Mumma paused, knelt: "Ria, I see you." Ria leaned in. Takeaway: "They do not know you are busy. They only know you are gone."',
+    generationRules: [
+      'The parent\'s view and the child\'s view must be visually distinct.',
+      'The child\'s view is shown at their eye level.',
+      'No judgment of the parent\'s view. It is normal, just unseen.',
+      'The adjustment must be small, not a full pivot.',
+      'End on the child\'s behaviour, not the parent\'s feeling.',
+    ],
+  );
+
+  // -- 28 The Rule of Three --------------------------------------------
+  static const FormatSpec theRuleOfThree = FormatSpec(
+    id: 'theRuleOfThree',
+    name: 'The Rule of Three',
+    definition:
+        'Children learn in threes: show once, try once, do once.',
+    structure: [
+      'The skill, named',
+      'First exposure — just watch',
+      'Second exposure — guided attempt',
+      'Third exposure — independent try',
+      'The result, the child succeeding',
+    ],
+    bestFor:
+        'Age-Based Skills and DO content. Gives parents a structure they can count on.',
+    bestContentTypes: ['carousel', 'imageSlideshowReel', 'staticImage'],
+    bestGoals: ['saves', 'authority', 'follows'],
+    example:
+        '"Tying shoes." Watch me once. Try with my hand over yours. Try on your own. Ria\'s shoes are crooked but she did it. Takeaway: "Show three times, then get out of the way."',
+    generationRules: [
+      'All three exposures must be shown, not described.',
+      'The skill must be doable with no special tools.',
+      'No skill may require verbal instruction on the third try.',
+      'The result must be a child attempt, not a parent win.',
+      'Beat 5 is a parent tip, not a child instruction.',
+    ],
+  );
+
+  // -- 29 Feelings First -----------------------------------------------
+  static const FormatSpec feelingsFirst = FormatSpec(
+    id: 'feelingsFirst',
+    name: 'Feelings First',
+    definition:
+        'Naming the emotion before solving the problem.',
+    structure: [
+      'The behaviour, shown',
+      'The feeling behind it, named',
+      'The child\'s struggle to name it',
+      'The parent naming it for them',
+      'The problem solving that follows',
+    ],
+    bestFor:
+        'TALK pillar content. Language is the long game, but naming is the door.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Ria screams for the toy." She is not being greedy — she is disappointed. She does not have the word. Mumma: "You really wanted it. It hurts when you can\'t have it." Ria: "Yeah." Then: "Can we ask if they have extras?"',
+    generationRules: [
+      'The feeling must be named, not guessed at.',
+      'The child must struggle to find the word. No perfect language.',
+      'The parent names it, not lectures about it.',
+      'Solving the problem comes after, not instead of.',
+      'No resolution where the child gets the toy.',
+    ],
+  );
+
+  // -- 30 The Library Hack ---------------------------------------------
+  static const FormatSpec theLibraryHack = FormatSpec(
+    id: 'theLibraryHack',
+    name: 'The Library Hack',
+    definition:
+        'A specific technique a parent can use, named and demonstrated.',
+    structure: [
+      'The problem, one line',
+      'The hack, named',
+      'How it works, shown',
+      'The result, immediate',
+      'Save note: the name is the trigger to remember',
+    ],
+    bestFor:
+        'Saves and shares. Named hacks are what parents pass to each other.',
+    bestContentTypes: ['carousel', 'staticImage', 'reel'],
+    bestGoals: ['saves', 'shares', 'authority'],
+    example:
+        '"Screen time battles." The hack: \'First Next Last\'. Before screen: \'First we eat, then next we watch, then last we turn off.\' Ria knows the order before the battle starts.',
+    generationRules: [
+      'The hack must have a name parents can repeat.',
+      'The name must be short — 3 words max.',
+      'Show the hack in action, do not describe it.',
+      'No product or service as the hack.',
+      'Beat 5 is a save reminder, not a moral.',
+    ],
+  );
+
+  // -- 31 Mirror Moment ------------------------------------------------
+  static const FormatSpec mirrorMoment = FormatSpec(
+    id: 'mirrorMoment',
+    name: 'Mirror Moment',
+    definition:
+        'A parent sees their own behaviour reflected in their child.',
+    structure: [
+      'The child\'s behaviour, shown',
+      'The parent\'s recognition',
+      'The behaviour the parent shares',
+      'The parent\'s choice',
+      'The result, in both of them',
+    ],
+    bestFor:
+        'Comments and shares. Seeing yourself in your child is a quiet shock every parent feels.',
+    bestContentTypes: ['reel', 'carousel', 'story'],
+    bestGoals: ['comments', 'relatability', 'follows'],
+    example:
+        '"Rio refuses to share." Mumma freezes — she was just doing the same thing on a work call. "I model this," she says aloud. Rio sees her sit. "Can I try?" He hands over the car. Takeaway: "They learn from watching. That is the job."',
+    generationRules: [
+      'The recognition must be honest, not performative.',
+      'The parent\'s behaviour must be adult, not childish.',
+      'No shame. Name it, change it.',
+      'The result shows in both parent and child.',
+      'Beat 5 is a takeaway, not a lecture.',
+    ],
+  );
+
+  // -- 32 The Anchor Word ----------------------------------------------
+  static const FormatSpec theAnchorWord = FormatSpec(
+    id: 'theAnchorWord',
+    name: 'The Anchor Word',
+    definition:
+        'One word the parent uses consistently to signal safety or boundary.',
+    structure: [
+      'The situation, named',
+      'The parent\'s usual response',
+      'The chosen anchor word',
+      'How the child responds to it',
+      'The result, calmer',
+    ],
+    bestFor:
+        'Authority and saves. One word repeated becomes a security blanket for the child.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage', 'story'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Tantrum at the grocery store." Instead of \'calm down,\' Mumma says \'anchor.\' She says it softly, makes eye contact. Ria looks up. "Anchor," she echoes. She takes Mumma\'s hand."',
+    generationRules: [
+      'The anchor word must be neutral, not emotional.',
+      'It is introduced after a moment of calm, not during chaos.',
+      'The child must echo or respond to it.',
+      'No anchor word that sounds like a command.',
+      'Beat 5 is a parent note: "One word, repeated, becomes safety."',
+    ],
+  );
+
+  // -- 33 The Two-Minute Rule ------------------------------------------
+  static const FormatSpec theTwoMinuteRule = FormatSpec(
+    id: 'theTwoMinuteRule',
+    name: 'The Two-Minute Rule',
+    definition:
+        'If a task takes less than two minutes, do it now rather than planning it.',
+    structure: [
+      'The task, named',
+      'The parent\'s tendency to defer',
+      'The two-minute threshold',
+      'Doing it now, shown',
+      'The result, less friction',
+    ],
+    bestFor:
+        'Practical DO content and saves. Parents hoard tasks that could be done in seconds.',
+    bestContentTypes: ['carousel', 'staticImage', 'reel'],
+    bestGoals: ['saves', 'authority', 'follows'],
+    example:
+        '"Shoes by the door." Mumma walks past them every morning and moves them mentally to \'later.\' Today: two minutes. Shoes in the rack. Tomorrow: smooth exit. Takeaway: "Two minutes now saves twenty later."',
+    generationRules: [
+      'The task must be genuinely under two minutes.',
+      'Show the deferral, then the action.',
+      'No product or tool needed.',
+      'The result is visible within the piece.',
+      'Beat 5 is a parent reminder, not a child instruction.',
+    ],
+  );
+
+  // -- 34 Story Reel ---------------------------------------------------
+  static const FormatSpec storyReel = FormatSpec(
+    id: 'storyReel',
+    name: 'Story Reel',
+    definition:
+        'A short narrative story with a twist and resolution, adapted from the viral reel format.',
+    structure: [
+      'The setup — character wants something',
+      'The conflict — it does not go as planned',
+      'The twist — a small surprise or discovery',
+      'The resolution — problem solved or lesson learned',
+      'The takeaway, one line to the parent',
+    ],
+    bestFor:
+        'Emotional connection through character moments with Ria, Rio, and Cuty. The viewer watches for the characters, not just the message.',
+    bestContentTypes: ['imageSlideshowReel', 'reel'],
+    bestGoals: ['relatability', 'shares', 'follows'],
+    example:
+        '"Ria\'s surprise drawing." Ria draws Mumma\'s portrait. Mumma hangs it. Ria asks: "Where is yours?" Twist: Mumma has no portrait of herself. Resolution: they draw each other. Takeaway: "Children see us when we think we are invisible."',
+    generationRules: [
+      'Exactly 5 beats. Not 3, not 7.',
+      'Ria, Rio or Cuty must be the protagonist.',
+      'The twist must come in beat 3, not beat 5.',
+      'The takeaway addresses the parent, not the child.',
+      'No moralising. Let the story teach.',
+    ],
+  );
+
+  // -- 35 The Reframe --------------------------------------------------
+  static const FormatSpec theReframe = FormatSpec(
+    id: 'theReframe',
+    name: 'The Reframe',
+    definition:
+        'Shifting the parent\'s interpretation of a behaviour from negative to neutral or positive.',
+    structure: [
+      'The behaviour, seen the old way',
+      'The parent\'s reaction, shown',
+      'The new interpretation, stated',
+      'The new reaction, shown',
+      'The result, calmer family atmosphere',
+    ],
+    bestFor:
+        'Relatability and saves. A reframe is a parent superpower they can steal.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['relatability', 'saves', 'authority'],
+    example:
+        '"Constant questions." Old view: Ria is demanding attention. New view: Ria is learning through language. New response: "That is your learning voice. Ask me five." She counts on her fingers. Takeaway: "Curiosity is not manipulation."',
+    generationRules: [
+      'The old interpretation must be a real parent thought, not mockable.',
+      'The reframe must be specific, not "they are just kids."',
+      'Show the new reaction, do not describe it.',
+      'No reframe that ignores genuine needs.',
+      'Beat 5 is a takeaway the parent can steal.',
+    ],
+  );
+
+  // -- 36 The Handoff --------------------------------------------------
+  static const FormatSpec theHandoff = FormatSpec(
+    id: 'theHandoff',
+    name: 'The Handoff',
+    definition:
+        'How a parent gracefully transfers attention from one caregiver to another.',
+    structure: [
+      'The current parent, engaged',
+      'The incoming parent, arriving',
+      'The child caught between',
+      'The handoff ritual, shown',
+      'The result, seamless transition',
+    ],
+    bestFor:
+        'Relatability and follows. Every household with two caregivers lives this.',
+    bestContentTypes: ['reel', 'carousel', 'story'],
+    bestGoals: ['relatability', 'follows', 'comments'],
+    example:
+        '"Papa arrives home." Ria is mid-story to Mumma. Papa enters. I kneel: "Beta, Papa has the next chapter." She runs to him. Takeaway: "Transitions are rituals. Make them visible."',
+    generationRules: [
+      'The handoff ritual must be specific, not "it\'s fine."',
+      'Show the child\'s resistance or hesitation.',
+      'Both parents must appear. Never hand off to silence.',
+      'The ritual takes under 10 seconds.',
+      'Beat 5 is a parent tip, not a child instruction.',
+    ],
+  );
+
+  // -- 37 The 80/20 Rule -----------------------------------------------
+  static const FormatSpec the8020Rule = FormatSpec(
+    id: 'the8020Rule',
+    name: 'The 80/20 Rule',
+    definition:
+        'A parent gets 80 percent compliance naturally; the last 20 percent needs a different strategy entirely.',
+    structure: [
+      'The goal, stated',
+      'The 80 percent, where it works naturally',
+      'The 20 percent, where it breaks down',
+      'The different strategy for 20 percent',
+      'The result, less frustration',
+    ],
+    bestFor:
+        'Authority and saves. Parents feel like failures at the 20 percent. Showing it is different work reframes everything.',
+    bestContentTypes: ['carousel', 'staticImage', 'reel'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Putting on shoes." 80 percent of the time, Ria does it herself. 20 percent: she sits and refuses. The strategy switches from "keep asking" to "give two choices, then carry." Takeaway: "The last 20 percent is not defiance. It is a different job."',
+    generationRules: [
+      'The 80 percent must be effortless, not forced.',
+      'The 20 percent must be named as a different scenario.',
+      'The different strategy must be specific and free.',
+      'Show the strategy, do not describe it.',
+      'Beat 5 is a parent reframing statement.',
+    ],
+  );
+
+  // -- 38 The Reset ----------------------------------------------------
+  static const FormatSpec theReset = FormatSpec(
+    id: 'theReset',
+    name: 'The Reset',
+    definition:
+        'A parent acknowledges a boundary breakdown and starts over with the child.',
+    structure: [
+      'The breakdown, shown',
+      'The parent\'s recognition',
+      'The reset words',
+      'Starting over, shown',
+      'The result, repaired',
+    ],
+    bestFor:
+        'Trust and relatability. Children need to see parents repair, not just be perfect.',
+    bestContentTypes: ['reel', 'carousel', 'story'],
+    bestGoals: ['relatability', 'comments', 'authority'],
+    example:
+        '"I yelled." Ria flinched. "Mumma sorry. My voice was loud. Let\'s start again." We both took a breath. "Can you try again?" "Yes." Takeaway: "A reset is not weakness. It is repair."',
+    generationRules: [
+      'The breakdown must be shown, not described.',
+      'The reset words must be specific, not "sorry."',
+      'Both parent and child must participate in the reset.',
+      'The result shows within 3 seconds.',
+      'No voiceover. Text and sound only.',
+    ],
+  );
+
+  // -- 39 The Substitute -----------------------------------------------
+  static const FormatSpec theSubstitute = FormatSpec(
+    id: 'theSubstitute',
+    name: 'The Substitute',
+    definition:
+        'Swapping an unavailable desired object for one that is already in the house.',
+    structure: [
+      'The desired object, named',
+      'The parent\'s refusal impulse',
+      'The substitute, offered',
+      'The child\'s acceptance or negotiation',
+      'The result, redirected',
+    ],
+    bestFor:
+        'Saves and authority. The substitute is a parent hack worth saving.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage'],
+    bestGoals: ['saves', 'authority', 'relatability'],
+    example:
+        '"Phone." Rio reaches for it. "Not now. Here — the wooden block phone." He takes it, dials imaginary numbers. Takeaway: "The substitute is not a punishment. It is a bridge."',
+    generationRules: [
+      'The substitute must use something already in the house.',
+      'Never shame the child for wanting the original.',
+      'The substitute must be presented positively, not as a consolation.',
+      'Show the child\'s negotiation, not just acceptance.',
+      'Beat 5 is a parent note.',
+    ],
+  );
+
+  // -- 40 The Counting Boundary ----------------------------------------
+  static const FormatSpec theCountingBoundary = FormatSpec(
+    id: 'theCountingBoundary',
+    name: 'The Counting Boundary',
+    definition:
+        'A parent states the boundary, counts, and follows through — without drama.',
+    structure: [
+      'The boundary, stated once',
+      'The child\'s non-compliance',
+      'The count, calm',
+      'The follow-through, immediate',
+      'The result, the boundary holds',
+    ],
+    bestFor:
+        'Authority and follows. Parents need to see the calm count, not the theatrical one.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['authority', 'follows', 'comments'],
+    example:
+        '"Time to clean up." Ria keeps building. "You have to toys in the bin by the time I count to five." One... two... three... she is on the fourth. "Four." She runs. Takeaway: "The count is the boundary. Not the drama."',
+    generationRules: [
+      'The count must be calm, not escalating.',
+      'The follow-through must be immediate, not delayed.',
+      'No count above five. Ever.',
+      'The result must show the boundary holding.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 41 The Invitation -----------------------------------------------
+  static const FormatSpec theInvitation = FormatSpec(
+    id: 'theInvitation',
+    name: 'The Invitation',
+    definition:
+        'Offering a choice that leads to the desired outcome rather than a direct request.',
+    structure: [
+      'The desired outcome, stated',
+      'The parent\'s direct request impulse',
+      'The invitation, offered',
+      'The child\'s choice',
+      'The result, cooperation',
+    ],
+    bestFor:
+        'Saves and authority. Invitations feel like choice, not control.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage', 'story'],
+    bestGoals: ['saves', 'authority', 'relatability'],
+    example:
+        '"Eat vegetables." Instead: "Would you like carrots or peas?" Ria points to peas. She eats them. Takeaway: "Choice is the oldest cooperation trick."',
+    generationRules: [
+      'Both options must be genuinely acceptable to the parent.',
+      'The invitation must be phrased as a question.',
+      'Show the child\'s choice, not just compliance.',
+      'No fake choices where only one outcome is allowed.',
+      'Beat 5 is a parent note.',
+    ],
+  );
+
+  // -- 42 The Observation ----------------------------------------------
+  static const FormatSpec theObservation = FormatSpec(
+    id: 'theObservation',
+    name: 'The Observation',
+    definition:
+        'Noticing and naming a child\'s competence or growth without praise.',
+    structure: [
+      'The behaviour, observed',
+      'The parent\'s impulse to praise',
+      'The parent\'s statement, instead',
+      'The child\'s response',
+      'The result, the child tries again',
+    ],
+    bestFor:
+        'Authority and saves. Praise motivates the parent; observation motivates the child.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Ria stacks blocks." She wobbles. Instead of \'good job,\' Mumma says: \'You noticed the base needed to be wider.\' Ria looks at her tower, adjusts. Takeaway: "Observation names the skill. Praise names the parent."',
+    generationRules: [
+      'The observation must be about the child\'s thinking, not appearance.',
+      'No comparison to other children.',
+      'Show the child\'s response, not just compliance.',
+      'The observation is one sentence, not a paragraph.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 43 The Script Handoff -------------------------------------------
+  static const FormatSpec theScriptHandoff = FormatSpec(
+    id: 'theScriptHandoff',
+    name: 'The Script Handoff',
+    definition:
+        'Teaching a peer script for a social moment a child will face, practiced before the moment.',
+    structure: [
+      'The upcoming moment, named',
+      'The child\'s usual response',
+      'The script, taught',
+      'The script practiced',
+      'The moment, script used',
+    ],
+    bestFor:
+        'TALK and Authority. Scripts reduce anxiety for both child and parent.',
+    bestContentTypes: ['carousel', 'staticImage', 'imageSlideshowReel'],
+    bestGoals: ['authority', 'saves', 'follows'],
+    example:
+        '"New friend says \'you can\'t play.\'" Script: \'I can show you how to play next.\' Practice: Rio says it to his dinosaur. The moment: Rio says it to the other child. Takeaway: "Scripts are training wheels for social moments."',
+    generationRules: [
+      'The script must be under 5 words.',
+      'Practice must happen, not just be stated.',
+      'The script must be the child\'s, not the parent\'s.',
+      'No script that requires adult presence.',
+      'Beat 5 is a parent note.',
+    ],
+  );
+
+  // -- 44 The 15-Minute Check ------------------------------------------
+  static const FormatSpec the15MinuteCheck = FormatSpec(
+    id: 'the15MinuteCheck',
+    name: 'The 15-Minute Check',
+    definition:
+        'A quick, regular check-in that prevents escalation.',
+    structure: [
+      'The pattern, named',
+      'The parent\'s usual reaction',
+      'The 15-minute check, introduced',
+      'The check in action',
+      'The result, no escalation',
+    ],
+    bestFor:
+        'Authority and saves. Prevention is cheaper than intervention.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage'],
+    bestGoals: ['authority', 'saves', 'relatability'],
+    example:
+        '"Afternoon energy crash." Every day at 3pm, Ria gets wild. Instead of waiting for meltdown: "15-minute check." At 2:45: "How is your body feeling?" She says: "Wiggly." We dance for 2 minutes. Takeaway: "Catch them before they crash."',
+    generationRules: [
+      'The check must happen before escalation, not after.',
+      'It must be routine, not spontaneous.',
+      'Show the check, do not describe it.',
+      'No product needed.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 45 The Choice Menu ----------------------------------------------
+  static const FormatSpec theChoiceMenu = FormatSpec(
+    id: 'theChoiceMenu',
+    name: 'The Choice Menu',
+    definition:
+        'Presenting a small set of options within a boundary, so the child chooses without losing the limit.',
+    structure: [
+      'The limit, stated',
+      'The child\'s reaction',
+      'The choices, offered',
+      'The child\'s choice',
+      'The result, limit held and child empowered',
+    ],
+    bestFor:
+        'Saves and authority. A limit with a menu of choices feels fair, not arbitrary.',
+    bestContentTypes: ['carousel', 'staticImage', 'reel'],
+    bestGoals: ['saves', 'authority', 'comments'],
+    example:
+        '"No park today — rain." Ria protests. "Choose: indoor obstacle course or blanket fort?" She picks fort. "We build together." Takeaway: "A menu of choices holds the limit and offers agency."',
+    generationRules: [
+      'The limit is stated first, not bargained after.',
+      'Both choices must be acceptable to the parent.',
+      'The child must actually choose, not default.',
+      'No choice that undermines the limit.',
+      'Beat 5 is a parent note.',
+    ],
+  );
+
+  // -- 46 The Echo -----------------------------------------------------
+  static const FormatSpec theEcho = FormatSpec(
+    id: 'theEcho',
+    name: 'The Echo',
+    definition:
+        'Reflecting back what the child said, so they hear their own words as valid.',
+    structure: [
+      'The child\'s words, stated',
+      'The parent\'s usual response',
+      'The parent\'s reflection, back',
+      'The child\'s reaction',
+      'The result, heard',
+    ],
+    bestFor:
+        'TALK and relatability. Children want to be heard; echoing proves they were.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['relatability', 'authority', 'comments'],
+    example:
+        '"I want to be first!" Mumma: \'You feel like being first really matters to you.\' Ria: \'Yes.\' \'Tell me about it.\' Ria explains. Takeaway: "An echo is not agreement. It is acknowledgement."',
+    generationRules: [
+      'The reflection must not add advice or correction.',
+      'Show the child\'s reaction, not just compliance.',
+      'The child must speak again after the echo.',
+      'No echo when the child is in genuine distress.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 47 The 3 AM Rule ------------------------------------------------
+  static const FormatSpec the3AmRule = FormatSpec(
+    id: 'the3AmRule',
+    name: 'The 3 AM Rule',
+    definition:
+        'If the parent would not do it at 3 AM, it is not needed.',
+    structure: [
+      'The urge, named',
+      'The parent\'s question: 3 AM?',
+      'The answer, honest',
+      'The choice, made',
+      'The result, lighter',
+    ],
+    bestFor:
+        'Saves and relatability. Parents are exhausted and doing too much.',
+    bestContentTypes: ['carousel', 'staticImage', 'reel', 'story'],
+    bestGoals: ['saves', 'relatability', 'authority'],
+    example:
+        '"Check Ria\'s homework again." 3 AM? No. She checked it this morning. The anxiety, not the task, is knocking. Takeaway: "If it survives the night, it is not urgent."',
+    generationRules: [
+      'The 3 AM question must be genuinely asked.',
+      'The answer must be honest.',
+      'No 3 AM rule that dismisses genuine needs.',
+      'Show the choice, not just the result.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 48 The Micro Win ------------------------------------------------
+  static const FormatSpec theMicroWin = FormatSpec(
+    id: 'theMicroWin',
+    name: 'The Micro Win',
+    definition:
+        'Celebrating a tiny step forward without fanfare or praise.',
+    structure: [
+      'The small step, shown',
+      'The parent\'s notice',
+      'The parent\'s acknowledgment',
+      'The child\'s response',
+      'The momentum, building',
+    ],
+    bestFor:
+        'Relatability and saves. Parents miss micro wins and wonder why motivation fades.',
+    bestContentTypes: ['reel', 'carousel', 'imageSlideshowReel'],
+    bestGoals: ['relatability', 'saves', 'authority'],
+    example:
+        '"Rio puts one block in the bin." Not the whole tower. One. Mumma: \'I saw that.\' He grins. Puts another. Takeaway: "Micro wins are not small. They are the foundation."',
+    generationRules: [
+      'The step must be genuinely small, not a whole task.',
+      'No celebration. Just acknowledgment.',
+      'Show the momentum, not just the step.',
+      'No praise language ("good job," "amazing").',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
+  // -- 49 The Exit Strategy --------------------------------------------
+  static const FormatSpec theExitStrategy = FormatSpec(
+    id: 'theExitStrategy',
+    name: 'The Exit Strategy',
+    definition:
+        'How to gracefully end an activity so the child transitions without resistance.',
+    structure: [
+      'The activity, named',
+      'The parent\'s usual ending',
+      'The exit strategy, stated',
+      'The exit, in action',
+      'The result, smooth',
+    ],
+    bestFor:
+        'Authority and saves. Transitions are the daily battle every parent fights.',
+    bestContentTypes: ['reel', 'carousel', 'staticImage', 'story'],
+    bestGoals: ['authority', 'saves', 'relatability', 'follows'],
+    example:
+        '"Blocks." Instead of \'clean up now,\' Mumma says: \'Five more minutes, then we sweep together.\' Timer dings. Rio: \'Timer!\' \'Ready?\' \'Yes!\' Takeaway: "The exit strategy is the promise. Keep it."',
+    generationRules: [
+      'The strategy must be named, not described.',
+      'It must involve the child, not just announce to them.',
+      'Show the transition, not just the strategy.',
+      'No strategy that uses time pressure as punishment.',
+      'Beat 5 is a parent note.',
+    ],
+  );
+
+  // -- 50 The Anchor Routine -------------------------------------------
+  static const FormatSpec theAnchorRoutine = FormatSpec(
+    id: 'theAnchorRoutine',
+    name: 'The Anchor Routine',
+    definition:
+        'A consistent sequence that marks the start or end of a transition, giving the child a predictable rhythm.',
+    structure: [
+      'The transition, named',
+      'The parent\'s usual approach',
+      'The anchor routine, established',
+      'The anchor in action',
+      'The result, predictable',
+    ],
+    bestFor:
+        'Authority and follow building. Routines are the invisible scaffolding children lean on.',
+    bestContentTypes: ['carousel', 'imageSlideshowReel', 'reel'],
+    bestGoals: ['authority', 'follows', 'saves'],
+    example:
+        '"Morning departure." Instead of chaos: \'Wash hands, shoes by door, wave to Cuty.\' Same order every day. Rio knows what comes next. Takeaway: "An anchor routine is a sentence the child can predict."',
+    generationRules: [
+      'The routine must be under 30 seconds.',
+      'It must use something already in the house.',
+      'Show the routine, do not describe it.',
+      'No routine that requires adult assistance at every step.',
+      'Beat 5 is a parent takeaway.',
+    ],
+  );
+
   static const List<FormatSpec> all = [
     pov,
     doThisNotThat,
@@ -682,6 +1634,40 @@ class FormatLibrary {
     miniStory,
     thisOrThat,
     questionAnswer,
+    mistakeToRecovery,
+    twoTruthsAndALieParenting,
+    myMistakeMonday,
+    childQuote,
+    showDontTell,
+    oneThingBetter,
+    theSwitch,
+    parentMath,
+    yesAnd,
+    thePause,
+    whatTheySee,
+    theRuleOfThree,
+    feelingsFirst,
+    theLibraryHack,
+    mirrorMoment,
+    theAnchorWord,
+    theTwoMinuteRule,
+    storyReel,
+    theReframe,
+    theHandoff,
+    the8020Rule,
+    theReset,
+    theSubstitute,
+    theCountingBoundary,
+    theInvitation,
+    theObservation,
+    theScriptHandoff,
+    the15MinuteCheck,
+    theChoiceMenu,
+    theEcho,
+    the3AmRule,
+    theMicroWin,
+    theExitStrategy,
+    theAnchorRoutine,
   ];
 
   static FormatSpec? byId(String id) {

@@ -127,7 +127,11 @@ Future<String> _geminiText(
 // ── Character block builder ───────────────────────────────────────────────────
 
 /// Builds the character lock section from canonical descriptions.
-String _characterBlock(List<String> characterNames) {
+String _characterBlock(List<String> characterNames, {bool hasReferenceImages = false}) {
+  if (hasReferenceImages) {
+    if (characterNames.isEmpty) return kCharacterNames.join(', ');
+    return characterNames.join(', ');
+  }
   if (characterNames.isEmpty) {
     return kCharacterNames
         .map((name) => '- $name: ${characterDescription(name)}')
@@ -136,6 +140,23 @@ String _characterBlock(List<String> characterNames) {
   return characterNames
       .map((name) => '- $name: ${characterDescription(name)}')
       .join('\n');
+}
+
+/// Builds a voice/pattern guide for each character in the cast.
+///
+/// Injects each character's speech pattern so dialogue sounds authentic per-character
+/// rather than from a single generic narrator voice. References the canonical
+/// [kSpeechPatterns] from characters.dart.
+String _characterVoiceBlock(List<String> characterNames) {
+  final lines = <String>[];
+  for (final name in characterNames) {
+    final pattern = speechPattern(name);
+    if (pattern.isNotEmpty) {
+      lines.add('- $name: $pattern');
+    }
+  }
+  if (lines.isEmpty) return '';
+  return '\n\nCHARACTER VOICE PATTERNS:\n${lines.join('\n')}';
 }
 
 String _brandStyleBlock() =>
@@ -187,7 +208,7 @@ Return ONLY valid JSON in exactly this shape:
   "visual_style": "The established Instagram illustration style",
   "lighting": "Lighting, shadows and atmosphere",
   "text_overlay": "Exact wording to display if needed, or empty string",
-  "negative_prompt": "Duplicates, distorted anatomy, unwanted characters, incorrect outfits, glasses on Ria/Rio, watermarks, text errors",
+  "negative_prompt": "Duplicates, distorted anatomy, unwanted characters, incorrect outfits, watermarks, text errors",
   "output_format": "Aspect ratio and resolution",
   "full_prompt": "The complete copy-paste-ready prompt combining all sections above into one coherent paragraph"
 }
@@ -262,10 +283,9 @@ $charBlock
 
 CHARACTER CONSISTENCY RULES:
 - Use the exact descriptions above. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
 - Only the listed characters may appear.
 - Keep faces, hair, outfits and proportions IDENTICAL across all slides.
+- NO on-screen text rendered in images — text_overlay is editor metadata only.
 
 CAROUSEL STRUCTURE (adapt to the idea):
 - Slide 1: Cover and hook — the most eye-catching image
@@ -446,11 +466,19 @@ Future<GeminiVideoResult> generateGeminiVideoPrompts({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
 }) async {
   final parts = (totalSeconds / 10).round().clamp(2, 6);
-  final charBlock = _characterBlock(characters);
+  final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
+  final voiceBlock = _characterVoiceBlock(characters);
+
+  final characterInstructions = hasReferenceImages
+      ? '''Use the attached reference images as the definitive character references.
+Preserve each character's exact face, identity, hairstyle, clothing, colours, and proportions. Do not redesign or replace characters.'''
+      : '''Use the exact descriptions above for every part. Do not paraphrase.
+Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.''';
 
   final prompt = '''
 You are a video content creator for "${BrandDefaults.name}", an Indian kids' education Instagram page.
@@ -465,21 +493,28 @@ ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additi
 ${_brandStyleBlock()}
 
 CHARACTERS:
-$charBlock
+$charBlock$voiceBlock
 
 CHARACTER CONSISTENCY RULES:
-- Use the exact descriptions above for every part. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
+- $characterInstructions
 - Only the listed characters may appear. Never duplicate any character.
-- Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
 - All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
+- NO on-screen text rendered in video frames — text_overlay/on_screen_text are editor metadata only.
 
 STORY STRUCTURE:
-- Part 1: Establish the problem/situation
+- Part 1: Establish the problem/situation — the relatable hook
 - Middle parts: Develop the conflict or action
 - Last part: Resolution and payoff
 - Each part must have ONE clear purpose. Do not compress the whole story into one part.
+
+SAFETY:
+- Never depict unsafe behavior as entertainment — no choking hazards, no climbing on unstable furniture, no small objects near babies under 3.
+- Solutions must show safe, realistic parenting.
+- No fear-based scenarios that could frighten a sensitive child.
+
+SHAREABILITY:
+- Before writing, ask: "Why would one parent send this to another parent?"
+  The story must name a specific parent who would send it.
 
 CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
 The ending state of each part becomes the starting state of the next.
@@ -494,6 +529,9 @@ Return ONLY valid JSON:
 {
   "story_title": "short title",
   "story_foundation": "2-3 sentences describing the complete story arc, characters, setting and lesson",
+  "caption": "1-2 lines for Instagram caption, warm, speaking to parents, ending with a question a parent will answer",
+  "hashtags": ["5 exactly", "story-relevant", "not generic", "tags", "here"],
+  "pin_comment": "One true thing about this situation in a parent's own house, then ask them about theirs.",
   "parts": [
     {
       "part_number": 1,
@@ -519,14 +557,14 @@ Each "full_prompt" must be completely self-contained and include:
 - TITLE, PART number, DURATION (exactly 10 seconds), FORMAT (vertical 9:16)
 - STORY CONTEXT (brief explanation of the complete story)
 - THIS PART'S PURPOSE
-- CHARACTER LOCK with exact descriptions from above
+- CHARACTER LOCK (reference images or descriptions from above)
 - SCENE AND SETTING
 - STARTING STATE
-- CAMERA (opening framing, movement, ending framing)
-- ACTION TIMELINE (0-4s, 4-8s, 8-10s)
-- DIALOGUE AND AUDIO
-- ON-SCREEN TEXT OVERLAYS (max 2 short lines, readable, for sound-off viewing)
-- CONTINUITY FROM PREVIOUS PART
+ - CAMERA (opening framing, movement, ending framing)
+ - ACTION TIMELINE (0-4s, 4-8s, 8-10s)
+ - DIALOGUE AND AUDIO
+ - ON-SCREEN TEXT OVERLAYS (editor metadata only, NOT rendered in video — max 2 short lines)
+ - CONTINUITY FROM PREVIOUS PART
 - CONTINUITY INTO NEXT PART
 - VISUAL STYLE
 - NEGATIVE INSTRUCTIONS
@@ -574,12 +612,19 @@ Future<VideoPartPrompt> regenerateSingleVideoPart({
   required List<String> characters,
   String language = 'Hinglish',
   String previousEndingState = '',
+  bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
 }) async {
-  final charBlock = _characterBlock(characters);
+  final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
 
-  final prompt = '''
+  final characterInstructions = hasReferenceImages
+      ? '''Use the attached reference images as the definitive character references.
+Preserve each character's exact face, identity, hairstyle, clothing, colours, and proportions. Do not redesign or replace characters.'''
+      : '''Use the exact descriptions above. Do not paraphrase.
+Preserve each character's face, age, hair, outfit, colours and proportions.''';
+
+   final prompt = '''
 You are a video content creator for "${BrandDefaults.name}", an Indian kids' education Instagram page.
 
 Regenerate ONLY Part $partNumber of $totalParts for this story. Keep the same story, same characters, same continuity — just produce a fresh version of this one part.
@@ -596,11 +641,14 @@ CHARACTERS:
 $charBlock
 
 CHARACTER CONSISTENCY RULES:
-- Use the exact descriptions above. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
+- $characterInstructions
 - Only the listed characters may appear.
 - All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
+- NO on-screen text rendered in video frames — text_overlay/on_screen_text are editor metadata only.
+
+SAFETY:
+- Never depict unsafe behavior as entertainment — no choking hazards, no climbing on unstable furniture, no small objects near babies under 3.
+- Solutions must show safe, realistic parenting.
 
 Return ONLY valid JSON for this single part:
 
@@ -1121,10 +1169,9 @@ $charBlock
 
 CHARACTER CONSISTENCY RULES:
 - Use the exact descriptions above. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
 - Only the listed characters may appear.
 - Keep faces, hair, outfits and proportions IDENTICAL across all slides.
+- NO on-screen text rendered in images — text_overlay is editor metadata only.
 
 CAROUSEL STRUCTURE (adapt to the idea):
 - Slide 1: Cover and hook — the most eye-catching image
@@ -1232,9 +1279,17 @@ String buildGeminiVideoPrompt({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  bool hasReferenceImages = false,
 }) {
   final parts = (totalSeconds / 10).round().clamp(2, 6);
-  final charBlock = _characterBlock(characters);
+  final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
+  final voiceBlock = _characterVoiceBlock(characters);
+
+  final characterInstructions = hasReferenceImages
+      ? '''Use the attached reference images as the definitive character references.
+Preserve each character's exact face, identity, hairstyle, clothing, colours, and proportions. Do not redesign or replace characters.'''
+      : '''Use the exact descriptions above for every part. Do not paraphrase.
+Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.''';
 
   return '''You are a video content creator for "${BrandDefaults.name}", an Indian kids' education Instagram page.
 
@@ -1248,21 +1303,28 @@ ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additi
 ${_brandStyleBlock()}
 
 CHARACTERS:
-$charBlock
+$charBlock$voiceBlock
 
 CHARACTER CONSISTENCY RULES:
-- Use the exact descriptions above for every part. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
+- $characterInstructions
 - Only the listed characters may appear. Never duplicate any character.
-- Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
 - All dialogue and text_overlay must be in $language (Hinglish = Hindi words in English script).
+- NO on-screen text rendered in video frames — text_overlay/on_screen_text are editor metadata only.
 
 STORY STRUCTURE:
-- Part 1: Establish the problem/situation
+- Part 1: Establish the problem/situation — the relatable hook
 - Middle parts: Develop the conflict or action
 - Last part: Resolution and payoff
 - Each part must have ONE clear purpose. Do not compress the whole story into one part.
+
+SAFETY:
+- Never depict unsafe behavior as entertainment — no choking hazards, no climbing on unstable furniture, no small objects near babies under 3.
+- Solutions must show safe, realistic parenting.
+- No fear-based scenarios that could frighten a sensitive child.
+
+SHAREABILITY:
+- Before writing, ask: "Why would one parent send this to another parent?"
+  The story must name a specific parent who would send it.
 
 CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
 The ending state of each part becomes the starting state of the next.
@@ -1277,6 +1339,9 @@ Return ONLY valid JSON:
 {
   "story_title": "short title",
   "story_foundation": "2-3 sentences describing the complete story arc, characters, setting and lesson",
+  "caption": "1-2 lines for Instagram caption, warm, speaking to parents, ending with a question a parent will answer",
+  "hashtags": ["5 exactly", "story-relevant", "not generic", "tags", "here"],
+  "pin_comment": "One true thing about this situation in a parent's own house, then ask them about theirs.",
   "parts": [
     {
       "part_number": 1,
@@ -1302,14 +1367,14 @@ Each "full_prompt" must be completely self-contained and include:
 - TITLE, PART number, DURATION (exactly 10 seconds), FORMAT (vertical 9:16)
 - STORY CONTEXT (brief explanation of the complete story)
 - THIS PART'S PURPOSE
-- CHARACTER LOCK with exact descriptions from above
+- CHARACTER LOCK (reference images or descriptions from above)
 - SCENE AND SETTING
 - STARTING STATE
-- CAMERA (opening framing, movement, ending framing)
-- ACTION TIMELINE (0-4s, 4-8s, 8-10s)
-- DIALOGUE AND AUDIO
-- ON-SCREEN TEXT OVERLAYS (max 2 short lines, readable, for sound-off viewing)
-- CONTINUITY FROM PREVIOUS PART
+ - CAMERA (opening framing, movement, ending framing)
+ - ACTION TIMELINE (0-4s, 4-8s, 8-10s)
+ - DIALOGUE AND AUDIO
+ - ON-SCREEN TEXT OVERLAYS (editor metadata only, NOT rendered in video — max 2 short lines)
+ - CONTINUITY FROM PREVIOUS PART
 - CONTINUITY INTO NEXT PART
 - VISUAL STYLE
 - NEGATIVE INSTRUCTIONS
@@ -1325,9 +1390,17 @@ String buildMasterReelPrompt({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  bool hasReferenceImages = false,
 }) {
-  final charBlock = _characterBlock(characters);
+  final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
   final parts = 3; // Fixed 30-second = 3 × 10s clips
+  final characterInstructions = hasReferenceImages
+      ? '''Use the attached reference images as the definitive character references.
+Preserve each character's exact face, identity, hairstyle, clothing, colours, and proportions. Do not redesign or replace characters.'''
+      : '''Use the exact descriptions above. Do not paraphrase.
+Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.''';
+
+  final voiceBlock = _characterVoiceBlock(characters);
 
   return '''You are a senior video director for "${BrandDefaults.name}", creating viral 30-second Instagram Reels (9:16 vertical) for Indian parents of preschoolers.
 
@@ -1335,34 +1408,17 @@ PRODUCE A COMPLETE 30-SECOND REEL IN 3 CONNECTED 10-SECOND CLIPS.
 
 MASTER SPECIFICATION:
 - Ratio & Format: 9:16 Vertical Video (Reels / Shorts)
-- Visual Aesthetic: Soft 3D Disney/Pixar animation, warm pastel cream backdrop, expressive character animation, clear cinematic lighting. No eyeglasses on children.
-- Characters: 
-  - Ria (preschool girl, pigtails with pink bows, energetic, expressive brown eyes)
-  - Rio (toddler boy, blue-grey t-shirt, playful, curious brown eyes)
-  - Cuty (fluffy little white bunny with a pink bow, calm, adorable)
+- Visual Aesthetic: Soft 3D Disney/Pixar animation, warm pastel cream backdrop, expressive character animation, clear cinematic lighting.
+- Characters: Only characters from the CHARACTER LOCK below may appear.
 
 STORY IDEA: $idea
 LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
+${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
 
-Soft 3D Disney-Pixar animation style, vertical 9:16 aspect ratio.
-Indian family setting. Target audience: parents of children aged 1-4.
-Bilingual Hindi-English environment: adults speak natural Hindi, children speak age-appropriate Hinglish.
-Warm natural lighting. Cream backgrounds preferred.
-Characters are toddlers with realistic proportions — no chibi or kawaii exaggeration.
-Every character looks the same in every scene: same clothes, same hair, same colors.
-Cute but not cartoonish. Semi-realistic rendering.
+${_brandStyleBlock()}
 
 CHARACTER LOCK (do not deviate):
-  Ria: 3-year-old girl, two high ponytails with pink bows, big brown eyes, dimple on left cheek,
-       wearing a pink star-print dress (no glasses), small feet in pink sandals.
-  Rio: 4-year-old boy, short brown hair, slight cowlick, brown eyes,
-       wearing a blue kurta with white border and brown juttis (no glasses).
-  Cuty: small white bunny, soft grey nose, pink neck bow, always upright on hind legs.
-  Robot: friendly white-silver body, teal LED chest panel, child-height, round eyes glow teal.
-  Mumma: warm Indian mother, yellow kurta, blue jeans, hair in a bun.
-  Papa: light blue kurta, brown juttis.
-  Daadi: silver bun, glasses, cream saree with gold border.
-  Teacher: blue kurta, holding a book, kind smile.
+$charBlock$voiceBlock
 
 LANGUAGE RULES:
   Adults speak natural, conversational Hindi or Hinglish — no stilted translations.
@@ -1378,62 +1434,58 @@ STORY QUALITY:
   Endings are satisfying but not artificially perfect — show a small, real-world improvement.
   Lessons are demonstrated through actions and consequences, not forced dialogue or moralizing.
 
-NEGATIVE INSTRUCTIONS: Ria and Rio NEVER wear glasses.
-Cuty is ALWAYS a small white bunny with a pink neck bow.
-Robot is friendly, white-silver with teal LED accents, child-height.
-Mumma: warm Indian mother, yellow kurta, blue jeans.
-Papa: light blue kurta, brown juttis.
-Daadi: cream saree with gold border.
-Teacher: blue kurta, holding a book.
-Use the exact full character descriptions from the CHARACTER LOCK block above in every part.
-No duplicate characters, no identity changes, no outfit changes between parts.
-Preserve character positions, object locations, and scene continuity across all parts.
-No distorted hands or anatomy, no floating objects, no blurry faces.
-NO on-screen text of any kind: no captions, titles, subtitles, speech bubbles,
-readable signs, logos or watermarks. Text is added later in the editor.
-No closing card, moral, quote or summary at the end.
-Audience: Indian moms and parents of children aged 1-4
-Brand: Fun Learning With Palak (@funlearningwithpalak)
+SAFETY:
+  Never depict unsafe behavior as entertainment — no choking hazards shown as play, no
+  climbing on furniture that could collapse, no small objects near babies under 3.
+  Solutions must show safe, realistic parenting — no magic fixes, no dismissing
+  genuine feelings.
+  No fear-based scenarios that could frighten a sensitive child.
 
-${_brandStyleBlock()}
+SHAREABILITY:
+  Before writing, answer: "Why would one parent send this to another parent?"
+  Include that specific, relatable hook. If the story cannot name a parent who would
+  send it, the concept is too generic — make it specific.
 
-CHARACTERS IN THIS REEL:
-$charBlock
+CHARACTER CONTINUITY RULES:
+  $characterInstructions
+  - Only the listed characters may appear. Never duplicate any character.
+  - Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
+  - Preserve character positions, object locations, and scene continuity across all parts.
 
-CHARACTER CONSISTENCY RULES (STRICT - APPLY TO ALL 3 CLIPS):
-- Use the EXACT descriptions above. Do not paraphrase.
-- Ria and Rio NEVER wear glasses.
-- Cuty is ALWAYS a small white bunny with a pink bow.
-- Only the listed characters may appear. Never duplicate any character.
-- Preserve each character's face, age, hair, outfit, colours and proportions across ALL 3 clips.
-- All dialogue and text_overlay must be in $language.
-- SAME lighting, color palette, art style across all clips.
+CONTINUITY:
+- Clip 1 ends at the exact frame Clip 2 starts from. Clip 2 ends at the exact frame Clip 3 starts from.
+- No distorted hands or anatomy, no floating objects, no blurry faces.
+- NO on-screen text of any kind: no captions, titles, subtitles, speech bubbles,
+  readable signs, logos or watermarks. Text is added later in the editor.
+- No closing card, moral, quote or summary at the end.
+- Audience: Indian moms and parents of children aged 1-4
+- Brand: Fun Learning With Palak (@funlearningwithpalak)
 
 CLIP STRUCTURE (MANDATORY - FOLLOW EXACTLY):
 
 CLIP 1 (0–10s): THE HOOK & PROBLEM
 - Visual Action: [Direct physical action demonstrating the struggle or situation]
 - Camera Work: Slow push-in at child eye-level.
-- On-Screen Text: 
-  - 0s–3s: [Bold Hook Headline - max 3 words, Hinglish]
-  - 4s–7s: [Context Text - max 5 words, Hinglish]
+- Editor Metadata (do NOT render in video — added post-generation):
+  - on_screen_text line_1_0_3s: [Bold Hook Headline - max 3 words, $language]
+  - on_screen_text line_2_4_7s: [Context Text - max 5 words, $language]
 - AI Video Generator Prompt: "Vibrant 3D Pixar-style vertical 9:16 animation. [Character] is [exact physical action]. Warm ambient room lighting, cream and pastel tones. Smooth eye-level slow push-in. Character shows dramatic, cute facial expression of [emotion]. At the 10-second mark, [character] freezes in posture, holding [object], facing [direction]."
 
 CLIP 2 (10–20s): THE TWIST & ESCALATION
 - Visual Action: [Unexpected turn, sibling joins, or humorous complication]
 - Camera Work: Steady medium tracking shot.
-- On-Screen Text: 
-  - 11s–15s: [Relatable Parent Insight - max 5 words, Hinglish]
-  - 16s–20s: [Tension / Anticipation Text - max 5 words, Hinglish]
+- Editor Metadata (do NOT render in video — added post-generation):
+  - on_screen_text line_1_11_15s: [Relatable Parent Insight - max 5 words, $language]
+  - on_screen_text line_2_16_20s: [Tension / Anticipation Text - max 5 words, $language]
 - AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 1. Vibrant 3D Pixar-style vertical 9:16 animation. [Character] maintains identical clothing and hairstyle. Suddenly, [second character/parent] steps in and [subtle action]. Fluid motion, consistent soft warm lighting. At the 20-second mark, [exact end pose]."
 
 CLIP 3 (20–30s): THE RESOLUTION & MORAL
-- Visual Action: [Gentle solution, teamwork, parent hug, or funny Cuty reaction]
+- Visual Action: [Gentle solution, teamwork, parent hug, or resolution action]
 - Camera Work: Slow pull-back to wide warm family shot.
-- On-Screen Text: 
-  - 21s–26s: [The Moral / Takeaway - max 5 words, Hinglish]
-  - 27s–30s: [Call to Action: 'Save this for later ❤️']
-- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 2. Vibrant 3D Pixar-style vertical 9:16 animation. Identical character models and lighting. [Characters] smile and [final resolution action]. Cuty the bunny hops forward happily. The scene resolves into a warm, joyful family tableau. Steady hold for smooth loop at second 30."
+- Editor Metadata (do NOT render in video — added post-generation):
+  - on_screen_text line_1_21_26s: [The Moral / Takeaway - max 5 words, $language]
+  - on_screen_text line_2_27_30s: [Call to Action: 'Save this for later ❤️']
+- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 2. Vibrant 3D Pixar-style vertical 9:16 animation. Identical character models and lighting. [Characters] smile and [final resolution action]. The scene resolves into a warm, joyful family tableau. Steady hold for smooth loop at second 30."
 
 CONTINUITY REQUIREMENTS (CRITICAL):
 - Clip 2 MUST start from the EXACT ending_state of Clip 1 (same character positions, props, lighting)
@@ -1446,6 +1498,9 @@ Return ONLY valid JSON:
 {
   "story_title": "Short Hinglish title with emoji",
   "story_foundation": "2-3 sentences describing the complete 30s story arc, characters, setting and moral",
+  "caption": "1-2 lines for Instagram caption, warm, speaking to parents, ending with a question a parent will answer",
+  "hashtags": ["5 exactly", "story-relevant", "not generic", "tags", "here"],
+  "pin_comment": "One true thing about this situation in a parent's own house, then ask them about theirs.",
   "parts": [
     {
       "part_number": 1,
@@ -1460,7 +1515,7 @@ Return ONLY valid JSON:
       "ending_state": "EXACT character positions, expressions, props at 10s - Clip 2 continues from HERE",
       "continuity_from": "Opening scene - establish the world",
       "continuity_into": "Describe the exact 10s frame that Clip 2 must continue from",
-      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
       "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 1 (0-10s) following the specification format above",
       "on_screen_text": {
         "line_1_0_3s": "Hook headline (max 3 words)",
@@ -1480,7 +1535,7 @@ Return ONLY valid JSON:
       "ending_state": "EXACT character positions, expressions, props at 20s - Clip 3 continues from HERE",
       "continuity_from": "Clip 1 ended with [describe exact 10s frame]",
       "continuity_into": "Describe the exact 20s frame that Clip 3 must continue from",
-      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
       "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 2 (10-20s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 1'",
       "on_screen_text": {
         "line_1_11_15s": "Parent insight (max 5 words)",
@@ -1500,7 +1555,7 @@ Return ONLY valid JSON:
       "ending_state": "Final warm family tableau at 30s, ready for smooth loop",
       "continuity_from": "Clip 2 ended with [describe exact 20s frame]",
       "continuity_into": "Final frame - loops back to beginning vibe",
-      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces, no glasses on Ria/Rio",
+       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
       "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 3 (20-30s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 2'",
       "on_screen_text": {
         "line_1_21_26s": "Moral/takeaway (max 5 words)",
@@ -1511,12 +1566,13 @@ Return ONLY valid JSON:
 }
 
 RULES:
-- Return exactly 3 parts.
+- Return exactly $parts parts.
 - Every "visual_prompt" must be completely self-contained and follow the AI Video Generator Prompt format in the specification.
-- All on_screen_text must be in $language (Hinglish).
+- All on_screen_text must be in $language.
 - The story must be specific to an Indian household with relatable preschool moments.
 - Character actions must be physically clear and animation-friendly.
-- Cuty the bunny must appear in at least 2 clips as the emotional anchor.
+- Only the listed characters (from CHARACTER LOCK above) may appear. Do NOT add characters not in that list.
+- NO on-screen text rendered in video frames — all text is editor metadata in the on_screen_text field only.
 ''';
 }
 
@@ -1535,6 +1591,7 @@ Future<GeminiVideoResult> generateGeminiVideoPromptsWithPreview({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
   bool useSheet = false,
@@ -1546,6 +1603,7 @@ Future<GeminiVideoResult> generateGeminiVideoPromptsWithPreview({
     characters: characters,
     language: language,
     additionalInstructions: additionalInstructions,
+    hasReferenceImages: hasReferenceImages,
   );
   final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
@@ -1596,6 +1654,7 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
   bool useSheet = true,
@@ -1605,6 +1664,7 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
     characters: characters,
     language: language,
     additionalInstructions: additionalInstructions,
+    hasReferenceImages: hasReferenceImages,
   );
   final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
@@ -1681,7 +1741,6 @@ Future<IdeaEvaluation> evaluateIdeaWithPreview({
   final checkPrompt = buildCheckStoryPrompt(idea);
   final sharePrompt = buildAnalyzeShareabilityPrompt(idea);
   final combinedPrompt = '$checkPrompt\n\n---\n\n$sharePrompt';
-  final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
   return combinedPrompt.withPromptPreview<IdeaEvaluation>(
     context: context,

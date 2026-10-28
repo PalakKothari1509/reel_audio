@@ -22,7 +22,8 @@
 //
 // There is deliberately no `enum NarrativeFormat`. Narrative formats live in
 // `format_handbook.dart` as `FormatSpec`, which is editable data synced from
-// `content_formats.md`, and 38 more are planned. A parallel enum would have to be
+// `content_formats.md`, and 50 are now registered (16 verified, 34 app-authored).
+// A parallel enum would have to be
 // hand-edited in lockstep with the handbook on every addition, and the two would
 // drift — which is the exact failure this refactor exists to remove. Use
 // `FormatLibrary.byId` / `FormatLibrary.byName` instead, and `validateNarrativeFormat`
