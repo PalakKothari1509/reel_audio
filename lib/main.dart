@@ -925,7 +925,7 @@ class _StoryScreenState extends State<StoryScreen> {
           title: Row(
             children: [
               Text(
-                '${check.score}/10',
+                '${check.effectiveScore}/10',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,

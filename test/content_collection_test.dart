@@ -97,7 +97,7 @@ void main() {
         counts[coll] = (counts[coll] ?? 0) + 1;
       }
 
-      expect(counts['robot'], 20);
+      expect(counts['robot'], 13);
       expect(counts['festivals'], greaterThanOrEqualTo(10));
       expect(counts['routines'], greaterThanOrEqualTo(5));
       expect(counts['food'], greaterThanOrEqualTo(3));

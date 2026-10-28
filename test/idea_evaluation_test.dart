@@ -275,7 +275,7 @@ void main() {
         verdict: '',
         rows: kStoryChecks.map((name) => CheckRow(name, true, '')).toList(),
       );
-      expect(allPass.score, equals(10));
+      expect(allPass.effectiveScore, equals(10));
 
       final allFail = StoryCheck(
         good: [],
@@ -283,7 +283,7 @@ void main() {
         verdict: '',
         rows: kStoryChecks.map((name) => CheckRow(name, false, '')).toList(),
       );
-      expect(allFail.score, equals(1));
+      expect(allFail.effectiveScore, equals(1));
     });
 
     test('band is Ready when score >= 9 and no blockers', () {

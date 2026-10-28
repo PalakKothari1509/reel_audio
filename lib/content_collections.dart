@@ -39,12 +39,12 @@ final Map<String, IdeaCollection> kCollectionById = {
 /// (robot prefix, navratri prefix, day15-day25 regex).
 const Map<String, List<String>> _members = {
   'routines': [
-    'h01', 'h04', 'h05', 'h07', 'h09', 'h12',
+    'h01', 'h04', 'h05', 'h06', 'h07', 'h09', 'h12',
     'pal06', 'pal07', 'pal09', 'pal12',
-    'shoe-bandhani', 'brushing-battle', 'missing-shoe-mystery',
+    'missing-shoe-mystery',
   ],
   'food': [
-    'h08', 'vegetable-drama', 'plate-patana',
+    'h08', 'plate-patana',
     'broken-biscuit-meltdown', 'the-snack-reach',
     'day12-dinner-types',
   ],
@@ -56,8 +56,13 @@ const Map<String, List<String>> _members = {
     'h06', 'h14', 'pal18',
     'toy-sharing', 'the-toy-car-share', 'the-block-tower',
   ],
+  'festivals': [
+    'h27', 'h28', 'h29', 'h30',
+    'navratri-garba-ghar', 'navratri-bachcha-roye',
+  ],
   'parent': [
-    'h16', 'h19',
+    'h16', 'h19', 'h19b', 'h23', 'h24', 'h25', 'h26',
+    'h31', 'h32', 'h34', 'h35', 'h36', 'h38',
     'pal01', 'pal02', 'pal05', 'pal08', 'pal11', 'pal15',
     'pal16', 'pal19',
     'dangerous-silence', 'asmr-cleaning-reel',
@@ -66,6 +71,7 @@ const Map<String, List<String>> _members = {
   'warm': [
     'h18', 'h20', 'h21',
     'pal10', 'pal17', 'pal20',
+    'h33', 'h37', 'h39', 'h40',
   ],
   'play': [
     'day2-which-doesnt-belong', 'day4-kitchen-challenge',

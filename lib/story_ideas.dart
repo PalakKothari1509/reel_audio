@@ -152,11 +152,16 @@ class StoryCheck {
     required this.verdict,
     this.rows = const [],
     this.hooks = const [],
+    this.score,
   });
 
+  /// Optional override for score; when null, score is computed from [rows].
+  final int? score;
+
   /// Score equals pass count, clamped to 1..10. Computed from rows so it
-  /// always reflects the actual pass/fail state.
-  int get score => rows.where((r) => r.pass).length.clamp(1, 10);
+  /// always reflects the actual pass/fail state, unless explicitly overridden.
+  int get effectiveScore =>
+      score ?? rows.where((r) => r.pass).length.clamp(1, 10);
 
   /// Worked out here from the score rather than trusted from the model, so a 7 always
   /// means the same thing. Below 7 is not worth an evening of making pictures for.
@@ -165,8 +170,8 @@ class StoryCheck {
   String get band {
     final hasBlocker = rows.any((r) =>
         !r.pass && (r.name == 'Hook' || r.name == 'Real-life problem'));
-    if (hasBlocker) return score >= 9 ? 'Improve' : score >= 7 ? 'Improve' : 'Rewrite';
-    return score >= 9 ? 'Ready' : score >= 7 ? 'Improve' : 'Rewrite';
+    if (hasBlocker) return effectiveScore >= 9 ? 'Improve' : effectiveScore >= 7 ? 'Improve' : 'Rewrite';
+    return effectiveScore >= 9 ? 'Ready' : effectiveScore >= 7 ? 'Improve' : 'Rewrite';
   }
 
   /// Derives the primary content purpose from the check results.

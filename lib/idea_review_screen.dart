@@ -93,7 +93,7 @@ class _IdeaReviewScreenState extends State<IdeaReviewScreen> {
           children: [
             // ── Score header ──────────────────────────────────────────────
             _ScoreHeader(
-              score: check.score,
+              score: check.effectiveScore,
               band: band,
               bandColor: bandColor,
               bandNote: _bandNote(band),

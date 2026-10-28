@@ -71,11 +71,11 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(
-        find.textContaining('Bus ka samay ho raha hai'),
+        find.textContaining('Main khud'),
         findsOneWidget,
       );
       expect(
-        find.textContaining('Ria haath jhatak deti'),
+        find.textContaining('try karogi'),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);
@@ -93,7 +93,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(
-        find.textContaining('Ek, do, teen, char, paanch'),
+        find.textContaining('Shabash'),
         findsOneWidget,
       );
     });

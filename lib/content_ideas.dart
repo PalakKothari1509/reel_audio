@@ -357,7 +357,7 @@ Moral: Body autonomy starts with a simple "no thank you" — and adults who resp
     mess: 'Relatives keep insisting — "Arre beta, itna bhi kya sharm?" — the pressure builds',
     innerThought: 'I need to show Ria that her "no" has power, without making her fear all touch.',
     endingBeat: 'Uncle accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
-    defaultCast: ['Ria', 'Mumma', 'Daadi', 'Uncle'],
+    defaultCast: ['Ria', 'Mumma', 'Uncle'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -810,7 +810,46 @@ Audio/Dialogue (Hinglish): Ria sleepy: "Mumma, ek aur paani!" Mumma gentle: "Lo 
 ''',
   ),
 
-HookIdea(
+  // Siblings: sharing, turn-taking, and the little wars between tiny humans
+  // who share a room and a parent.
+  HookIdea(
+    id: 'h06',
+    category: 'Relatable',
+    cover: 'Mere Pair, Mera Game!',
+    opening: 'Ek hi pair of shoes — Ria aur Rio dono ko pehne ki koshish!',
+    problem: 'Only one pair of shoes available, but two siblings need to wear them',
+    lesson: 'Share karne ka ek simple rule: timer se ek vyakti pehle pahengi, doosra agla round.',
+    postFormat: 'Reel',
+    strategy: 'Use a timer for sharing — clear rules prevent fights.',
+    caption: 'Ek joota, do bachche — timer se share karo, fight kam karo! ⏱️ #SiblingSharing #TurnTaking #FunLearningWithPalak #IndianParents #ToddlerLife',
+    pinnedComment: 'Timer trick try kari? "Gaana khatam, phir tumhari baari!"',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Only one pair of pink sparkly jootis by the door — Ria and Rio both grab for them.
+Twist: Mumma: "Jisne pehle pehna, uski 1 minute. Phir switch." Ria: "Mere saath timer!" Mumma sets phone timer.
+Resolution: Ria plays "princess walk" for 1 minute, then Rio gets his turn. Both laughing by the switch.
+Moral: Clear timer, clear rules — no tears over sharing.
+''',
+    setting: 'Hallway, one pair of jootis by the door, morning rush',
+    sceneDetail: 'Ria and Rio both pulling at the same jooti, Mumma holding a phone timer',
+    dialogue: '"Mere pair!" "Mera pair!" "Timer shuru ho gaya!"',
+    mess: 'Both grab the same jooti, tug-of-war begins until Mumma intervenes',
+    innerThought: 'A timer works better than my pleading voice.',
+    endingBeat: 'Rio does his "princess walk" with dramatic flair — both laughing.',
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
+  // Siblings: sharing, turn-taking, and the little wars between tiny humans
+  // who share a room and a parent.
+  HookIdea(
     id: 'h07',
     category: 'Relatable',
     cover: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
@@ -992,7 +1031,7 @@ Moral: Ek hi boundary, teen alag support. Ria, Rio ya Cuty — aapka bachcha kis
     mess: 'All three react differently at once — Ria negotiates, Rio protests, Cuty withdraws. Mumma stays calm.',
     innerThought: 'Same boundary, different kids. The magic is in how I adapt, not in changing the rule.',
     endingBeat: 'Timer dings, goodbye song ends, Cuty yawns in Mumma\'s arms. "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?"',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1051,7 +1090,7 @@ Moral: These aren't problems — they're proof your child is growing, exploring,
     mess: 'Seven rapid-fire toddler moments — spoon refusal, car drop, blanket demand, penguin walk, random fact',
     innerThought: 'Each "problem" is actually a milestone in disguise. The chaos is the childhood.',
     endingBeat: 'Montage ends with all three kids asleep in a pile. Text: "7 things. 1 childhood. 💛"',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1106,7 +1145,7 @@ Moral: Ek "nahi" teen alag zarooratein pura kar sakta hai — agar har bachche k
     mess: 'Ria keeps negotiating ("bas ek piece"), Rio melts down, Cuty quietly eats carrot',
     innerThought: 'Ek hi "nahi" — lekin teen alag bachche, teen alag zarooratein. Mumma ka kaam: boundary rakho, support badlo.',
     endingBeat: 'Mumma gives Ria a story, Rio a countdown hug, Cuty a gentle pat. All three settle. Boundary intact, feelings met.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
@@ -1130,7 +1169,43 @@ Audio/Dialogue (Hinglish): Mom firm: "Chocolate nahi beta." Ria pleading: "Bas e
 ''',
   ),
 
-HookIdea(
+  // Tantrums & big feelings: when emotions overflow and a calm reset helps.
+  HookIdea(
+    id: 'pal04',
+    category: 'Struggle first',
+    cover: 'Bedtime Ki Darr!',
+    opening: 'Cuty: "Bas ek aur story!" ... jab tak aankh band nahi hoti.',
+    problem: 'Cuty refuses bedtime, demanding "just one more" story',
+    lesson: 'Ek story, phir lamp off. Use a visual timer — when sand runs out, it is sleep time.',
+    postFormat: 'Reel',
+    strategy: '',
+    caption: 'Ek aur story? No. Ek story phir sleep time. Timer ke saath easy! 😴 #BedtimeBattle #SleepTraining #FunLearningWithPalak #IndianParents #BedtimeStories',
+    pinnedComment: 'Tip: "Story timer" with 2-minute sand clock — visual, fair, final.',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Cuty sits bolt upright in bed: "Ek aur story!" Mumma: "Time up, beta." Cuty: "But I need one more!" Tears welling.
+Twist: Mumma shows a 2-minute sand timer: "Jab tak ravaan khatam ho jaye, tab tak ek story. Phir sleep." Cuty watches the sand.
+Resolution: Timer runs out. Cuty snuggles down: "The End story?" Mumma: "Goodnight story. Always."
+Moral: One more story means one more minute — then it is sleep time.
+''',
+    setting: 'Cuty\'s bedroom, bedtime, soft night light',
+    sceneDetail: 'Cuty clutching her favorite stuffed carrot, sand timer on the nightstand',
+    dialogue: '"Ek aur story!" "Jab tak ravaan khatam ho jaye, tab tak ek story."',
+    mess: 'Cuty cries, hiccers, asks for "The Very Hungry Caterpillar" again',
+    innerThought: 'The timer is the bad guy, not Mumma.',
+    endingBeat: 'Cuty whispers "The End story, Mumma?" and snuggles under the blanket.',
+    defaultCast: ['Cuty', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
+  HookIdea(
     id: 'pal05',
     category: 'Relatable',
     cover: 'Neend Ka Evidence 😴',
@@ -1258,7 +1333,7 @@ Moral: Being first ready doesn't mean you leave everyone behind. True readiness 
     mess: 'Ria changes her hair clip three times, time slipping away; Cuty struggles with shoe; Rio watches clock',
     innerThought: 'Ready hona kaafi nahi — team ke saath ready hona asli ready hai.',
     endingBeat: 'Ria picks no-bow, helps Cuty with his shoe. "Team complete!" All three walk out together, on time.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1309,7 +1384,7 @@ Moral: Sabse paas ka suspect aksar asli culprit hota hai — check karo pehle, b
     mess: 'Ria points at Rio, accusation in her voice, while the evidence trail leads elsewhere',
     innerThought: 'The closest suspect often has the best poker face — check evidence before blaming.',
     endingBeat: 'Ria picks up the apple piece near Cuty, puts it on the plate. "Cuty ke paas mila!" Rio grins: "Maine nahi khaya."',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1333,7 +1408,43 @@ Audio/Dialogue (Hinglish): Ria urgent: "Mumma, koi ne apple kha liye! Rio!" Mumm
 ''',
   ),
 
-HookIdea(
+  // Routines: daily rituals that become tiny battles until they become habits.
+  HookIdea(
+    id: 'pal09',
+    category: 'Relatable',
+    cover: 'Morning Race Against Time!',
+    opening: 'Pack the bag, brush the teeth, tie the shoe — three kids, one clock, zero calm.',
+    problem: 'Getting three children ready for school in the morning is a race against time',
+    lesson: 'Ek visual routine chart — brush, dress, eat. Check-off karo, phir jaldi nikal jao.',
+    postFormat: 'Reel',
+    strategy: '',
+    caption: 'Morning chaos? Ek chart, teen steps. "Abhi tak: brush ✅, dress ✅, breakfast ✅!" ⏰ #MorningRoutine #ToddlerChaos #FunLearningWithPalak #IndianParents #ParentingHacks',
+    pinnedComment: 'Visual chart kaise banate hain aap? Share karo!',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Morning rush — Ria needs hair brushed, Rio refuses shoes, Cuty can't find her backpack. Mumma: "Chalo, ek ek karo." She pulls out a laminated routine chart: "Brush, dress, breakfast."
+Twist: Each kid marks off their step with a sticker. Rio proudly sticks "shoes" — then realizes he forgot socks.
+Resolution: Chart shows: socks missing. Quick fix: "Ek aur minute, phir done!" All three leave, chart almost full, one sticker left.
+Moral: Ek chart, teen alag hurry — sab ek saath nikal jate hain.
+''',
+    setting: 'Hallway mirror, morning light, backpacks hanging',
+    sceneDetail: 'Laminated routine chart with Velcro stickers, Rio\'s socks on the floor',
+    dialogue: '"Brush ✅ Dress ✅ Breakfast ✅" "Socks? Nahi socks!" "Ek aur minute!"',
+    mess: 'Ria\'s hair, Rio\'s shoes, Cuty\'s backpack — three crises at once',
+    innerThought: 'The chart is my co-pilot.',
+    endingBeat: 'Rio finds his socks, sticks the final sticker, chart complete. "Done!"',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
+  HookIdea(
     id: 'pal10',
     category: 'Relatable',
     cover: 'Mumma Ne Kaha Tha! 🗣️',
@@ -1412,7 +1523,7 @@ Moral: Give them a role suited to them — even if they do it their way, the tea
     innerThought: 'They misunderstood the brief — but the teamwork is perfect anyway. Safety first!'
 ,
     endingBeat: 'They laugh: "Hamari shopping team badi achhi hai!" Ria puts mangoes on belt, Rio lifts box, Cuty waves receipt from the basket.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1436,7 +1547,43 @@ Audio/Dialogue (Hinglish): Mumma: "Ria, pick yellow fruit. Rio, cereal box. Cuty
 ''',
   ),
 
-HookIdea(
+  // Routines: daily rituals that become tiny battles until they become habits.
+  HookIdea(
+    id: 'pal12',
+    category: 'Relatable',
+    cover: 'Brushing Ka Naya Style!',
+    opening: 'Cuty ne kaha — "Brush nahi, dinosaur chahiye!" Poori bathroom ghoom li.',
+    problem: 'Cuty resists brushing teeth, wants to play with the toothbrush instead',
+    lesson: 'Brushing ek game banao — "Dinosaur roar, toothpaste foam, sparkly smile!"',
+    postFormat: 'Reel',
+    strategy: '',
+    caption: 'Toothbrush ko dinosaur banao, foam banao, sparkly smile pao! 🦖 #Toothbrushing #ToddlerDental #FunLearningWithPalak #IndianParents #OralHygiene',
+    pinnedComment: 'Aapke bachche ka brushing game kya hai?',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Cuty grabs the toothbrush, puts it in her mouth like a dinosaur. "Rawr! Brush nahi, chew!" Foam floats everywhere. Mumma: "Dinosaur ne toothpaste khaya — sparkly bubbles ban gaye!"
+Twist: Cuty spits in the sink: "Dinosaur sparkly now!" She sees her tooth in the foam — a tiny gap where the lost tooth will come out.
+Resolution: Mumma: "Ek minute aur brushing, phir nani story." Cuty: "OK OK!" She brushes properly, eyes on the mirror.
+Moral: Brushing ek game hai — jab tak mazaa aa raha hai, koi dikkat nahi hoti.
+''',
+    setting: 'Bathroom sink, morning, toothpaste and dinosaur toothbrush',
+    sceneDetail: 'Cuty with toothpaste foam dripping from her mouth, trying to roar like a dinosaur',
+    dialogue: '"Rawr! Brush nahi, chew!" "Dinosaur sparkly now!"',
+    mess: 'Foam everywhere — sink, mirror, Cuty\'s nose, but she is having fun',
+    innerThought: 'If she is laughing while brushing, I am winning.',
+    endingBeat: 'Cuty raises her toothbrush like a trophy: "Dinosaur done!"',
+    defaultCast: ['Cuty', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
+  HookIdea(
     id: 'pal13',
     category: 'Struggle first',
     cover: 'Car Bhi Ghar Chalegi! 🚗',
@@ -1463,7 +1610,7 @@ Moral: Real seatbelts for children in car seats. Imaginative travel bags for toy
     mess: 'Ria clutches the toy car, refusing to let it stay behind. Mumma explains: seatbelts for kids in car seats, travel pouch for toy.',
     innerThought: 'Safety first — real seatbelt for child in car seat. Imagination for toy — with its own travel solution.',
     endingBeat: 'Ria buckled in car seat, toy car secure in travel pouch. Rio: "Donon safe!" Both ride along safely.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1565,7 +1712,7 @@ Moral: Ek clear, fair transition — blocks ke baad shoes. Food reward nahi, scr
     mess: 'Rio wants more blocks, more time. Papa offers clear step: tower complete + two-minute timer = shoes on. Fair deal.',
     innerThought: 'Ek clear sa fair transition sabke liye kaam karta hai — food reward bina, screen time bina.',
     endingBeat: 'Timer dings. Rio puts on shoes. High-five! "Fair deal done!" Sab khush, door ke bahar.',
-    defaultCast: ['Ria', 'Rio', 'Mumma', 'Papa'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1616,7 +1763,7 @@ Moral: Validate the feeling. Set the boundary. Simple turns win over mocking.
     mess: 'Rio grabs ball, Ria echoes "Why!" Words escalate — Mumma intervenes with validation + boundary + simple turns',
     innerThought: 'Mocking escalates. Validation + boundary + simple system = resolution.',
     endingBeat: 'Turns work. One minute each. Cuty gets a turn too. "Dono ko mila, ginti se!" Fair play wins.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
@@ -1881,6 +2028,42 @@ Moral: A spill can look huge — but a little help makes it manageable.
     readyPrompt: '',
   ),
 
+  // Tantrums & big feelings: when emotions overflow and a calm reset helps.
+  HookIdea(
+    id: 'h11',
+    category: 'Struggle first',
+    cover: 'Store Mein Badi Mushkil!',
+    opening: 'Ria ne kaha — "I want it, I want it!" Poora supermarket ghoom liya.',
+    problem: 'Ria has a full meltdown in the grocery store when denied a snack',
+    lesson: 'Acknowledge feelings first, then offer the next step: "I see you want chips. We have fruit at home."',
+    postFormat: 'Reel',
+    strategy: '',
+    caption: 'Store mein rona hone ka asar bhi hota hai — pehle bola "main dekhi, tumhara gussa samajh gaya, phir nahi." 🛒 #ToddlerMeltdown #PublicTantrum #FunLearningWithPalak #IndianParents #StayCalm',
+    pinnedComment: 'Tip: Floor par baith kar bhi baat chaleti hai — bachcha turant sambhal leta hai.',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Ria spots a packet of chips at the checkout. "Mummy, chips chahiye!" Mumma says no — it's almost lunch. Ria drops to the floor: "I WANT IT!"
+Twist: Mumma kneels beside her: "Main dekhi, tumhara gussa samajh gaya. Ab yeh nahi hoga, lekin fruit ke saath kuchh aur chahiye?"
+Resolution: Ria cries for two minutes, then sniffles: "Apple?" Mumma: "Haan, apple." They walk out, chips forgotten.
+Moral: A meltdown is information — listen first, then guide.
+''',
+    setting: 'Grocery store checkout lane, afternoon',
+    sceneDetail: 'Ria on the floor, crumpled chips packet in hand, Mumma kneeling at eye level',
+    dialogue: '"I WANT IT! I WANT IT!" "Main dekhi, tumhara gussa samajh gaya..."',
+    mess: 'Ria wails loudly enough that other shoppers look over, Mumma stays calm',
+    innerThought: 'The floor is not the enemy — the unmet need is.',
+    endingBeat: 'Ria takes the apple, walks out holding Mumma\'s hand, no chips.',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
   HookIdea(
     id: 'h12',
     category: 'Struggle first',
@@ -1979,7 +2162,7 @@ Moral: Tickets turn fights into fair turns — everyone wins a lap.
     mess: 'Both grab the red car, arguing whose lap it is for — it snaps',
     innerThought: 'A ticket system — will it actually work?',
     endingBeat: 'Paper tickets, one minute each, then together — "Dono car, do laps!"',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2012,7 +2195,7 @@ Ending line: Rio: "Next time phone use karoongi!" Mumma: "Haan, volume button di
 Moral: Badlaav ka intezaar karo, phir agla kadam lagao.
 ''',
     setting: 'Living room, afternoon, song playing from phone',
-    sceneDetail: 'One earbud is missing from the pair',
+    sceneDetail: 'Phone playing music on the couch, song cuts off suddenly mid-beat',
     dialogue: '"Music bandh ho gayi. Ab kya karein?"',
     mess: 'Rio freezes, then says "one more minute" instead of crying',
     innerThought: 'This transition is harder than I thought.',
@@ -2047,7 +2230,7 @@ Resolution: Papa robot ko dabbe mein bitha dete hain: "Ye astronaut hai." Dono u
 Moral: Dabba hi kaafi hai.
 ''',
     setting: 'Kitchen, morning, delivery boxes on the counter',
-    sceneDetail: 'One dabba is blue, the other is red — swapped by accident',
+    sceneDetail: 'Empty cardboard box on the kitchen floor, Rio crawling toward it, Robot toy ignored nearby',
     dialogue: '"Papa ke liye cover aaya. Rio ka naya robot bhi aaya."',
     mess: 'Rio ignores the robot and crawls into the empty box',
     innerThought: 'The box is bigger than he is.',
@@ -2082,7 +2265,7 @@ Resolution: They sit in the quiet. Ria discovers she can hear her own heartbeat.
 Moral: Naming the noise makes the fear small enough to hold.
 ''',
     setting: 'Bedroom, bedtime, night light casting soft shadows',
-    sceneDetail: 'One sock is missing, the other is paired on the radiator',
+    sceneDetail: 'Night light still glowing, Rio clinging to Mumma in the sudden dark',
     dialogue: '"Bijli band ho gayi! Ab kya karein?"',
     mess: 'Power cuts at bedtime, Rio is afraid of the dark',
     innerThought: 'I should have checked the inverter earlier.',
@@ -2283,7 +2466,43 @@ Moral: The best toy costs nothing and takes up no space.
     mess: 'Box flaps flying, packing peanuts everywhere, three kids claiming parts',
     innerThought: 'The box was free. The imagination was priceless.',
     endingBeat: 'Box becomes a car, then a house, then a cave — all three play together.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+  ),
+
+  // Milestone posts: complete concepts for the 50th Instagram post.
+  HookIdea(
+    id: 'p06',
+    category: 'Page & milestone',
+    cover: 'Jod Do, Jod Do!',
+    opening: 'Ria: "Mumma, sabse pehle kya karein?" Mumma: "Jod do — sabko ek saath le aao."',
+    problem: 'A milestone post that ties together all three characters in one unifying message',
+    lesson: 'Jod do means join — when we all come together, even the smallest voice matters.',
+    postFormat: 'Reel / Pinned intro',
+    strategy: '',
+    caption: '50 posts. ❤️\n\nHalf a century of little stories, big lessons, and tiny voices that grew louder together. Ria, Rio, Cuty — and you, our wonderful community.\n\nThank you for being here.\n\nLittle Stories. Big Lessons. 🌱\n\n#FunLearningWithPalak #Post50 #LittleStoriesBigLessons #IndianParents #CommunityLove',
+    pinnedComment: 'Post #50 — Ria, Rio, Cuty, and YOU. What story resonated most?',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Ria asks, "Mumma, sabse pehle kya karein?" Mumma: "Jod do — sabko ek saath le aao." Ria, Rio, Cuty gather around.
+Twist: Each child shares their favorite moment from the past 50 posts — Ria remembers the shoe story, Rio the dinosaur game, Cuty the carrot adventure.
+Resolution: They link hands and wave at the camera: "Hum saath hain!" Mumma: "Aur hum sab tumhare saath hain."
+Moral: Jod kar khushiya banati hain — together, every story is bigger.
+''',
+    setting: 'Living room, three kids holding hands, family photos on the wall',
+    sceneDetail: 'Photos from past reels framed on the walls, kids linking hands in a chain',
+    dialogue: '"Jod do!" "Hum saath hain!" "Aur hum sab tumhare saath hain!"',
+    mess: 'Ria wants to show her favorite, Rio his favorite, Cuty just wants everyone together',
+    innerThought: 'Fifty stories in. Still learning every day.',
+    endingBeat: 'All four link hands, wave at the camera: "Post 50! Thank you!"',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2353,7 +2572,7 @@ Moral: Tiny moments, big lessons — and every day brings a new reel.
     mess: 'Three distinct personalities, one page promise: Problem + playful solution',
     innerThought: '',
     endingBeat: 'Logo animation: "Fun Learning With Palak — Little Stories. Big Lessons."',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2813,7 +3032,7 @@ Moral: Ek minute separation, poora mood badal jaata hai.
   ),
 
 HookIdea(
-    id: 'h19',
+    id: 'h19b',
     category: 'Surprising',
     cover: 'Bhaago Mat? Dheere Chalo!',
     opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
@@ -3084,7 +3303,7 @@ Moral: The most suspicious silences always end with creative chaos to clean up.
     mess: 'Ria and Rio, flour-covered, sitting in a cloud of spilled wheat, building a "snowman"',
     innerThought: 'The silence was too good to be true.',
     endingBeat: 'They stand up, snowman wobbles, flour explodes — creative chaos confirmed.',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -3576,7 +3795,7 @@ Moral: Surprises are sweet to share; secrets that make you uncomfortable must be
     mess: 'Rio blurts out the surprise to everyone, Ria face falls',
     innerThought: 'Some secrets are meant to be shared at the right time.',
     endingBeat: 'Robot draws a two-column chart — surprise vs secret — Rio understands.',
-    defaultCast: ['Ria', 'Rio', 'Robot', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -3648,7 +3867,7 @@ Moral: Bachche apni tareeke se solution dhoondhte hain — unki creativity ko en
     mess: 'Ria keeps adding steps — "Step 5: Cake cut" "Step 6: Everyone nap" — each more elaborate',
     innerThought: 'Agar maine yeh plan suna toh sab theek ho jayega, why do adults always need to change it',
     endingBeat: 'Ria\'s new plan with everyone getting what they actually asked for — crumpled again',
-    defaultCast: ['Ria', 'Papa', 'Mumma', 'Rio'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
@@ -3753,7 +3972,7 @@ Moral: Bachche bade ki baatein apne tareeke se samajhte hain — unhe simple sha
     mess: 'Ria keeps asking "kitna budget hai?" and "kiska share hai"',
     innerThought: 'Agar main bahar hoon toh kya main free hoon, and then will they still love me',
     endingBeat: 'Cuty drops the coin, everyone stares at it like it just solved everything',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
@@ -3788,7 +4007,7 @@ Moral: Bachche har cheez notice karte hain — unki curiosity ko sahi direction 
     mess: 'Ria keeps finding "clues" everywhere — missing spoon, untied shoelace, half-eaten breakfast',
     innerThought: 'Maine kuchh bhi nahi kara par sabse badi investigation main hogi, when the adults are not looking',
     endingBeat: 'Cuty drops the spoon at Rio\'s feet, all three kids form a tiny detective team',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
@@ -4029,7 +4248,7 @@ Moral: Pehchaan kho jana matlab sirf photo yaad nahi hona — apna naam lena.
     mess: 'Photos fall off the tree chart when Ria touches it eagerly',
     innerThought: 'I want to know who I really am.',
     endingBeat: 'Ria pins her own photo into the empty spot on the tree, smiling.',
-    defaultCast: ['Ria', 'Mumma', 'Daadi', 'Daddy'],
+    defaultCast: ['Ria', 'Mumma', 'Daadi'],
     keepMoralOffScreen: false,
     quote: 'Roots don\'t hold us back - they lift us forward.',
     detail: 'Create a living family tree with new photos every year.',
@@ -4097,7 +4316,7 @@ Moral: It's not about where you work — it's about how much you love.
     mess: 'A spilled coffee lands on the WFH mom\'s work shirt',
     innerThought: 'Why does everyone think I have it "easier"?',
     endingBeat: 'Both moms laugh over spilled coffee, trading places for a day.',
-    defaultCast: ['Ria', 'Mummy', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: false,
     quote: 'Whether in heels or slippers, every mom walks the same path.',
     detail: 'Celebrate both work styles — they both matter.',
