@@ -376,7 +376,7 @@ Moral: Body autonomy starts with a simple "no thank you" — and adults who resp
     postFormat: 'Reel',
     strategy: '',
     caption: 'अनजान व्यक्ति chocolate देकर बुलाए तो "नहीं, पहले मम्मी से पूछूँगी" कहकर दूर हट जाओ। फ़ौरन मम्मी, पापा या टीचर को बताओ। कोई पीछा करे तो सुरक्षित जगह या दूसरे भरोसेमंद adult के पास जाओ। हर अनजान खतरनाक नहीं, पर हर जानकार भी सुरक्षित नहीं। #StrangerSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -412,7 +412,7 @@ Moral: Pehle trusted adult se poochho. Unsafe lage toh door jao aur help maango.
     postFormat: 'Reel',
     strategy: '',
     caption: 'कभी भी ball या toy ke peeche sadak par na bhaagen. Ruko, bade ko bulao, aur unka haath pakad kar hi road cross karo. Sadak cross karte waqt bade ka haath hamesha pakad kar rakho — signal green bhi ho toh bhi. #RoadSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: "Mat" ki jagah ek clear "do" do — "Ungli pakdo, saath cross karo".',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -448,7 +448,7 @@ Moral: Ball ke peeche sadak par nahi bhaagna. Road cross karte waqt bade ka haat
     postFormat: 'Reel',
     strategy: '',
     caption: 'बच्चों को अपना पूरा नाम, भरोसेमंद adult का नंबर और help kaise maangni hai, ye practise karayein. India ka emergency number 112 hai. Lost child plan ghar pe hi bana lo. #EmergencySafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Emergency number yaad rakhne ke liye ek song banayein — rhythm yaad rahega!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -461,7 +461,7 @@ Moral: Naam yaad karo, trusted adult ka number practise karo, aur bichhad jao to
 ''',
     setting: 'Living room, afternoon, Papa and Ria sitting together',
     sceneDetail: 'Papa clapping a rhythm, Ria repeating her name and a pretend phone number',
-    dialogue: '"Ria, apna pura naam bolo." "Ria Sharma." "Aur Papa ka number?" "98765-43210."',
+    dialogue: '"Ria, apna pura naam bolo." "Ria Sharma." "Aur trusted adult ka number?" "XXXXXXXXXX."',
     mess: 'Ria mixes up the digits at first, Papa gently corrects and they try again',
     innerThought: 'The rhythm makes it stick — safety can be playful, not scary.',
     endingBeat: 'Papa and Ria high-five after nailing the song twice. "Ab bichhad jao toh kya karogi?" "Rukungi, help maangungi."',
@@ -484,7 +484,7 @@ Moral: Naam yaad karo, trusted adult ka number practise karo, aur bichhad jao to
     postFormat: 'Reel',
     strategy: 'Uses a familiar festive-shopping distraction, an emotional turning point when Ria realizes Mumma is gone, and a practical safety lesson — stay put and seek help from staff instead of wandering.',
     caption: 'Diwali shopping mein bachche beautiful outfits, toys, decorations dekhke distract ho sakte hain. Crowded market mein jaane se pehle unhe batao: "Mumma na dikhein toh wahi ruko aur staff se help maango." Ye simple plan ghar pe practise karo. #DiwaliShopping #ChildSafety #LostChild #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -523,7 +523,7 @@ Moral: Mumma na dikhein toh wahi ruko, staff se help maango.
     postFormat: 'Reel',
     strategy: 'Shows the real danger of a child entering an active cooking area, a calm parent redirecting the child, and the practical solution of creating a safe play space away from the stove.',
     caption: 'Bachche cooking area se door rahen jab gas chalu ho. Kitchen se door safe play space bana lo. Floor pe line kaafi nahi — bade ki supervision zaroori hai. #KitchenSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -568,7 +568,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Preschool ke time pe bachche "main khud!" bolte hain toh dil khush bhi hota hai aur tension bhi hoti hai. Thoda time do, try karne do, zaroorat pade toh pyaar se help karo. 👟 #Independence #ToddlerLife #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Time tellne ke liye ek simple song ya rhyme banayein!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -605,6 +605,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria pushes Mumma's hand away at the door, 
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria corrects the shoe, puts both on right feet, beams with pride. Text: "SELF-CORRECT! 💡" "SHABASH! 🥹❤️". Mumma hugs: "Tumne khud try kiya! Shabash." Both walk out together.
 
 Audio/Dialogue (Hinglish): Ria determined: "Main khud!" Mumma gentle: "Ek baar phir try karogi?" Ria happy: "Ho gaya! Main khud pehen li!" Mumma proud: "Shabash beta!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.
+
 ''',
   ),
 HookIdea(
@@ -617,7 +620,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Cartoon beech mein band hua toh rona lena laga. Do minute pehle batado, timer laga do — transition smooth hota hai. Tears kam honge, khatam nahi. 📱 #ScreenTime #TransitionHack #ToddlerEmotions #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Screen time se pehle ek countdown lelo — "5 se 1, phir screen band"! ',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -654,6 +657,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria cries on the couch, tears pointing at 
 Part 2 (10-20s): 3D Pixar style, 9:16. Next day: Mumma sets a visual timer on the phone. Timer dings: "Abhi do minute, phir bye-bye!" Ria blows a kiss at the screen: "Bye-bye cartoon!" Hands phone to Mumma. Text: "NEXT TIME: 2 MIN WARNING ⏰" "TIMER DING = BYE-BYE 🔔" "WARNING HELPS, NOT MAGIC ✨"
 
 Audio/Dialogue (Hinglish): Ria wailing: "Nahi nahi! Wapas chahiye!" Mumma gentle: "Beta, yeh episode kal bhi chalega." Ria still sniffling: "Par aaj nahi!" Mumma: "Theek hai, 2 minute warning se hi shuru karein ge." Next day — timer dings: Ria happy: "Bye-bye cartoon!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A two-minute warning before the agreed stopping point helps Ria choose a calm goodbye. A timer can support the transition but does not guarantee zero tears.
+
 ''',
   ),
 
@@ -667,7 +673,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Bachche ko frustration ho toh haath mat lagao — ek hint do, unhe khud dhundne do. Tower gira toh base bada karo. Seekhne ka maza usi mein hai. #Persistence #LearningThroughPlay #ToddlerPlay #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Har game se pehle ek simple rule samjho — "Yeh kaise khelnge" batao!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -705,6 +711,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rio builds, tower falls. He tries again �
 Part 2 (10-20s): 3D Pixar style, 9:16. Rio tries wider base, wobbles, adjusts, adds block. Tower stands. Rio beams: "Khada hai!" Ria nods. Cuty hops over nearby, watches — tower holds. Text: "BASE BADA KARO 🧱" "KHUD SEEKHA! 🎉" "HINT DO, HAATH MAT LAGAO 🌱"
 
 Audio/Dialogue (Hinglish): Rio frustrated: "Mujhse nahi hoga!" Ria calm: "Ek idea try karein? Neeche ke blocks thode phailao." Rio trying: "Hmm... base bada karo." Rio proud: "Khada hai!" Ria: "Tune khud kiya!" Cuty hops: *boop*
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria tries once more, succeeds, and beams. Ho gaya. Mumma: Shabash beta. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.
+
 ''',
   ),
 
@@ -718,7 +727,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Room messy ho toh Cuty bhi kho jata hai. Ek chhota area saaf karo, toys wapas rakho, aur milkar kaam karo. Cuty mil jayega! 🐰 #TidyUp #SiblingTeamwork #LostAndFound #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -756,6 +765,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria panics, room is a toy jungle. Rio dist
 Part 2 (10-20s): 3D Pixar style, 9:16. They find Cuty under couch, whisper "Shhh!" Finish tidying together. Cuty hops over, nudges block into bin. Text: "TOYS WAPAS RAKHO 📦" "MILKAR KAAM KARO 🤝" "CUTY MIL GAYA! 🐰"
 
 Audio/Dialogue (Hinglish): Ria urgent: "Cuty kahan gaya?!" Rio distracted: "Arre, mera blue car!" Ria firm: "Ruko, ek area saaf karte hain!" Both whisper: "Shhh, Cuty so raha hai!" Ria happy: "Room saaf, Cuty mil gaya!" Cuty hops: *boop*
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.
+
 ''',
   ),
 
@@ -769,7 +781,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Bedtime loop familiar hai? Pehle se paani, blanket, hug ready rakho. Routine banao, pyaar se boundary rakho. Rona kam hoga — khatam nahi hoga. 😴 #BedtimeRoutine #ToddlerSleep #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Jootey pehne ko ek game bana lo — "Superhero ban jao!"',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -807,6 +819,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria in bed asks for water, Mumma brings st
 Part 2 (10-20s): 3D Pixar style, 9:16. Next night: Mumma pre-places cup, blanket, sits ready. Ria asks: "Ek aur story?" Mumma gentle: "Kal sunein, ab so jao." Ria snuggles, settles. Text: "PREP KARO, ROUTINE BANAO ✅" "BOUNDARY PYAAR SE 🌙" "CALMER, NOT PERFECT 🌱". Ria: "Goodnight, Mumma." Mumma: "Goodnight, beta."
 
 Audio/Dialogue (Hinglish): Ria sleepy: "Mumma, ek aur paani!" Mumma gentle: "Lo beta, ab so jao." Ria: "Teddy ko blanket." Mumma: "Haan, le lo." Ria: "Ek aur story?" Mumma: "Kal sunein, ab so jao." Ria: "Goodnight, Mumma." Mumma: "Goodnight, beta."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit without being asked. Mumma smiles - routine se free ho jaati hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Predictable routines, preparation, affection, and consistent boundaries make bedtime calmer. Preparation helps, but it does not guarantee zero requests or tears.
+
 ''',
   ),
 
@@ -859,7 +874,7 @@ Moral: Clear timer, clear rules — no tears over sharing.
     postFormat: 'Reel',
     strategy: '',
     caption: 'Brush ke time pe Ria chhup gayi? Cuty ke daant brush karke dikhao, fir Ria khud try karegi. Pea-sized fluoride paste, bade ki supervision. 🪥 #BrushTime #ToddlerRoutine #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Time tellne ke liye ek simple song ya rhyme banayein!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -897,6 +912,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria hides under blanket: "Nahi!" Mumma sit
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria gets child brush with pea-sized fluoride paste. "Dhire dhire, upar neeche." Mumma guides hand for back teeth. Ria spits, smiles at mirror. Text: "AB MERI BAARI! 😁" "DHEERE DHEERE... SPIT! 💦" "SHINING SMILE! ✨"
 
 Audio/Dialogue (Hinglish): Mumma gentle: "Brush time, Ria!" Ria: "Nahi!" Mumma calm: "Theek hai, pehle Cuty ke daant saaf karte hain." Mumma narrating: "Upar, neeche, peeche — dhire dhire." Ria curious: "Mere daant bhi?" Mumma: "Dhire dhire, upar neeche." Ria: "Ho gaya!" Mumma: "Shining smile!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.
+
     ''',
   ),
 
@@ -910,7 +928,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Broccoli se Ria bhagi? Papa khud khake dikhaye, pressure nahi. Chhota piece offer kiya, Ria ne soongha, chhua — bite optional. Low-pressure exposure se familiarity aati hai. 🥦 #FoodExploration #PickyEater #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Bachcho ko meal banate waqt ek tiny helper bana kar involve karo!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -948,6 +966,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria pushes broccoli away: "Nahi chahiye!" 
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria looks at piece, touches, smells, maybe tiny taste or puts back. Papa calm: "Theek hai, kal phir try karenge." Text: "TRY KARO, WARNA REHNE DO 🤷‍♂️" "EXPLORE: LOOK, TOUCH, SMELL 👃" "PRESSURE NAHI, EXPOSURE HAAN ✅"
 
 Audio/Dialogue (Hinglish): Ria firm: "Nahi chahiye!" Papa natural: "Crunchy hai, thoda kadwa." Papa gentle: "Chaho toh try karo, warna rehne do." Ria curious: *sniffs, touches* Papa calm: "Theek hai, kal phir try karenge." Both eat together.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria takes a big breath, counts to 3, and relaxes. Jab bhi pareshan, saanson se shuru karo. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.
+
     ''',
   ),
 
@@ -961,7 +982,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Rio khud try karta hai, Ria pyaar se check karti hai, Mumma hint deti hai. Shoes pehenna seekhna teamwork hai — koi bhi confused nahi. 👟 #ShoeTime #SiblingSupport #ToddlerIndependence #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Jootey pehne ko ek game bana lo — "Superhero ban jao!"',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -999,6 +1020,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rio runs to door, shoes on wrong feet, wad
 Part 2 (10-20s): 3D Pixar style, 9:16. Rio fixes left shoe, hesitates on right. Mumma: "Toe kis taraf? Bas seedha karo." Rio fixes it, stands proud: "Ho gaya!" Ria high-fives. Text: "HINT DO, KAAM KARNE DO 🤝" "HO GAYA! 🎉" "PATIENCE + HINT = CONFIDENCE 🌱"
 
 Audio/Dialogue (Hinglish): Rio excited: "Park jana hai!" Ria gentle: "Rio, check karein, sahi pair hai?" Rio trying: "Hmm..." Mumma calm: "Toe kis taraf? Bas seedha karo." Rio proud: "Ho gaya!" Ria: "Partner ban gayi!" Both run: "Chalo, park!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria counts to 10 with Mumma, then gets what she asked for. Thoda intezaar se sab milta hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Patience, checking, and helping without taking over. Let the child try first; offer a small hint only if needed.
+
     ''',
   ),
 
@@ -1014,7 +1038,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Park se ghar aana hai? Ria negotiate karegi, Rio "ek aur" bolega, Cuty corner dhundhegi. Mumma ki ek hi boundary, teen alag support. 😂 #SiblingPersonalities #ParkToHome #ToddlerTransitions #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1055,6 +1079,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mumma: "Chalo, ghar!" Ria: "5 minute!" Rio
 Part 2 (10-20s): 3D Pixar style, 9:16. Mumma: "Do minute, same rule for all." Ria sets timer. Rio picks goodbye song. Cuty lifted to quiet corner. Text: "EK BOUNDARY, TEEN SUPPORT ✨" "RIA: TIMER ⏱️ RIO: SONG 🎵 CUTY: QUIET 😴" "RIA, RIO YA CUTY — AAPKA BACHCHA? 🤔"
 
 Audio/Dialogue (Hinglish): Mumma calm: "Chalo, ghar chalna hai." Ria firm: "Mere saath 5 minute, phir Rio karega!" Rio dramatic: "Ek aur slide, ek aur!" Mumma gentle: "Do minute, timer laga lo." Ria happy: "Main timer set karungi!" Rio: "Goodbye song — Happy Birthday!" Mumma lifts Cuty: "Tera quiet corner yahan hai." Cuty sleepy: "Hmm..." All transition. Mumma to camera: "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give all children the same clear, fair transition boundary. Adapt your support to each child\'s personality — negotiate timing for the negotiator, offer a choice for the protester, and provide a calm corner for the quiet one. A timer can help but does not guarantee instant calm.
+
 ''',
   ),
 
@@ -1068,7 +1095,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Har parent in 7 cheezon ko pehchaane ga! 1) "Nahi!" 2) Same spoon 3) Sudden Mumma need 4) Toy drop-pickup loop 5) Bedtime stretch 6) Wrong shoe pride 7) Random fact drop. #ToddlerTruths #ParentingHumor #DailyChaos #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1115,6 +1142,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rapid cuts: Ria crosses arms "Nahi!" Rio r
 Part 2 (10-20s): 3D Pixar style, 9:16. Rio waddles in wrong shoes. Ria: "Butterfly taste with feet!" Montage ends with all three asleep in a pile. Text: "6. WRONG SHOE PRIDE 🐧" "7. RANDOM FACT 🦋" "7 THINGS. 1 CHILDHOOD. 💛" "THE CHAOS IS THE CHILDHOOD 💛"
 
 Audio/Dialogue (Hinglish): Ria firm: "Nahi!" Rio: "Blue spoon hi chahiye!" Cuty: "Mumma!" *giggle drop* Rio penguin walk. Ria: "Mumma, butterfly taste with their feet!" Mumma tired: "Haan beta, sahi hai." All asleep: "The chaos is the childhood."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: These tiny, universal behaviors are the funny, exhausting, and heartwarming signs of childhood — not problems to fix.
+
 ''',
   ),
 
@@ -1128,7 +1158,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Mumma: "Chocolate nahi." Ria negotiate karegi, Rio refuse karega, Cuty quietly accept karegi. Ek "nahi", teen alag support. 🍫 #SiblingReactions #GentleParenting #BoundariesWithLove #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1166,6 +1196,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mom at kitchen counter. Ria dramatically p
 Part 2 (10-20s): 3D Pixar style, 9:16. Mom gives Ria a story. Mom gives Rio a countdown hug: "Ek, do, teen... gale laga lo!" Mom gives Cuty a gentle pat: "Carrot bhi tasty hai!" Text: "SAME NO. DIFFERENT SUPPORT." "RIA: STORY 📖" "RIO: COUNTDOWN HUG 🤗" "CUTY: PAT 🤝" "SAME BOUNDARY. TAILORED LOVE. ❤️".
 
 Audio/Dialogue (Hinglish): Mom firm: "Chocolate nahi beta." Ria pleading: "Bas ek piece, I promise!" Rio melodramatic: "NO! Main nahi khana!" Cuty quietly: "Carrot khaa sakti hoon." Mom to Ria: "Ab kahani." Mom to Rio: "Ek, do, teen... gale laga lo!" Mom to Cuty: "Carrot bhi tasty hai!" Cuty: "Haan!" All settle.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One consistent boundary, three tailored responses. Meet each child where they are without changing the rule.
+
 ''',
   ),
 
@@ -1215,7 +1248,7 @@ Moral: One more story means one more minute — then it is sleep time.
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria: "Mujhe neend nahi!" ... phir aankh band. Protest bhi pyaar hai, neend bhi zaroori. Bedtime protest normal hai — pyaar se handle karo. 😴 #BedtimeStruggles #ToddlerSleep #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1252,6 +1285,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria dramatically protests sleep, sits bolt
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria's eyelids grow heavy, she pats the pillow: "Thoda aur?" Mumma tucks blanket around Ria's shoulders, continues whispering the story. Ria snoring softly on Mumma's lap. Text: "DETECT: EYELIDS HEAVY" "BLANKET TUCK STRATEGY" "PROTEST = LOVE 💤".
 
 Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma smiling: "Ek aur page?" Ria sleepy: "Thoda aur?" Mumma whispering: "Jaane do beta, kal subah nayi kahani."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit without being asked. Mumma smiles - routine se free ho jaati hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bedtime protest is normal — it can be a way of staying close. Validate the feeling, keep the routine warm and firm, and trust that sleep will come. Do not promise the protest will stop or that sleep will be instant.
+
 ''',
   ),
 
@@ -1265,7 +1301,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Morning chaos? Sock, shirt, bottle — checklist banao saath milke. Ria, Rio, Cuty sab yaad rakhenge! ✅ #MorningRoutine #ChecklistHack #ToddlerIndependence #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Routine ko ek picture banao — har step ek star ban jaye!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1303,6 +1339,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Morning chaos: sock on couch, shirt inside
 Part 2 (10-20s): 3D Pixar style, 9:16. Next morning: Ria checks off sock ✅ shirt ✅ bottle ✅ smile ✅. Rio high-fives. Text: "SOCK ✅ SHIRT ✅ BOTTLE ✅ SMILE ✅" "VISUAL CHECKLIST = TEAMWORK" "KIDS REMEMBER WHAT THEY CREATE"
 
 Audio/Dialogue (Hinglish): Ria: "Mumma, maine hi gira diya!" Mumma: "Chalo checklist banate hain." Ria: "Sock, shirt, bottle, smile!" Next morning: Ria checks off: "Sock done! Shirt done! Bottle done! Smile done!" Mumma: "Morning sorted!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A visual morning checklist made together turns chaos into teamwork. Kids remember what they help create.
+
 ''',
   ),
 
@@ -1316,7 +1355,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria: "Ready Captain!" Par clip teen baar badli. Rio: "Time khatam!" Ria picks no-bow, helps Cuty. Team first! 🎀 #MorningRoutine #SiblingSupport #ToddlerIndependence #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1354,6 +1393,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria changes clip: blue → pink → none. 
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria picks no-bow, helps Cuty with shoe. "Team complete!" All walk out together. Text: "TEAM FIRST! 🤝" "HELP CUTY 👟" "TEAM COMPLETE! 🤝✨"
 
 Audio/Dialogue (Hinglish): Ria: "Ready Captain!" *changes clip* Rio: "Time khatam!" Ria sees Cuty struggle. Ria: "Team complete!" Helps Cuty. "Jab tak sabke saath, tab tak team complete." All walk out.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Being ready first does not mean leaving the team behind. True readiness means helping others get ready too.
+
 ''',
   ),
 
@@ -1367,7 +1409,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Plate khali, Ria blame Rio ko kar di! Check karo pehle, blame baad mein. 🕵️‍♀️ #EvidenceFirst #SiblingMystery #ToddlerHumor #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1405,6 +1447,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria sees empty plate, immediately points a
 Part 2 (10-20s): 3D Pixar style, 9:16. Finds apple piece near Cuty's paws. Ria: "Cuty ke paas mila!" Puts it on plate. Rio grins: "Maine nahi khaya." Text: "EVIDENCE CHECK! 🔍" "FOUND IT! 🍎" "CHECK FIRST, BLAME LATER 💡"
 
 Audio/Dialogue (Hinglish): Ria urgent: "Mumma, koi ne apple kha liye! Rio!" Mumma calm: "Check karte hain." Rio's hands clean. Finds peels: "Cuty ke paas piece!" Ria giggles: "Oh! Cuty ke paas mila!" Rio grins: "Maine nahi khaya."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Check the evidence before blaming someone. The real answer is often right in front of you — look first, accuse later.
+
 ''',
   ),
 
@@ -1454,7 +1499,7 @@ Moral: Ek chart, teen alag hurry — sab ek saath nikal jate hain.
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria: "Teddy, negotiation band!" Mumma: "Yeh toh maine kaha tha!" Bachche wahi bolte jo sunte hain. 🗣️ #ToddlerQuotes #ParentingMirror #WordsMatter #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1492,6 +1537,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mumma at bedtime: "Aaj jaldi sona hai." Ri
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria whispers: "Mumma ne kaha tha!" Mumma gives quiet hug, reflects: "Kal se behtar words choose karungi." Text: "MUMMA NE KAHA THA! 🗣️" "WORDS STICK — CHOOSE WISELY 💡" "SPEAK LOVE, HEAR LOVE 💛"
 
 Audio/Dialogue (Hinglish): Mumma: "Aaj jaldi sona hai." Ria to Teddy: "Teddy, negotiation band — ab so jao!" Mumma at door: *smiles* Ria whispers: "Mumma ne kaha tha!" Mumma hugs: "Haan beta, maine hi kaha tha. Kal se behtar words."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Small phrases stick; what we say becomes their inner voice. Speak the words you want them to repeat.
+
 ''',
   ),
 
@@ -1505,7 +1553,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Supermarket team ready! Ria: mangoes 🥭 Rio: cereal box 📦 Cuty: list guard 📝 Jobs diye, teamwork mila! 🛒 #SupermarketTeam #SiblingTeamwork #GroceryWithKids #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Jootey pehne ko ek game bana lo — "Superhero ban jao!"',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1544,6 +1592,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mumma assigns jobs. Ria picks mangoes. Rio
 Part 2 (10-20s): 3D Pixar style, 9:16. At checkout: Ria puts mangoes, Rio lifts box, Cuty waves receipt from basket. Text: "RIA: MANGOES 🥭" "RIO: CEREAL 📦" "CUTY: GUARD 📝" "TEAMWORK = WIN 🤝"
 
 Audio/Dialogue (Hinglish): Mumma: "Ria, pick yellow fruit. Rio, cereal box. Cuty, hold list clip." Ria: "Mangoes!" Rio: "Big box!" Cuty: "Main rakwala!" At checkout: Ria: "Hamari team badhi achhi hai!" All laugh.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give each child an age-appropriate job. They may misunderstand, but the teamwork and inclusion matter more than perfect execution. Safety comes first — no riding on cart handles.
+
 ''',
   ),
 
@@ -1593,7 +1644,7 @@ Moral: Brushing ek game hai — jab tak mazaa aa raha hai, koi dikkat nahi hoti.
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Safety first, imagination second! 🚗💺 #CarSeatSafety #TravelWithKids #ToyTravel #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1631,6 +1682,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria: "Car bhi ghar chalegi!" Mumma: "Seatb
 Part 2 (10-20s): 3D Pixar style, 9:16. Both secured — Ria in car seat with harness, toy in travel pouch. Rio: "Donon safe!" Text: "SEATBELT = SAFETY 💺" "TRAVEL BAG = TOY TRAVEL 🎒" "SAFETY FIRST, IMAGINATION SECOND 💡"
 
 Audio/Dialogue (Hinglish): Ria: "Car bhi ghar chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Ria: "Lock hai!" Rio: "Donon safe!" All safe, ready for road trip.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria snuggles with her book. Time to rest, dreams to grow. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Safety first: real seatbelts for children in appropriate car seats. Toys travel safely in a travel bag or pouch — never use a backpack as a car restraint, even for a toy.
+
 ''',
   ),
 
@@ -1644,7 +1698,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria ka drawing phata — duniya khatam! Validate karo pehle: "Bada dukh hua." Phir saath repair karo. Big feelings = big love. 🎨💔 #BigFeelings #ToddlerEmotions #ValidateFirst #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1682,6 +1736,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria crying over torn drawing: "MERI drawin
 Part 2 (10-20s): 3D Pixar style, 9:16. They make new drawing together: "Nayi shuruaat!" Heart drawn by Mumma. Ria giggles. Text: "REPAIR TOGETHER 🎨" "NAYI SHURUAAT! 💛" "VALIDATE FIRST, REPAIR TOGETHER ❤️"
 
 Audio/Dialogue (Hinglish): Ria sobbing: "MERI drawing phaa gaya!" Mumma gentle: "Bada dukh hua na? Yeh drawing tumne pyaar se banayi thi." Ria nods. Mumma: "Chalo, nayi shuruaat karte hain." Together drawing: "Nayi shuruaat!" Ria giggles.
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the feeling first. A torn drawing is a big feeling to a child. Comfort first, then repair together. Do not dismiss the loss or expect instant happiness.
+
 ''',
   ),
 
@@ -1695,7 +1752,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Rio: "Do blocks aur!" Papa: "Tower complete, phir shoes!" Fair deal, shoes on, sab khush! 🧱👟 #BlocksToShoes #TransitionHack #NoFoodBribes #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1733,6 +1790,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rio building blocks: "Do blocks aur!" Papa
 Part 2 (10-20s): 3D Pixar style, 9:16. Rio completes tower, timer dings, puts on shoes. High-five! Text: "TIMER DINGS! SHOES ON ✅" "FAIR DEAL = DONE! 🤝" "NO FOOD BRIBES 💡"
 
 Audio/Dialogue (Hinglish): Papa: "Tower complete, phir shoes." Rio: "Ab do aur do!" Papa: "Tower complete hua, ab shoes. Timer do minute." Rio: "Theek hai!" Timer dings. Rio puts shoes on. "Fair deal done!" High-five!
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One clear, fair transition turns "more" into "done" — without food as a reward or screens as bribes.
+
 ''',
   ),
 
@@ -1746,7 +1806,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Rio: "No! Mine! Why!" Mumma validates: "Gussa hai?" Sets boundary. Simple turns. No mocking! 🎭 #EmotionValidation #TurnTaking #SiblingConflict #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1784,6 +1844,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rio grabs ball: "No! Mine! Why!" Ria echoe
 Part 2 (10-20s): 3D Pixar style, 9:16. Mumma sets simple turns: one minute each. They take turns. Cuty gets a turn too. Text: "SIMPLE TURNS ⏱️" "ONE MINUTE EACH ⏱️" "VALIDATE + BOUNDARY = PEACE 🌱"
 
 Audio/Dialogue (Hinglish): Rio: "No! Mine! Why!" Ria: "Why!" Mumma: "Gussa hai Rio? Theek hai." Rio: "Haan." Mumma: "Ek minute Ria, ek minute Rio — ginti karke." Rio: "Theek hai!" Turns taken. "Fair!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the emotion behind the words. Set a clear boundary on behavior. Offer a simple, age-appropriate turn-taking approach. No mocking, no broken-record mimicry.
+
 ''',
   ),
 
@@ -1797,7 +1860,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Ria ka scrape, Cuty ka saath, Mumma ki first aid. Cuty sirf saath baitha — lick nahi kiya! Presence over lectures. 🐰🩹 #FirstAid #ComfortNotLectures #RabbitSafety #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1835,6 +1898,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria sulking with scraped knee. Cuty sits b
 Part 2 (10-20s): 3D Pixar style, 9:16. Mumma applies colorful bandaid. Cuty sits proudly beside finished job. Text: "NO LECTURES, JUST PRESENCE 🐰" "NO LICKING! 🚫👅" "FIRST AID + PRESENCE = HEALING 💛"
 
 Audio/Dialogue (Hinglish): Ria: "Ouch, bada dukh raha hai!" Mumma calm: "Pehle saaf karte hain, phir bandaid." Ria: "Cuty, tujhe pata hai?" Cuty: *nudges tissue* Mumma: "Good job, Cuty! No licking!" Ria: "Shukriya Mumma, shukriya Cuty!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria and Rio join Daadi in the quiet corner, clapping to a softer beat. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Appropriate first aid for the injury, quiet presence from a companion. Cuty never licks or touches wound-care items. Comfort without lectures.
+
 ''',
   ),
 
@@ -1848,7 +1914,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Sock kho gayi, bow kho gaya! Morning mix-up hua par personal items alag rakho. Apna apna, alag alag! 🧦🎀 #MorningMixUp #PersonalItems #SiblingFun #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1886,6 +1952,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Ria: "Meri striped sock kahaan hai?" Rio h
 Part 2 (10-20s): 3D Pixar style, 9:16. Finds Ria\'s striped sock in Rio\'s shoe. Puts it on. Text: "BOW = HAIR 🎀🚫" "SOCK = FOOT 🧦" "PERSONAL ITEMS STAY PERSONAL 💡"
 
 Audio/Dialogue (Hinglish): Ria: "Meri striped sock kahaan hai?" Mumma: "Rio, yeh Ria ka bow — baalon ke liye, haath ke liye nahi!" Rio: "Haan, mazaak tha!" Finds sock: "Meri sock yahan thi!" Mumma: "Bow baalon ke liye, sock pairon ke liye!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Morning mix-ups happen. Keep personal items separate. Find the right item for the right person — no sharing socks, bows, or other personal items!
+
 ''',
   ),
 
@@ -1899,7 +1968,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Rio mimics Mumma\'s every word — not to annoy, but because words stick. Warm response > reprimand. 🦜 #ToddlerMimicry #ParentingMirror #WordsMatter #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1937,6 +2006,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mumma rushing: "Joote pehno! Daudo mat! Bo
 Part 2 (10-20s): 3D Pixar style, 9:16. Mumma smiles: "Main itna bolti hoon?" Rio: "Haan, roz!" Mumma: "Theek hai, kam bolo, zyada karo." Rio puts shoes on. Text: "MIMICRY = LEARNING 💡" "WARM RESPONSE > REPRIMAND 💛"
 
 Audio/Dialogue (Hinglish): Mumma rushing: "Joote pehno! Daudo mat! Bottle kahan hai?" Rio echo: "Joote pehno! Daudo mat! Bottle kahan hai!" Mumma smiling: "Main itna bolti hoon?" Rio: "Haan, roz!" Mumma: "Theek hai, kam bolo, zyada karo." Rio puts shoes on: "Main toh sirf practice kar raha tha!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Children echo what they hear. Mimicry is learning. Respond with warmth, not reprimand. Show them the words you want them to keep.
+
 ''',
   ),
 
@@ -1950,7 +2022,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Mumma thak ke aayi, Ria ne bag notice kiya. Chhoti si help, bada pyaar. Notice karna hi pyaar hai. 💛 #NoticeAndHelp #ToddlerKindness #ParentChildBond #IndianParents #FunLearningWithPalak',
-    pinnedComment: '',
+    pinnedComment: 'Tip: "Help puchne" ka tareeqa sikha lo — specific request zyada effective hoti hai!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -1988,6 +2060,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Mumma comes home, bag drops. Ria pauses pl
 Part 2 (10-20s): 3D Pixar style, 9:16. Ria puts bag on hook. They sit — tea for Mumma, drawing for Ria. Text: "SMALL HELP, BIG LOVE 💛" "QUIET TOGETHERNESS 🍵🎨" "NOTICE = LOVE 💛"
 
 Audio/Dialogue (Hinglish): Mumma tired: "Thak gayi..." Ria gentle: "Mumma, tum thak gayi ho." Mumma: "Beta, main saambhaal lungi." Ria: "Tum bahut thak gayi ho. Main rakh deti hoon." Both sit: "Shukriya beta." "Tumhara saath hi toh maza aata hai."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A small gesture needs no speech; noticing is already love in action. A preschooler can offer emotional support without lifting heavy items.
+
     ''',
 
   ),
@@ -2322,8 +2397,8 @@ Moral: Cleaning up becomes a team win when the praise names what they did.
     lesson: 'Kya nahi karna, nahi — kya karna hai, woh batao',
     postFormat: 'Reel',
     strategy: '',
-    caption: '',
-    pinnedComment: '',
+    caption: 'Bachche "mat bhaago" sunta nahi magar "karo" sun leta hai — ek word ka fark poora behavior badalta hai! ❤️ #ToddlerTips #ParentingHack #FunLearningWithPalak #IndianParents #PositiveDiscipline',
+    pinnedComment: 'Tip: "Mat bhaago!" ka jawab "Ungli pakdo!" do — ek word change se hi behavior badalta hai! ❤️',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -2360,6 +2435,9 @@ Part 1 (0-10s): 3D Pixar style, 9:16. Rio at parking lot crossing, tugging towar
 Part 2 (10-20s): 3D Pixar style, 9:19. Both walk slowly, hand in hand, red car waiting. Text: "HAND HOLD TECHNIQUE 💪" "SMALL HANDS, BIG SAFETY 🌟" "CROSS TOGETHER, ALWAYS 🤝". Rio: "Theek hai, main tumhari saath hoon." Mumma: "Haan, hum dono milke teerahon."
 
 Audio/Dialogue (Hinglish): Rio urgent: "Rio, meri ungli pakho!" Mumma hesitant: "Par thoda maza aa raha tha..." Rio: "Ruk jao beta, ek second." Rio reassuring: "Main tumhe saaf pakad hoon gi." Mumma: "Haan, chalo... saath milkar." Both crossing: "Ek dusre ki ungli pakad ke chal rahe hain!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Kya nahi karna, nahi — kya karna hai, woh batao
+
     ''',
   ),
 
@@ -2519,7 +2597,7 @@ Moral: Jod kar khushiya banati hain — together, every story is bigger.
     lesson: 'Meet the negotiator, the no-expert, the silent observer',
     postFormat: 'Reel / Discovery',
     strategy: 'Use the funniest version for discovery. Ria claims credit, Rio argues, Cuty keeps sleeping, and the final card reveals POST #100 🎉.',
-    caption: 'Who made it to Post #100? 😂\n\nRia says it was her. Rio says NO. Cuty is sleeping through the celebration.\n\nStill causing trouble, one little story at a time. ❤️\n\n#FunLearningWithPalak #Post100 #CharacterIntro #IndianParents #MeetTheTeam',
+    caption: 'Who made it to Post 100? 😂\n\nRia says it was her. Rio says NO. Cuty is sleeping through the celebration.\n\nStill causing trouble, one little story at a time. ❤️\n\n#FunLearningWithPalak #Post100 #CharacterIntro #IndianParents #MeetTheTeam',
     pinnedComment: 'Who is most like your little one: Tofani Ria, Ziddi Rio or sleepy Cuty? 😂',
     forApp: true,
     usedOn: '',
@@ -2706,7 +2784,7 @@ Moral: Every child celebrates differently — finding their comfort rhythm is it
     mess: 'Cuty cries over not getting the "good" bangle',
     innerThought: 'She has seven other bangles. This is about the one.',
     endingBeat: 'Daadi ties the cracked bangle, "this one held prayers."',
-    defaultCast: ['Ria', 'Mumma', 'Daadi', 'Cuty'],
+    defaultCast: ['Ria', 'Mumma', 'Daadi'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2828,7 +2906,7 @@ Moral: Comfort before style — when kids feel good, they shine.
     lesson: 'No real child problem',
     postFormat: 'Reel',
     strategy: 'parenting-relatability',
-    caption: 'Chhote bachchon ko Garba mein kaise include karein? Simple steps aur extra smiles — perfection se zyada khushi zaroori hai. #InclusiveGarba #KidsDance #FunLearningWithPalak',
+    caption: 'Chhote bachchon ko Garba mein kaise include karein? Simple steps aur extra smiles — perfection se zyada khushi zaroori hai. #InclusiveGarba #KidsDance #FunLearningWithPalak #NavratriTips #ToddlerRoutine',
     pinnedComment: 'Tip: Toddler ke saath simple 2-step taali banayein — kids energy copy karte hain!',
     forApp: true,
     usedOn: '',
@@ -2881,7 +2959,7 @@ Moral: Rushing creates resistance — transform the race into play and everythin
     mess: 'Everything is ready except one small thing that takes ten minutes',
     innerThought: 'We will miss the first aarti.',
     endingBeat: 'Rio finds the bangle, they leave with two minutes to spare.',
-    defaultCast: ['Ria', 'Rio', 'Mumma', 'Papa'],
+    defaultCast: ['Ria', 'Mumma', 'Papa'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2933,7 +3011,7 @@ Moral: A new perspective can turn overwhelm into magic — sometimes elevation h
     lesson: 'Consolidated into h02',
     postFormat: 'Reel',
     strategy: 'parenting-relatability',
-    caption: 'Garba mein phone ke bina toddler ko busy kaise rakhein? Chhota activity pouch — crayons, stickers aur finger puppets! 🎨 #ScreenFreeKids #NavratriTips #FunLearningWithPalak',
+    caption: 'Garba mein phone ke bina toddler ko busy kaise rakhein? Chhota activity pouch — crayons, stickers aur finger puppets! 🎨 #ScreenFreeKids #NavratriTips #FunLearningWithPalak #IndianParents #ParentingHack',
     pinnedComment: 'Tip: Activity bag mein sirf 3-4 favorite items rakhein — focus bana rehta hai.',
     forApp: true,
     usedOn: '',
@@ -4527,7 +4605,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Create a bright, clean preschool puzzle card, square format, cream pastel background. Four large, simple, colorful illustrations in a row: Ria (pigtails, pink dress), Rio (blue shirt), Cuty (white bunny with pink bow), and a single yellow banana. Rounded card border, soft drop shadow under each figure, minimal clutter, no text inside the image, playful children\'s illustration style.',
     caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
     cta: 'Comment your child\'s answer below 👇',
-    hashtags: '#preschoolactivities #toddlerlearning #kidsbrainbooster #earlylearningindia #funlearningwithpalak #momsofinstagram #observationskills',
+    hashtags: '#preschoolactivities #toddlerlearning #kidsbrainbooster #earlylearningindia #funlearningwithpalak',
     comments: [
       'Try this with your little one and tell us — did they spot it right away? 👀',
       'So clever! Kids love these simple observations.',
@@ -4556,7 +4634,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Disney/Pixar-style render, cream background, vertical 9:16. Scene 1: Ria barefoot holding shoes, "Coming!" speech bubble, 5 min later still barefoot. Scene 2: Rio shrugging, water bottle beside him. Scene 3: Ria and Rio sprinting past, Cuty asleep. Scene 4: Both with angry faces, Cuty still asleep. Scene 5: Parent searching, "COME HERE!" text. No glasses on Ria and Rio.',
     caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
     cta: 'Be honest — how many times today? 👇',
-    hashtags: '#parentingmemes #toddlerlife #momsofindia #relatablemom #funlearningwithpalak #parentinghumor #toddlermom',
+    hashtags: '#parentingmemes #toddlerlife #momsofindia #relatablemom #funlearningwithpalak',
     comments: [
       'Drop a number 👇 be honest, we won\'t judge 😂',
       'Literally on repeat in my house every single morning 😭',
@@ -4585,7 +4663,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream kitchen countertop background, five safe kitchen items (wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup) arranged playfully, a small illustrated child hands exploring them with an adult hand nearby, warm cozy lighting, minimal text, square format.',
     caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
     cta: 'Save this for your next kitchen moment ❤️',
-    hashtags: '#preschoolactivities #kitchenlearning #toddleractivities #earlylearning #sortingskills #funlearningwithpalak #momhacks',
+    hashtags: '#preschoolactivities #kitchenlearning #toddleractivities #earlylearning #sortingskills',
     comments: [
       'Tried this yet? Tell us how your little chef did! 🥄',
       'Love that this uses stuff I already have at home!',
@@ -4614,7 +4692,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream bedroom background, warm evening lighting. Ria (pigtails with pink bows, pink star dress) sitting on her bed hugging Cuty the white bunny, a small thought bubble above Cuty\'s head with a question mark. Rio (blue-grey t-shirt) peeking in from the doorway curiously. No glasses, no text inside image, gentle cozy mood, square format.',
     caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
     cta: 'What did they say? Comment below 👇',
-    hashtags: '#talkwithyourkids #parentingtips #bedtimeroutine #toddlerconversations #funlearningwithpalak #earlychildhood #momlife',
+    hashtags: '#talkwithyourkids #parentingtips #bedtimeroutine #toddlerconversations #funlearningwithpalak',
     comments: [
       'We\'d love to hear what your little one said — share it below! ❤️',
       'My son said his teddy would say "let\'s go on an adventure!" 😍',
@@ -4643,7 +4721,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Ria and Rio standing together pointing at a floating checklist icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, minimal text inside image, square format.',
     caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
     cta: 'Bookmark this for your 3-year-old\'s next milestone check 📌',
-    hashtags: '#preschoolmilestones #3yearoldactivities #toddlerdevelopment #earlylearning #parentingindia #funlearningwithpalak #momsofinstagram',
+    hashtags: '#preschoolmilestones #3yearoldactivities #toddlerdevelopment #earlylearning #parentingindia',
     comments: [
       'How many can your 3-year-old already do? Tell us below! 💛',
       'My daughter can do 4 out of 5, so proud!',
@@ -4672,7 +4750,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Bold bright meme-style reel, soft 3D Pixar animation, cream background, vertical 9:16. Scene 1: "1 biscuit = hungry" — Rio holding one biscuit, neutral face. Scene 2: "2 biscuits = still hungry" — same neutral face. Scene 3: "3 biscuits = \'MUMMA, MORE!\'" — dramatic happy face, arms outstretched. Scene 4: Cuty unimpressed, nibbling one carrot. No glasses.',
     caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
     cta: 'Tag a parent who gets this 😅',
-    hashtags: '#toddlerlife #parentingmemes #momsofindia #relatablehumor #funlearningwithpalak #toddlermom #parentinghumor',
+    hashtags: '#toddlerlife #parentingmemes #momsofindia #relatablehumor #funlearningwithpalak',
     comments: [
       'Be honest — how many biscuits does it take in your house? 😂',
       'This is exact science in my house 😭',
@@ -4701,7 +4779,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render illustrated garden scene, cream and green tones, flowers, bushes, small toys scattered around. Cuty the small white bunny cleverly tucked partially behind a bush or flower pot with only ears and pink bow peeking out. Ria and Rio standing to the side looking around playfully, no glasses, square format, minimal text inside image.',
     caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
     cta: 'How fast did you find him? ⏱️ Comment below!',
-    hashtags: '#hiddenobject #spotthedifference #preschoolgames #observationskills #toddleractivities #funlearningwithpalak #kidsgames',
+    hashtags: '#hiddenobject #spotthedifference #preschoolgames #observationskills #toddleractivities',
     comments: [
       'Found him? Drop a 🐰 in the comments!',
       'Found him behind the flower pot! 🐰',
@@ -4730,7 +4808,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream laundry room background, vertical 9:16. Scene 1: Pile of mismatched colorful socks on floor, Ria and Rio diving in curiously. Scene 2: Rio holds two socks of different colors, shakes head "no match." Scene 3: Ria finds matching pair, holds triumphantly. Scene 4: Montage of pairs stacking, Cuty sitting on finished pile. No glasses on Ria and Rio.',
     caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
     cta: 'Try this before your next laundry day 😂',
-    hashtags: '#laundryhacks #toddleractivities #preschoollearning #momhacks #sortingskills #funlearningwithpalak #parentingtips',
+    hashtags: '#laundryhacks #toddleractivities #preschoollearning #momhacks #sortingskills',
     comments: [
       'Does this actually work in your house too? 😂 Tell us!',
       'Genius, why didn\'t I think of this before 😂',
@@ -4759,7 +4837,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, warm evening lighting. Ria and Rio sitting together on the floor in conversation, Cuty curled nearby, gentle cozy family mood, no glasses, minimal text inside image, square format.',
     caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
     cta: 'Save this — ask one each night this week.',
-    hashtags: '#talkwithyourkids #parentingtips #mindfulparenting #toddlerconversations #funlearningwithpalak #familytime #momlife',
+    hashtags: '#talkwithyourkids #parentingtips #mindfulparenting #toddlerconversations #funlearningwithpalak',
     comments: [
       'Starting with the 100 blocks question tonight!',
       'These are so simple but so meaningful, saving this.',
@@ -4788,7 +4866,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Rio and Ria standing together pointing at a floating icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, square format.',
     caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
     cta: 'Bookmark this for your 4-year-old\'s next milestone check 📌',
-    hashtags: '#preschoolmilestones #4yearoldactivities #toddlerdevelopment #earlylearning #parentingindia #funlearningwithpalak #momsofinstagram',
+    hashtags: '#preschoolmilestones #4yearoldactivities #toddlerdevelopment #earlylearning #parentingindia',
     comments: [
       'How many can your 4-year-old already do? Tell us below! 💛',
       'He\'s got the alphabet down but still working on days of the week!',
@@ -4817,7 +4895,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, three-panel layout on cream background, dinner table setting. Panel 1: Ria poking curiously at a plate of food, questioning expression. Panel 2: Rio with arms crossed, refusing his plate, stubborn expression. Panel 3: Cuty the white bunny calmly and happily eating a carrot from a small bowl. No glasses, clean simple outlines, minimal text inside image, square format.',
     caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
     cta: 'Which one is your child? 👇',
-    hashtags: '#parentingmemes #toddlerdinner #relatablehumor #momsofindia #pickyeater #funlearningwithpalak #toddlermom',
+    hashtags: '#parentingmemes #toddlerdinner #relatablehumor #momsofindia #pickyeater',
     comments: [
       'Tag the parent whose child is ALL THREE some nights 😂',
       'My son is 100% Rio energy at every meal 😩',
@@ -4846,7 +4924,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Bold simple animation-style reel, soft 3D Pixar style, cream background, vertical 9:16. Yellow and blue circles appear in sequence: 🟡🔵🟡🔵. Then a large question mark where the next circle should go. Ria taps her chin, thinking. Yellow circle slides into place, Ria claps, Cuty hops happily. No glasses.',
     caption: 'Can your child guess what comes next? 🟡🔵🟡🔵❓ A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
     cta: 'Did your child guess it before the reveal? 😄',
-    hashtags: '#patternrecognition #preschoolmath #earlylearning #toddlerbrain #funlearningwithpalak #kidsactivities #momsofinstagram',
+    hashtags: '#patternrecognition #preschoolmath #earlylearning #toddlerbrain #funlearningwithpalak',
     comments: [
       'Guess before you scroll — what comes next? 👇',
       'Got it right away, yellow obviously! 🟡',
@@ -4875,7 +4953,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, small icon representing the bucket theme (puzzle piece / speech bubble / house / laughing face / checklist), Ria, Rio, or Cuty featured lightly in the corner depending on tile, clean minimal design, square format.',
     caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
     cta: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
-    hashtags: '#newcontent #parentingcommunity #preschoollearning #funlearningwithpalak #momsofinstagram #instagramgrowth',
+    hashtags: '#newcontent #parentingcommunity #preschoollearning #funlearningwithpalak #momsofinstagram',
     comments: [
       'Tell us honestly — which one should we make more of? 👇',
       'Loved the puzzles the most, more of those please!',
@@ -4904,7 +4982,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) appear across all slides with Cuty the white bunny (pink bow). Each slide shows split view: left side "official" mission prop, right side "at-home swap" using household items. Slide 1: broomstick between chairs + dupatta line. Slide 2: wooden spoon mic + steel plates. Slide 3: paper/slate + kitchen chalk. Slide 4: sunglasses/binoculars + cupped hands. Slide 5: laundry basket + dupatta rope. Slide 6: tiffin box with toys. Slide 7: tiffin, water bottle, toothbrush. Warm, practical, encouraging mood.',
     caption: 'Promised, delivered! 🏠 Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Save this — now you have zero excuses to skip a mission! 📌',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Using my dupatta for the rescue mission right now 😂',
       'This removes literally every excuse, thank you!',
@@ -4962,7 +5040,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) in a home hallway/living room. Scene: Rio jumping over a pillow "hurdle" made from cushions, Ria walking a taped line on floor, Cuty the white bunny (pink bow) cheering from the side. Bright morning light, energetic movement captured in soft 3D Pixar render style.',
     caption: 'Mission 1: Race Track! 🏁 Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Tag us trying this mission! 🏁',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #grossmotorskills',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'My toddler LOVED the pillow hurdle! 😂',
       'We used couch cushions and it was perfect!',
@@ -4991,7 +5069,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) singing into a wooden spoon microphone, Rio (brown eyes, warm skin tone, no glasses) clapping and dancing, Cuty the white bunny (pink bow) tapping a steel plate like a drum. Kitchen utensils as instruments visible. Joyful musical chaos, warm family energy.',
     caption: 'Mission 2: Concert! 🎤 Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! 🎤 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Show us your concert! 🎤',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #musiceducation',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Wooden spoon mic is iconic now! 😂🎤',
       'My daughter performed a 20-minute concert for us!',
@@ -5020,7 +5098,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) drawing a big yellow sun on paper, Rio (brown eyes, warm skin tone, no glasses) writing his name on a slate with chalk, Cuty the white bunny (pink bow) watching curiously. Kitchen chalk drawing on floor visible. Cozy creative atmosphere, warm light.',
     caption: 'Mission 3: Art Studio! 🎨 Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! 🎨 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Share your child\'s masterpiece! 🎨',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #fineartforkids',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Kitchen chalk on the floor = genius and washable!',
       'Slate writing practice is such a classic for a reason.',
@@ -5049,7 +5127,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) looking through cardboard tube binoculars, Rio (brown eyes, warm skin tone, no glasses) with cupped hands around eyes, Cuty the white bunny (pink bow) with a magnifying glass. A "clue" (toy footprint) on floor. Playful mystery mood.',
     caption: 'Mission 4: Detective! 🕵️ Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Did your detective solve it? 🕵️',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #criticalthinking',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Cardboard tube binoculars = best DIY ever!',
       'My son found the "clue" in 3 seconds flat 😂',
@@ -5078,7 +5156,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) pushing a laundry basket with toys inside, Rio (brown eyes, warm skin tone, no glasses) pulling a dupatta rope attached to the basket, Cuty the white bunny (pink bow) riding in the basket. Heavy work play, teamwork energy, warm home setting.',
     caption: 'Mission 5: Rescue Team! 🧸 Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? 🧸 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Teamwork tip from your house? 🧸',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #heavywork #proprioception',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Laundry basket rescue is our go-to now!',
       'My kids fight over who gets to pull the rope 😂',
@@ -5107,7 +5185,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) opening a tiffin box to find a small toy, Rio (brown eyes, warm skin tone, no glasses) closing the box carefully, Cuty the white bunny (pink bow) being tucked into a blanket nearby. Cozy bedtime transition energy.',
     caption: 'Mission 6: Treasure Box! 🎁 Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? 🎁 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'What treasure did you hide? 🎁',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #finemotor #objectpermanence',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Tiffin box treasure hunt is brilliant!',
       'My daughter tucks Cuty in every night now 😍',
@@ -5136,7 +5214,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) eating apple slices from her tiffin, Rio (brown eyes, warm skin tone, no glasses) drinking from his water bottle, both brushing teeth side by side, Cuty the white bunny (pink bow) watching from the counter. Cozy bathroom/kitchen routine atmosphere.',
     caption: 'Mission 7: Daily Care! 🍎 Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
     cta: 'Which routine is hardest at your house? 🍎',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #2yearoldactivities #3yearoldactivities #selfcare #routinesforkids',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'Tiffin for snacks = independence unlocked!',
       'Brushing together makes it way easier.',
@@ -5165,7 +5243,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Fast-cut vertical 9:16 reel montage, Soft 3D Pixar/Disney-style render, cream background. Quick 1-2 second shots: 1) Ria/Rio jumping pillow hurdle (Race Track) 2) Ria singing into spoon, Rio on plate drums (Concert) 3) Ria drawing sun, Rio on slate (Art Studio) 4) Ria with binoculars, Rio cupped hands (Detective) 5) Pushing laundry basket, pulling rope (Rescue) 6) Opening tiffin box, finding toy (Treasure) 7) Eating fruit, drinking water, brushing (Daily Care). Final frame: All 7 mission icons in a grid, "We Did It!" celebration with Ria, Rio, Cuty. Upbeat, energetic, no glasses on children.',
     caption: '7 screen-free missions, 60 seconds, zero shopping required 🏠✨ Follow along as we play through all of them with Ria & Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
     cta: 'Follow for a new mission every day this week! 🏠',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak #indianmoms #ahmedabadmoms #earlylearning',
+    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
     comments: [
       'This makes screen-free time actually look doable!',
       'Following now, need this mission list saved!',
@@ -5194,7 +5272,7 @@ final kDay14Posts = <QuickIdea>[
     imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, square carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses), Rio (brown eyes, warm skin tone, no glasses), Cuty (white bunny, pink bow) across all slides. Celebratory confetti/trophy theme. Slide 1: "WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉" with trophy. Slides 2-8: Each mission with one-line learning note. Slide 9: "What\'s next? Tell us below!" with Ria, Rio, Cuty excited for new adventures.',
     caption: 'A full week of screen-free missions, complete! 🎉 From racing to detective work to bedtime routines, Ria & Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
     cta: 'Which mission will you repeat this week? Comment below! 🎉',
-    hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome #milestone',
+    hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome',
     comments: [
       'This was such a fun week to follow along with!',
       'Please do a kitchen-themed mission series next!',

@@ -33,7 +33,52 @@ void main() {
       }
     });
 
-    test('Safety hooks: all maintain keepMoralOffScreen = false', () {
+    test('kDefaultHooks: defaultCast has at most 3 characters', () {
+      for (final h in kDefaultHooks) {
+        expect(h.defaultCast.length, lessThanOrEqualTo(3),
+            reason: '${h.id} has more than 3 cast members: ${h.defaultCast}');
+      }
+    });
+
+    test('kDefaultHooks: caption hashtag count is exactly 5 when non-empty', () {
+      for (final h in kDefaultHooks) {
+        if (h.caption.isNotEmpty) {
+          final hashtags = RegExp(r'#\w+').allMatches(h.caption).toList();
+          expect(hashtags.length, 5,
+              reason: '${h.id} caption has ${hashtags.length} hashtags instead of 5');
+        }
+      }
+    });
+
+    test('kDefaultHooks: pinnedComment is non-empty', () {
+      for (final h in kDefaultHooks) {
+        expect(h.pinnedComment, isNotEmpty, reason: '${h.id} has empty pinnedComment');
+      }
+    });
+
+    test('kDefaultHooks: readyPrompt with content contains Part 3', () {
+      for (final h in kDefaultHooks) {
+        if (h.readyPrompt.isNotEmpty) {
+          expect(h.readyPrompt, contains('Part 3'),
+              reason: '${h.id} readyPrompt missing Part 3 (20-30s)');
+        }
+      }
+    });
+
+    test('QuickIdea: all hashtags fields have exactly 5 hashtags', () {
+      int checked = 0;
+      for (final q in kDay14Posts) {
+        final tags = q.hashtags.split(' ').where((t) => t.isNotEmpty).toList();
+        if (tags.isNotEmpty) {
+          expect(tags.length, 5,
+              reason: '${q.title} has ${tags.length} hashtags instead of 5');
+          checked++;
+        }
+      }
+      expect(checked, greaterThan(0), reason: 'No QuickIdea hashtags were checked');
+    });
+
+    test("Safety hooks: all maintain keepMoralOffScreen = false", () {
       for (final h in kSafetyHooks) {
         expect(h.keepMoralOffScreen, isFalse,
             reason: '${h.id} in kSafetyHooks must keep moral visible');
