@@ -606,7 +606,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria corrects the shoe, puts both on right
 
 Audio/Dialogue (Hinglish): Ria determined: "Main khud!" Mumma gentle: "Ek baar phir try karogi?" Ria happy: "Ho gaya! Main khud pehen li!" Mumma proud: "Shabash beta!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria puts on both shoes correctly, stands up proud. Mumma gives a quick hug. "Chalo, chalte hain." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.
 
 ''',
   ),
@@ -658,7 +658,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Next day: Mumma sets a visual timer on th
 
 Audio/Dialogue (Hinglish): Ria wailing: "Nahi nahi! Wapas chahiye!" Mumma gentle: "Beta, yeh episode kal bhi chalega." Ria still sniffling: "Par aaj nahi!" Mumma: "Theek hai, 2 minute warning se hi shuru karein ge." Next day — timer dings: Ria happy: "Bye-bye cartoon!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A two-minute warning before the agreed stopping point helps Ria choose a calm goodbye. A timer can support the transition but does not guarantee zero tears.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria blows a kiss at the phone, then lets the screen go dark. Mumma: "Timer pehle lagayenge kal." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A two-minute warning before the agreed stopping point helps Ria choose a calm goodbye. A timer can support the transition but does not guarantee zero tears.
 
 ''',
   ),
@@ -712,7 +712,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio tries wider base, wobbles, adjusts, a
 
 Audio/Dialogue (Hinglish): Rio frustrated: "Mujhse nahi hoga!" Ria calm: "Ek idea try karein? Neeche ke blocks thode phailao." Rio trying: "Hmm... base bada karo." Rio proud: "Khada hai!" Ria: "Tune khud kiya!" Cuty hops: *boop*
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria tries once more, succeeds, and beams. Ho gaya. Mumma: Shabash beta. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.
+Part 3 (20-30s): 3D Pixar style, 9:16. Rio places the final block on his steady tower. Ria gives a small nod. Cuty hops over nearby, watching — the tower still stands. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.
 
 ''',
   ),
@@ -766,7 +766,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. They find Cuty under couch, whisper "Shhh
 
 Audio/Dialogue (Hinglish): Ria urgent: "Cuty kahan gaya?!" Rio distracted: "Arre, mera blue car!" Ria firm: "Ruko, ek area saaf karte hain!" Both whisper: "Shhh, Cuty so raha hai!" Ria happy: "Room saaf, Cuty mil gaya!" Cuty hops: *boop*
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.
+Part 3 (20-30s): 3D Pixar style, 9:16. They finish tidying together. Cuty wakes up, hops over, and nudges a block into the bin — helping too! Room clean, Cuty found. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.
 
 ''',
   ),
@@ -820,7 +820,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Next night: Mumma pre-places cup, blanket
 
 Audio/Dialogue (Hinglish): Ria sleepy: "Mumma, ek aur paani!" Mumma gentle: "Lo beta, ab so jao." Ria: "Teddy ko blanket." Mumma: "Haan, le lo." Ria: "Ek aur story?" Mumma: "Kal sunein, ab so jao." Ria: "Goodnight, Mumma." Mumma: "Goodnight, beta."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit without being asked. Mumma smiles - routine se free ho jaati hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Predictable routines, preparation, affection, and consistent boundaries make bedtime calmer. Preparation helps, but it does not guarantee zero requests or tears.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria sips water, tucks Teddy, gets her goodnight hug. "Goodnight, Mumma." She settles. Mumma kisses her forehead. "Goodnight, beta." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Predictable routines, preparation, affection, and consistent boundaries make bedtime calmer. Preparation helps, but it does not guarantee zero requests or tears.
 
 ''',
   ),
@@ -913,7 +913,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria gets child brush with pea-sized fluor
 
 Audio/Dialogue (Hinglish): Mumma gentle: "Brush time, Ria!" Ria: "Nahi!" Mumma calm: "Theek hai, pehle Cuty ke daant saaf karte hain." Mumma narrating: "Upar, neeche, peeche — dhire dhire." Ria curious: "Mere daant bhi?" Mumma: "Dhire dhire, upar neeche." Ria: "Ho gaya!" Mumma: "Shining smile!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria spits, rinses, smiles at the mirror. Mumma wipes her chin. "Shining smile!" Cuty sits proudly on the counter. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.
 
     ''',
   ),
@@ -967,7 +967,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria looks at piece, touches, smells, mayb
 
 Audio/Dialogue (Hinglish): Ria firm: "Nahi chahiye!" Papa natural: "Crunchy hai, thoda kadwa." Papa gentle: "Chaho toh try karo, warna rehne do." Ria curious: *sniffs, touches* Papa calm: "Theek hai, kal phir try karenge." Both eat together.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria takes a big breath, counts to 3, and relaxes. Jab bhi pareshan, saanson se shuru karo. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria puts the piece back or takes a tiny taste. Either way, Papa stays calm. "Kal phir try karenge." They continue eating together. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.
 
     ''',
   ),
@@ -1021,7 +1021,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio fixes left shoe, hesitates on right. 
 
 Audio/Dialogue (Hinglish): Rio excited: "Park jana hai!" Ria gentle: "Rio, check karein, sahi pair hai?" Rio trying: "Hmm..." Mumma calm: "Toe kis taraf? Bas seedha karo." Rio proud: "Ho gaya!" Ria: "Partner ban gayi!" Both run: "Chalo, park!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria counts to 10 with Mumma, then gets what she asked for. Thoda intezaar se sab milta hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Patience, checking, and helping without taking over. Let the child try first; offer a small hint only if needed.
+Part 3 (20-30s): 3D Pixar style, 9:16. Rio fixes both shoes, stands tall. Ria high-fives: "Partner ban gayi!" They run to the park together. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Patience, checking, and helping without taking over. Let the child try first; offer a small hint only if needed.
 
     ''',
   ),
@@ -1080,7 +1080,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mumma: "Do minute, same rule for all." Ri
 
 Audio/Dialogue (Hinglish): Mumma calm: "Chalo, ghar chalna hai." Ria firm: "Mere saath 5 minute, phir Rio karega!" Rio dramatic: "Ek aur slide, ek aur!" Mumma gentle: "Do minute, timer laga lo." Ria happy: "Main timer set karungi!" Rio: "Goodbye song — Happy Birthday!" Mumma lifts Cuty: "Tera quiet corner yahan hai." Cuty sleepy: "Hmm..." All transition. Mumma to camera: "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Next day, Ria sets the timer herself: 2 minute, phir bye-bye. No tears, no fuss. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give all children the same clear, fair transition boundary. Adapt your support to each child\'s personality — negotiate timing for the negotiator, offer a choice for the protester, and provide a calm corner for the quiet one. A timer can help but does not guarantee instant calm.
+Part 3 (20-30s): 3D Pixar style, 9:16. Timer dings, goodbye song ends, Cuty yawns in Mumma's arms. "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?" Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give all children the same clear, fair transition boundary. Adapt your support to each child's personality — a timer helps but does not guarantee instant calm.
 
 ''',
   ),
@@ -1143,7 +1143,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio waddles in wrong shoes. Ria: "Butterf
 
 Audio/Dialogue (Hinglish): Ria firm: "Nahi!" Rio: "Blue spoon hi chahiye!" Cuty: "Mumma!" *giggle drop* Rio penguin walk. Ria: "Mumma, butterfly taste with their feet!" Mumma tired: "Haan beta, sahi hai." All asleep: "The chaos is the childhood."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: These tiny, universal behaviors are the funny, exhausting, and heartwarming signs of childhood — not problems to fix.
+Part 3 (20-30s): 3D Pixar style, 9:16. Montage ends with all three kids asleep in a pile. Text: "7 things. 1 childhood. 💛" Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: These tiny, universal behaviors are the funny, exhausting, and heartwarming signs of childhood — not problems to fix.
 
 ''',
   ),
@@ -1197,7 +1197,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mom gives Ria a story. Mom gives Rio a co
 
 Audio/Dialogue (Hinglish): Mom firm: "Chocolate nahi beta." Ria pleading: "Bas ek piece, I promise!" Rio melodramatic: "NO! Main nahi khana!" Cuty quietly: "Carrot khaa sakti hoon." Mom to Ria: "Ab kahani." Mom to Rio: "Ek, do, teen... gale laga lo!" Mom to Cuty: "Carrot bhi tasty hai!" Cuty: "Haan!" All settle.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One consistent boundary, three tailored responses. Meet each child where they are without changing the rule.
+Part 3 (20-30s): 3D Pixar style, 9:16. Mumma gives Ria a story, Rio a countdown hug, Cuty a gentle pat. All three settle. Boundary intact, feelings met. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One consistent boundary, three tailored responses. Meet each child where they are without changing the rule.
 
 ''',
   ),
@@ -1286,7 +1286,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria's eyelids grow heavy, she pats the pi
 
 Audio/Dialogue (Hinglish): Ria dramatically: "Maa, mujhe neend nahi!" Mumma smiling: "Ek aur page?" Ria sleepy: "Thoda aur?" Mumma whispering: "Jaane do beta, kal subah nayi kahani."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit without being asked. Mumma smiles - routine se free ho jaati hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bedtime protest is normal — it can be a way of staying close. Validate the feeling, keep the routine warm and firm, and trust that sleep will come. Do not promise the protest will stop or that sleep will be instant.
+Part 3 (20-30s): 3D Pixar style, 9:16. Mumma tucks the blanket around Ria's shoulders, both half-asleep by page three. "Goodnight, beta." "Goodnight, Mumma." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bedtime protest is normal — it can be a way of staying close. Validate the feeling, keep the routine warm and firm, and trust that sleep will come. Do not promise the protest will stop or that sleep will be instant.
 
 ''',
   ),
@@ -1340,7 +1340,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Next morning: Ria checks off sock ✅ shi
 
 Audio/Dialogue (Hinglish): Ria: "Mumma, maine hi gira diya!" Mumma: "Chalo checklist banate hain." Ria: "Sock, shirt, bottle, smile!" Next morning: Ria checks off: "Sock done! Shirt done! Bottle done! Smile done!" Mumma: "Morning sorted!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A visual morning checklist made together turns chaos into teamwork. Kids remember what they help create.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria checks off "smile" last, beams. "Checklist complete!" Rio high-fives. Morning sorted. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A visual morning checklist made together turns chaos into teamwork. Kids remember what they help create.
 
 ''',
   ),
@@ -1394,7 +1394,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria picks no-bow, helps Cuty with shoe. "
 
 Audio/Dialogue (Hinglish): Ria: "Ready Captain!" *changes clip* Rio: "Time khatam!" Ria sees Cuty struggle. Ria: "Team complete!" Helps Cuty. "Jab tak sabke saath, tab tak team complete." All walk out.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Being ready first does not mean leaving the team behind. True readiness means helping others get ready too.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria picks no-bow, helps Cuty with his shoe. "Team complete!" All three walk out together, on time. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Being ready first does not mean leaving the team behind. True readiness means helping others get ready too.
 
 ''',
   ),
@@ -1448,7 +1448,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Finds apple piece near Cuty's paws. Ria: 
 
 Audio/Dialogue (Hinglish): Ria urgent: "Mumma, koi ne apple kha liye! Rio!" Mumma calm: "Check karte hain." Rio's hands clean. Finds peels: "Cuty ke paas piece!" Ria giggles: "Oh! Cuty ke paas mila!" Rio grins: "Maine nahi khaya."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Check the evidence before blaming someone. The real answer is often right in front of you — look first, accuse later.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria picks up the apple piece near Cuty, puts it on the plate. "Cuty ke paas mila!" Rio grins: "Maine nahi khaya." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Check the evidence before blaming someone. The real answer is often right in front of you — look first, accuse later.
 
 ''',
   ),
@@ -1538,7 +1538,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria whispers: "Mumma ne kaha tha!" Mumma 
 
 Audio/Dialogue (Hinglish): Mumma: "Aaj jaldi sona hai." Ria to Teddy: "Teddy, negotiation band — ab so jao!" Mumma at door: *smiles* Ria whispers: "Mumma ne kaha tha!" Mumma hugs: "Haan beta, maine hi kaha tha. Kal se behtar words."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Small phrases stick; what we say becomes their inner voice. Speak the words you want them to repeat.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria whispers "Mumma ne kaha tha!" and Mumma gives her a quiet, warm hug. "Haan beta, maine hi kaha tha. Kal se behtar words choose karungi." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Small phrases stick; what we say becomes their inner voice. Speak the words you want them to repeat.
 
 ''',
   ),
@@ -1593,7 +1593,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. At checkout: Ria puts mangoes, Rio lifts 
 
 Audio/Dialogue (Hinglish): Mumma: "Ria, pick yellow fruit. Rio, cereal box. Cuty, hold list clip." Ria: "Mangoes!" Rio: "Big box!" Cuty: "Main rakwala!" At checkout: Ria: "Hamari team badhi achhi hai!" All laugh.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give each child an age-appropriate job. They may misunderstand, but the teamwork and inclusion matter more than perfect execution. Safety comes first — no riding on cart handles.
+Part 3 (20-30s): 3D Pixar style, 9:16. They laugh: "Hamari shopping team badi achhi hai!" Ria puts mangoes on belt, Rio lifts box, Cuty waves receipt from the basket. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give each child an age-appropriate job. They may misunderstand, but the teamwork and inclusion matter more than perfect execution. Safety comes first — no riding on cart handles.
 
 ''',
   ),
@@ -1683,7 +1683,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Both secured — Ria in car seat with har
 
 Audio/Dialogue (Hinglish): Ria: "Car bhi ghar chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Ria: "Lock hai!" Rio: "Donon safe!" All safe, ready for road trip.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria snuggles with her book. Time to rest, dreams to grow. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Safety first: real seatbelts for children in appropriate car seats. Toys travel safely in a travel bag or pouch — never use a backpack as a car restraint, even for a toy.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria buckled in car seat, toy car secure in travel pouch. Rio: "Donon safe!" Both ride along safely. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Safety first: real seatbelts for children in appropriate car seats. Toys travel safely in a travel bag or pouch — never use a backpack as a car restraint, even for a toy.
 
 ''',
   ),
@@ -1737,7 +1737,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. They make new drawing together: "Nayi shu
 
 Audio/Dialogue (Hinglish): Ria sobbing: "MERI drawing phaa gaya!" Mumma gentle: "Bada dukh hua na? Yeh drawing tumne pyaar se banayi thi." Ria nods. Mumma: "Chalo, nayi shuruaat karte hain." Together drawing: "Nayi shuruaat!" Ria giggles.
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the feeling first. A torn drawing is a big feeling to a child. Comfort first, then repair together. Do not dismiss the loss or expect instant happiness.
+Part 3 (20-30s): 3D Pixar style, 9:16. They make a new drawing together — "Nayi shuruaat!" — Ria's tears turn to giggles as they draw. The new drawing has a heart drawn by Mumma. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the feeling first. A torn drawing is a big feeling to a child. Comfort first, then repair together. Do not dismiss the loss or expect instant happiness.
 
 ''',
   ),
@@ -1791,7 +1791,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Rio completes tower, timer dings, puts on
 
 Audio/Dialogue (Hinglish): Papa: "Tower complete, phir shoes." Rio: "Ab do aur do!" Papa: "Tower complete hua, ab shoes. Timer do minute." Rio: "Theek hai!" Timer dings. Rio puts shoes on. "Fair deal done!" High-five!
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One clear, fair transition turns "more" into "done" — without food as a reward or screens as bribes.
+Part 3 (20-30s): 3D Pixar style, 9:16. Timer dings. Rio puts on shoes. High-five! "Fair deal done!" Sab khush, door ke bahar. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One clear, fair transition turns "more" into "done" — without food as a reward or screens as bribes.
 
 ''',
   ),
@@ -1845,7 +1845,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mumma sets simple turns: one minute each.
 
 Audio/Dialogue (Hinglish): Rio: "No! Mine! Why!" Ria: "Why!" Mumma: "Gussa hai Rio? Theek hai." Rio: "Haan." Mumma: "Ek minute Ria, ek minute Rio — ginti karke." Rio: "Theek hai!" Turns taken. "Fair!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the emotion behind the words. Set a clear boundary on behavior. Offer a simple, age-appropriate turn-taking approach. No mocking, no broken-record mimicry.
+Part 3 (20-30s): 3D Pixar style, 9:16. Turns work. One minute each. Cuty gets a turn too. "Dono ko mila, ginti se!" Fair play wins. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Validate the emotion behind the words. Set a clear boundary on behavior. Offer a simple, age-appropriate turn-taking approach. No mocking, no broken-record mimicry.
 
 ''',
   ),
@@ -1899,7 +1899,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mumma applies colorful bandaid. Cuty sits
 
 Audio/Dialogue (Hinglish): Ria: "Ouch, bada dukh raha hai!" Mumma calm: "Pehle saaf karte hain, phir bandaid." Ria: "Cuty, tujhe pata hai?" Cuty: *nudges tissue* Mumma: "Good job, Cuty! No licking!" Ria: "Shukriya Mumma, shukriya Cuty!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria and Rio join Daadi in the quiet corner, clapping to a softer beat. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Appropriate first aid for the injury, quiet presence from a companion. Cuty never licks or touches wound-care items. Comfort without lectures.
+Part 3 (20-30s): 3D Pixar style, 9:16. They wrap the knee together with a colorful bandaid. Cuty sits proudly beside the finished job. "Good job, Cuty!" Ria smiles. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Appropriate first aid for the injury, quiet presence from a companion. Cuty never licks or touches wound-care items. Comfort without lectures.
 
 ''',
   ),
@@ -1953,7 +1953,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Finds Ria\'s striped sock in Rio\'s shoe.
 
 Audio/Dialogue (Hinglish): Ria: "Meri striped sock kahaan hai?" Mumma: "Rio, yeh Ria ka bow — baalon ke liye, haath ke liye nahi!" Rio: "Haan, mazaak tha!" Finds sock: "Meri sock yahan thi!" Mumma: "Bow baalon ke liye, sock pairon ke liye!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Morning mix-ups happen. Keep personal items separate. Find the right item for the right person — no sharing socks, bows, or other personal items!
+Part 3 (20-30s): 3D Pixar style, 9:16. Bow back in Ria's hair. Sock on Ria's foot. Everyone laughs. "Apna apna, alag alag!" Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Morning mix-ups happen. Keep personal items separate. Find the right item for the right person — no sharing socks, bows, or other personal items!
 
 ''',
   ),
@@ -2007,7 +2007,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Mumma smiles: "Main itna bolti hoon?" Rio
 
 Audio/Dialogue (Hinglish): Mumma rushing: "Joote pehno! Daudo mat! Bottle kahan hai?" Rio echo: "Joote pehno! Daudo mat! Bottle kahan hai!" Mumma smiling: "Main itna bolti hoon?" Rio: "Haan, roz!" Mumma: "Theek hai, kam bolo, zyada karo." Rio puts shoes on: "Main toh sirf practice kar raha tha!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Children echo what they hear. Mimicry is learning. Respond with warmth, not reprimand. Show them the words you want them to keep.
+Part 3 (20-30s): 3D Pixar style, 9:16. Rio puts shoes on correctly, grins: "Main toh sirf practice kar raha tha!" Mumma laughs: "Achha practice!" Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Children echo what they hear. Mimicry is learning. Respond with warmth, not reprimand. Show them the words you want them to keep.
 
 ''',
   ),
@@ -2061,7 +2061,7 @@ Part 2 (10-20s): 3D Pixar style, 9:16. Ria puts bag on hook. They sit — tea fo
 
 Audio/Dialogue (Hinglish): Mumma tired: "Thak gayi..." Ria gentle: "Mumma, tum thak gayi ho." Mumma: "Beta, main saambhaal lungi." Ria: "Tum bahut thak gayi ho. Main rakh deti hoon." Both sit: "Shukriya beta." "Tumhara saath hi toh maza aata hai."
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A small gesture needs no speech; noticing is already love in action. A preschooler can offer emotional support without lifting heavy items.
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria puts bag on hook. They sit together — tea for Mumma, drawing for Ria. Quiet togetherness. "Shukriya beta." "Tumhara saath hi toh maza aata hai." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A small gesture needs no speech; noticing is already love in action. A preschooler can offer emotional support without lifting heavy items.
 
     ''',
 
@@ -2436,7 +2436,7 @@ Part 2 (10-20s): 3D Pixar style, 9:19. Both walk slowly, hand in hand, red car w
 
 Audio/Dialogue (Hinglish): Rio urgent: "Rio, meri ungli pakho!" Mumma hesitant: "Par thoda maza aa raha tha..." Rio: "Ruk jao beta, ek second." Rio reassuring: "Main tumhe saaf pakad hoon gi." Mumma: "Haan, chalo... saath milkar." Both crossing: "Ek dusre ki ungli pakad ke chal rahe hain!"
 
-Part 3 (20-30s): 3D Pixar style, 9:16. Ria does the habit naturally now. Mumma laughs: Dekho ke phir khud hi hota hai. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Kya nahi karna, nahi — kya karna hai, woh batao
+Part 3 (20-30s): 3D Pixar style, 9:16. Both cross the road together, hand in hand. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Kya nahi karna, nahi — kya karna hai, woh batao
 
     ''',
   ),

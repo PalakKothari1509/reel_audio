@@ -401,12 +401,12 @@ class GeminiVideoResult {
           ));
         }
         partNumber = 1;
-        currentPart = '';
+        currentPart = _partHeaderContent(trimmed, 1);
         currentPurpose = 'Hook & Problem';
       } else if (_isPartHeader(trimmed, 2)) {
-        if (partNumber == 1 && currentPart.trim().isNotEmpty) {
+        if (partNumber > 0 && currentPart.trim().isNotEmpty) {
           parts.add(VideoPartPrompt(
-            partNumber: 1,
+            partNumber: partNumber,
             totalParts: 3,
             promptText: currentPart.trim(),
             purpose: currentPurpose,
@@ -414,12 +414,12 @@ class GeminiVideoResult {
           ));
         }
         partNumber = 2;
-        currentPart = '';
+        currentPart = _partHeaderContent(trimmed, 2);
         currentPurpose = 'Twist & Escalation';
       } else if (_isPartHeader(trimmed, 3)) {
-        if (partNumber == 2 && currentPart.trim().isNotEmpty) {
+        if (partNumber > 0 && currentPart.trim().isNotEmpty) {
           parts.add(VideoPartPrompt(
-            partNumber: 2,
+            partNumber: partNumber,
             totalParts: 3,
             promptText: currentPart.trim(),
             purpose: currentPurpose,
@@ -427,7 +427,7 @@ class GeminiVideoResult {
           ));
         }
         partNumber = 3;
-        currentPart = '';
+        currentPart = _partHeaderContent(trimmed, 3);
         currentPurpose = 'Resolution & Moral';
       } else if (trimmed.startsWith('On-Screen Text:') ||
           trimmed.startsWith('Audio/Dialogue')) {
@@ -451,7 +451,7 @@ class GeminiVideoResult {
     }
 
     // If we didn't find structured parts, wrap the whole prompt
-    if (parts.isEmpty && foundation.isNotEmpty) {
+    if (parts.isEmpty) {
       parts.add(VideoPartPrompt(
         partNumber: 1,
         totalParts: 1,
@@ -470,9 +470,18 @@ class GeminiVideoResult {
 
   static bool _isPartHeader(String line, int part) {
     final p = part.toString();
-    return line.contains('Part $p') ||
-        line.contains('### Part $p') ||
-        line.contains('Part $p (');
+    final regex = RegExp(
+        r'^(?:###\s*)?Part\s+' + p + r'(?:\s*\([^)]*\))?\s*:',
+        caseSensitive: false);
+    return regex.hasMatch(line);
+  }
+
+  static String _partHeaderContent(String line, int part) {
+    final regex = RegExp(
+        r'^(?:###\s*)?Part\s+' + part.toString() + r'(?:\s*\([^)]*\))?\s*:?\s*(.*)',
+        caseSensitive: false);
+    final match = regex.firstMatch(line);
+    return match?.group(1)?.trim() ?? '';
   }
 }
 

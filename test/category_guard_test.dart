@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:reel_audio/content_ideas.dart';
+import 'package:reel_audio/content_studio_service.dart';
 
 void main() {
   group('Category guards', () {
@@ -63,6 +64,129 @@ void main() {
               reason: '${h.id} readyPrompt missing Part 3 (20-30s)');
         }
       }
+    });
+
+    test('parseReadyPrompt: all 26 prompts produce 3 valid parts with intact Part 3', () {
+      final hooks = [
+        for (final h in [...kSafetyHooks, ...kDefaultHooks])
+          if (h.readyPrompt.isNotEmpty) h,
+      ];
+      expect(hooks.length, 26,
+          reason: 'Expected exactly 26 populated readyPrompt entries');
+
+      for (final h in hooks) {
+        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        expect(result.parts.length, 3,
+            reason: '${h.id}: expected 3 parts, got ${result.parts.length}');
+
+        for (final p in result.parts) {
+          expect(p.promptText.trim(), isNotEmpty,
+              reason: '${h.id}: Part ${p.partNumber} promptText is empty');
+          expect(p.fullPrompt.trim(), isNotEmpty,
+              reason: '${h.id}: Part ${p.partNumber} fullPrompt is empty');
+        }
+
+        final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+        expect(p3.promptText, contains('Moral:'),
+            reason: '${h.id}: Part 3 missing Moral');
+        expect(p3.promptText, contains('Final text overlay'),
+            reason: '${h.id}: Part 3 missing Final text overlay');
+        expect(p3.promptText, isNot(contains('\\')),
+            reason: '${h.id}: Part 3 contains backslash artifact');
+
+        expect(p3.purpose, contains('Resolut'),
+            reason: '${h.id}: Part 3 purpose not "Resolution & Moral"');
+      }
+    });
+
+    test('parseReadyPrompt: repaired hooks retain apostrophes and quotes in Part 3', () {
+      final checks = <String, List<String>>{
+        'pal01': ["Cuty yawns in Mumma's arms. \"Ria, Rio ya Cuty"],
+        'pal05': ["around Ria's shoulders, both half-asleep by page three"],
+        'pal14': ["Ria's tears turn to giggles as they draw"],
+        'pal18': ["Bow back in Ria's hair", "Sock on Ria's foot"],
+      };
+
+      for (final entry in checks.entries) {
+        final h = kDefaultHooks.firstWhere((e) => e.id == entry.key);
+        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+        for (final expected in entry.value) {
+          expect(p3.promptText, contains(expected),
+              reason: '${entry.key}: Part 3 missing "$expected"');
+        }
+      }
+    });
+
+    group('parseReadyPrompt header variations', () {
+      test('header with inline content', () {
+        final prompt = '''PROMPT: Foundation text
+
+Part 1 (0-10s): Inline content for part 1
+Part 2 (10-20s): Inline content for part 2
+Part 3 (20-30s): Inline "quotes" and apostrophes here
+''';
+        final result = GeminiVideoResult.parseReadyPrompt(prompt, 'Test');
+        expect(result.parts.length, 3);
+        expect(result.parts[0].promptText, contains('Inline content for part 1'));
+        expect(result.parts[1].promptText, contains('Inline content for part 2'));
+        expect(result.parts[2].promptText, contains('Inline "quotes"'));
+      });
+
+      test('header with content on subsequent lines', () {
+        final prompt = '''PROMPT: Foundation text
+
+Part 1 (0-10s):
+Content next line 1
+Part 2 (10-20s):
+Content next line 2
+Part 3 (20-30s):
+Content next line 3
+''';
+        final result = GeminiVideoResult.parseReadyPrompt(prompt, 'Test');
+        expect(result.parts.length, 3);
+        expect(result.parts[0].promptText, contains('Content next line 1'));
+        expect(result.parts[1].promptText, contains('Content next line 2'));
+        expect(result.parts[2].promptText, contains('Content next line 3'));
+      });
+
+      test('different spacing and capitalization', () {
+        final prompt = '''PROMPT: Foundation text
+
+PART 1 (0-10s): Content 1
+Part 2(10-20s): Content 2
+  part 3 (20-30s): Content 3
+''';
+        final result = GeminiVideoResult.parseReadyPrompt(prompt, 'Test');
+        expect(result.parts.length, 3);
+        expect(result.parts[0].promptText, contains('Content 1'));
+        expect(result.parts[1].promptText, contains('Content 2'));
+        expect(result.parts[2].promptText, contains('Content 3'));
+      });
+
+      test('missing Part 2 retains Part 1 and Part 3', () {
+        final prompt = '''PROMPT: Foundation
+
+Part 1 (0-10s): Content 1
+Part 3 (20-30s): Content 3
+''';
+        final result = GeminiVideoResult.parseReadyPrompt(prompt, 'Test');
+        expect(result.parts.length, 2);
+        expect(result.parts[0].partNumber, 1);
+        expect(result.parts[1].partNumber, 3);
+      });
+
+      test('empty input falls back to single part', () {
+        final result = GeminiVideoResult.parseReadyPrompt('', 'Empty');
+        expect(result.parts.length, 1);
+        expect(result.parts[0].purpose, 'Full Prompt');
+      });
+
+      test('non-part text falls back to single part', () {
+        final result = GeminiVideoResult.parseReadyPrompt('Just text', 'Fallback');
+        expect(result.parts.length, 1);
+        expect(result.parts[0].purpose, 'Full Prompt');
+      });
     });
 
     test('QuickIdea: all hashtags fields have exactly 5 hashtags', () {
