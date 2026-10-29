@@ -16,7 +16,6 @@ import 'regenerator.dart';
 import 'slide_prompts.dart';
 import 'theme.dart';
 
-
 // A reusable comment in the promo comment vault, optionally tagged with a content bucket.
 class PromoComment {
   final String text;
@@ -44,7 +43,8 @@ class _PromoCommentFileStore extends JsonFileStore<PromoComment> {
   String idOf(PromoComment item) => item.text;
 
   @override
-  PromoComment fromJson(Map<String, dynamic> json) => PromoComment.fromJson(json);
+  PromoComment fromJson(Map<String, dynamic> json) =>
+      PromoComment.fromJson(json);
 
   @override
   Map<String, dynamic> toJson(PromoComment item) => item.toJson();
@@ -414,19 +414,21 @@ class _PromoCommentVaultScreenState extends State<PromoCommentVaultScreen> {
                                                 .bodyLarge,
                                           ),
                                         ),
-IconButton(
-  tooltip: 'Copy comment',
-  onPressed: () =>
-  _copyComment(comment.text),
-  icon: const Icon(Icons.copy_outlined),
-  ),
-  IconButton(
-  tooltip: 'Delete comment',
-  onPressed: () =>
-  _deleteComment(comment),
-  icon: const Icon(Icons.delete_outline),
-  ),
-  ],
+                                        IconButton(
+                                          tooltip: 'Copy comment',
+                                          onPressed: () =>
+                                              _copyComment(comment.text),
+                                          icon: const Icon(Icons.copy_outlined),
+                                        ),
+                                        IconButton(
+                                          tooltip: 'Delete comment',
+                                          onPressed: () =>
+                                              _deleteComment(comment),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     if (comment.bucket.isNotEmpty)
                                       Padding(
@@ -1037,32 +1039,35 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
     }
   }
 
-  void _loadFrom14DayPost(QuickIdea post) {
+  void _loadFrom14DayPost(ideas.HookIdea post) {
     _titleCtrl.text = post.title;
-    _postType = post.postType;
-    _audienceCtrl.text = post.audience;
-    _goalCtrl.text = post.contentGoal.isEmpty
-        ? 'Build connection'
-        : post.contentGoal;
-    _moodCtrl.text = post.mood;
-    _hookCtrl.text = post.hook;
-    _ideaCtrl.text = post.mainIdea;
+    _postType = post.postFormat;
+    _audienceCtrl.text = 'Parents of 3-6 year olds';
+    _goalCtrl.text = 'Build connection';
+    _moodCtrl.text = 'Relatable';
+    _hookCtrl.text = post.cover.isNotEmpty ? post.cover : post.opening;
+    _ideaCtrl.text = post.storyDetail.isNotEmpty
+        ? post.storyDetail
+        : post.problem;
     _problemCtrl.text = post.problem;
     _lessonCtrl.text = post.lesson;
-    _styleCtrl.text = post.visualStyle;
-    _ctaCtrl.text = post.cta;
-    _imagePromptCtrl.text = post.imagePrompt;
+    _styleCtrl.text = post.setting;
+    _ctaCtrl.text = 'Save this for later';
+    _imagePromptCtrl.text = post.readyPrompt;
     _captionCtrl.text = post.caption;
-    _scriptCtrl.text = post.script;
-    _hashtagsCtrl.text = post.hashtags;
-    _pinCommentCtrl.text = post.comments.isNotEmpty ? post.comments.first : '';
-    _comments = post.comments;
-    _bucketValue = post.bucket;
+    _scriptCtrl.text = post.storyDetail;
+    _hashtagsCtrl.text = RegExp(r'#\w+')
+        .allMatches(post.caption)
+        .map((match) => match.group(0)!)
+        .join(' ');
+    _pinCommentCtrl.text = post.pinnedComment;
+    _comments = post.pinnedComment.isEmpty ? [] : [post.pinnedComment];
+    _bucketValue = ideas.bucketByName(post.category)?.id ?? '';
     setState(() {});
   }
 
   Future<void> _pick14DayPost() async {
-    final chosen = await showModalBottomSheet<QuickIdea>(
+    final chosen = await showModalBottomSheet<ideas.HookIdea>(
       context: context,
       isScrollControlled: true,
       builder: (ctx) => DraggableScrollableSheet(
@@ -1081,12 +1086,12 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
               style: AppText.hint,
             ),
             Gap.m,
-            ...ideas.kDay14Posts.map(
+            ...ideas.kDay14PostIdeas.map(
               (post) => Card(
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor:
-                        ideas.bucketById(post.bucket)?.color ??
+                        ideas.bucketByName(post.category)?.color ??
                         AppColors.accent,
                     child: Text(
                       post.id.substring(4).substring(0, 1).toUpperCase(),
@@ -1102,7 +1107,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   subtitle: Text(
-                    '${post.postType} • ${ideas.bucketLabel(post.bucket)}\n${post.hook}',
+                    '${post.postFormat} • ${post.category}\n${post.opening}',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppText.hint,
@@ -2910,7 +2915,7 @@ class IdeaInboxItem {
     rawIdea: json['rawIdea'] as String,
     bucketId: json['bucketId'] as String,
     notes: json['notes'] as String,
-       status: IdeaStatus.fromLegacy(json['status'] as String),
+    status: IdeaStatus.fromLegacy(json['status'] as String),
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
@@ -2926,7 +2931,8 @@ class _IdeaInboxFileStore extends JsonFileStore<IdeaInboxItem> {
   String idOf(IdeaInboxItem item) => item.id;
 
   @override
-  IdeaInboxItem fromJson(Map<String, dynamic> json) => IdeaInboxItem.fromJson(json);
+  IdeaInboxItem fromJson(Map<String, dynamic> json) =>
+      IdeaInboxItem.fromJson(json);
 
   @override
   Map<String, dynamic> toJson(IdeaInboxItem item) => item.toJson();
@@ -3255,7 +3261,7 @@ class _IdeaInboxScreenState extends State<IdeaInboxScreen> {
     }
   }
 
-Future<void> _generateFromIdea(IdeaInboxItem item) async {
+  Future<void> _generateFromIdea(IdeaInboxItem item) async {
     final updated = item.copyWith(
       status: IdeaStatus.scripted,
       updatedAt: DateTime.now(),
@@ -3602,7 +3608,9 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
                   )
                 : const Icon(Icons.auto_awesome),
             label: Text(
-              _generating ? 'Generating...' : 'Generate ${_selectedFormat.label}',
+              _generating
+                  ? 'Generating...'
+                  : 'Generate ${_selectedFormat.label}',
             ),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -3613,9 +3621,7 @@ class _MultiFormatScreenState extends State<MultiFormatScreen> {
           if (_results.isNotEmpty || _errors.isNotEmpty) ...[
             const Text('Results', style: AppText.screenTitle),
             Gap.s,
-            ..._results.keys.map((
-              format,
-            ) {
+            ..._results.keys.map((format) {
               final pkg = _results[format];
               final err = _errors[format];
               return Card(

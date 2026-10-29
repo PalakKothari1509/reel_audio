@@ -79,19 +79,19 @@ class HookIdea {
   final String storyDetail;
 
   // NEW FIELDS for specificity & anti-AI-smell
-  final String setting;        // where/when, Indian-home specific
-  final String sceneDetail;    // one physical, imperfect detail
-  final String dialogue;       // the line somebody actually says
-  final String mess;           // what goes wrong and stays wrong
-  final String innerThought;   // what the parent thinks but doesn't say
-  final String endingBeat;     // closing image; replaces spoken moral
-  final List<String> defaultCast;   // 2–3 max, not all 7
+  final String setting; // where/when, Indian-home specific
+  final String sceneDetail; // one physical, imperfect detail
+  final String dialogue; // the line somebody actually says
+  final String mess; // what goes wrong and stays wrong
+  final String innerThought; // what the parent thinks but doesn't say
+  final String endingBeat; // closing image; replaces spoken moral
+  final List<String> defaultCast; // 2–3 max, not all 7
   final bool keepMoralOffScreen;
 
-   // Task 3: quote, detail, punchline
-  final String quote;          // exact line of dialogue for the hook
-  final String detail;         // one concrete sensory detail
-  final String punchline;      // closing image/beat (alternative to endingBeat)
+  // Task 3: quote, detail, punchline
+  final String quote; // exact line of dialogue for the hook
+  final String detail; // one concrete sensory detail
+  final String punchline; // closing image/beat (alternative to endingBeat)
 
   /// Ready-to-use 30-second viral Reel prompt (Part 1 + Part 2 + Part 3 + on-screen text).
   /// Empty when the hook does not have a pre-built viral prompt.
@@ -172,108 +172,109 @@ class HookIdea {
     int? score,
     String? band,
     String? reviewedOn,
-  }) =>
-      HookIdea(
-        id: id ?? this.id,
-        category: category ?? this.category,
-        title: title ?? this.title,
-        cover: cover ?? this.cover,
-        opening: opening ?? this.opening,
-        problem: problem ?? this.problem,
-        lesson: lesson ?? this.lesson,
-        postFormat: postFormat ?? this.postFormat,
-        strategy: strategy ?? this.strategy,
-        caption: caption ?? this.caption,
-        pinnedComment: pinnedComment ?? this.pinnedComment,
-        forApp: forApp ?? this.forApp,
-        usedOn: usedOn ?? this.usedOn,
-        custom: custom ?? this.custom,
-        archived: archived ?? this.archived,
-        storyDetail: storyDetail ?? this.storyDetail,
-        setting: setting ?? this.setting,
-        sceneDetail: sceneDetail ?? this.sceneDetail,
-        dialogue: dialogue ?? this.dialogue,
-        mess: mess ?? this.mess,
-        innerThought: innerThought ?? this.innerThought,
-        endingBeat: endingBeat ?? this.endingBeat,
-        defaultCast: defaultCast ?? this.defaultCast,
-        keepMoralOffScreen: keepMoralOffScreen ?? this.keepMoralOffScreen,
-        quote: quote ?? this.quote,
-        detail: detail ?? this.detail,
-        punchline: punchline ?? this.punchline,
-        readyPrompt: readyPrompt ?? this.readyPrompt,
-        score: score ?? this.score,
-        band: band ?? this.band,
-        reviewedOn: reviewedOn ?? this.reviewedOn,
-      );
+  }) => HookIdea(
+    id: id ?? this.id,
+    category: category ?? this.category,
+    title: title ?? this.title,
+    cover: cover ?? this.cover,
+    opening: opening ?? this.opening,
+    problem: problem ?? this.problem,
+    lesson: lesson ?? this.lesson,
+    postFormat: postFormat ?? this.postFormat,
+    strategy: strategy ?? this.strategy,
+    caption: caption ?? this.caption,
+    pinnedComment: pinnedComment ?? this.pinnedComment,
+    forApp: forApp ?? this.forApp,
+    usedOn: usedOn ?? this.usedOn,
+    custom: custom ?? this.custom,
+    archived: archived ?? this.archived,
+    storyDetail: storyDetail ?? this.storyDetail,
+    setting: setting ?? this.setting,
+    sceneDetail: sceneDetail ?? this.sceneDetail,
+    dialogue: dialogue ?? this.dialogue,
+    mess: mess ?? this.mess,
+    innerThought: innerThought ?? this.innerThought,
+    endingBeat: endingBeat ?? this.endingBeat,
+    defaultCast: defaultCast ?? this.defaultCast,
+    keepMoralOffScreen: keepMoralOffScreen ?? this.keepMoralOffScreen,
+    quote: quote ?? this.quote,
+    detail: detail ?? this.detail,
+    punchline: punchline ?? this.punchline,
+    readyPrompt: readyPrompt ?? this.readyPrompt,
+    score: score ?? this.score,
+    band: band ?? this.band,
+    reviewedOn: reviewedOn ?? this.reviewedOn,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'category': category,
-        'title': title,
-        'cover': cover,
-        'opening': opening,
-        'problem': problem,
-        'lesson': lesson,
-        'forApp': forApp,
-        'usedOn': usedOn,
-        'custom': custom,
-        'archived': archived,
-        'postFormat': postFormat,
-        'strategy': strategy,
-        'caption': caption,
-        'pinnedComment': pinnedComment,
-        'storyDetail': storyDetail,
-        'setting': setting,
-        'sceneDetail': sceneDetail,
-        'dialogue': dialogue,
-        'mess': mess,
-        'innerThought': innerThought,
-        'endingBeat': endingBeat,
-        'defaultCast': defaultCast,
-        'keepMoralOffScreen': keepMoralOffScreen,
-        'quote': quote,
-        'detail': detail,
-        'punchline': punchline,
-        'readyPrompt': readyPrompt,
-        'score': score,
-        'band': band,
-        'reviewedOn': reviewedOn,
-      };
+    'id': id,
+    'category': category,
+    'title': title,
+    'cover': cover,
+    'opening': opening,
+    'problem': problem,
+    'lesson': lesson,
+    'forApp': forApp,
+    'usedOn': usedOn,
+    'custom': custom,
+    'archived': archived,
+    'postFormat': postFormat,
+    'strategy': strategy,
+    'caption': caption,
+    'pinnedComment': pinnedComment,
+    'storyDetail': storyDetail,
+    'setting': setting,
+    'sceneDetail': sceneDetail,
+    'dialogue': dialogue,
+    'mess': mess,
+    'innerThought': innerThought,
+    'endingBeat': endingBeat,
+    'defaultCast': defaultCast,
+    'keepMoralOffScreen': keepMoralOffScreen,
+    'quote': quote,
+    'detail': detail,
+    'punchline': punchline,
+    'readyPrompt': readyPrompt,
+    'score': score,
+    'band': band,
+    'reviewedOn': reviewedOn,
+  };
 
-factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
-        id: j['id'] as String? ?? '',
-        category: j['category'] as String? ?? 'Relatable',
-        title: j['title'] as String? ?? '',
-        cover: j['cover'] as String? ?? '',
-        opening: j['opening'] as String? ?? '',
-        problem: j['problem'] as String? ?? '',
-        lesson: j['lesson'] as String? ?? '',
-        postFormat: j['postFormat'] as String? ?? 'Reel',
-        strategy: j['strategy'] as String? ?? '',
-        caption: j['caption'] as String? ?? '',
-        pinnedComment: j['pinnedComment'] as String? ?? '',
-        forApp: j['forApp'] as bool? ?? true,
-        usedOn: j['usedOn'] as String? ?? '',
-        custom: j['custom'] as bool? ?? false,
-        archived: j['archived'] as bool? ?? false,
-        storyDetail: j['storyDetail'] as String? ?? '',
-        setting: j['setting'] as String? ?? '',
-        sceneDetail: j['sceneDetail'] as String? ?? '',
-        dialogue: j['dialogue'] as String? ?? '',
-        mess: j['mess'] as String? ?? '',
-        innerThought: j['innerThought'] as String? ?? '',
-        endingBeat: j['endingBeat'] as String? ?? '',
-        defaultCast: (j['defaultCast'] as List?)?.map((e) => e as String).toList() ?? ['Ria', 'Rio', 'Cuty'],
-        keepMoralOffScreen: j['keepMoralOffScreen'] as bool? ?? false,
-        quote: j['quote'] as String? ?? '',
-        detail: j['detail'] as String? ?? '',
-        punchline: j['punchline'] as String? ?? '',
-        readyPrompt: j['readyPrompt'] as String? ?? '',
-        score: j['score'] as int? ?? 0,
-        band: j['band'] as String? ?? '',
-        reviewedOn: j['reviewedOn'] as String? ?? '',
-      );
+  factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
+    id: j['id'] as String? ?? '',
+    category: j['category'] as String? ?? 'Relatable',
+    title: j['title'] as String? ?? '',
+    cover: j['cover'] as String? ?? '',
+    opening: j['opening'] as String? ?? '',
+    problem: j['problem'] as String? ?? '',
+    lesson: j['lesson'] as String? ?? '',
+    postFormat: j['postFormat'] as String? ?? 'Reel',
+    strategy: j['strategy'] as String? ?? '',
+    caption: j['caption'] as String? ?? '',
+    pinnedComment: j['pinnedComment'] as String? ?? '',
+    forApp: j['forApp'] as bool? ?? true,
+    usedOn: j['usedOn'] as String? ?? '',
+    custom: j['custom'] as bool? ?? false,
+    archived: j['archived'] as bool? ?? false,
+    storyDetail: j['storyDetail'] as String? ?? '',
+    setting: j['setting'] as String? ?? '',
+    sceneDetail: j['sceneDetail'] as String? ?? '',
+    dialogue: j['dialogue'] as String? ?? '',
+    mess: j['mess'] as String? ?? '',
+    innerThought: j['innerThought'] as String? ?? '',
+    endingBeat: j['endingBeat'] as String? ?? '',
+    defaultCast:
+        (j['defaultCast'] as List?)?.map((e) => e as String).toList() ??
+        ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: j['keepMoralOffScreen'] as bool? ?? false,
+    quote: j['quote'] as String? ?? '',
+    detail: j['detail'] as String? ?? '',
+    punchline: j['punchline'] as String? ?? '',
+    readyPrompt: j['readyPrompt'] as String? ?? '',
+    score: j['score'] as int? ?? 0,
+    band: j['band'] as String? ?? '',
+    reviewedOn: j['reviewedOn'] as String? ?? '',
+  );
 
   /// Laid out as the story form, ready for Write the script.
   /// If [storyDetail] is present, it is the primary source. Otherwise, falls back
@@ -299,8 +300,13 @@ factory HookIdea.fromJson(Map<String, dynamic> j) => HookIdea(
           'Status: ${usedOn.isEmpty ? "New" : usedOn}';
     }
     // Fallback to individual fields, but mark as Draft if no real content
-    final hasContent = setting.isNotEmpty || sceneDetail.isNotEmpty || dialogue.isNotEmpty ||
-        mess.isNotEmpty || innerThought.isNotEmpty || endingBeat.isNotEmpty;
+    final hasContent =
+        setting.isNotEmpty ||
+        sceneDetail.isNotEmpty ||
+        dialogue.isNotEmpty ||
+        mess.isNotEmpty ||
+        innerThought.isNotEmpty ||
+        endingBeat.isNotEmpty;
     if (!hasContent) {
       return 'Cover hook: $cover\n'
           'Hook: $opening\n'
@@ -352,41 +358,45 @@ const kHookCategories = [
 /// labels the offline generator expects.
 List<HookIdea> buildDefaultHooks() {
   final list = <HookIdea>[
-// NEEDS EXPERT REVIEW before posting
-HookIdea(
-    id: 'idea_1',
-    category: 'Safety',
-    cover: 'Meri Marzi!',
-    title: 'Meri Marzi!',
-    opening: 'Ria ne sabke saamne Uncle ko mana kar diya! 😳',
-    problem: 'A relative insists on a hug and kiss, but Ria does not want to — and the adults are watching.',
-    lesson: 'Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत किसी भरोसेमंद adult (मम्मी, पापा, टीचर) के पास जाओ। अगर पहली बार कोई न सुने, तो दुबारा बोलो — तब तक बोलो जब तक कोई मदद न करे। #ChildSafety #GoodTouchBadTouch #BodyAutonomy #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'क्या बाचों को relatives को hug करने के लिए force करना चाहिए?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_1',
+      category: 'Safety',
+      cover: 'Meri Marzi!',
+      title: 'Meri Marzi!',
+      opening: 'Ria ne sabke saamne Uncle ko mana kar diya! 😳',
+      problem: 'A relative insists on a hug and kiss, but Ria does not want to — and the adults are watching.',
+      lesson:
+          'Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'जब कोई भी touch अच्छा न लगे, तो तुरंत किसी भरोसेमंद adult (मम्मी, पापा, टीचर) के पास जाओ। अगर पहली बार कोई न सुने, तो दुबारा बोलो — तब तक बोलो जब तक कोई मदद न करे। #ChildSafety #GoodTouchBadTouch #BodyAutonomy #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'क्या बाचों को relatives को hug करने के लिए force करना चाहिए?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: At Daadi's house, relatives gather. Daadi opens her arms: "Ria, hug? Ek pappi toh banti hai!" Ria feels the pressure — everyone's eyes are on her. She steps back, hides behind Mumma: "Nahi, mujhe hug nahi chahiye."
 Twist: An aunt insists: "Arre beta, itna bhi kya sharm? Daadi pyaar karte hain!" Mumma steps in calmly: "Beta, Ria ne mana kiya. Uske liye kaafi hai." Mumma turns to Ria: "Wave, high-five, ya kuch bhi nahi — tum choose karo." Ria gives a small wave from beside Mumma, shoulders relaxing.
 Resolution: Daadi smiles: "Wave bhi accha hai." End card: "Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai."
 Moral: Body autonomy starts with a simple "no thank you" — and adults who respect it.
 ''',
-    setting: 'Daadi\'s living room, afternoon light, family gathering',
-    sceneDetail: 'Daadi with open arms, Ria hiding behind Mumma\'s saree, aunt leaning in with expectant smile',
-    dialogue: '"Ria, hug? Ek pappi toh banti hai!" "Nahi, mujhe hug nahi chahiye."',
-    mess: 'Relatives keep insisting — "Arre beta, itna bhi kya sharm?" — the pressure builds',
-    innerThought: 'I need to show Ria that her "no" has power, without making her fear all touch.',
-    endingBeat: 'Daadi accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
-    defaultCast: ['Ria', 'Mumma', 'Daadi'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Daadi\'s living room, afternoon light, family gathering',
+      sceneDetail: 'Daadi with open arms, Ria hiding behind Mumma\'s saree, aunt leaning in with expectant smile',
+      dialogue:
+          '"Ria, hug? Ek pappi toh banti hai!" "Nahi, mujhe hug nahi chahiye."',
+      mess: 'Relatives keep insisting — "Arre beta, itna bhi kya sharm?" — the pressure builds',
+      innerThought: 'I need to show Ria that her "no" has power, without making her fear all touch.',
+      endingBeat: 'Daadi accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
+      defaultCast: ['Ria', 'Mumma', 'Daadi'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Daadi's living room, afternoon light, family gathered for a visit. Daadi opens her arms: "Ria, hug? Ek pappi toh banti hai!" Ria steps back, hides behind Mumma's saree: "Nahi, mujhe hug nahi chahiye." Text on screen: "MERI MARZI! 🙅" "NO THANK YOU IS ENOUGH ❤️"
 
 On-Screen Text:
@@ -406,43 +416,45 @@ Part 3 (20-30s): $kPartStyle. Daadi smiles and accepts the wave. Ria's shoulders
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  // NEEDS EXPERT REVIEW before posting
-  HookIdea(
-    id: 'idea_2',
-    category: 'Safety',
-    cover: 'Chocolate Ke Badle Kya? 🍫',
-    title: 'Chocolate Ke Badle Kya? 🍫',
-    opening: 'Park mein ek anjaan aadmi ne Ria ko chocolate di… Ria kya karegi?',
-    problem: 'An unknown adult offers Ria chocolate and asks her to go with him for more, without Mumma\'s permission.',
-    lesson: 'Do not accept unexpected treats or go anywhere with someone without your trusted adult\'s permission. Say "Nahi, thank you" if safe. Move away and immediately tell a trusted adult. If the adult persists or you cannot find your trusted adult, seek help from a safe, staffed place or another trusted adult. Unsafe behaviour can come from familiar people too — not every stranger is dangerous, and not every familiar person is safe.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'अनजान व्यक्ति chocolate देकर बुलाए तो "नहीं, पहले मम्मी से पूछूँगी" कहकर दूर हट जाओ। फ़ौरन मम्मी, पापा या टीचर को बताओ। कोई पीछा करे तो सुरक्षित जगह या दूसरे भरोसेमंद adult के पास जाओ। हर अनजान खतरनाक नहीं, पर हर जानकार भी सुरक्षित नहीं। #StrangerSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_2',
+      category: 'Safety',
+      cover: 'Chocolate Ke Badle Kya? 🍫',
+      title: 'Chocolate Ke Badle Kya? 🍫',
+      opening:
+          'Park mein ek anjaan aadmi ne Ria ko chocolate di… Ria kya karegi?',
+      problem: 'An unknown adult offers Ria chocolate and asks her to go with him for more, without Mumma\'s permission.',
+      lesson: 'Do not accept unexpected treats or go anywhere with someone without your trusted adult\'s permission. Say "Nahi, thank you" if safe. Move away and immediately tell a trusted adult. If the adult persists or you cannot find your trusted adult, seek help from a safe, staffed place or another trusted adult. Unsafe behaviour can come from familiar people too — not every stranger is dangerous, and not every familiar person is safe.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'अनजान व्यक्ति chocolate देकर बुलाए तो "नहीं, पहले मम्मी से पूछूँगी" कहकर दूर हट जाओ। फ़ौरन मम्मी, पापा या टीचर को बताओ। कोई पीछा करे तो सुरक्षित जगह या दूसरे भरोसेमंद adult के पास जाओ। हर अनजान खतरनाक नहीं, पर हर जानकार भी सुरक्षित नहीं। #StrangerSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: At the society park, a man Ria doesn't know offers her chocolate and says, "Mere saath chalo, aur chocolate milegi." Ria remembers Mumma's rule.
 Twist: Ria says, "Nahi, main Mumma se poochhe bina nahi loongi." She moves away instead of following him.
 Resolution: Ria goes straight to Mumma and explains what happened. Mumma praises her for coming to tell her and explains that she should never leave with anyone without permission, even if she knows that person.
 Moral: Pehle trusted adult se poochho. Unsafe lage toh door jao aur help maango.
 ''',
-    setting: 'Society park, evening, strangers nearby',
-    sceneDetail: 'A man offering a wrapped chocolate bar to Ria',
-    dialogue: '"Mere saath chalo, aur chocolate milegi." "Nahi, main Mumma se poochhe bina nahi loongi."',
-    mess: 'The man takes a step closer, waiting — Ria takes two steps back, looking toward Mumma',
-    innerThought: 'Ria remembers the rule: ask a trusted adult before taking anything or going anywhere.',
-    endingBeat: 'Ria runs to Mumma: "Mumma! Anjaan uncle ne chocolate di, maine mana kar diya." Mumma hugs her: "Bahut badhiya kiya beta."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society park, evening, strangers nearby',
+      sceneDetail: 'A man offering a wrapped chocolate bar to Ria',
+      dialogue: '"Mere saath chalo, aur chocolate milegi." "Nahi, main Mumma se poochhe bina nahi loongi."',
+      mess: 'The man takes a step closer, waiting — Ria takes two steps back, looking toward Mumma',
+      innerThought: 'Ria remembers the rule: ask a trusted adult before taking anything or going anywhere.',
+      endingBeat: 'Ria runs to Mumma: "Mumma! Anjaan uncle ne chocolate di, maine mana kar diya." Mumma hugs her: "Bahut badhiya kiya beta."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society park, evening, strangers nearby. A man Ria doesn't know holds out a wrapped chocolate bar: "Mere saath chalo, aur chocolate milegi." Ria takes two steps back. Text on screen: "CHOCOLATE KE BADLE KYA? 🍫" "NAHI, PEHLE POOCHUNGI! 🙅"
 
 On-Screen Text:
@@ -462,43 +474,45 @@ Part 3 (20-30s): $kPartStyle. Mumma hugs Ria tight: "Bahut badhiya kiya beta." F
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-  // NEEDS EXPERT REVIEW before posting
-  HookIdea(
-    id: 'idea_3',
-    category: 'Safety',
-    cover: 'Ruko, Dekho, Chalo! 🚦',
-    title: 'Ruko, Dekho, Chalo! 🚦',
-    opening: 'Rio ki ball sadak ke paas chali gayi… kya woh uske peeche bhaagega?',
-    problem: 'Young children may impulsively chase a ball or toy toward a road without recognizing the danger.',
-    lesson: 'Never chase a ball into the road. Stop at a safe distance and immediately call a trusted adult. Young children must cross roads with an adult holding their hand, using a safe designated crossing when available. Looking both ways does not replace adult supervision.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'कभी भी ball या toy ke peeche sadak par na bhaagen. Ruko, bade ko bulao, aur unka haath pakad kar hi road cross karo. Sadak cross karte waqt bade ka haath hamesha pakad kar rakho — signal green bhi ho toh bhi. #RoadSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: "Mat" ki jagah ek clear "do" do — "Ungli pakdo, saath cross karo".',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_3',
+      category: 'Safety',
+      cover: 'Ruko, Dekho, Chalo! 🚦',
+      title: 'Ruko, Dekho, Chalo! 🚦',
+      opening:
+          'Rio ki ball sadak ke paas chali gayi… kya woh uske peeche bhaagega?',
+      problem: 'Young children may impulsively chase a ball or toy toward a road without recognizing the danger.',
+      lesson: 'Never chase a ball into the road. Stop at a safe distance and immediately call a trusted adult. Young children must cross roads with an adult holding their hand, using a safe designated crossing when available. Looking both ways does not replace adult supervision.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'कभी भी ball या toy ke peeche sadak par na bhaagen. Ruko, bade ko bulao, aur unka haath pakad kar hi road cross karo. Sadak cross karte waqt bade ka haath hamesha pakad kar rakho — signal green bhi ho toh bhi. #RoadSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: "Mat" ki jagah ek clear "do" do — "Ungli pakdo, saath cross karo".',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio and Papa are walking near a society park. Rio's ball rolls toward the roadside. Rio starts moving toward it but stops when Papa says, "Ruko, Rio! Road ke paas mat jao."
 Twist: Rio wants to retrieve the ball, but remembers to stay beside Papa and calls him instead.
 Resolution: Papa keeps Rio safely away from traffic and retrieves the ball only when safe. They practise stopping, holding hands, and crossing together at a designated crossing.
 Moral: Ball ke peeche sadak par nahi bhaagna. Road cross karte waqt bade ka haath pakadna.
 ''',
-    setting: 'Society park footpath near a quiet road, late afternoon',
-    sceneDetail: 'A red ball resting on the grass verge, a few metres from the road edge',
-    dialogue: '"Ruko, Rio! Road ke paas mat jao." "Papa, ball!" "Main laata hoon, tum yahan rukho."',
-    mess: 'Rio steps toward the road edge but freezes when Papa calls out — the ball is just out of reach',
-    innerThought: 'One impulsive step toward the road can change everything. The habit of stopping must be stronger than the urge to chase.',
-    endingBeat: 'Papa retrieves the ball safely. Rio holds Papa\'s hand, they walk to the crossing together, and cross with Papa\'s hand firmly in his.',
-    defaultCast: ['Rio', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society park footpath near a quiet road, late afternoon',
+      sceneDetail: 'A red ball resting on the grass verge, a few metres from the road edge',
+      dialogue: '"Ruko, Rio! Road ke paas mat jao." "Papa, ball!" "Main laata hoon, tum yahan rukho."',
+      mess: 'Rio steps toward the road edge but freezes when Papa calls out — the ball is just out of reach',
+      innerThought: 'One impulsive step toward the road can change everything. The habit of stopping must be stronger than the urge to chase.',
+      endingBeat: 'Papa retrieves the ball safely. Rio holds Papa\'s hand, they walk to the crossing together, and cross with Papa\'s hand firmly in his.',
+      defaultCast: ['Rio', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society park footpath near a quiet road, late afternoon. Rio's red ball rolls toward the road edge. Rio steps toward it. Papa: "Ruko, Rio! Road ke paas mat jao." Text on screen: "RUKO, DEKHO, CHALO! 🚦" "BALL KE PEECHE MAT BHAAGO! ❌"
 
 On-Screen Text:
@@ -518,43 +532,45 @@ Part 3 (20-30s): $kPartStyle. Papa retrieves the ball, holds Rio's hand firmly, 
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-  // NEEDS EXPERT REVIEW before posting
-  HookIdea(
-    id: 'idea_4',
-    category: 'Safety',
-    cover: 'Ria Ka Safety Song 🎵',
-    title: 'Ria Ka Safety Song 🎵',
-    opening: 'Agar Ria Mumma se bichhad jaaye, toh help kaise maangegi?',
-    problem: 'A preschooler may become confused when separated from a parent in a crowded public place.',
-    lesson: 'Practise the child\'s full name, a trusted parent\'s phone number, and how to seek help from a designated trusted adult. Children should not be expected to manage emergencies alone.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'बच्चों को अपना पूरा नाम, भरोसेमंद adult का नंबर और help kaise maangni hai, ye practise karayein. India ka emergency number 112 hai. Lost child plan ghar pe hi bana lo. #EmergencySafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Emergency number yaad rakhne ke liye ek song banayein — rhythm yaad rahega!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_4',
+      category: 'Safety',
+      cover: 'Ria Ka Safety Song 🎵',
+      title: 'Ria Ka Safety Song 🎵',
+      opening: 'Agar Ria Mumma se bichhad jaaye, toh help kaise maangegi?',
+      problem: 'A preschooler may become confused when separated from a parent in a crowded public place.',
+      lesson: 'Practise the child\'s full name, a trusted parent\'s phone number, and how to seek help from a designated trusted adult. Children should not be expected to manage emergencies alone.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'बच्चों को अपना पूरा नाम, भरोसेमंद adult का नंबर और help kaise maangni hai, ye practise karayein. India ka emergency number 112 hai. Lost child plan ghar pe hi bana lo. #EmergencySafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Emergency number yaad rakhne ke liye ek song banayein — rhythm yaad rahega!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: At home, Papa turns safety practice into a simple clapping song. Ria practises saying her full name and repeating a trusted parent's phone number with Papa's help.
 Twist: Papa asks, "Agar bheed mein Mumma dikhai na dein, toh kya karogi?" Ria answers, "Main yahin rukungi aur safe adult se help maangungi."
 Resolution: Papa explains the family's agreed safety plan, including which adults to approach and how to ask for help. They practise together.
 Moral: Naam yaad karo, trusted adult ka number practise karo, aur bichhad jao toh help maango.
 ''',
-    setting: 'Living room, afternoon, Papa and Ria sitting together',
-    sceneDetail: 'Papa clapping a rhythm, Ria repeating her name and a pretend phone number',
-    dialogue: '"Ria, apna pura naam bolo." "Ria Sharma." "Aur trusted adult ka number?" "XXXXXXXXXX."',
-    mess: 'Ria mixes up the digits at first, Papa gently corrects and they try again',
-    innerThought: 'The rhythm makes it stick — safety can be playful, not scary.',
-    endingBeat: 'Papa and Ria high-five after nailing the song twice. "Ab bichhad jao toh kya karogi?" "Rukungi, help maangungi."',
-    defaultCast: ['Ria', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, Papa and Ria sitting together',
+      sceneDetail: 'Papa clapping a rhythm, Ria repeating her name and a pretend phone number',
+      dialogue: '"Ria, apna pura naam bolo." "Ria Sharma." "Aur trusted adult ka number?" "XXXXXXXXXX."',
+      mess: 'Ria mixes up the digits at first, Papa gently corrects and they try again',
+      innerThought:
+          'The rhythm makes it stick — safety can be playful, not scary.',
+      endingBeat: 'Papa and Ria high-five after nailing the song twice. "Ab bichhad jao toh kya karogi?" "Rukungi, help maangungi."',
+      defaultCast: ['Ria', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon, Papa and Ria sitting together clapping a rhythm. Papa: "Ria, apna pura naam bolo." Ria: "Ria Sharma." Text on screen: "RIA KA SAFETY SONG 🎵" "NAAM + NUMBER PRACTISE! 👏"
 
 On-Screen Text:
@@ -574,26 +590,27 @@ Part 3 (20-30s): $kPartStyle. Papa and Ria high-five after nailing the song twic
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
+    ),
 
-  // NEEDS EXPERT REVIEW before posting
-  HookIdea(
-    id: 'idea_5',
-    category: 'Safety',
-    cover: 'Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰',
-    title: 'Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰',
-    opening: 'Bas ek beautiful outfit dekhne aage gayi thi Ria… phir Mumma nahi dikhi! 😰',
-    problem: 'During Diwali shopping, Ria spots a beautiful festive outfit displayed outside a clothing shop. While Mumma is busy checking prices and talking to the shopkeeper, Ria takes a few steps towards the display. When she turns around, she cannot see Mumma in the crowded market.',
-    lesson: 'If a child becomes separated from their parent in a crowded place, they should stay where they are and seek help from a staff member at a nearby counter or a uniformed security guard. They should not wander around searching. Follow the family\'s safety plan.',
-    postFormat: 'Reel',
-    strategy: 'Uses a familiar festive-shopping distraction, an emotional turning point when Ria realizes Mumma is gone, and a practical safety lesson — stay put and seek help from staff instead of wandering.',
-    caption: 'Diwali shopping mein bachche beautiful outfits, toys, decorations dekhke distract ho sakte hain. Crowded market mein jaane se pehle unhe batao: "Mumma na dikhein toh wahi ruko aur staff se help maango." Ye simple plan ghar pe practise karo. #DiwaliShopping #ChildSafety #LostChild #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_5',
+      category: 'Safety',
+      cover: 'Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰',
+      title: 'Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰',
+      opening: 'Bas ek beautiful outfit dekhne aage gayi thi Ria… phir Mumma nahi dikhi! 😰',
+      problem: 'During Diwali shopping, Ria spots a beautiful festive outfit displayed outside a clothing shop. While Mumma is busy checking prices and talking to the shopkeeper, Ria takes a few steps towards the display. When she turns around, she cannot see Mumma in the crowded market.',
+      lesson: 'If a child becomes separated from their parent in a crowded place, they should stay where they are and seek help from a staff member at a nearby counter or a uniformed security guard. They should not wander around searching. Follow the family\'s safety plan.',
+      postFormat: 'Reel',
+      strategy: 'Uses a familiar festive-shopping distraction, an emotional turning point when Ria realizes Mumma is gone, and a practical safety lesson — stay put and seek help from staff instead of wandering.',
+      caption: 'Diwali shopping mein bachche beautiful outfits, toys, decorations dekhke distract ho sakte hain. Crowded market mein jaane se pehle unhe batao: "Mumma na dikhein toh wahi ruko aur staff se help maango." Ye simple plan ghar pe practise karo. #DiwaliShopping #ChildSafety #LostChild #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma and Ria are shopping in a busy Diwali market. Mumma is checking the price of diyas at a nearby stall. Ria notices a beautiful lehenga displayed at a clothing shop and takes a few steps closer to see its sparkling details. When she turns around, Mumma is no longer visible in the crowd.
 
 Twist: Ria becomes worried but remembers Mumma's safety rule — she stays where she is instead of wandering through the market. She approaches a staff member at the nearest shop counter and asks for help.
@@ -602,18 +619,20 @@ Resolution: The staff member follows the shop's child-safety procedure and helps
 
 Moral: Mumma na dikhein toh wahi ruko, staff se help maango.
 ''',
-    setting: 'A busy Indian Diwali market in the early evening, with festive clothing displays, shoppers, diya stalls, and warm decorative lights.',
-    sceneDetail: 'Ria admires a beautiful festive lehenga displayed outside a clothing shop while Mumma is briefly occupied at a nearby shopping stall. Ria turns around and realizes she cannot see Mumma.',
-    dialogue: '"Ria, beta, yahin mere paas rehna." "Mumma? Aap kahan ho?" "Mujhe Mumma nahi mil rahi. Please help kariye." "Ria, tum mil gayi! Dar gayi thi na? Chalo, hum apna safety plan phir se yaad karte hain."',
-    mess: 'Ria becomes distracted by the beautiful outfit, moves a few steps away, and then cannot see Mumma in the crowded market.',
-    innerThought: 'Woh bas outfit dekhne ruki thi… aur ab Mumma nazar nahi aa rahi!',
-    endingBeat: 'Ria reunites with Mumma at the shop counter. Mumma comforts her. End with a clear visual safety reminder: "Bheed mein bichhad jao toh wahi ruko aur staff se help maango."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'A busy Indian Diwali market in the early evening, with festive clothing displays, shoppers, diya stalls, and warm decorative lights.',
+      sceneDetail: 'Ria admires a beautiful festive lehenga displayed outside a clothing shop while Mumma is briefly occupied at a nearby shopping stall. Ria turns around and realizes she cannot see Mumma.',
+      dialogue: '"Ria, beta, yahin mere paas rehna." "Mumma? Aap kahan ho?" "Mujhe Mumma nahi mil rahi. Please help kariye." "Ria, tum mil gayi! Dar gayi thi na? Chalo, hum apna safety plan phir se yaad karte hain."',
+      mess: 'Ria becomes distracted by the beautiful outfit, moves a few steps away, and then cannot see Mumma in the crowded market.',
+      innerThought:
+          'Woh bas outfit dekhne ruki thi… aur ab Mumma nazar nahi aa rahi!',
+      endingBeat: 'Ria reunites with Mumma at the shop counter. Mumma comforts her. End with a clear visual safety reminder: "Bheed mein bichhad jao toh wahi ruko aur staff se help maango."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. A busy Indian Diwali market, early evening, festive clothing displays and diya stalls glowing. Ria admires a sparkling lehenga outside a shop while Mumma checks diya prices nearby. Ria turns around — Mumma is gone. Text on screen: "MUMMA KAHAN GAYI?! 😰" "WAHIN RUKO, HELP MAANGO! 🙋"
 
 On-Screen Text:
@@ -633,43 +652,44 @@ Part 3 (20-30s): $kPartStyle. Mumma reunites with Ria at the counter and comfort
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
+    ),
 
-  // NEEDS EXPERT REVIEW before posting
-  HookIdea(
-    id: 'idea_6',
-    category: 'Safety',
-    cover: 'Rasoi Mein Ruko, Ria!',
-    title: 'Rasoi Mein Ruko, Ria!',
-    opening: 'Mumma gas par khana bana rahi thi… aur Ria apni car lekar rasoi mein aa gayi!',
-    problem: 'Ria wants to stay near Mumma and brings her toy into the kitchen while Mumma is cooking. Hot cookware and the active stove create a genuine hazard.',
-    lesson: 'Young children must stay out of the cooking area while cooking is underway. Floor markings are not a safety barrier. Adults must supervise children and prevent access to hot stoves, cookware, boiling liquids, and other kitchen hazards. Create a safe play space away from the kitchen during cooking.',
-    postFormat: 'Reel',
-    strategy: 'Shows the real danger of a child entering an active cooking area, a calm parent redirecting the child, and the practical solution of creating a safe play space away from the stove.',
-    caption: 'Bachche cooking area se door rahen jab gas chalu ho. Kitchen se door safe play space bana lo. Floor pe line kaafi nahi — bade ki supervision zaroori hai. #KitchenSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // NEEDS EXPERT REVIEW before posting
+    HookIdea(
+      id: 'idea_6',
+      category: 'Safety',
+      cover: 'Rasoi Mein Ruko, Ria!',
+      title: 'Rasoi Mein Ruko, Ria!',
+      opening: 'Mumma gas par khana bana rahi thi… aur Ria apni car lekar rasoi mein aa gayi!',
+      problem: 'Ria wants to stay near Mumma and brings her toy into the kitchen while Mumma is cooking. Hot cookware and the active stove create a genuine hazard.',
+      lesson: 'Young children must stay out of the cooking area while cooking is underway. Floor markings are not a safety barrier. Adults must supervise children and prevent access to hot stoves, cookware, boiling liquids, and other kitchen hazards. Create a safe play space away from the kitchen during cooking.',
+      postFormat: 'Reel',
+      strategy: 'Shows the real danger of a child entering an active cooking area, a calm parent redirecting the child, and the practical solution of creating a safe play space away from the stove.',
+      caption: 'Bachche cooking area se door rahen jab gas chalu ho. Kitchen se door safe play space bana lo. Floor pe line kaafi nahi — bade ki supervision zaroori hai. #KitchenSafety #ChildSafety #ParentingTips #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma is preparing lunch on the gas stove. Ria enters the kitchen with her toy car and asks to play beside Mumma.
 Twist: Mumma notices Ria near the cooking area, stops what she is doing when safe, and guides Ria out of the kitchen.
 Resolution: Mumma sets up a simple play activity in a safe area away from the kitchen. She explains gently, "Jab gas par khana banta hai, tum kitchen ke bahar khelo. Main tumhare paas aakar khelungi."
 Moral: Garam rasoi se door raho. Cooking ke waqt bade ki safety rules follow karo.
 ''',
-    setting: 'Kitchen, midday, gas stove with active cooking',
-    sceneDetail: 'Ria standing at the kitchen entrance with a toy car, Mumma at the stove with a pot simmering',
-    dialogue: '"Mumma, main bhi khelungi yahan!" "Ria, beta, kitchen mein gas chalu hai. Bahar khelo, main aati hoon."',
-    mess: 'Ria inches closer to the stove with her car, Mumma turns and sees her just before the hot zone',
-    innerThought: 'The kitchen feels warm and inviting, but the stove is no place for a toddler — even for a minute.',
-    endingBeat: 'Mumma lifts Ria out, sets up blocks in the living room, and joins her. "Yahan safe hai, Ria."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, midday, gas stove with active cooking',
+      sceneDetail: 'Ria standing at the kitchen entrance with a toy car, Mumma at the stove with a pot simmering',
+      dialogue: '"Mumma, main bhi khelungi yahan!" "Ria, beta, kitchen mein gas chalu hai. Bahar khelo, main aati hoon."',
+      mess: 'Ria inches closer to the stove with her car, Mumma turns and sees her just before the hot zone',
+      innerThought: 'The kitchen feels warm and inviting, but the stove is no place for a toddler — even for a minute.',
+      endingBeat: 'Mumma lifts Ria out, sets up blocks in the living room, and joins her. "Yahan safe hai, Ria."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, midday, gas stove with a pot simmering. Ria enters with her toy car: "Mumma, main bhi khelungi yahan!" Mumma: "Ria, beta, kitchen mein gas chalu hai. Bahar khelo, main aati hoon." Text on screen: "RASOI MEIN RUKO, RIA! 🚫" "FLOOR LINE KAAFI NAHI, SUPERVISION ZAROORI 👀"
 
 On-Screen Text:
@@ -689,43 +709,47 @@ Part 3 (20-30s): $kPartStyle. Mumma joins Ria with the blocks in the living room
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-  ),
+    ),
 
     // Relatable: the child's own words, the thing every parent has heard this week.
-HookIdea(
-    id: 'idea_7',
-    category: 'Ria Chaos',
-    cover: 'Main Khud! 👟',
-    title: 'Main Khud! 👟',
-    opening: 'Mumma bas joota pehnane lagi… Ria boli, "MAIN KHUD!" 😤',
-    problem: 'Ria insists on putting on her own shoes while the family is getting ready to leave.',
-    lesson: 'Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Preschool ke time pe bachche "main khud!" bolte hain toh dil khush bhi hota hai aur tension bhi hoti hai. Thoda time do, try karne do, zaroorat pade toh pyaar se help karo. 👟 #Independence #ToddlerLife #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_7',
+      category: 'Ria Chaos',
+      cover: 'Main Khud! 👟',
+      title: 'Main Khud! 👟',
+      opening: 'Mumma bas joota pehnane lagi… Ria boli, "MAIN KHUD!" 😤',
+      problem: 'Ria insists on putting on her own shoes while the family is getting ready to leave.',
+      lesson: 'Give children age-appropriate opportunities to practise independence, allow reasonable time, and offer gentle help when needed.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Preschool ke time pe bachche "main khud!" bolte hain toh dil khush bhi hota hai aur tension bhi hoti hai. Thoda time do, try karne do, zaroorat pade toh pyaar se help karo. 👟 #Independence #ToddlerLife #ParentingHacks #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: It is time to leave for preschool. Mumma bends down to help Ria put on her shoes. Ria pulls her feet back and declares, "Main khud!"
 Twist: Ria tries to put on a shoe but gets confused about which foot it belongs on. Mumma pauses and asks gently, "Ek baar phir try karogi, ya meri help chahiye?"
 Resolution: Ria checks the shoes, corrects the mistake, and puts them on successfully. Mumma smiles: "Tumne khud try kiya! Shabash." They leave together.
 Moral: Khud try karne do. Zaroorat ho toh pyaar se help karo.
 ''',
-    setting: 'Front door area, morning, shoes by the mat',
-    sceneDetail: 'A pair of small shoes by the door, Ria sitting down to put them on',
-    dialogue: '"Main khud!" "Ek baar phir try karogi, ya meri help chahiye?"',
-    mess: 'Ria puts a shoe on the wrong foot, pauses, then looks at the other shoe and self-corrects',
-    innerThought: 'Let her try. If she asks, I\'ll help. Either way, she learns.',
-    endingBeat: 'Ria puts on both shoes correctly, stands up proud. Mumma gives a quick hug. "Chalo, chalte hain."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Front door area, morning, shoes by the mat',
+      sceneDetail:
+          'A pair of small shoes by the door, Ria sitting down to put them on',
+      dialogue: '"Main khud!" "Ek baar phir try karogi, ya meri help chahiye?"',
+      mess: 'Ria puts a shoe on the wrong foot, pauses, then looks at the other shoe and self-corrects',
+      innerThought:
+          'Let her try. If she asks, I\'ll help. Either way, she learns.',
+      endingBeat: 'Ria puts on both shoes correctly, stands up proud. Mumma gives a quick hug. "Chalo, chalte hain."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Front door area, morning light. Ria (pink star dress, pigtails) sitting by the door, determined: "Main khud!" Mumma (yellow kurti, top bun) starts to help, pauses, smiles: "Ek baar phir try karogi?" Ria looks at the shoes, realizes one is on the wrong foot, switches them, puts both on correctly. Text: "MAIN KHUD! 👟" "TRY KARNE DO" "SHABASH! 🥹❤️"
 
 On-Screen Text:
@@ -746,41 +770,42 @@ Part 3 (20-30s): $kPartStyle. Ria puts on both shoes correctly, stands up proud.
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
-HookIdea(
-    id: 'idea_8',
-    category: 'Ria Chaos',
-    cover: 'Bas 5 Minute Aur?! 📱',
-    title: 'Bas 5 Minute Aur?! 📱',
-    opening: 'Cartoon beech mein band hua... aur Ria ka rona shuru! 😭',
-    problem: 'Ria cries when a cartoon ends mid-song without warning — she needs a predictable transition.',
-    lesson: 'A two-minute warning before the agreed stopping point helps Ria choose a calm goodbye. A timer can support the transition but does not guarantee zero tears.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Cartoon beech mein band hua toh rona lena laga. Do minute pehle batado, timer laga do — transition smooth hota hai. Tears kam honge, khatam nahi. 📱 #ScreenTime #TransitionHack #ToddlerEmotions #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Screen time se pehle ek countdown lelo — "5 se 1, phir screen band"! ',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_8',
+      category: 'Ria Chaos',
+      cover: 'Bas 5 Minute Aur?! 📱',
+      title: 'Bas 5 Minute Aur?! 📱',
+      opening: 'Cartoon beech mein band hua... aur Ria ka rona shuru! 😭',
+      problem: 'Ria cries when a cartoon ends mid-song without warning — she needs a predictable transition.',
+      lesson: 'A two-minute warning before the agreed stopping point helps Ria choose a calm goodbye. A timer can support the transition but does not guarantee zero tears.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Cartoon beech mein band hua toh rona lena laga. Do minute pehle batado, timer laga do — transition smooth hota hai. Tears kam honge, khatam nahi. 📱 #ScreenTime #TransitionHack #ToddlerEmotions #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Screen time se pehle ek countdown lelo — "5 se 1, phir screen band"! ',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Cartoon credits start rolling mid-song. Ria points at the screen: "Wapas! Wapas!" Tears fall. Mumma realises the episode ended mid-song with no warning.
 Twist: Next day, Mumma asks, "Ye episode kab khatam hoga?" She sets a visual timer for two minutes before the end. When the timer dings: "Abhi do minute, phir bye-bye."
 Resolution: Episode ends. Ria blows a kiss at the screen: "Bye-bye cartoon!" Hands the phone to Mumma. "Kal timer pehle lagayenge."
 Moral: Beech mein nahi, khatam hone par — par pehle se batana bhi badi baat hai.
 ''',
-    setting: 'Living room, late afternoon, phone propped on the armrest playing a cartoon',
-    sceneDetail: 'Cartoon credits rolling mid-song, phone face-up on the armrest, Ria reaching for it',
-    dialogue: '"Bas five minute aur!" "Ye episode kab khatam hoga?" "Abhi do minute, phir bye-bye." "Bye-bye cartoon!"',
-    mess: 'Screen pauses mid-song, credits rolling in background, Ria reaches for the phone with tears',
-    innerThought: 'Main kab tak ye gaana sun sakti hoon, until even the humming stops. Warning helps — but it is not a magic wand.',
-    endingBeat: 'Ria blows a kiss at the phone, then lets the screen go dark. Mumma: "Timer pehle lagayenge kal."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, late afternoon, phone propped on the armrest playing a cartoon',
+      sceneDetail: 'Cartoon credits rolling mid-song, phone face-up on the armrest, Ria reaching for it',
+      dialogue: '"Bas five minute aur!" "Ye episode kab khatam hoga?" "Abhi do minute, phir bye-bye." "Bye-bye cartoon!"',
+      mess: 'Screen pauses mid-song, credits rolling in background, Ria reaches for the phone with tears',
+      innerThought: 'Main kab tak ye gaana sun sakti hoon, until even the humming stops. Warning helps — but it is not a magic wand.',
+      endingBeat: 'Ria blows a kiss at the phone, then lets the screen go dark. Mumma: "Timer pehle lagayenge kal."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room couch, afternoon light, phone playing cartoon. Ria (sparkly pink star dress, pigtails) suddenly cries, tiny fists shaking. Phone shows credits mid-song. Ria points: "Wapas! Wapas!" Text on screen: "CARTOON BEICH MEIN BAND... 📱" "😭 RONA SHURU!"
 
 On-Screen Text:
@@ -801,42 +826,44 @@ Part 3 (20-30s): $kPartStyle. Ria blows a kiss at the phone, then lets the scree
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_9',
-    category: 'Child Chaos',
-    cover: 'Mujhse Nahi Hoga! 🧱',
-    title: 'Mujhse Nahi Hoga! 🧱',
-    opening: 'Teesri baar tower gira… Rio bola, "Mujhse nahi hoga!" 😔',
-    problem: 'Rio feels genuinely frustrated after his block tower falls repeatedly. He is not being naughty — he just cannot figure out why it keeps collapsing.',
-    lesson: 'When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bachche ko frustration ho toh haath mat lagao — ek hint do, unhe khud dhundne do. Tower gira toh base bada karo. Seekhne ka maza usi mein hai. #Persistence #LearningThroughPlay #ToddlerPlay #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Har game se pehle ek simple rule samjho — "Yeh kaise khelnge" batao!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_9',
+      category: 'Child Chaos',
+      cover: 'Mujhse Nahi Hoga! 🧱',
+      title: 'Mujhse Nahi Hoga! 🧱',
+      opening: 'Teesri baar tower gira… Rio bola, "Mujhse nahi hoga!" 😔',
+      problem: 'Rio feels genuinely frustrated after his block tower falls repeatedly. He is not being naughty — he just cannot figure out why it keeps collapsing.',
+      lesson: 'When a child is stuck, offer a hint without taking over. Let them experiment, fail, and try again — that is how real learning happens.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bachche ko frustration ho toh haath mat lagao — ek hint do, unhe khud dhundne do. Tower gira toh base bada karo. Seekhne ka maza usi mein hai. #Persistence #LearningThroughPlay #ToddlerPlay #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Har game se pehle ek simple rule samjho — "Yeh kaise khelnge" batao!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio builds a tower. It falls. He builds again — it falls again. Third time, he sits back, eyes welling up: "Mujhse nahi hoga!" He is not giving up to be difficult; he truly feels stuck.
 Twist: Ria watches quietly, then asks, "Ek idea try karein?" She does not touch the blocks. Instead, she points: "Neeche ke blocks thode aur phailao, base bana ke dekho." Rio hesitates, then tries.
 Resolution: Rio tries a wider base. It still wobbles. He adjusts, adds one more block at the bottom. The tower stands. He looks up, surprised and proud: "Khada hai!" Ria smiles: "Tune khud kiya."
 Moral: Hint do, haath mat lagao. Bachcha khud seekhta hai — fail karke, try karke, phir safal hoke.
 ''',
-    setting: 'Play mat in the living room, afternoon sunlight through the window',
-    sceneDetail: 'A collapsed tower, scattered blocks, Rio sitting with knees pulled up looking defeated',
-    dialogue: '"Mujhse nahi hoga!" "Ek idea try karein?" "Neeche ke blocks thode phailao." "Khada hai!"',
-    mess: 'Rio tries the wider base, tower wobbles, he adjusts a block, tries again — frustration turning into focus',
-    innerThought: 'The hardest thing for a parent is watching them struggle without fixing it. But that is exactly what they need.',
-    endingBeat: 'Rio places the final block on his steady tower. Ria gives a small nod. Cuty hops over nearby, watching — the tower still stands.',
-    defaultCast: ['Rio', 'Ria', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Play mat in the living room, afternoon sunlight through the window',
+      sceneDetail: 'A collapsed tower, scattered blocks, Rio sitting with knees pulled up looking defeated',
+      dialogue: '"Mujhse nahi hoga!" "Ek idea try karein?" "Neeche ke blocks thode phailao." "Khada hai!"',
+      mess: 'Rio tries the wider base, tower wobbles, he adjusts a block, tries again — frustration turning into focus',
+      innerThought: 'The hardest thing for a parent is watching them struggle without fixing it. But that is exactly what they need.',
+      endingBeat: 'Rio places the final block on his steady tower. Ria gives a small nod. Cuty hops over nearby, watching — the tower still stands.',
+      defaultCast: ['Rio', 'Ria', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Play mat in living room. Rio builds a tower — it collapses. He rebuilds — collapses again. Third time, he slumps: "Mujhse nahi hoga!" Text: "TEESRI BAAR GIRA 😔" "MUJHSE NAHI HOGA"
 
 On-Screen Text:
@@ -858,42 +885,44 @@ Part 3 (20-30s): $kPartStyle. Rio places the final block on his steady tower. Ri
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_10',
-    category: 'Child Chaos',
-    cover: 'Cuty Gayab! Toys Ke Jungle Mein 😱',
-    title: 'Cuty Gayab! Toys Ke Jungle Mein 😱',
-    opening: 'Cuty gayab! Toys ke jungle mein Ria dhundh rahi hai 😱',
-    problem: 'Cuty is missing in a living room buried under toys. Ria and Rio start searching together, clearing one area at a time.',
-    lesson: 'When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Room messy ho toh Cuty bhi kho jata hai. Ek chhota area saaf karo, toys wapas rakho, aur milkar kaam karo. Cuty mil jayega! 🐰 #TidyUp #SiblingTeamwork #LostAndFound #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_10',
+      category: 'Child Chaos',
+      cover: 'Cuty Gayab! Toys Ke Jungle Mein 😱',
+      title: 'Cuty Gayab! Toys Ke Jungle Mein 😱',
+      opening: 'Cuty gayab! Toys ke jungle mein Ria dhundh rahi hai 😱',
+      problem: 'Cuty is missing in a living room buried under toys. Ria and Rio start searching together, clearing one area at a time.',
+      lesson: 'When the room is a mess, clear one small area at a time and put each toy back in its proper place. Working together makes it faster — and the missing thing shows up when the clutter is gone.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Room messy ho toh Cuty bhi kho jata hai. Ek chhota area saaf karo, toys wapas rakho, aur milkar kaam karo. Cuty mil jayega! 🐰 #TidyUp #SiblingTeamwork #LostAndFound #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: "Pehle mera, phir tera" rule lao — turn timer se share karo.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria gasps, "Cuty kahan gaya?!" The living room floor is a toy jungle — blocks, cars, plushies everywhere. Ria and Rio start searching. Rio picks up a car: "Arre, mera blue car!" and starts vrooming it. Ria sighs, picks up a doll: "Wait, I was looking for Cuty!"
 Twist: Ria says firmly, "Ruko. Ek chhota area saaf karte hain. Toys wapas unke box mein, phir Cuty dhundhte hain." They clear one corner together, putting blocks in the block bin, cars in the car basket. Under the couch, they spot Cuty's ears peeking out.
 Resolution: They whisper, "Shhh, Cuty so raha hai!" They leave Cuty undisturbed. Then they finish tidying the rest of the room together — each toy finding its home.
 Moral: Ek area saaf karo, toys wapas rakho, milkar kaam karo. Clutter door hua toh khoi hui cheez bhi mil jayegi.
 ''',
-    setting: 'Living room floor, afternoon, toys scattered everywhere like a jungle',
-    sceneDetail: 'Blocks, cars, plushies covering the floor; Cuty sleeping under the couch with ears visible',
-    dialogue: '"Cuty kahan gaya?!" "Arre, mera blue car!" "Ruko, ek area saaf karte hain pehle." "Shhh, Cuty so raha hai!"',
-    mess: 'Rio gets distracted by every toy he picks up — cars, blocks, dolls — while Ria tries to keep the search on track',
-    innerThought: 'The mess is the problem. Fix the mess, and the missing thing appears.',
-    endingBeat: 'They finish tidying together. Cuty wakes up, hops over, and nudges a block into the bin — helping too! Room clean, Cuty found.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, afternoon, toys scattered everywhere like a jungle',
+      sceneDetail: 'Blocks, cars, plushies covering the floor; Cuty sleeping under the couch with ears visible',
+      dialogue: '"Cuty kahan gaya?!" "Arre, mera blue car!" "Ruko, ek area saaf karte hain pehle." "Shhh, Cuty so raha hai!"',
+      mess: 'Rio gets distracted by every toy he picks up — cars, blocks, dolls — while Ria tries to keep the search on track',
+      innerThought: 'The mess is the problem. Fix the mess, and the missing thing appears.',
+      endingBeat: 'They finish tidying together. Cuty wakes up, hops over, and nudges a block into the bin — helping too! Room clean, Cuty found.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, toys everywhere like a jungle. Ria panics: "Cuty kahan gaya?!" Rio picks up a car, vrooms it. Ria: "Ruko, ek area saaf karte hain!" They clear one corner, toys go back in bins. Under the couch — Cuty's ears peek out. They whisper: "Shhh, Cuty so raha hai!" Text: "CUTY GAYAB?! 😱" "EK AREA SAAF KARO 🧸" "TOYS WAPAS RAKHO 📦" "MILKAR KAAM KARO 🤝" "CUTY MIL GAYA! 🐰"
 
 On-Screen Text:
@@ -915,44 +944,48 @@ Part 3 (20-30s): $kPartStyle. They finish tidying together. Cuty wakes up, hops 
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-// Siblings: sharing, turn-taking, and the little wars between tiny humans
-  // who share a room and a parent.
-  HookIdea(
-    id: 'idea_11',
-    category: 'Child Chaos',
-    cover: 'Mere Pair, Mera Game!',
-    title: 'Mere Pair, Mera Game!',
-    opening: 'Ek hi pair of shoes — Ria aur Rio dono ko pehne ki koshish!',
-    problem: 'Only one pair of shoes available, but two siblings need to wear them',
-    lesson: 'Share karne ka ek simple rule: timer se ek vyakti pehle pahengi, doosra agla round.',
-    postFormat: 'Reel',
-    strategy: 'Use a timer for sharing — clear rules prevent fights.',
-    caption: 'Ek joota, do bachche — timer se share karo, fight kam karo! ⏱️ #SiblingSharing #TurnTaking #FunLearningWithPalak #IndianParents #ToddlerLife',
-    pinnedComment: 'Timer trick try kari? "Gaana khatam, phir tumhari baari!"',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Siblings: sharing, turn-taking, and the little wars between tiny humans
+    // who share a room and a parent.
+    HookIdea(
+      id: 'idea_11',
+      category: 'Child Chaos',
+      cover: 'Mere Pair, Mera Game!',
+      title: 'Mere Pair, Mera Game!',
+      opening: 'Ek hi pair of shoes — Ria aur Rio dono ko pehne ki koshish!',
+      problem: 'Only one pair of shoes available, but two siblings need to wear them',
+      lesson: 'Share karne ka ek simple rule: timer se ek vyakti pehle pahengi, doosra agla round.',
+      postFormat: 'Reel',
+      strategy: 'Use a timer for sharing — clear rules prevent fights.',
+      caption: 'Ek joota, do bachche — timer se share karo, fight kam karo! ⏱️ #SiblingSharing #TurnTaking #FunLearningWithPalak #IndianParents #ToddlerLife',
+      pinnedComment:
+          'Timer trick try kari? "Gaana khatam, phir tumhari baari!"',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Only one pair of pink sparkly jootis by the door — Ria and Rio both grab for them.
 Twist: Mumma: "Jisne pehle pehna, uski 1 minute. Phir switch." Ria: "Mere saath timer!" Mumma sets phone timer.
 Resolution: Ria plays "princess walk" for 1 minute, then Rio gets his turn. Both laughing by the switch.
 Moral: Clear timer, clear rules — no tears over sharing.
 ''',
-    setting: 'Hallway, one pair of jootis by the door, morning rush',
-    sceneDetail: 'Ria and Rio both pulling at the same jooti, Mumma holding a phone timer',
-    dialogue: '"Mere pair!" "Mera pair!" "Timer shuru ho gaya!"',
-    mess: 'Both grab the same jooti, tug-of-war begins until Mumma intervenes',
-    innerThought: 'A timer works better than my pleading voice.',
-    endingBeat: 'Rio does his "princess walk" with dramatic flair — both laughing.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Hallway, one pair of jootis by the door, morning rush',
+      sceneDetail: 'Ria and Rio both pulling at the same jooti, Mumma holding a phone timer',
+      dialogue: '"Mere pair!" "Mera pair!" "Timer shuru ho gaya!"',
+      mess:
+          'Both grab the same jooti, tug-of-war begins until Mumma intervenes',
+      innerThought: 'A timer works better than my pleading voice.',
+      endingBeat:
+          'Rio does his "princess walk" with dramatic flair — both laughing.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Hallway, morning rush. One pair of pink sparkly jootis by the door. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both grab for them. Mumma holds phone timer. Text on screen: "EKPairo SHOES 👟" "TIMER TRICK ⏱️" "PRINCESS WALK! 👸"
 
 On-Screen Text:
@@ -972,42 +1005,44 @@ Part 3 (20-30s): $kPartStyle. Switch — Rio puts on jootis, does his own silly 
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_12',
-    category: 'Ria Chaos',
-    cover: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
-    title: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
-    opening: 'Brush ka naam sunte hi Ria kambal mein gayab! 🪥',
-    problem: 'Ria resists toothbrushing and hides under the blanket. Mumma stays calm instead of rushing or scolding.',
-    lesson: 'Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Brush ke time pe Ria chhup gayi? Cuty ke daant brush karke dikhao, fir Ria khud try karegi. Pea-sized fluoride paste, bade ki supervision. 🪥 #BrushTime #ToddlerRoutine #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_12',
+      category: 'Ria Chaos',
+      cover: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
+      title: 'Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥',
+      opening: 'Brush ka naam sunte hi Ria kambal mein gayab! 🪥',
+      problem: 'Ria resists toothbrushing and hides under the blanket. Mumma stays calm instead of rushing or scolding.',
+      lesson: 'Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Brush ke time pe Ria chhup gayi? Cuty ke daant brush karke dikhao, fir Ria khud try karegi. Pea-sized fluoride paste, bade ki supervision. 🪥 #BrushTime #ToddlerRoutine #ParentingHacks #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma says, "Brush time, Ria!" Ria pulls the blanket over her head: "Nahi!" Mumma stays calm, sits on the floor, and says, "Theek hai. Pehle Cuty ke daant saaf karte hain."
 Twist: Mumma takes Cuty's toy teeth (plastic, no real toothbrush in mouth) and gently mimics brushing with a child-sized brush and a pea-sized dab of fluoride toothpaste. She narrates: "Upar, neeche, peeche — dhire dhire." Ria peeks out, curious.
 Resolution: Ria pulls the blanket down: "Mere daant bhi?" Mumma hands her a child-sized brush with a pea-sized amount of fluoride paste. "Dhire dhire, upar neeche." Ria brushes; Mumma guides her hand for the back teeth. Ria spits into the sink. "Ho gaya!"
 Moral: Khel-khel mein brush seekho. Bade ki madad se bachcha khud brush karta hai — par supervision zaroori hai.
 ''',
-    setting: 'Bathroom, morning, mirror at child height, toothbrushes and fluoride toothpaste on the counter',
-    sceneDetail: 'Ria peeking from under the blanket; Cuty sitting on the counter with toy teeth; child-sized brush and pea-sized fluoride paste ready',
-    dialogue: '"Brush time, Ria!" "Nahi!" "Theek hai, pehle Cuty ke daant." "Upar, neeche, peeche — dhire dhire." "Mere daant bhi?" "Dhire dhire, upar neeche, peeche." "Ho gaya!"',
-    mess: 'Ria hides under blanket, refuses brush. Mumma stays calm, demonstrates on Cuty\'s toy teeth. Ria watches, then asks to brush.',
-    innerThought: 'Scolding makes it worse. A calm demo on a toy makes it a game she wants to join.',
-    endingBeat: 'Ria spits, rinses, smiles at the mirror. Mumma wipes her chin. "Shining smile!" Cuty sits proudly on the counter.',
-    defaultCast: ['Ria', 'Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bathroom, morning, mirror at child height, toothbrushes and fluoride toothpaste on the counter',
+      sceneDetail: 'Ria peeking from under the blanket; Cuty sitting on the counter with toy teeth; child-sized brush and pea-sized fluoride paste ready',
+      dialogue: '"Brush time, Ria!" "Nahi!" "Theek hai, pehle Cuty ke daant." "Upar, neeche, peeche — dhire dhire." "Mere daant bhi?" "Dhire dhire, upar neeche, peeche." "Ho gaya!"',
+      mess: 'Ria hides under blanket, refuses brush. Mumma stays calm, demonstrates on Cuty\'s toy teeth. Ria watches, then asks to brush.',
+      innerThought: 'Scolding makes it worse. A calm demo on a toy makes it a game she wants to join.',
+      endingBeat: 'Ria spits, rinses, smiles at the mirror. Mumma wipes her chin. "Shining smile!" Cuty sits proudly on the counter.',
+      defaultCast: ['Ria', 'Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bathroom, child-height mirror. Ria under blanket: "Nahi!" Mumma calm on floor with Cuty. Demonstrates brushing on Cuty's toy teeth (plastic) with child brush, pea-sized fluoride paste. Narrates: "Upar, neeche, peeche." Ria peeks: "Mere daant bhi?" Text: "BRUSH KA NAAM... 🪥" "CUTY KE DAANT PEHLE 🦷" "AB MERI BAARI! 😁"
 
 On-Screen Text:
@@ -1027,25 +1062,25 @@ Audio/Dialogue (Hinglish): Mumma gentle: "Brush time, Ria!" Ria: "Nahi!" Mumma c
 Part 3 (20-30s): $kPartStyle. Ria spits, rinses, smiles at the mirror. Mumma wipes her chin. "Shining smile!" Cuty sits proudly on the counter. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Playful modelling and patient support can make brushing easier, but not every child will cooperate immediately. Adult supervision and a pea-sized amount of fluoride toothpaste are essential.
 
     ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_13',
-    category: 'Ria Chaos',
-    cover: 'Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦',
-    title: 'Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦',
-    opening: 'Broccoli dekhte hi Ria ne plate se doori bana li! 🥦',
-    problem: 'Ria refuses the broccoli on her plate. She pushes the plate away and crosses her arms.',
-    lesson: 'Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Broccoli se Ria bhagi? Papa khud khake dikhaye, pressure nahi. Chhota piece offer kiya, Ria ne soongha, chhua — bite optional. Low-pressure exposure se familiarity aati hai. 🥦 #FoodExploration #PickyEater #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Bachcho ko meal banate waqt ek tiny helper bana kar involve karo!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_13',
+      category: 'Ria Chaos',
+      cover: 'Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦',
+      title: 'Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦',
+      opening: 'Broccoli dekhte hi Ria ne plate se doori bana li! 🥦',
+      problem: 'Ria refuses the broccoli on her plate. She pushes the plate away and crosses her arms.',
+      lesson: 'Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Broccoli se Ria bhagi? Papa khud khake dikhaye, pressure nahi. Chhota piece offer kiya, Ria ne soongha, chhua — bite optional. Low-pressure exposure se familiarity aati hai. 🥦 #FoodExploration #PickyEater #ParentingHacks #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Bachcho ko meal banate waqt ek tiny helper bana kar involve karo!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Lunch is served. Broccoli sits on Ria's plate. She makes a face, pushes the plate away: "Nahi chahiye!"
 Twist: Papa picks up a floret, takes a bite himself, and says naturally, "Crunchy hai, thoda kadwa bhi." He puts a small piece on the side of Ria's plate: "Chaho toh try karo, warna rehne do." No bargaining, no "ek bite toh lo."
 Resolution: Ria stares at the piece. She picks it up, turns it over, smells it. She touches it to her lips. Maybe she takes a tiny taste. Maybe she puts it back. Papa smiles: "Theek hai, kal phir try karenge."
@@ -1053,18 +1088,19 @@ Moral: Dikhana, offer karna, pressure nahi. Baar baar dikhane se familiarity aat
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-    setting: 'Dining table, lunch time, afternoon light',
-    sceneDetail: 'Ria\'s plate with broccoli florets; Papa\'s plate with a half-eaten floret; a small extra piece on the side of Ria\'s plate',
-    dialogue: '"Nahi chahiye!" "Crunchy hai, thoda kadwa bhi." "Chaho toh try karo, warna rehne do." "Theek hai, kal phir try karenge."',
-    mess: 'Ria refuses the broccoli, pushes plate away. Papa models eating without pressure. Ria explores the piece — looks, touches, smells — bite optional.',
-    innerThought: 'My job is to offer, not to force. Every exposure counts, even if she does not bite today.',
-    endingBeat: 'Ria puts the piece back or takes a tiny taste. Either way, Papa stays calm. "Kal phir try karenge." They continue eating together.',
-    defaultCast: ['Ria', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Dining table, lunch time, afternoon light',
+      sceneDetail: 'Ria\'s plate with broccoli florets; Papa\'s plate with a half-eaten floret; a small extra piece on the side of Ria\'s plate',
+      dialogue: '"Nahi chahiye!" "Crunchy hai, thoda kadwa bhi." "Chaho toh try karo, warna rehne do." "Theek hai, kal phir try karenge."',
+      mess: 'Ria refuses the broccoli, pushes plate away. Papa models eating without pressure. Ria explores the piece — looks, touches, smells — bite optional.',
+      innerThought: 'My job is to offer, not to force. Every exposure counts, even if she does not bite today.',
+      endingBeat: 'Ria puts the piece back or takes a tiny taste. Either way, Papa stays calm. "Kal phir try karenge." They continue eating together.',
+      defaultCast: ['Ria', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Dining table, lunch time. Ria pushes broccoli away: "Nahi chahiye!" Papa takes a bite: "Crunchy hai." Offers small piece: "Try karo, warna rehne do." No pressure. Text: "BROCCOLI? NAHI! 🥦" "PAPA KHAKE DIKHAYE 🍴" "PRESSURE NAHI 🚫"
 
 On-Screen Text:
@@ -1084,26 +1120,27 @@ Audio/Dialogue (Hinglish): Ria firm: "Nahi chahiye!" Papa natural: "Crunchy hai,
 Part 3 (20-30s): $kPartStyle. Ria puts the piece back or takes a tiny taste. Either way, Papa stays calm. "Kal phir try karenge." They continue eating together. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Repeated low-pressure exposure and calm modelling can help children become familiar with foods, but acceptance is never guaranteed. Never pressure, bargain, or threaten.
 
     ''',
-  ),
+    ),
 
-// New built-in content ideas from Palak's marketing and character plan.
-HookIdea(
-    id: 'idea_14',
-    category: 'Child Chaos',
-    cover: 'Park Se Ghar: Teen Bachche, Teen Reactions 😂',
-    title: 'Park Se Ghar: Teen Bachche, Teen Reactions 😂',
-    opening: 'Park se ghar aane par aapka bachcha kaun sa drama karta hai? 😂',
-    problem: 'Ria negotiates for more turns, Rio demands "ek aur slide," and Cuty seeks a quiet moment — all at the same time. Mumma needs to transition all three without a meltdown.',
-    lesson: 'Give all children the same clear, fair transition boundary. Adapt your support to each child\'s personality — negotiate timing for the negotiator, offer a choice for the protester, and provide a calm corner for the quiet one. A timer can help but does not guarantee instant calm.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Park se ghar aana hai? Ria negotiate karegi, Rio "ek aur" bolega, Cuty corner dhundhegi. Mumma ki ek hi boundary, teen alag support. 😂 #SiblingPersonalities #ParkToHome #ToddlerTransitions #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // New built-in content ideas from Palak's marketing and character plan.
+    HookIdea(
+      id: 'idea_14',
+      category: 'Child Chaos',
+      cover: 'Park Se Ghar: Teen Bachche, Teen Reactions 😂',
+      title: 'Park Se Ghar: Teen Bachche, Teen Reactions 😂',
+      opening:
+          'Park se ghar aane par aapka bachcha kaun sa drama karta hai? 😂',
+      problem: 'Ria negotiates for more turns, Rio demands "ek aur slide," and Cuty seeks a quiet moment — all at the same time. Mumma needs to transition all three without a meltdown.',
+      lesson: 'Give all children the same clear, fair transition boundary. Adapt your support to each child\'s personality — negotiate timing for the negotiator, offer a choice for the protester, and provide a calm corner for the quiet one. A timer can help but does not guarantee instant calm.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Park se ghar aana hai? Ria negotiate karegi, Rio "ek aur" bolega, Cuty corner dhundhegi. Mumma ki ek hi boundary, teen alag support. 😂 #SiblingPersonalities #ParkToHome #ToddlerTransitions #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: At the park, Mumma says, "Chalo, ghar chalna hai." Ria instantly starts negotiating: "Mere saath 5 minute, phir Rio karega!" Rio protests: "Ek aur slide, ek aur!" Cuty silently slides off the swing and hides behind Mumma's leg, eyes half-closed.
 Twist: Mumma gives the same boundary to all: "Do minute aur, phir chalenge." For Ria, she adds: "Tum timer set karo." For Rio, she offers: "Ek goodbye song, phir chalo." For Cuty, she just lifts her gently: "Tere liye quiet corner bana ke rakha hai."
 Resolution: Ria sets the timer, proud. Rio picks "Happy Birthday" as his goodbye song. Cuty snuggles into Mumma's arms, already half-asleep. All three transition without tears — the timer helps, but the real win is the tailored support.
@@ -1111,18 +1148,19 @@ Moral: Ek hi boundary, teen alag support. Ria, Rio ya Cuty — aapka bachcha kis
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-    setting: 'Park with three swings, late afternoon, Mumma standing ready to leave',
-    sceneDetail: 'Three swings — Ria on one bargaining, Rio on another protesting, Cuty curled up on the third drowsy',
-    dialogue: '"Chalo, ghar chalna hai." "Mere saath 5 minute!" "Ek aur slide!" *Cuty hides silently*',
-    mess: 'All three react differently at once — Ria negotiates, Rio protests, Cuty withdraws. Mumma stays calm.',
-    innerThought: 'Same boundary, different kids. The magic is in how I adapt, not in changing the rule.',
-    endingBeat: 'Timer dings, goodbye song ends, Cuty yawns in Mumma\'s arms. "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?"',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Park with three swings, late afternoon, Mumma standing ready to leave',
+      sceneDetail: 'Three swings — Ria on one bargaining, Rio on another protesting, Cuty curled up on the third drowsy',
+      dialogue: '"Chalo, ghar chalna hai." "Mere saath 5 minute!" "Ek aur slide!" *Cuty hides silently*',
+      mess: 'All three react differently at once — Ria negotiates, Rio protests, Cuty withdraws. Mumma stays calm.',
+      innerThought: 'Same boundary, different kids. The magic is in how I adapt, not in changing the rule.',
+      endingBeat: 'Timer dings, goodbye song ends, Cuty yawns in Mumma\'s arms. "Ria, Rio ya Cuty — aapka bachcha kis jaisa hai?"',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Park, late afternoon. Mumma: "Chalo, ghar chalna hai." Ria (pink dress): "Mere saath 5 minute!" Rio (blue shirt): "Ek aur slide!" Cuty (tiny, sleepy): *hides behind leg*. Text: "PARK SE GHAR 🏃‍♀️" "TEEN BACHCHE, TEEN REACTIONS 😂"
 
 On-Screen Text:
@@ -1147,25 +1185,25 @@ Part 3 (20-30s): $kPartStyle. Timer dings, goodbye song ends, Cuty yawns in Mumm
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_15',
-    category: 'Funny',
-    cover: '7 Things Every Toddler Does 😂',
-    title: '7 Things Every Toddler Does 😂',
-    opening: 'Says no, wants the same spoon, suddenly needs Mumma — seven tiny dramas in one Reel! 😂',
-    problem: 'Seven distinct, relatable toddler behaviors that every parent recognizes but rarely sees compiled together.',
-    lesson: 'These tiny, universal behaviors are the funny, exhausting, and heartwarming signs of childhood — not problems to fix.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Har parent in 7 cheezon ko pehchaane ga! 1) "Nahi!" 2) Same spoon 3) Sudden Mumma need 4) Toy drop-pickup loop 5) Bedtime stretch 6) Wrong shoe pride 7) Random fact drop. #ToddlerTruths #ParentingHumor #DailyChaos #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_15',
+      category: 'Funny',
+      cover: '7 Things Every Toddler Does 😂',
+      title: '7 Things Every Toddler Does 😂',
+      opening: 'Says no, wants the same spoon, suddenly needs Mumma — seven tiny dramas in one Reel! 😂',
+      problem: 'Seven distinct, relatable toddler behaviors that every parent recognizes but rarely sees compiled together.',
+      lesson: 'These tiny, universal behaviors are the funny, exhausting, and heartwarming signs of childhood — not problems to fix.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Har parent in 7 cheezon ko pehchaane ga! 1) "Nahi!" 2) Same spoon 3) Sudden Mumma need 4) Toy drop-pickup loop 5) Bedtime stretch 6) Wrong shoe pride 7) Random fact drop. #ToddlerTruths #ParentingHumor #DailyChaos #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Seven quick vignettes, one after another.
 1) "Nahi!" — Ria refuses the green shirt, crosses arms.
 2) Same spoon — Rio only eats with the blue spoon, ignores the red one.
@@ -1176,18 +1214,20 @@ Story: Seven quick vignettes, one after another.
 7) Random fact drop — Ria: "Mumma, butterfly taste with their feet!"
 Moral: These aren't problems — they're proof your child is growing, exploring, and being exactly who they should be.
 ''',
-    setting: 'Montage across home — kitchen, bedroom, playroom, hallway, bedtime',
-    sceneDetail: 'Quick cuts: blue spoon rejected, car dropped, blanket tugged, penguin walk, butterfly fact',
-    dialogue: '"Nahi!" "Blue spoon!" "Mumma!" *giggle* "Penguin!" "Butterfly taste with feet!"',
-    mess: 'Seven rapid-fire toddler moments — spoon refusal, car drop, blanket demand, penguin walk, random fact',
-    innerThought: 'Each "problem" is actually a milestone in disguise. The chaos is the childhood.',
-    endingBeat: 'Montage ends with all three kids asleep in a pile. Text: "7 things. 1 childhood. 💛"',
-    defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Montage across home — kitchen, bedroom, playroom, hallway, bedtime',
+      sceneDetail: 'Quick cuts: blue spoon rejected, car dropped, blanket tugged, penguin walk, butterfly fact',
+      dialogue: '"Nahi!" "Blue spoon!" "Mumma!" *giggle* "Penguin!" "Butterfly taste with feet!"',
+      mess: 'Seven rapid-fire toddler moments — spoon refusal, car drop, blanket demand, penguin walk, random fact',
+      innerThought: 'Each "problem" is actually a milestone in disguise. The chaos is the childhood.',
+      endingBeat: 'Montage ends with all three kids asleep in a pile. Text: "7 things. 1 childhood. 💛"',
+      defaultCast: ['Ria', 'Rio', 'Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Fast-paced montage of 7 toddler moments.
 Text: "7 THINGS EVERY TODDLER DOES 😂"
 
@@ -1213,43 +1253,46 @@ Part 3 (20-30s): $kPartStyle. Montage ends with all three kids asleep in a pile.
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-// Tantrums & big feelings: when emotions overflow and a calm reset helps.
-  HookIdea(
-    id: 'idea_16',
-    category: 'Child Chaos',
-    cover: 'Bedtime Ki Darr!',
-    title: 'Bedtime Ki Darr!',
-    opening: 'Cuty: "Bas ek aur story!" ... jab tak aankh band nahi hoti.',
-    problem: 'Cuty refuses bedtime, demanding "just one more" story',
-    lesson: 'Ek story, phir lamp off. Use a visual timer — when sand runs out, it is sleep time.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ek aur story? No. Ek story phir sleep time. Timer ke saath easy! 😴 #BedtimeBattle #SleepTraining #FunLearningWithPalak #IndianParents #BedtimeStories',
-    pinnedComment: 'Tip: "Story timer" with 2-minute sand clock — visual, fair, final.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Tantrums & big feelings: when emotions overflow and a calm reset helps.
+    HookIdea(
+      id: 'idea_16',
+      category: 'Child Chaos',
+      cover: 'Bedtime Ki Darr!',
+      title: 'Bedtime Ki Darr!',
+      opening: 'Cuty: "Bas ek aur story!" ... jab tak aankh band nahi hoti.',
+      problem: 'Cuty refuses bedtime, demanding "just one more" story',
+      lesson: 'Ek story, phir lamp off. Use a visual timer — when sand runs out, it is sleep time.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ek aur story? No. Ek story phir sleep time. Timer ke saath easy! 😴 #BedtimeBattle #SleepTraining #FunLearningWithPalak #IndianParents #BedtimeStories',
+      pinnedComment:
+          'Tip: "Story timer" with 2-minute sand clock — visual, fair, final.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Cuty sits bolt upright in bed: "Ek aur story!" Mumma: "Time up, beta." Cuty: "But I need one more!" Tears welling.
 Twist: Mumma shows a 2-minute sand timer: "Jab tak ravaan khatam ho jaye, tab tak ek story. Phir sleep." Cuty watches the sand.
 Resolution: Timer runs out. Cuty snuggles down: "The End story?" Mumma: "Goodnight story. Always."
 Moral: One more story means one more minute — then it is sleep time.
 ''',
-    setting: 'Cuty\'s bedroom, bedtime, soft night light',
-    sceneDetail: 'Cuty clutching her favorite stuffed carrot, sand timer on the nightstand',
-    dialogue: '"Ek aur story!" "Jab tak ravaan khatam ho jaye, tab tak ek story."',
-    mess: 'Cuty cries, hiccers, asks for "The Very Hungry Caterpillar" again',
-    innerThought: 'The timer is the bad guy, not Mumma.',
-    endingBeat: 'Cuty whispers "The End story, Mumma?" and snuggles under the blanket.',
-    defaultCast: ['Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cuty\'s bedroom, bedtime, soft night light',
+      sceneDetail: 'Cuty clutching her favorite stuffed carrot, sand timer on the nightstand',
+      dialogue:
+          '"Ek aur story!" "Jab tak ravaan khatam ho jaye, tab tak ek story."',
+      mess: 'Cuty cries, hiccers, asks for "The Very Hungry Caterpillar" again',
+      innerThought: 'The timer is the bad guy, not Mumma.',
+      endingBeat: 'Cuty whispers "The End story, Mumma?" and snuggles under the blanket.',
+      defaultCast: ['Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Cuty's bedroom, bedtime. Soft night light glows. Cuty (fluffy white bunny, pink bow, large dark eyes) sits bolt upright in bed: "Ek aur story!" Mumma (yellow kurti, top bun) holds a 2-minute sand timer. Text on screen: "BEDTIME STORY? 📖" "SAND TIMER ⏰" "ONE MORE MINUTE... THEN SLEEP 💤"
 
 On-Screen Text:
@@ -1269,42 +1312,44 @@ Part 3 (20-30s): $kPartStyle. Cuty snuggles under blanket, eyes already heavy. M
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_17',
-    category: 'Ria Chaos',
-    cover: 'Neend Ka Evidence 😴',
-    title: 'Neend Ka Evidence 😴',
-    opening: 'Ria: "Mujhe neend nahi!" ... jab tak aankh band nahi hoti. 😴',
-    problem: 'Ria protests sleep loudly, then falls asleep mid-story. Her protest is real, but so is her tiredness.',
-    lesson: 'Bedtime protest is normal — it can be a way of staying close. Validate the feeling, keep the routine warm and firm, and trust that sleep will come. Do not promise the protest will stop or that sleep will be instant.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria: "Mujhe neend nahi!" ... phir aankh band. Protest bhi pyaar hai, neend bhi zaroori. Bedtime protest normal hai — pyaar se handle karo. 😴 #BedtimeStruggles #ToddlerSleep #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_17',
+      category: 'Ria Chaos',
+      cover: 'Neend Ka Evidence 😴',
+      title: 'Neend Ka Evidence 😴',
+      opening: 'Ria: "Mujhe neend nahi!" ... jab tak aankh band nahi hoti. 😴',
+      problem: 'Ria protests sleep loudly, then falls asleep mid-story. Her protest is real, but so is her tiredness.',
+      lesson: 'Bedtime protest is normal — it can be a way of staying close. Validate the feeling, keep the routine warm and firm, and trust that sleep will come. Do not promise the protest will stop or that sleep will be instant.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria: "Mujhe neend nahi!" ... phir aankh band. Protest bhi pyaar hai, neend bhi zaroori. Bedtime protest normal hai — pyaar se handle karo. 😴 #BedtimeStruggles #ToddlerSleep #ParentingHacks #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria sits bolt upright mid-storybook on Mumma's lap, legs kicking. "Mujhe neend nahi!" She pats the pillow: "Thoda aur?"
 Twist: Halfway through page two, her eyelids grow heavy. Mumma: "Evidence mil gaya." Ria snaps awake: "Main toh jaag rahi thi!"
 Resolution: Mumma tucks the blanket around Ria's shoulders and keeps reading in a whisper. By page three Ria is breathing evenly, one hand still holding the page corner.
 Moral: Protest bhi pyaar hai. Neend aayegi — bas pyaar se saath do.
 ''',
-    setting: 'Living room couch, storybook on Mumma lap, dim lamp',
-    sceneDetail: 'Half-read storybook, blanket half-draped, one hand holding the page corner',
-    dialogue: '"Mujhe neend nahi!" "Evidence mil gaya." "Main toh jaag rahi thi!"',
-    mess: 'Ria keeps restarting the story from page one, refusing to stay still',
-    innerThought: 'Agar main jaldi so jaoongi toh kal subah uthna padega, and I will anyway',
-    endingBeat: 'Mumma tucks the blanket around Ria\'s shoulders, both half-asleep by page three. "Goodnight, beta." "Goodnight, Mumma."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room couch, storybook on Mumma lap, dim lamp',
+      sceneDetail: 'Half-read storybook, blanket half-draped, one hand holding the page corner',
+      dialogue:
+          '"Mujhe neend nahi!" "Evidence mil gaya." "Main toh jaag rahi thi!"',
+      mess: 'Ria keeps restarting the story from page one, refusing to stay still',
+      innerThought: 'Agar main jaldi so jaoongi toh kal subah uthna padega, and I will anyway',
+      endingBeat: 'Mumma tucks the blanket around Ria\'s shoulders, both half-asleep by page three. "Goodnight, beta." "Goodnight, Mumma."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Cozy living room couch, dim lamp, half-read storybook on Mumma's lap. Ria (pajamas, hair messy) sits bolt upright: "Mujhe neend nahi!" Yawns, then pats the pillow: "Thoda aur?" Text on screen: "NEEND KA EVIDENCE" "PROTEST • DETECT • RESOLVE"
 
 On-Screen Text:
@@ -1325,42 +1370,44 @@ Part 3 (20-30s): $kPartStyle. Mumma tucks the blanket around Ria's shoulders, bo
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_18',
-    category: 'Child Chaos',
-    cover: 'Morning Checklist: Sock, Shirt, Bottle! ✅',
-    title: 'Morning Checklist: Sock, Shirt, Bottle! ✅',
-    opening: 'Ek sock missing, shirt ulta, bottle reh gaya — morning checklist se sab theek! ✅',
-    problem: 'Morning routine creates scattered chaos — missing sock, inside-out shirt, forgotten water bottle.',
-    lesson: 'A visual morning checklist made together turns chaos into teamwork. Kids remember what they help create.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Morning chaos? Sock, shirt, bottle — checklist banao saath milke. Ria, Rio, Cuty sab yaad rakhenge! ✅ #MorningRoutine #ChecklistHack #ToddlerIndependence #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Routine ko ek picture banao — har step ek star ban jaye!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_18',
+      category: 'Child Chaos',
+      cover: 'Morning Checklist: Sock, Shirt, Bottle! ✅',
+      title: 'Morning Checklist: Sock, Shirt, Bottle! ✅',
+      opening: 'Ek sock missing, shirt ulta, bottle reh gaya — morning checklist se sab theek! ✅',
+      problem: 'Morning routine creates scattered chaos — missing sock, inside-out shirt, forgotten water bottle.',
+      lesson: 'A visual morning checklist made together turns chaos into teamwork. Kids remember what they help create.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Morning chaos? Sock, shirt, bottle — checklist banao saath milke. Ria, Rio, Cuty sab yaad rakhenge! ✅ #MorningRoutine #ChecklistHack #ToddlerIndependence #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: Routine ko ek picture banao — har step ek star ban jaye!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Morning check: one sock by the couch, shirt inside-out, water bottle left on the chair.
 Twist: Ria spots her own sock — "Mumma, maine hi gira diya!" — and laughs instead of crying. They turn the chaos into a game: "Morning Checklist — sock, shirt, bottle, smile!"
 Resolution: They make a visual checklist together on the fridge: sock ✅ shirt ✅ bottle ✅ smile ✅. Next morning, Ria checks each item off proudly.
 Moral: Small things make big mornings — and a checklist made together turns chaos into teamwork.
 ''',
-    setting: 'Hallway by the door, morning, coats on hooks, fridge with visual checklist',
-    sceneDetail: 'Visual checklist on fridge with pictures: sock, shirt, bottle, smile — Ria checking off items',
-    dialogue: '"Mumma, maine hi gira diya!" "Checklist: sock, shirt, bottle, smile!"',
-    mess: 'Morning chaos: sock here, shirt inverted, bottle forgotten on the table — turned into a visual checklist',
-    innerThought: 'If we make the checklist together, maybe tomorrow will be smoother — and it is.',
-    endingBeat: 'Ria checks off "smile" last, beams. "Checklist complete!" Rio high-fives. Morning sorted.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Hallway by the door, morning, coats on hooks, fridge with visual checklist',
+      sceneDetail: 'Visual checklist on fridge with pictures: sock, shirt, bottle, smile — Ria checking off items',
+      dialogue: '"Mumma, maine hi gira diya!" "Checklist: sock, shirt, bottle, smile!"',
+      mess: 'Morning chaos: sock here, shirt inverted, bottle forgotten on the table — turned into a visual checklist',
+      innerThought: 'If we make the checklist together, maybe tomorrow will be smoother — and it is.',
+      endingBeat: 'Ria checks off "smile" last, beams. "Checklist complete!" Rio high-fives. Morning sorted.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Hallway by the door, morning. Visual checklist on fridge with pictures: sock, shirt, bottle, smile. Ria checks off each item: sock ✅ shirt ✅ bottle ✅ smile ✅ Text: "MORNING CHECKLIST ✅" "SOCK • SHIRT • BOTTLE • SMILE"
 
 On-Screen Text:
@@ -1382,42 +1429,44 @@ Part 3 (20-30s): $kPartStyle. Ria checks off "smile" last, beams. "Checklist com
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_19',
-    category: 'Ria Chaos',
-    cover: 'Ready Captain! Ria Ki Indecision 🎀',
-    title: 'Ready Captain! Ria Ki Indecision 🎀',
-    opening: 'Ria: "Ready Captain!" Par hair clip teen baar badli... time nikal gaya! 🎀',
-    problem: 'Ria declares herself "Ready Captain" but keeps changing her hair clip — blue bow, pink bow, no bow — while time slips away.',
-    lesson: 'Being ready first does not mean leaving the team behind. True readiness means helping others get ready too.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria: "Ready Captain!" Par clip teen baar badli. Rio: "Time khatam!" Ria picks no-bow, helps Cuty. Team first! 🎀 #MorningRoutine #SiblingSupport #ToddlerIndependence #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_19',
+      category: 'Ria Chaos',
+      cover: 'Ready Captain! Ria Ki Indecision 🎀',
+      title: 'Ready Captain! Ria Ki Indecision 🎀',
+      opening: 'Ria: "Ready Captain!" Par hair clip teen baar badli... time nikal gaya! 🎀',
+      problem: 'Ria declares herself "Ready Captain" but keeps changing her hair clip — blue bow, pink bow, no bow — while time slips away.',
+      lesson: 'Being ready first does not mean leaving the team behind. True readiness means helping others get ready too.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria: "Ready Captain!" Par clip teen baar badli. Rio: "Time khatam!" Ria picks no-bow, helps Cuty. Team first! 🎀 #MorningRoutine #SiblingSupport #ToddlerIndependence #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria declares: "Ready Captain!" — but she changes her hair clip three times: blue bow, pink bow, no bow.
 Twist: Rio points at the clock: "Time khatam ho raha hai!" Cuty is still struggling with his second shoe. Ria pauses, sees Cuty struggling.
 Resolution: Ria picks "no bow," kneels down, and helps Cuty with his second shoe. "Jab tak sabke saath, tab tak team complete." They walk out together.
 Moral: Being first ready doesn't mean you leave everyone behind. True readiness means helping the team cross the finish line together.
 ''',
-    setting: 'Front door, backpacks by the shoe rack, "Ready Captain" badge on Ria\'s shirt, clock on wall',
-    sceneDetail: 'Three hair clips on the counter — blue bow, pink bow, plain clip; Cuty struggling with shoe; clock showing time',
-    dialogue: '"Ready Captain!" "Blue bow, pink bow, no bow." "Time khatam ho raha hai!" "Team complete!"',
-    mess: 'Ria changes her hair clip three times, time slipping away; Cuty struggles with shoe; Rio watches clock',
-    innerThought: 'Ready hona kaafi nahi — team ke saath ready hona asli ready hai.',
-    endingBeat: 'Ria picks no-bow, helps Cuty with his shoe. "Team complete!" All three walk out together, on time.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Front door, backpacks by the shoe rack, "Ready Captain" badge on Ria\'s shirt, clock on wall',
+      sceneDetail: 'Three hair clips on the counter — blue bow, pink bow, plain clip; Cuty struggling with shoe; clock showing time',
+      dialogue: '"Ready Captain!" "Blue bow, pink bow, no bow." "Time khatam ho raha hai!" "Team complete!"',
+      mess: 'Ria changes her hair clip three times, time slipping away; Cuty struggles with shoe; Rio watches clock',
+      innerThought:
+          'Ready hona kaafi nahi — team ke saath ready hona asli ready hai.',
+      endingBeat: 'Ria picks no-bow, helps Cuty with his shoe. "Team complete!" All three walk out together, on time.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Front door, backpacks by shoe rack. Ria with "Ready Captain" badge changes hair clip: blue bow → pink bow → no bow. Clock ticks. Rio: "Time khatam!" Cuty struggles with shoe. Ria picks no-bow, helps Cuty. Text: "READY CAPTAIN! 🎀" "CLIP CHANGES × 3 🔄" "TIME TICKING ⏰" "TEAM FIRST! 🤝"
 
 On-Screen Text:
@@ -1439,42 +1488,43 @@ Part 3 (20-30s): $kPartStyle. Ria picks no-bow, helps Cuty with his shoe. "Team 
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_20',
-    category: 'Child Chaos',
-    cover: 'Kaun Kha Gaya? Mystery! 🕵️‍♀️',
-    title: 'Kaun Kha Gaya? Mystery! 🕵️‍♀️',
-    opening: 'Fruit pieces everywhere... Ria points at Rio. Asli culprit kaun? 🕵️‍♀️',
-    problem: 'A snack plate is empty. Ria immediately blames Rio without checking the evidence.',
-    lesson: 'Check the evidence before blaming someone. The real answer is often right in front of you — look first, accuse later.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Plate khali, Ria blame Rio ko kar di! Check karo pehle, blame baad mein. 🕵️‍♀️ #EvidenceFirst #SiblingMystery #ToddlerHumor #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_20',
+      category: 'Child Chaos',
+      cover: 'Kaun Kha Gaya? Mystery! 🕵️‍♀️',
+      title: 'Kaun Kha Gaya? Mystery! 🕵️‍♀️',
+      opening: 'Fruit pieces everywhere... Ria points at Rio. Asli culprit kaun? 🕵️‍♀️',
+      problem: 'A snack plate is empty. Ria immediately blames Rio without checking the evidence.',
+      lesson: 'Check the evidence before blaming someone. The real answer is often right in front of you — look first, accuse later.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Plate khali, Ria blame Rio ko kar di! Check karo pehle, blame baad mein. 🕵️‍♀️ #EvidenceFirst #SiblingMystery #ToddlerHumor #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A plate of apple slices sits empty on the coffee table. Ria gasps: "Mumma, Mumma — koi ne apple kha liye!" Points at Rio: "Rio ne khaya!"
 Twist: Mumma: "Check karte hain." She looks at Rio's hands — clean. Then she looks at the rug under the coffee table — apple peels and a few slices tucked there. She looks at Cuty — a small apple piece sits near her paws.
 Resolution: Ria giggles: "Oh! Cuty ke paas mila!" She picks up the piece and puts it back on the plate. Rio grins: "Maine nahi khaya."
 Moral: Sabse paas ka suspect aksar asli culprit hota hai — check karo pehle, blame baad mein.
 ''',
-    setting: 'Living room, coffee table with empty snack plate, apple peels on rug nearby',
-    sceneDetail: 'Empty snack plate, apple peels on rug under table, Cuty sitting nearby with a small apple piece near her paws, Rio with clean hands',
-    dialogue: '"Mumma, Mummy — koi ne apple kha liye!" "Rio ne khaya!" "Check karte hain." "Cuty ke paas mila!"',
-    mess: 'Ria points at Rio, accusation in her voice, while the evidence trail leads elsewhere',
-    innerThought: 'The closest suspect often has the best poker face — check evidence before blaming.',
-    endingBeat: 'Ria picks up the apple piece near Cuty, puts it on the plate. "Cuty ke paas mila!" Rio grins: "Maine nahi khaya."',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, coffee table with empty snack plate, apple peels on rug nearby',
+      sceneDetail: 'Empty snack plate, apple peels on rug under table, Cuty sitting nearby with a small apple piece near her paws, Rio with clean hands',
+      dialogue: '"Mumma, Mummy — koi ne apple kha liye!" "Rio ne khaya!" "Check karte hain." "Cuty ke paas mila!"',
+      mess: 'Ria points at Rio, accusation in her voice, while the evidence trail leads elsewhere',
+      innerThought: 'The closest suspect often has the best poker face — check evidence before blaming.',
+      endingBeat: 'Ria picks up the apple piece near Cuty, puts it on the plate. "Cuty ke paas mila!" Rio grins: "Maine nahi khaya."',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, empty snack plate on coffee table. Ria points at Rio: "Rio ne khaya!" Mumma: "Check karte hain." Looks at Rio's hands — clean. Finds apple peels on rug, piece near Cuty's paws. Text: "MYSTERY SNACK 🕵️‍♀️" "EVIDENCE FIRST! 🔍"
 
 On-Screen Text:
@@ -1496,43 +1546,45 @@ Part 3 (20-30s): $kPartStyle. Ria picks up the apple piece near Cuty, puts it on
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
+    ),
 
-  // Routines: daily rituals that become tiny battles until they become habits.
-HookIdea(
-    id: 'idea_21',
-    category: 'Funny',
-    cover: 'Mumma Ne Kaha Tha! 🗣️',
-    title: 'Mumma Ne Kaha Tha! 🗣️',
-    opening: 'Mumma ne kaha — "Aaj jaldi sona hai." Ria ne Teddy ko bol diya! 🗣️',
-    problem: 'Children repeat the exact phrases adults say — often at the most unexpected (and funny) moments.',
-    lesson: 'Small phrases stick; what we say becomes their inner voice. Speak the words you want them to repeat.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria: "Teddy, negotiation band!" Mumma: "Yeh toh maine kaha tha!" Bachche wahi bolte jo sunte hain. 🗣️ #ToddlerQuotes #ParentingMirror #WordsMatter #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Routines: daily rituals that become tiny battles until they become habits.
+    HookIdea(
+      id: 'idea_21',
+      category: 'Funny',
+      cover: 'Mumma Ne Kaha Tha! 🗣️',
+      title: 'Mumma Ne Kaha Tha! 🗣️',
+      opening:
+          'Mumma ne kaha — "Aaj jaldi sona hai." Ria ne Teddy ko bol diya! 🗣️',
+      problem: 'Children repeat the exact phrases adults say — often at the most unexpected (and funny) moments.',
+      lesson: 'Small phrases stick; what we say becomes their inner voice. Speak the words you want them to repeat.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria: "Teddy, negotiation band!" Mumma: "Yeh toh maine kaha tha!" Bachche wahi bolte jo sunte hain. 🗣️ #ToddlerQuotes #ParentingMirror #WordsMatter #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma tells Ria at bedtime, "Aaj jaldi sona hai." Later that night, Ria tucks Teddy in and repeats Mumma's exact phrase with a twist: "Teddy, negotiation band — ab so jao!"
 Twist: Mumma, sitting nearby on the bed, tries not to laugh — she's heard every word. She realizes: "Yeh toh maine hi kaha tha... lekin alag andaaz mein."
 Resolution: Ria whispers, "Mumma ne kaha tha!" and Mumma gives her a quiet, warm hug, thinking about the words she wants Ria to keep.
 Moral: Jo baatein hum dete hain, wohi din mein dobara sunai deti hain — par pyaar ke saath.
 ''',
-    setting: 'Bedroom, bedtime, Teddy on the pillow, night light glowing',
-    sceneDetail: 'Ria tucking Teddy in, night light casting soft shadows, Mumma watching from the doorway',
-    dialogue: '"Aaj jaldi sona hai." "Teddy, negotiation band — ab so jao!" "Mumma ne kaha tha!"',
-    mess: 'Ria repeats Mumma\'s exact phrase to Teddy, not knowing she was overheard',
-    innerThought: 'That phrase I said in frustration — she made it her own lullaby. What else is she storing?',
-    endingBeat: 'Ria whispers "Mumma ne kaha tha!" and Mumma gives her a quiet, warm hug. "Haan beta, maine hi kaha tha. Kal se behtar words choose karungi."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bedroom, bedtime, Teddy on the pillow, night light glowing',
+      sceneDetail: 'Ria tucking Teddy in, night light casting soft shadows, Mumma watching from the doorway',
+      dialogue: '"Aaj jaldi sona hai." "Teddy, negotiation band — ab so jao!" "Mumma ne kaha tha!"',
+      mess: 'Ria repeats Mumma\'s exact phrase to Teddy, not knowing she was overheard',
+      innerThought: 'That phrase I said in frustration — she made it her own lullaby. What else is she storing?',
+      endingBeat: 'Ria whispers "Mumma ne kaha tha!" and Mumma gives her a quiet, warm hug. "Haan beta, maine hi kaha tha. Kal se behtar words choose karungi."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, bedtime. Mumma: "Aaj jaldi sona hai." Ria tucks Teddy: "Teddy, negotiation band — ab so jao!" Mumma at doorway smiles. Text: "MUMMA NE KAHA THA! 🗣️" "BACCHE SUNATE HAIN 🎧"
 
 On-Screen Text:
@@ -1554,43 +1606,44 @@ Part 3 (20-30s): $kPartStyle. Ria whispers "Mumma ne kaha tha!" and Mumma gives 
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_22',
-    category: 'Child Chaos',
-    cover: 'Supermarket Team! 🛒',
-    title: 'Supermarket Team! 🛒',
-    opening: 'Ria: mangoes! Rio: cereal box! Cuty: list guard! Supermarket team ready! 🛒',
-    problem: 'Shopping with three kids — each gets a job suited to their age and energy, with safety first.',
-    lesson: 'Give each child an age-appropriate job. They may misunderstand, but the teamwork and inclusion matter more than perfect execution. Safety comes first — no riding on cart handles.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Supermarket team ready! Ria: mangoes 🥭 Rio: cereal box 📦 Cuty: list guard 📝 Jobs diye, teamwork mila! 🛒 #SupermarketTeam #SiblingTeamwork #GroceryWithKids #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Jootey pehne ko ek game bana lo — "Superhero ban jao!"',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_22',
+      category: 'Child Chaos',
+      cover: 'Supermarket Team! 🛒',
+      title: 'Supermarket Team! 🛒',
+      opening: 'Ria: mangoes! Rio: cereal box! Cuty: list guard! Supermarket team ready! 🛒',
+      problem: 'Shopping with three kids — each gets a job suited to their age and energy, with safety first.',
+      lesson: 'Give each child an age-appropriate job. They may misunderstand, but the teamwork and inclusion matter more than perfect execution. Safety comes first — no riding on cart handles.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Supermarket team ready! Ria: mangoes 🥭 Rio: cereal box 📦 Cuty: list guard 📝 Jobs diye, teamwork mila! 🛒 #SupermarketTeam #SiblingTeamwork #GroceryWithKids #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Tip: Jootey pehne ko ek game bana lo — "Superhero ban jao!"',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: At the supermarket, Mumma gives each a job — Ria: "Pick the yellow fruit." Rio: "Find the cereal box on the shelf." Cuty: "Hold the list clip on the cart."
 Twist: Ria returns with mangoes (yellow fruit ✅). Rio finds the cereal box (manageable size ✅). Cuty "guards" the list by sitting safely in the cart basket — "Main list ka rakwala hoon!" Mumma smiles: "Cart handle pe nahi, basket mein baitho."
 Resolution: They laugh at the checkout: "Hamari shopping team badi achhi hai!" Ria helps put mangoes on the belt. Rio puts the cereal box up. Cuty waves the receipt from the basket.
 Moral: Give them a role suited to them — even if they do it their way, the teamwork is the real win. Safety first!
 ''',
-    setting: 'Supermarket aisle, evening, shopping cart with list clipped on, cart basket safe for Cuty',
-    sceneDetail: 'Ria holding mangoes, Rio placing cereal box in cart, Cuty sitting safely in cart basket "guarding" the list',
-    dialogue: '"Ria, pick the yellow fruit." "Rio, find the cereal box." "Cuty, hold the list clip!"',
-    mess: 'Ria picks mangoes, Rio finds cereal box, Cuty "guards" list from cart basket — each does it their way safely',
-    innerThought: 'They misunderstood the brief — but the teamwork is perfect anyway. Safety first!'
-,
-    endingBeat: 'They laugh: "Hamari shopping team badi achhi hai!" Ria puts mangoes on belt, Rio lifts box, Cuty waves receipt from the basket.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Supermarket aisle, evening, shopping cart with list clipped on, cart basket safe for Cuty',
+      sceneDetail: 'Ria holding mangoes, Rio placing cereal box in cart, Cuty sitting safely in cart basket "guarding" the list',
+      dialogue: '"Ria, pick the yellow fruit." "Rio, find the cereal box." "Cuty, hold the list clip!"',
+      mess: 'Ria picks mangoes, Rio finds cereal box, Cuty "guards" list from cart basket — each does it their way safely',
+      innerThought: 'They misunderstood the brief — but the teamwork is perfect anyway. Safety first!',
+      endingBeat: 'They laugh: "Hamari shopping team badi achhi hai!" Ria puts mangoes on belt, Rio lifts box, Cuty waves receipt from the basket.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Supermarket aisle, cart with list clipped on. Ria picks mangoes: "Yellow fruit!" Rio grabs cereal box. Cuty sits safely in cart basket: "Main list ka rakwala!" Text: "SUPERMARKET TEAM 🛒" "RIA: MANGOES 🥭 RIO: CEREAL 📦 CUTY: LIST GUARD 📝"
 
 On-Screen Text:
@@ -1612,43 +1665,45 @@ Part 3 (20-30s): $kPartStyle. They laugh: "Hamari shopping team badi achhi hai!"
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  // Routines: daily rituals that become tiny battles until they become habits.
-  HookIdea(
-    id: 'idea_23',
-    category: 'Child Chaos',
-    cover: 'Brushing Ka Naya Style!',
-    title: 'Brushing Ka Naya Style!',
-    opening: 'Cuty ne kaha — "Brush nahi, dinosaur chahiye!" Poori bathroom ghoom li.',
-    problem: 'Cuty resists brushing teeth, wants to play with the toothbrush instead',
-    lesson: 'Brushing ek game banao — "Dinosaur roar, toothpaste foam, sparkly smile!"',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Toothbrush ko dinosaur banao, foam banao, sparkly smile pao! 🦖 #Toothbrushing #ToddlerDental #FunLearningWithPalak #IndianParents #OralHygiene',
-    pinnedComment: 'Aapke bachche ka brushing game kya hai?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Routines: daily rituals that become tiny battles until they become habits.
+    HookIdea(
+      id: 'idea_23',
+      category: 'Child Chaos',
+      cover: 'Brushing Ka Naya Style!',
+      title: 'Brushing Ka Naya Style!',
+      opening: 'Cuty ne kaha — "Brush nahi, dinosaur chahiye!" Poori bathroom ghoom li.',
+      problem: 'Cuty resists brushing teeth, wants to play with the toothbrush instead',
+      lesson: 'Brushing ek game banao — "Dinosaur roar, toothpaste foam, sparkly smile!"',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Toothbrush ko dinosaur banao, foam banao, sparkly smile pao! 🦖 #Toothbrushing #ToddlerDental #FunLearningWithPalak #IndianParents #OralHygiene',
+      pinnedComment: 'Aapke bachche ka brushing game kya hai?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Cuty grabs the toothbrush, puts it in her mouth like a dinosaur. "Rawr! Brush nahi, chew!" Foam floats everywhere. Mumma: "Dinosaur ne toothpaste khaya — sparkly bubbles ban gaye!"
 Twist: Cuty spits in the sink: "Dinosaur sparkly now!" She sees her tooth in the foam — a tiny gap where the lost tooth will come out.
 Resolution: Mumma: "Ek minute aur brushing, phir nani story." Cuty: "OK OK!" She brushes properly, eyes on the mirror.
 Moral: Brushing ek game hai — jab tak mazaa aa raha hai, koi dikkat nahi hoti.
 ''',
-    setting: 'Bathroom sink, morning, toothpaste and dinosaur toothbrush',
-    sceneDetail: 'Cuty with toothpaste foam dripping from her mouth, trying to roar like a dinosaur',
-    dialogue: '"Rawr! Brush nahi, chew!" "Dinosaur sparkly now!"',
-    mess: 'Foam everywhere — sink, mirror, Cuty\'s nose, but she is having fun',
-    innerThought: 'If she is laughing while brushing, I am winning.',
-    endingBeat: 'Cuty raises her toothbrush like a trophy: "Dinosaur done!"',
-    defaultCast: ['Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bathroom sink, morning, toothpaste and dinosaur toothbrush',
+      sceneDetail: 'Cuty with toothpaste foam dripping from her mouth, trying to roar like a dinosaur',
+      dialogue: '"Rawr! Brush nahi, chew!" "Dinosaur sparkly now!"',
+      mess:
+          'Foam everywhere — sink, mirror, Cuty\'s nose, but she is having fun',
+      innerThought: 'If she is laughing while brushing, I am winning.',
+      endingBeat: 'Cuty raises her toothbrush like a trophy: "Dinosaur done!"',
+      defaultCast: ['Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bathroom sink, morning light. Cuty (white bunny, pink bow) grabs the dinosaur toothbrush, puts it in her mouth: "Rawr! Brush nahi, chew!" Toothpaste foam drips everywhere. Mumma (yellow kurti, top bun) holds a timer. Text on screen: "DINOSAUR MODE! 🦖" "FOAM PARTY! 🧼" "SPARKLY SMILE! ✨"
 
 On-Screen Text:
@@ -1668,42 +1723,43 @@ Part 3 (20-30s): $kPartStyle. Cuty brushes properly, eyes on mirror, timer runni
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_24',
-    category: 'Ria Chaos',
-    cover: 'Car Bhi Ghar Chalegi! 🚗',
-    title: 'Car Bhi Ghar Chalegi! 🚗',
-    opening: 'Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" 🚗💺',
-    problem: 'Ria insists her toy car must come on the road trip. She refuses to leave it behind.',
-    lesson: 'Safety first: real seatbelts for children in appropriate car seats. Toys travel safely in a travel bag or pouch — never use a backpack as a car restraint, even for a toy.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Safety first, imagination second! 🚗💺 #CarSeatSafety #TravelWithKids #ToyTravel #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_24',
+      category: 'Ria Chaos',
+      cover: 'Car Bhi Ghar Chalegi! 🚗',
+      title: 'Car Bhi Ghar Chalegi! 🚗',
+      opening: 'Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" 🚗💺',
+      problem: 'Ria insists her toy car must come on the road trip. She refuses to leave it behind.',
+      lesson: 'Safety first: real seatbelts for children in appropriate car seats. Toys travel safely in a travel bag or pouch — never use a backpack as a car restraint, even for a toy.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Safety first, imagination second! 🚗💺 #CarSeatSafety #TravelWithKids #ToyTravel #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria packing for a road trip: "Car bhi ghar chalegi!" She clutches her toy car, refusing to let it stay behind.
 Twist: Mumma: "Seatbelt ka concept samajh aa gaya?" She shows Ria the car seat: "Tumhara seatbelt yahan — proper car seat, harness sahi se." For the toy car: "Iska alag travel bag." She places the toy car in a small travel pouch and puts it in the seat pocket.
 Resolution: Rio checks the pouch — "Safe hai!" — and the toy car rides along in its own travel bag. Ria buckled correctly in her car seat, toy car secure in its pouch. Both safe.
 Moral: Real seatbelts for children in car seats. Imaginative travel bags for toys. Safety first, imagination respected.
 ''',
-    setting: 'Living room, packing for a road trip, suitcases open, car seat visible',
-    sceneDetail: 'Ria\'s toy car placed in a small travel pouch in the seat pocket; Ria\'s car seat with harness ready',
-    dialogue: '"Car bhi ghar chalegi!" "Seatbelt bachche ke liye, car ke liye travel bag!"',
-    mess: 'Ria clutches the toy car, refusing to let it stay behind. Mumma explains: seatbelts for kids in car seats, travel pouch for toy.',
-    innerThought: 'Safety first — real seatbelt for child in car seat. Imagination for toy — with its own travel solution.',
-    endingBeat: 'Ria buckled in car seat, toy car secure in travel pouch. Rio: "Donon safe!" Both ride along safely.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, packing for a road trip, suitcases open, car seat visible',
+      sceneDetail: 'Ria\'s toy car placed in a small travel pouch in the seat pocket; Ria\'s car seat with harness ready',
+      dialogue: '"Car bhi ghar chalegi!" "Seatbelt bachche ke liye, car ke liye travel bag!"',
+      mess: 'Ria clutches the toy car, refusing to let it stay behind. Mumma explains: seatbelts for kids in car seats, travel pouch for toy.',
+      innerThought: 'Safety first — real seatbelt for child in car seat. Imagination for toy — with its own travel solution.',
+      endingBeat: 'Ria buckled in car seat, toy car secure in travel pouch. Rio: "Donon safe!" Both ride along safely.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, packing for road trip. Ria: "Car bhi chalegi!" Mumma: "Seatbelt bachche ke liye, car ke liye travel bag!" Buckles Ria in car seat with harness. Places toy car in travel pouch in seat pocket. Text: "CAR BHI CHALEGI! 🚗" "SEATBELT = SAFETY 💺" "TRAVEL BAG = TOY TRAVEL 🎒"
 
 On-Screen Text:
@@ -1725,42 +1781,43 @@ Part 3 (20-30s): $kPartStyle. Ria buckled in car seat, toy car secure in travel 
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_25',
-    category: 'Learning Lesson',
-    cover: 'Big Feelings, Torn Drawing 🎨',
-    title: 'Big Feelings, Torn Drawing 🎨',
-    opening: 'Ria: "MERI drawing phaa gaya!" — to a child, it feels like the world ended. 🎨💔',
-    problem: 'Ria\'s drawing tears — to her, it feels like the world ended. Adults see a torn paper; she sees a lost masterpiece.',
-    lesson: 'Validate the feeling first. A torn drawing is a big feeling to a child. Comfort first, then repair together. Do not dismiss the loss or expect instant happiness.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria ka drawing phata — duniya khatam! Validate karo pehle: "Bada dukh hua." Phir saath repair karo. Big feelings = big love. 🎨💔 #BigFeelings #ToddlerEmotions #ValidateFirst #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_25',
+      category: 'Learning Lesson',
+      cover: 'Big Feelings, Torn Drawing 🎨',
+      title: 'Big Feelings, Torn Drawing 🎨',
+      opening: 'Ria: "MERI drawing phaa gaya!" — to a child, it feels like the world ended. 🎨💔',
+      problem: 'Ria\'s drawing tears — to her, it feels like the world ended. Adults see a torn paper; she sees a lost masterpiece.',
+      lesson: 'Validate the feeling first. A torn drawing is a big feeling to a child. Comfort first, then repair together. Do not dismiss the loss or expect instant happiness.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria ka drawing phata — duniya khatam! Validate karo pehle: "Bada dukh hua." Phir saath repair karo. Big feelings = big love. 🎨💔 #BigFeelings #ToddlerEmotions #ValidateFirst #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria is crying over a torn drawing — "MERI drawing phaa gaya!" The paper is everything to her.
 Twist: Mumma kneels: "Dekh rahi hoon. Bada dukh hua na?" She does not say "it is just paper." She validates: "Yeh drawing tumne pyaar se banayi thi. Phatne ka dukh real hai." Then: "Chalo, nayi shuruaat karte hain."
 Resolution: They make a new drawing together — "Nayi shuruaat!" — Ria\'s tears slowly turn to giggles as they draw. The new drawing has a heart drawn by Mumma.
 Moral: Big feelings over small things are real — and they deserve big love to match. Validate first, repair together.
 ''',
-    setting: 'Drawing table, morning, torn paper on the floor, Ria crying',
-    sceneDetail: 'Half-torn drawing in Ria\'s hands, the other half still on the table, tears on cheeks',
-    dialogue: '"MERI drawing phaa gaya!" "Bada dukh hua na?" "Chalo, nayi shuruaat karte hain."',
-    mess: 'Ria crying, torn paper fragment clutched in her fist — Mumma validates before fixing',
-    innerThought: 'This paper feels like it held the whole world together. Validate the loss before offering the fix.',
-    endingBeat: 'They make a new drawing together — "Nayi shuruaat!" — Ria\'s tears turn to giggles. New drawing has a heart from Mumma.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Drawing table, morning, torn paper on the floor, Ria crying',
+      sceneDetail: 'Half-torn drawing in Ria\'s hands, the other half still on the table, tears on cheeks',
+      dialogue: '"MERI drawing phaa gaya!" "Bada dukh hua na?" "Chalo, nayi shuruaat karte hain."',
+      mess: 'Ria crying, torn paper fragment clutched in her fist — Mumma validates before fixing',
+      innerThought: 'This paper feels like it held the whole world together. Validate the loss before offering the fix.',
+      endingBeat: 'They make a new drawing together — "Nayi shuruaat!" — Ria\'s tears turn to giggles. New drawing has a heart from Mumma.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Drawing table, torn paper, Ria crying. Mumma kneels: "Bada dukh hua na?" Validates first. Text: "BIG FEELINGS 🎨" "VALIDATE FIRST ❤️"
 
 On-Screen Text:
@@ -1782,42 +1839,44 @@ Part 3 (20-30s): $kPartStyle. They make a new drawing together — "Nayi shuruaa
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_26',
-    category: 'Child Chaos',
-    cover: 'Blocks Se Shoes Tak! 🧱👟',
-    title: 'Blocks Se Shoes Tak! 🧱👟',
-    opening: 'Rio: "Do blocks aur!" Papa: "Ek baar tower complete, phir shoes!" — fair deal done! 🧱👟',
-    problem: 'Rio wants more blocks, more time, more everything before putting on shoes. Transition from play to routine needs a clear, fair step — not a food bargain.',
-    lesson: 'One clear, fair transition turns "more" into "done" — without food as a reward or screens as bribes.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Rio: "Do blocks aur!" Papa: "Tower complete, phir shoes!" Fair deal, shoes on, sab khush! 🧱👟 #BlocksToShoes #TransitionHack #NoFoodBribes #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_26',
+      category: 'Child Chaos',
+      cover: 'Blocks Se Shoes Tak! 🧱👟',
+      title: 'Blocks Se Shoes Tak! 🧱👟',
+      opening: 'Rio: "Do blocks aur!" Papa: "Ek baar tower complete, phir shoes!" — fair deal done! 🧱👟',
+      problem: 'Rio wants more blocks, more time, more everything before putting on shoes. Transition from play to routine needs a clear, fair step — not a food bargain.',
+      lesson: 'One clear, fair transition turns "more" into "done" — without food as a reward or screens as bribes.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Rio: "Do blocks aur!" Papa: "Tower complete, phir shoes!" Fair deal, shoes on, sab khush! 🧱👟 #BlocksToShoes #TransitionHack #NoFoodBribes #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio playing with blocks. Papa: "Shoes pehenne ka time." Rio: "Do blocks aur!" Papa: "Theek hai, tower complete karo — phir shoes."
 Twist: Rio builds two more blocks, completes the tower, then: "Ab do aur do!" Papa holds the boundary with a smile: "Tower complete hua, ab shoes. Timer set karte hain — do minute."
 Resolution: Timer dings. Rio puts on shoes (with a little help). High-fives all around. "Fair deal done!"
 Moral: Ek clear, fair transition — blocks ke baad shoes. Food reward nahi, screen time nahi — sirf fair deal.
 ''',
-    setting: 'Living room floor, blocks scattered, Papa kneeling with Rio\'s shoes',
-    sceneDetail: 'Block tower in progress, Rio\'s shoes by the door, timer on phone',
-    dialogue: '"Do blocks aur, phir shoes." "Ab do aur do!" "Tower complete, ab shoes. Timer do minute." "Theek hai!"',
-    mess: 'Rio wants more blocks, more time. Papa offers clear step: tower complete + two-minute timer = shoes on. Fair deal.',
-    innerThought: 'Ek clear sa fair transition sabke liye kaam karta hai — food reward bina, screen time bina.',
-    endingBeat: 'Timer dings. Rio puts on shoes. High-five! "Fair deal done!" Sab khush, door ke bahar.',
-    defaultCast: ['Rio', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, blocks scattered, Papa kneeling with Rio\'s shoes',
+      sceneDetail:
+          'Block tower in progress, Rio\'s shoes by the door, timer on phone',
+      dialogue: '"Do blocks aur, phir shoes." "Ab do aur do!" "Tower complete, ab shoes. Timer do minute." "Theek hai!"',
+      mess: 'Rio wants more blocks, more time. Papa offers clear step: tower complete + two-minute timer = shoes on. Fair deal.',
+      innerThought: 'Ek clear sa fair transition sabke liye kaam karta hai — food reward bina, screen time bina.',
+      endingBeat: 'Timer dings. Rio puts on shoes. High-five! "Fair deal done!" Sab khush, door ke bahar.',
+      defaultCast: ['Rio', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, blocks scattered. Rio: "Do blocks aur!" Papa: "Tower complete, phir shoes!" Timer set. Rio completes tower, timer dings, puts on shoes. Text: "BLOCKS → SHOES 🧱👟" "FAIR DEAL 🤝"
 
 On-Screen Text:
@@ -1839,42 +1898,43 @@ Part 3 (20-30s): $kPartStyle. Timer dings. Rio puts on shoes. High-five! "Fair d
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_27',
-    category: 'Child Chaos',
-    cover: 'No, Mine, Why — Emotion Validated! 🎭',
-    title: 'No, Mine, Why — Emotion Validated! 🎭',
-    opening: 'Rio: "No! Mine! Why!" Ria echoes. Mumma validates, sets boundary, no mocking! 🎭',
-    problem: 'Rio repeats "No! Mine! Why!" in a loop. Ria echoes. The words escalate until both are upset.',
-    lesson: 'Validate the emotion behind the words. Set a clear boundary on behavior. Offer a simple, age-appropriate turn-taking approach. No mocking, no broken-record mimicry.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Rio: "No! Mine! Why!" Mumma validates: "Gussa hai?" Sets boundary. Simple turns. No mocking! 🎭 #EmotionValidation #TurnTaking #SiblingConflict #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_27',
+      category: 'Child Chaos',
+      cover: 'No, Mine, Why — Emotion Validated! 🎭',
+      title: 'No, Mine, Why — Emotion Validated! 🎭',
+      opening: 'Rio: "No! Mine! Why!" Ria echoes. Mumma validates, sets boundary, no mocking! 🎭',
+      problem: 'Rio repeats "No! Mine! Why!" in a loop. Ria echoes. The words escalate until both are upset.',
+      lesson: 'Validate the emotion behind the words. Set a clear boundary on behavior. Offer a simple, age-appropriate turn-taking approach. No mocking, no broken-record mimicry.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Rio: "No! Mine! Why!" Mumma validates: "Gussa hai?" Sets boundary. Simple turns. No mocking! 🎭 #EmotionValidation #TurnTaking #SiblingConflict #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Isi concept ko real-life situation mein try karo — consistency se results milti hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria: "Mujhe bhi!" Rio: "No!" He grabs the ball. "Mine!" Ria: "Why!" — not asking, just echoing.
 Twist: Mumma kneels: "Gussa hai Rio? Theek hai, gussa hota hai." She names the feeling. "Par ball Ria ke paas bhi aayegi." She sets a simple turn: "Ek minute Ria, ek minute Rio — ginti karke."
 Resolution: They take turns — one minute Ria, one minute Rio. Cuty watches, then gets a turn too. "Dono ko mila, ginti se!"
 Moral: Validate the feeling. Set the boundary. Simple turns win over mocking.
 ''',
-    setting: 'Living room floor, toy ball between them, Mumma close by',
-    sceneDetail: 'Both kids\' hands reaching for the same ball, Mumma kneeling with a gentle hand on each shoulder',
-    dialogue: '"Mujhe bhi!" "No!" "Mine!" "Why!" "Gussa hai?" "Ek minute Ria, ek minute Rio."',
-    mess: 'Rio grabs ball, Ria echoes "Why!" Words escalate — Mumma intervenes with validation + boundary + simple turns',
-    innerThought: 'Mocking escalates. Validation + boundary + simple system = resolution.',
-    endingBeat: 'Turns work. One minute each. Cuty gets a turn too. "Dono ko mila, ginti se!" Fair play wins.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, toy ball between them, Mumma close by',
+      sceneDetail: 'Both kids\' hands reaching for the same ball, Mumma kneeling with a gentle hand on each shoulder',
+      dialogue: '"Mujhe bhi!" "No!" "Mine!" "Why!" "Gussa hai?" "Ek minute Ria, ek minute Rio."',
+      mess: 'Rio grabs ball, Ria echoes "Why!" Words escalate — Mumma intervenes with validation + boundary + simple turns',
+      innerThought: 'Mocking escalates. Validation + boundary + simple system = resolution.',
+      endingBeat: 'Turns work. One minute each. Cuty gets a turn too. "Dono ko mila, ginti se!" Fair play wins.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, one ball between Rio and Ria. Rio: "No! Mine! Why!" Ria echoes. Mumma kneels: "Gussa hai?" Validates. Simple turn-taking: one minute each. Text: "NO! MINE! WHY! 🎭" "VALIDATE FIRST ❤️" "SIMPLE TURNS ⏱️"
 
 On-Screen Text:
@@ -1896,42 +1956,43 @@ Part 3 (20-30s): $kPartStyle. Turns work. One minute each. Cuty gets a turn too.
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_28',
-    category: 'Learning Lesson',
-    cover: 'Cuty Stays Close — Scrape Care 🐰🩹',
-    title: 'Cuty Stays Close — Scrape Care 🐰🩹',
-    opening: 'Ria neeche baithi... Cuty saath bhi baithi. Scrape pehle, cuddle baad! 🐰🩹',
-    problem: 'Ria scrapes her knee and sulks. Cuty sits beside her, offering quiet companionship while Mumma provides appropriate first aid.',
-    lesson: 'Appropriate first aid for the injury, quiet presence from a companion. Cuty never licks or touches wound-care items. Comfort without lectures.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria ka scrape, Cuty ka saath, Mumma ki first aid. Cuty sirf saath baitha — lick nahi kiya! Presence over lectures. 🐰🩹 #FirstAid #ComfortNotLectures #RabbitSafety #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_28',
+      category: 'Learning Lesson',
+      cover: 'Cuty Stays Close — Scrape Care 🐰🩹',
+      title: 'Cuty Stays Close — Scrape Care 🐰🩹',
+      opening: 'Ria neeche baithi... Cuty saath bhi baithi. Scrape pehle, cuddle baad! 🐰🩹',
+      problem: 'Ria scrapes her knee and sulks. Cuty sits beside her, offering quiet companionship while Mumma provides appropriate first aid.',
+      lesson: 'Appropriate first aid for the injury, quiet presence from a companion. Cuty never licks or touches wound-care items. Comfort without lectures.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria ka scrape, Cuty ka saath, Mumma ki first aid. Cuty sirf saath baitha — lick nahi kiya! Presence over lectures. 🐰🩹 #FirstAid #ComfortNotLectures #RabbitSafety #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Gaadi aane se pehle ek signal lelo — haath pakad kar khade raho, jab tak nahi aayi.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria has a scraped knee and sits on the couch, sulking. "Ouch, bada dukh raha hai."
 Twist: Cuty sits beside her, nudges a clean tissue box closer with her nose — no licking, just quiet presence. Mumma cleans the scrape with antiseptic wipe, applies a colorful bandaid. "Pehle saaf karte hain, phir bandaid."
 Resolution: They wrap the knee together — no lectures, no "it's okay" speeches. Just quiet presence, proper first aid, and a colorful bandaid. Cuty sits proudly beside the finished job.
 Moral: Pehle first aid, phir pyaar. Cuty sirf saath baitha — usne kaam kiya, lick nahi kiya.
 ''',
-    setting: 'Living room floor, Cuty beside Ria on the couch, first aid kit nearby',
-    sceneDetail: 'One clean tissue box on the coffee table, Ria\'s scraped knee visible, colorful bandaid ready, Cuty sitting quietly beside her',
-    dialogue: '"Ouch, bada dukh raha hai." "Pehle saaf karte hain, phir bandaid." "Cuty, tujhe pata hai?"',
-    mess: 'Ria refuses to look at the scrape, keeps pulling her sleeve down. Cuty sits quietly, nudges tissue box — no licking.',
-    innerThought: 'The scrape hurts more when she thinks about it. Cuty\'s quiet presence helps more than words.',
-    endingBeat: 'They wrap the knee together with a colorful bandaid. Cuty sits proudly beside the finished job. "Good job, Cuty!" Ria smiles.',
-    defaultCast: ['Ria', 'Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, Cuty beside Ria on the couch, first aid kit nearby',
+      sceneDetail: 'One clean tissue box on the coffee table, Ria\'s scraped knee visible, colorful bandaid ready, Cuty sitting quietly beside her',
+      dialogue: '"Ouch, bada dukh raha hai." "Pehle saaf karte hain, phir bandaid." "Cuty, tujhe pata hai?"',
+      mess: 'Ria refuses to look at the scrape, keeps pulling her sleeve down. Cuty sits quietly, nudges tissue box — no licking.',
+      innerThought: 'The scrape hurts more when she thinks about it. Cuty\'s quiet presence helps more than words.',
+      endingBeat: 'They wrap the knee together with a colorful bandaid. Cuty sits proudly beside the finished job. "Good job, Cuty!" Ria smiles.',
+      defaultCast: ['Ria', 'Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, Ria on couch with scraped knee. Cuty sits beside her, nudges tissue box — no licking! Mumma cleans with antiseptic wipe, applies colorful bandaid. Text: "SCRAPE CARE 🩹" "CUTY: QUIET PRESENCE 🐰" "FIRST AID FIRST 🩹"
 
 On-Screen Text:
@@ -1953,42 +2014,43 @@ Part 3 (20-30s): $kPartStyle. They wrap the knee together with a colorful bandai
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_29',
-    category: 'Child Chaos',
-    cover: 'Morning Mix-Up: Socks & Bow! 🧦🎀',
-    title: 'Morning Mix-Up: Socks & Bow! 🧦🎀',
-    opening: 'Sock kahaan? Bow kahaan? Sab kuchh ulta ho gaya — but no sharing personal items! 🧦🎀',
-    problem: 'Ria\'s favorite sock is missing. Rio\'s hair bow is missing. A funny morning mix-up — but no sharing personal items.',
-    lesson: 'Morning mix-ups happen. Keep personal items separate. Find the right item for the right person — no sharing socks, bows, or other personal items!',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Sock kho gayi, bow kho gaya! Morning mix-up hua par personal items alag rakho. Apna apna, alag alag! 🧦🎀 #MorningMixUp #PersonalItems #SiblingFun #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_29',
+      category: 'Child Chaos',
+      cover: 'Morning Mix-Up: Socks & Bow! 🧦🎀',
+      title: 'Morning Mix-Up: Socks & Bow! 🧦🎀',
+      opening: 'Sock kahaan? Bow kahaan? Sab kuchh ulta ho gaya — but no sharing personal items! 🧦🎀',
+      problem: 'Ria\'s favorite sock is missing. Rio\'s hair bow is missing. A funny morning mix-up — but no sharing personal items.',
+      lesson: 'Morning mix-ups happen. Keep personal items separate. Find the right item for the right person — no sharing socks, bows, or other personal items!',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Sock kho gayi, bow kho gaya! Morning mix-up hua par personal items alag rakho. Apna apna, alag alag! 🧦🎀 #MorningMixUp #PersonalItems #SiblingFun #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Tip: Har tip ko try karo aur comment mein batana — community seekha jayega!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria\'s favorite striped sock is missing — "Meri striped sock kahaan hai?" — but it\'s not in the drawer. Rio\'s blue hair bow is missing too — he\'s been wearing Ria\'s pink bow as a wristband (just pretending!).
 Twist: Mumma spots the mix-up: "Rio, yeh Ria ka bow hai — baalon ke liye, haath ke liye nahi!" Rio giggles, takes it off. They find Ria\'s striped sock in Rio\'s shoe.
 Resolution: "Ab dono milenge!" Bow goes back to Ria\'s hair. Sock goes on Ria\'s foot. Everyone laughs at the mix-up — but no real sharing of personal items.
 Moral: Morning mix-ups are funny — but personal items stay personal. Your bow, your sock, your things!
 ''',
-    setting: 'Bedroom, morning, socks in drawer, bows on dresser, shoes by the door',
-    sceneDetail: 'Rio wearing Ria\'s pink bow as wristband (gently), Ria\'s striped sock found in Rio\'s shoe, Rio\'s blue bow on dresser',
-    dialogue: '"Meri striped sock kahaan hai?" "Rio, yeh Ria ka bow hai — baalon ke liye!" "Meri sock mil gayi!"',
-    mess: 'Rio wears Ria\'s pink bow as wristband. Ria\'s striped sock found in Rio\'s shoe. Rio\'s blue bow on dresser. No actual sharing of personal items.',
-    innerThought: 'Morning confusion is real — but personal items have their place. Your bow, your sock, your things.',
-    endingBeat: 'Bow back in Ria\'s hair. Sock on Ria\'s foot. Everyone laughs. "Apna apna, alag alag!"',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bedroom, morning, socks in drawer, bows on dresser, shoes by the door',
+      sceneDetail: 'Rio wearing Ria\'s pink bow as wristband (gently), Ria\'s striped sock found in Rio\'s shoe, Rio\'s blue bow on dresser',
+      dialogue: '"Meri striped sock kahaan hai?" "Rio, yeh Ria ka bow hai — baalon ke liye!" "Meri sock mil gayi!"',
+      mess: 'Rio wears Ria\'s pink bow as wristband. Ria\'s striped sock found in Rio\'s shoe. Rio\'s blue bow on dresser. No actual sharing of personal items.',
+      innerThought: 'Morning confusion is real — but personal items have their place. Your bow, your sock, your things.',
+      endingBeat: 'Bow back in Ria\'s hair. Sock on Ria\'s foot. Everyone laughs. "Apna apna, alag alag!"',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, morning. Rio wearing Ria\'s pink bow as wristband (gently). Mumma: "Rio, yeh Ria ka bow — baalon ke liye!" Rio giggles, takes it off. Finds Ria\'s striped sock in Rio\'s shoe. Text: "MORNING MIX-UP! 🧦🎀" "BOW = HAIR 🎀" "SOCK = FOOT 🧦"
 
 On-Screen Text:
@@ -2010,43 +2072,44 @@ Part 3 (20-30s): $kPartStyle. Bow back in Ria's hair. Sock on Ria's foot. Everyo
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-// Struggle first: open on the moment it goes wrong.
-  HookIdea(
-    id: 'idea_30',
-    category: 'Child Chaos',
-    cover: '1 Galti, Bada Mess!',
-    title: '1 Galti, Bada Mess!',
-    opening: 'Rio ke haath se saare rang gir gaye...',
-    problem: 'Rio spills paint everywhere by accident',
-    lesson: 'Galti pe gussa nahi, saath mein saaf karo',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bachche se galti ho jaye toh gussa nahi, saath saaf karo. "Table ko blue dress chahiye thi!" 🎨 #ToddlerMess #ParentingHacks #FunLearningWithPalak #IndianParents #MessyPlay',
-    pinnedComment: 'Tip: Damp cloth ready rakho — paint smears fast!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Struggle first: open on the moment it goes wrong.
+    HookIdea(
+      id: 'idea_30',
+      category: 'Child Chaos',
+      cover: '1 Galti, Bada Mess!',
+      title: '1 Galti, Bada Mess!',
+      opening: 'Rio ke haath se saare rang gir gaye...',
+      problem: 'Rio spills paint everywhere by accident',
+      lesson: 'Galti pe gussa nahi, saath mein saaf karo',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bachche se galti ho jaye toh gussa nahi, saath saaf karo. "Table ko blue dress chahiye thi!" 🎨 #ToddlerMess #ParentingHacks #FunLearningWithPalak #IndianParents #MessyPlay',
+      pinnedComment: 'Tip: Damp cloth ready rakho — paint smears fast!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio is painting at the art table. He reaches for the blue cup and it tips over — blue paint spreads across the clean white tablecloth. "Arre, blue paint!" A napkin only smears it wider.
 Twist: Mumma moves the paint cup away, gives Rio a damp cloth. "Table ko blue dress chahiye thi." She doesn't scold — she helps.
 Resolution: Rio scrubs, watches the blue disappear. The table is clean again, but Rio's hands and cheeks are streaked with blue. He grins: "Main ne saaf kiya!"
 Moral: A spill can look huge — but a little help makes it manageable.
 ''',
-    setting: 'Art table, morning, paint cups lined up',
-    sceneDetail: 'Blue paint tips onto a clean white tablecloth, napkin smears it wider',
-    dialogue: '"Arre, blue paint!" "Table ko blue dress chahiye thi."',
-    mess: 'Blue paint spreads across the table, Rio watches wide-eyed',
-    innerThought: 'How do you contain a flood with one napkin?',
-    endingBeat: 'Rio scrubs, watches blue disappear, ends up streaked with blue himself.',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Art table, morning, paint cups lined up',
+      sceneDetail: 'Blue paint tips onto a clean white tablecloth, napkin smears it wider',
+      dialogue: '"Arre, blue paint!" "Table ko blue dress chahiye thi."',
+      mess: 'Blue paint spreads across the table, Rio watches wide-eyed',
+      innerThought: 'How do you contain a flood with one napkin?',
+      endingBeat: 'Rio scrubs, watches blue disappear, ends up streaked with blue himself.',
+      defaultCast: ['Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Art table, morning, paint cups lined up. Rio (blue t-shirt, shorts) reaches for blue paint cup, it tips over — blue paint spreads across white tablecloth. Mumma (yellow kurti, top bun) moves the cup away, gives Rio a damp cloth. Text on screen: "OH NO! BLUE! 🎨" "NO SCOld, NO BLAME ❤️" "SAATH MILKE SAAF!"
 
 On-Screen Text:
@@ -2066,42 +2129,47 @@ Part 3 (20-30s): $kPartStyle. Table clean but Rio streaked with blue paint, grin
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_31',
-    category: 'Ria Chaos',
-    cover: 'Store Mein Badi Mushkil!',
-    title: 'Store Mein Badi Mushkil!',
-    opening: 'Ria ne kaha — "I want it, I want it!" Poora supermarket ghoom liya.',
-    problem: 'Ria has a full meltdown in the grocery store when denied a snack',
-    lesson: 'Acknowledge feelings first, then offer the next step: "I see you want chips. We have fruit at home."',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Store mein rona hone ka asar bhi hota hai — pehle bola "main dekhi, tumhara gussa samajh gaya, phir nahi." 🛒 #ToddlerMeltdown #PublicTantrum #FunLearningWithPalak #IndianParents #StayCalm',
-    pinnedComment: 'Tip: Floor par baith kar bhi baat chaleti hai — bachcha turant sambhal leta hai.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_31',
+      category: 'Ria Chaos',
+      cover: 'Store Mein Badi Mushkil!',
+      title: 'Store Mein Badi Mushkil!',
+      opening:
+          'Ria ne kaha — "I want it, I want it!" Poora supermarket ghoom liya.',
+      problem:
+          'Ria has a full meltdown in the grocery store when denied a snack',
+      lesson: 'Acknowledge feelings first, then offer the next step: "I see you want chips. We have fruit at home."',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Store mein rona hone ka asar bhi hota hai — pehle bola "main dekhi, tumhara gussa samajh gaya, phir nahi." 🛒 #ToddlerMeltdown #PublicTantrum #FunLearningWithPalak #IndianParents #StayCalm',
+      pinnedComment: 'Tip: Floor par baith kar bhi baat chaleti hai — bachcha turant sambhal leta hai.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria spots a packet of chips at the checkout. "Mummy, chips chahiye!" Mumma says no — it's almost lunch. Ria drops to the floor: "I WANT IT!"
 Twist: Mumma kneels beside her: "Main dekhi, tumhara gussa samajh gaya. Ab yeh nahi hoga, lekin fruit ke saath kuchh aur chahiye?"
 Resolution: Ria cries for two minutes, then sniffles: "Apple?" Mumma: "Haan, apple." They walk out, chips forgotten.
 Moral: A meltdown is information — listen first, then guide.
 ''',
-    setting: 'Grocery store checkout lane, afternoon',
-    sceneDetail: 'Ria on the floor, crumpled chips packet in hand, Mumma kneeling at eye level',
-    dialogue: '"I WANT IT! I WANT IT!" "Main dekhi, tumhara gussa samajh gaya..."',
-    mess: 'Ria wails loudly enough that other shoppers look over, Mumma stays calm',
-    innerThought: 'The floor is not the enemy — the unmet need is.',
-    endingBeat: 'Ria takes the apple, walks out holding Mumma\'s hand, no chips.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Grocery store checkout lane, afternoon',
+      sceneDetail: 'Ria on the floor, crumpled chips packet in hand, Mumma kneeling at eye level',
+      dialogue:
+          '"I WANT IT! I WANT IT!" "Main dekhi, tumhara gussa samajh gaya..."',
+      mess: 'Ria wails loudly enough that other shoppers look over, Mumma stays calm',
+      innerThought: 'The floor is not the enemy — the unmet need is.',
+      endingBeat:
+          'Ria takes the apple, walks out holding Mumma\'s hand, no chips.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Grocery store checkout lane, afternoon. Ria (sparkly pink star dress, pigtails) spots chips at checkout: "Mummy, chips chahiye!" Mumma says no — almost lunch. Ria drops to floor: "I WANT IT!" Text on screen: "CHIPS WANT 💔" "FEELINGS FIRST ❤️" "APPLE TRADE-OFF 🍎"
 
 On-Screen Text:
@@ -2121,42 +2189,44 @@ Part 3 (20-30s): $kPartStyle. They walk out, Ria holding Mumma's hand, apple in 
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_32',
-    category: 'Learning Lesson',
-    cover: 'Mumma Bhi Thak Gayi!',
-    title: 'Mumma Bhi Thak Gayi!',
-    opening: 'Mumma: "Bas 5 minute rest." Lies down. Ria tucks her in.',
-    problem: 'Mumma needs rest but asks Ria to respect it',
-    lesson: 'Thoda sa pause, poori family ke liye',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Mumma ko bhi break chahiye — Ria ne samjha! "Ab paani nahi maangna, okay?" 😴 #MomNeedsRest #ParentingTruth #FunLearningWithPalak #IndianParents #SelfCare',
-    pinnedComment: 'Kabhi aapne apne bachche se "5 minute rest" maangi? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_32',
+      category: 'Learning Lesson',
+      cover: 'Mumma Bhi Thak Gayi!',
+      title: 'Mumma Bhi Thak Gayi!',
+      opening: 'Mumma: "Bas 5 minute rest." Lies down. Ria tucks her in.',
+      problem: 'Mumma needs rest but asks Ria to respect it',
+      lesson: 'Thoda sa pause, poori family ke liye',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Mumma ko bhi break chahiye — Ria ne samjha! "Ab paani nahi maangna, okay?" 😴 #MomNeedsRest #ParentingTruth #FunLearningWithPalak #IndianParents #SelfCare',
+      pinnedComment: 'Kabhi aapne apne bachche se "5 minute rest" maangi? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma sits down — "Bas five minute rest." She lies on the floor with a cushion. Ria watches, then tucks a blanket over her: "Ab paani nahi maangna, okay?" Mumma smiles: "Main itni bhi dramatic hoon?"
 Twist: Ria says seriously: "Mumma, aap hi toh ho." She brings a small cup of water and sits quietly beside her.
 Resolution: Ria stays close without demanding anything. Mumma gets her five minutes, and Ria learns that caring means giving space too.
 Moral: When grown-ups rest, children learn that love doesn't always mean fixing — sometimes just being there.
 ''',
-    setting: 'Living room floor, afternoon, cushions scattered',
-    sceneDetail: 'One cushion has a small tear on the seam',
-    dialogue: '"Ria, pehle cuddle ya paani?" "Ab paani nahi maangna, okay?"',
-    mess: 'Ria watches Mumma lie down, unsure if she should disturb her',
-    innerThought: 'If I say one word right now, I become part of it.',
-    endingBeat: 'Ria sits beside her, brings a small cup of water, sits quietly.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, afternoon, cushions scattered',
+      sceneDetail: 'One cushion has a small tear on the seam',
+      dialogue: '"Ria, pehle cuddle ya paani?" "Ab paani nahi maangna, okay?"',
+      mess: 'Ria watches Mumma lie down, unsure if she should disturb her',
+      innerThought: 'If I say one word right now, I become part of it.',
+      endingBeat:
+          'Ria sits beside her, brings a small cup of water, sits quietly.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, afternoon, cushions scattered. Mumma lies on the floor with a cushion: "Bas five minute rest." Ria watches, tucks a blanket over her: "Ab paani nahi maangna, okay?" Text on screen: "MUMMY TIRED 😴" "RIA NOTICES 👀" "QUIET TOGETHERNESS 🧘"
 
 On-Screen Text:
@@ -2176,43 +2246,45 @@ Part 3 (20-30s): $kPartStyle. Five minutes pass. Mumma sits up, Ria pats the cus
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_33',
-    category: 'Child Chaos',
-    cover: 'Tod Diya!',
-    title: 'Tod Diya!',
-    opening: 'Car ke do tukde... aur dono ek doosre ko blame kar rahe hain.',
-    problem: 'The shared toy breaks and both children blame each other',
-    lesson: 'Kaun jeeta nahi, saath mein kaise theek karein',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Toy toota toh blame game nahi — saath theek karo! "Dono car, do laps!" 🚗 #SiblingConflict #ProblemSolving #FunLearningWithPalak #IndianParents #Teamwork',
-    pinnedComment: 'Paper tickets trick — try it! One minute each, then together.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_33',
+      category: 'Child Chaos',
+      cover: 'Tod Diya!',
+      title: 'Tod Diya!',
+      opening: 'Car ke do tukde... aur dono ek doosre ko blame kar rahe hain.',
+      problem: 'The shared toy breaks and both children blame each other',
+      lesson: 'Kaun jeeta nahi, saath mein kaise theek karein',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Toy toota toh blame game nahi — saath theek karo! "Dono car, do laps!" 🚗 #SiblingConflict #ProblemSolving #FunLearningWithPalak #IndianParents #Teamwork',
+      pinnedComment:
+          'Paper tickets trick — try it! One minute each, then together.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Both grab the red car — "Mera pehle!" They argue over whose lap it is for. The car snaps in two.
 Twist: Mumma: "Rio one lap, Ria one lap." They make paper tickets — Rio gets #1, Ria gets #2.
 Resolution: Cuty sits as ticket checker. One minute each, then together. "Dono car, do laps!"
 Ending line: "Next time? Ek ticket, teen dots!"
 Moral: Tickets turn fights into fair turns — everyone wins a lap.
 ''',
-    setting: 'Living room floor, red toy car between them, broken in two',
-    sceneDetail: 'Paper ticket #1 in Rio\'s hand, ticket #2 in Ria\'s hand, Cuty sits beside the car',
-    dialogue: '"Mera pehle!" — "Toh main aakhir mein bhi thi!"',
-    mess: 'Both grab the red car, arguing whose lap it is for — it snaps',
-    innerThought: 'A ticket system — will it actually work?',
-    endingBeat: 'Paper tickets, one minute each, then together — "Dono car, do laps!"',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, red toy car between them, broken in two',
+      sceneDetail: 'Paper ticket #1 in Rio\'s hand, ticket #2 in Ria\'s hand, Cuty sits beside the car',
+      dialogue: '"Mera pehle!" — "Toh main aakhir mein bhi thi!"',
+      mess: 'Both grab the red car, arguing whose lap it is for — it snaps',
+      innerThought: 'A ticket system — will it actually work?',
+      endingBeat: 'Paper tickets, one minute each, then together — "Dono car, do laps!"',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, red toy car between them, broken in two. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both grabbed the car — it snapped. Paper ticket #1 in Rio's hand, #2 in Ria's hand. Cuty the bunny sits beside the car. Text on screen: "CAR BREAK 💔" "TICKET SYSTEM! 🎫" "TEAMWORK WINS 🏆"
 
 On-Screen Text:
@@ -2232,43 +2304,46 @@ Part 3 (20-30s): $kPartStyle. Both drive cars together, one lap each. "Dono car,
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_34',
-    category: 'Funny',
-    cover: 'Music Sudden Ruko!',
-    title: 'Music Sudden Ruko!',
-    opening: 'Music bandh ho gayi... Rio freezz!',
-    problem: 'Music suddenly stops mid-play, and Rio freezes or protests',
-    lesson: 'Name the change, then offer the next step',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Music bandh hui toh bachcha freeze kare? Badlaav name karo, agla kadam dikhao! 🎵 #TransitionTips #ToddlerPlay #FunLearningWithPalak #IndianParents #ParentingHacks',
-    pinnedComment: 'Music bandh hone ka signal bana lo — "Gaana khatam, pack up time!"',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_34',
+      category: 'Funny',
+      cover: 'Music Sudden Ruko!',
+      title: 'Music Sudden Ruko!',
+      opening: 'Music bandh ho gayi... Rio freezz!',
+      problem: 'Music suddenly stops mid-play, and Rio freezes or protests',
+      lesson: 'Name the change, then offer the next step',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Music bandh hui toh bachcha freeze kare? Badlaav name karo, agla kadam dikhao! 🎵 #TransitionTips #ToddlerPlay #FunLearningWithPalak #IndianParents #ParentingHacks',
+      pinnedComment:
+          'Music bandh hone ka signal bana lo — "Gaana khatam, pack up time!"',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio is dancing to his favorite song when the music suddenly stops mid-beat. Rio freezes, eyes wide.
 Twist: Mumma names the change: "Music bandh ho gayi. Ab kya karein?" She offers: "Ek minute aur dance karo, ya turant room saaf karo?"
 Resolution: Rio chooses one more minute of dance, then they clean up the toys together. Mumma restarts soft music.
 Ending line: Rio: "Next time phone use karoongi!" Mumma: "Haan, volume button dikha."
 Moral: Badlaav ka intezaar karo, phir agla kadam lagao.
 ''',
-    setting: 'Living room, afternoon, song playing from phone',
-    sceneDetail: 'Phone playing music on the couch, song cuts off suddenly mid-beat',
-    dialogue: '"Music bandh ho gayi. Ab kya karein?"',
-    mess: 'Rio freezes, then says "one more minute" instead of crying',
-    innerThought: 'This transition is harder than I thought.',
-    endingBeat: 'They clean up toys together, soft music restarts.',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, song playing from phone',
+      sceneDetail:
+          'Phone playing music on the couch, song cuts off suddenly mid-beat',
+      dialogue: '"Music bandh ho gayi. Ab kya karein?"',
+      mess: 'Rio freezes, then says "one more minute" instead of crying',
+      innerThought: 'This transition is harder than I thought.',
+      endingBeat: 'They clean up toys together, soft music restarts.',
+      defaultCast: ['Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon, song playing from phone on the couch. Rio (blue t-shirt, shorts) dancing to his favorite song — music suddenly stops mid-beat. Rio freezes, eyes wide. Mumma kneels: "Music bandh ho gayi. Ab kya karein?" Text on screen: "MUSIC STOPS! 🔇" "FREEZE MODE 😵" "NAME THE CHANGE 🗣️"
 
 On-Screen Text:
@@ -2288,42 +2363,43 @@ Part 3 (20-30s): $kPartStyle. Soft music restarts, room clean. "Next time phone 
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_35',
-    category: 'Funny',
-    cover: 'Dabba Ban Gaya Rocket!',
-    title: 'Dabba Ban Gaya Rocket!',
-    opening: 'Itne saare khilone... aur Rio ko chahiye khaali dabba?',
-    problem: 'Expensive toys are ignored; an empty box becomes a spaceship',
-    lesson: 'Kam khilone, zyada kalpana',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Mahenga toy ignore, khaala dabba = rocket! 🚀 Imagination > toys. #ImaginationWins #ToddlerPlay #FunLearningWithPalak #IndianParents #OpenEndedPlay',
-    pinnedComment: 'Aapke bachche ka "favorite toy" kya hai — box ya toy? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_35',
+      category: 'Funny',
+      cover: 'Dabba Ban Gaya Rocket!',
+      title: 'Dabba Ban Gaya Rocket!',
+      opening: 'Itne saare khilone... aur Rio ko chahiye khaali dabba?',
+      problem: 'Expensive toys are ignored; an empty box becomes a spaceship',
+      lesson: 'Kam khilone, zyada kalpana',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Mahenga toy ignore, khaala dabba = rocket! 🚀 Imagination > toys. #ImaginationWins #ToddlerPlay #FunLearningWithPalak #IndianParents #OpenEndedPlay',
+      pinnedComment: 'Aapke bachche ka "favorite toy" kya hai — box ya toy? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Papa ke liye cover aaya hai. Rio ka naya robot toy bhi aaya hai. Rio robot ko dekhta bhi nahi aur khaali dabbe mein ghus jaata hai.
 Twist: Papa dabba uthaane aate hain: "Ye kabaad mein jayega." Rio: "Ye mera rocket hai!"
 Resolution: Papa robot ko dabbe mein bitha dete hain: "Ye astronaut hai." Dono ulti ginti karte hain: "5, 4, 3, 2, 1… chalo!"
 Moral: Dabba hi kaafi hai.
 ''',
-    setting: 'Kitchen, morning, delivery boxes on the counter',
-    sceneDetail: 'Empty cardboard box on the kitchen floor, Rio crawling toward it, Robot toy ignored nearby',
-    dialogue: '"Papa ke liye cover aaya. Rio ka naya robot bhi aaya."',
-    mess: 'Rio ignores the robot and crawls into the empty box',
-    innerThought: 'The box is bigger than he is.',
-    endingBeat: 'They count down together, "5, 4, 3, 2, 1... chalo!"',
-    defaultCast: ['Rio', 'Robot', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, morning, delivery boxes on the counter',
+      sceneDetail: 'Empty cardboard box on the kitchen floor, Rio crawling toward it, Robot toy ignored nearby',
+      dialogue: '"Papa ke liye cover aaya. Rio ka naya robot bhi aaya."',
+      mess: 'Rio ignores the robot and crawls into the empty box',
+      innerThought: 'The box is bigger than he is.',
+      endingBeat: 'They count down together, "5, 4, 3, 2, 1... chalo!"',
+      defaultCast: ['Rio', 'Robot', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, morning, delivery boxes on the counter. Empty cardboard box on the floor, Robot toy (silver, blue LED eyes) ignored nearby. Rio (blue t-shirt, shorts) crawls toward the box, ignoring the new robot toy. Papa enters. Text on screen: "BOX > ROBOT! 📦" "COUNTDOWN! 5-4-3-2-1" "IMAGINATION WINS 🎉"
 
 On-Screen Text:
@@ -2343,42 +2419,44 @@ Part 3 (20-30s): $kPartStyle. Box launches (Rio's imagination), Robot inside. Te
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_36',
-    category: 'Funny',
-    cover: 'Bijli Band Ho Gayi!',
-    title: 'Bijli Band Ho Gayi!',
-    opening: 'Light flicker, fan ruka. Ria: "Bijli band ho jaye!"',
-    problem: 'Power cuts out suddenly and Ria is startled',
-    lesson: 'Naam dekar dar ko chhota karna',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bijli gayi toh bachcha dar gaya? Naam do, dar chhota karo! "Bijli khel rahi thi — ab rest karegi." 💡 #PowerCut #ToddlerFears #FunLearningWithPalak #IndianParents #ValidateFeelings',
-    pinnedComment: 'Power cut par aapke bachche ka reaction kaisa hota hai?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_36',
+      category: 'Funny',
+      cover: 'Bijli Band Ho Gayi!',
+      title: 'Bijli Band Ho Gayi!',
+      opening: 'Light flicker, fan ruka. Ria: "Bijli band ho jaye!"',
+      problem: 'Power cuts out suddenly and Ria is startled',
+      lesson: 'Naam dekar dar ko chhota karna',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bijli gayi toh bachcha dar gaya? Naam do, dar chhota karo! "Bijli khel rahi thi — ab rest karegi." 💡 #PowerCut #ToddlerFears #FunLearningWithPalak #IndianParents #ValidateFeelings',
+      pinnedComment: 'Power cut par aapke bachche ka reaction kaisa hota hai?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Light flickers, fan cuts out mid-hum. Ria tugs Mumma's hand: "Bijli ko bolo, band ho jaye!"
 Twist: Mumma kneels: "Thumbs up if you're worried. Bijli khel rahi thi—ab rest karegi."
 Resolution: They sit in the quiet. Ria discovers she can hear her own heartbeat. "Thump-thump!" "It means you're safe."
 Moral: Naming the noise makes the fear small enough to hold.
 ''',
-    setting: 'Bedroom, bedtime, night light casting soft shadows',
-    sceneDetail: 'Night light still glowing, Ria clinging to Mumma in the sudden dark',
-    dialogue: '"Bijli band ho gayi! Ab kya karein?"',
-    mess: 'Power cuts at bedtime, Ria is afraid of the dark',
-    innerThought: 'I should have checked the inverter earlier.',
-    endingBeat: 'They sit in the quiet, Ria hears her own heartbeat.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bedroom, bedtime, night light casting soft shadows',
+      sceneDetail:
+          'Night light still glowing, Ria clinging to Mumma in the sudden dark',
+      dialogue: '"Bijli band ho gayi! Ab kya karein?"',
+      mess: 'Power cuts at bedtime, Ria is afraid of the dark',
+      innerThought: 'I should have checked the inverter earlier.',
+      endingBeat: 'They sit in the quiet, Ria hears her own heartbeat.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, bedtime, night light casting soft shadows. Ria (sparkly pink star dress, pigtails) clinging to Mumma. Light flickers, fan cuts out mid-hum. Power gone. Mumma kneels: "Bijli khel rahi thi — ab rest karegi." Text on screen: "DARKNESS FALLS 🌙" "NAAMKARAN ❤️" "SAFE WITH LOVE 💛"
 
 On-Screen Text:
@@ -2398,42 +2476,44 @@ Part 3 (20-30s): $kPartStyle. Night light still glows. They sit in quiet, hand i
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_37',
-    category: 'Learning Lesson',
-    cover: 'Blocks Box Mein!',
-    title: 'Blocks Box Mein!',
-    opening: 'Rio ne saare blocks phailaye... Mumma ne name dia.',
-    problem: 'Rio dumps blocks; Mumma names the cleanup action',
-    lesson: 'Specific praise builds confidence',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: '"Tumne saare blocks box mein rakhe — thank you!" Specific praise works! 🙌 #SpecificPraise #ToddlerCleanup #FunLearningWithPalak #IndianParents #PositiveParenting',
-    pinnedComment: '"Good job" ki jagah "Tumne X kiya" bolo — dekhna farak!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_37',
+      category: 'Learning Lesson',
+      cover: 'Blocks Box Mein!',
+      title: 'Blocks Box Mein!',
+      opening: 'Rio ne saare blocks phailaye... Mumma ne name dia.',
+      problem: 'Rio dumps blocks; Mumma names the cleanup action',
+      lesson: 'Specific praise builds confidence',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: '"Tumne saare blocks box mein rakhe — thank you!" Specific praise works! 🙌 #SpecificPraise #ToddlerCleanup #FunLearningWithPalak #IndianParents #PositiveParenting',
+      pinnedComment: '"Good job" ki jagah "Tumne X kiya" bolo — dekhna farak!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio dumps a box of blocks everywhere. Mumma points: "Tumne saare blocks box mein rakhe—thank you!"
 Twist: Rio beams, then spots one block hiding behind the couch. "Mummy, yeh bhi!"
 Resolution: They put the last block in together. Papa claps. "Box full, heart full."
 Moral: Cleaning up becomes a team win when the praise names what they did.
 ''',
-    setting: 'Living room floor, box of blocks half-empty, pieces everywhere',
-    sceneDetail: 'One block hiding behind the couch, Mumma pointing at it',
-    dialogue: '"Tumne saare blocks box mein rakhe—thank you!"',
-    mess: 'Rio dumps the box of blocks everywhere, then beams when praised for picking up',
-    innerThought: 'The praise named what they did — not just "good job".',
-    endingBeat: 'Papa claps: "Box full, heart full." Rio grins at the empty box.',
-    defaultCast: ['Rio', 'Mumma', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, box of blocks half-empty, pieces everywhere',
+      sceneDetail: 'One block hiding behind the couch, Mumma pointing at it',
+      dialogue: '"Tumne saare blocks box mein rakhe—thank you!"',
+      mess: 'Rio dumps the box of blocks everywhere, then beams when praised for picking up',
+      innerThought: 'The praise named what they did — not just "good job".',
+      endingBeat:
+          'Papa claps: "Box full, heart full." Rio grins at the empty box.',
+      defaultCast: ['Rio', 'Mumma', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, box of blocks half-empty, pieces everywhere. Rio (blue t-shirt, shorts) dumps blocks all over the floor. One block hides behind the couch. Mumma points: "Tumne saare blocks box mein rakhe — thank you!" Text on screen: "BLOCK EXPLOSION! 🧱" "NAMED PRAISE! 👏" "TEAM CLEANUP! ✨"
 
 On-Screen Text:
@@ -2453,42 +2533,43 @@ Part 3 (20-30s): $kPartStyle. Empty box, full hearts. Papa: "Box full, heart ful
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_38',
-    category: 'Learning Lesson',
-    cover: 'Bhaago Mat? Dheere Chalo!',
-    title: 'Bhaago Mat? Dheere Chalo!',
-    opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
-    problem: 'A child ignores "don\'t" but follows a clear "do"',
-    lesson: 'Kya nahi karna, nahi — kya karna hai, woh batao',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bachche "mat bhaago" sunta nahi magar "karo" sun leta hai — ek word ka fark poora behavior badalta hai! ❤️ #ToddlerTips #ParentingHack #FunLearningWithPalak #IndianParents #PositiveDiscipline',
-    pinnedComment: 'Tip: "Mat bhaago!" ka jawab "Ungli pakdo!" do — ek word change se hi behavior badalta hai! ❤️',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_38',
+      category: 'Learning Lesson',
+      cover: 'Bhaago Mat? Dheere Chalo!',
+      title: 'Bhaago Mat? Dheere Chalo!',
+      opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
+      problem: 'A child ignores "don\'t" but follows a clear "do"',
+      lesson: 'Kya nahi karna, nahi — kya karna hai, woh batao',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bachche "mat bhaago" sunta nahi magar "karo" sun leta hai — ek word ka fark poora behavior badalta hai! ❤️ #ToddlerTips #ParentingHack #FunLearningWithPalak #IndianParents #PositiveDiscipline',
+      pinnedComment: 'Tip: "Mat bhaago!" ka jawab "Ungli pakdo!" do — ek word change se hi behavior badalta hai! ❤️',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Parking mein Mumma: "Rio, mat bhaago!" Rio aur tez bhaagta hai.
 Twist: Mumma daud ke pakadti hai aur ab alag bolti hai: "Rio, meri ungli pakdo." Rio ruk jaata hai: "Kyun?"
 Resolution: "Gaadi aati hai. Ungli pakdo, hum dono saath cross karenge." Rio ungli kas ke pakad leta hai. Dono dhire dhire chalte hain.
 Moral: "Mat" nahi, "ungli pakdo".
 ''',
-    setting: 'Society parking, afternoon, cars entering',
-    sceneDetail: 'One red car stops at the line, others pass',
-    dialogue: '"Rio, meri ungli pakho."',
-    mess: 'Rio starts to run, then stops when he feels Mumma\'s hand',
-    innerThought: 'He\'s faster than me, but safer with me.',
-    endingBeat: 'Both cross the road together, hand in hand.',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society parking, afternoon, cars entering',
+      sceneDetail: 'One red car stops at the line, others pass',
+      dialogue: '"Rio, meri ungli pakho."',
+      mess: 'Rio starts to run, then stops when he feels Mumma\'s hand',
+      innerThought: 'He\'s faster than me, but safer with me.',
+      endingBeat: 'Both cross the road together, hand in hand.',
+      defaultCast: ['Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society parking lot, afternoon, red car stopped at a crossing line. Rio (blue t-shirt, shorts) runs ahead toward the road. Mumma calls out: "Rio, mat bhaago!" Text on screen: "MAT BHAAGO ❌" "UNGLI PAKDO ✅"
 
 On-Screen Text:
@@ -2508,45 +2589,47 @@ Part 3 (20-30s): $kPartStyle. Both cross the road together, hand in hand, the re
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-
-  // Warm lesson: gentle stories that end on something a parent wants to keep.
-  HookIdea(
-    id: 'idea_39',
-    category: 'Learning Lesson',
-    cover: 'Pyaar Bhi, Rule Bhi',
-    title: 'Pyaar Bhi, Rule Bhi',
-    opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
-    problem: 'Holding a boundary kindly instead of giving in or shouting',
-    lesson: 'Pyaar ke saath rule, bachcha safe mehsoos karta hai',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Boundary todi toh chillaaye nahi — pyaar se samjhaya! "Haan beta, tumne kara. Par main tumhe pyar karti hoon." ❤️ #GentleBoundaries #ParentingWithLove #FunLearningWithPalak #IndianParents #RespectfulParenting',
-    pinnedComment: 'Rule + pyaar = bachcha safe feel karta hai. Try karo!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Warm lesson: gentle stories that end on something a parent wants to keep.
+    HookIdea(
+      id: 'idea_39',
+      category: 'Learning Lesson',
+      cover: 'Pyaar Bhi, Rule Bhi',
+      title: 'Pyaar Bhi, Rule Bhi',
+      opening: 'Rio ne phir se rule toda... par Mumma ne chillaaya nahi.',
+      problem: 'Holding a boundary kindly instead of giving in or shouting',
+      lesson: 'Pyaar ke saath rule, bachcha safe mehsoos karta hai',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Boundary todi toh chillaaye nahi — pyaar se samjhaya! "Haan beta, tumne kara. Par main tumhe pyar karti hoon." ❤️ #GentleBoundaries #ParentingWithLove #FunLearningWithPalak #IndianParents #RespectfulParenting',
+      pinnedComment: 'Rule + pyaar = bachcha safe feel karta hai. Try karo!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio takes cookie from the jar again—"Mummy, maine bas ek hi liya tha!"
 Twist: Instead of shouting, Mumma kneels down—"Haan beta, tumne kara. Par main tumhe pyar karti hoon."
 Resolution: Rio hugs her—"Next time I'll ask pehle!"—and puts the cookie back in the jar.
 Ending line: "Phir se promise, Mummy?" "Haan, phir se promise."
 Moral: Pyaar ke saath rule set karna, bachcha safe mehsoos karta hai.
 ''',
-    setting: 'Kitchen counter, morning, cookie jar on the table',
-    sceneDetail: 'Rio with cookie in hand, Mumma watching from the sink',
-    dialogue: '"Haan beta, tumne kara. Par main tumhe pyar karti hoon."',
-    mess: 'Rio looks guilty, cookie halfway to his mouth, Mumma kneeling down',
-    innerThought: 'A boundary held with love — not a shout, not a give-in.',
-    endingBeat: 'Rio puts the cookie back in the jar: "Next time I\'ll ask pehle!"',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen counter, morning, cookie jar on the table',
+      sceneDetail: 'Rio with cookie in hand, Mumma watching from the sink',
+      dialogue: '"Haan beta, tumne kara. Par main tumhe pyar karti hoon."',
+      mess:
+          'Rio looks guilty, cookie halfway to his mouth, Mumma kneeling down',
+      innerThought: 'A boundary held with love — not a shout, not a give-in.',
+      endingBeat:
+          'Rio puts the cookie back in the jar: "Next time I\'ll ask pehle!"',
+      defaultCast: ['Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen counter, morning, cookie jar on the table. Rio (blue t-shirt, shorts, holding cookie) sneaks from the jar again. Mumma kneels: "Haan beta, tumne kara. Par main tumhe pyar karti hoon." Text on screen: "COOKIE SNATCH! 🍪" "LOVE BOUNDARY ❤️" "ASK NEXT TIME 💛"
 
 On-Screen Text:
@@ -2566,43 +2649,44 @@ Part 3 (20-30s): $kPartStyle. Cookie jar closed. "Phir se promise?" "Haan." Text
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_40',
-    category: 'Learning Lesson',
-    cover: 'Bag On Floor!',
-    title: 'Bag On Floor!',
-    opening: 'Mumma ke saath bag gir gaya, Ria ne turant pick up kiya.',
-    problem: 'Ria sees Mumma tired and picks up the bag from the floor',
-    lesson: 'A child noticing and helping without being asked',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria ne dekha Mumma thak gayi — bag uthaya bina puchhe! "Tum itni thak gayi ho!" ❤️ #ChildEmpathy #UnaskedHelp #FunLearningWithPalak #IndianParents #LittleHelpers',
-    pinnedComment: 'Aapka bachcha kab aapki madad kiya bina puchhe? 🥹',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_40',
+      category: 'Learning Lesson',
+      cover: 'Bag On Floor!',
+      title: 'Bag On Floor!',
+      opening: 'Mumma ke saath bag gir gaya, Ria ne turant pick up kiya.',
+      problem: 'Ria sees Mumma tired and picks up the bag from the floor',
+      lesson: 'A child noticing and helping without being asked',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria ne dekha Mumma thak gayi — bag uthaya bina puchhe! "Tum itni thak gayi ho!" ❤️ #ChildEmpathy #UnaskedHelp #FunLearningWithPalak #IndianParents #LittleHelpers',
+      pinnedComment: 'Aapka bachcha kab aapki madad kiya bina puchhe? 🥹',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria notices Mumma tired, picks up bag from floor and hands it.
 Twist: Mumma starts to refuse — "Maine kaha tha, main saambhaa lunga."
 Resolution: Ria: "Tum itni thak gayi ho!" Mumma lets her help, ruffles her hair.
 Ending line: "Mumma: Shukriya beta. Ria: Tumhara saath hi toh maza aata hai."
 Moral: Children see tiredness before we admit it — and small hands can still hold a big bag.
 ''',
-    setting: 'Living room floor, Mumma slumped on the couch, bag beside her',
-    sceneDetail: 'Ria standing, looking from the bag to Mumma\'s tired face',
-    dialogue: '"Tum itni thak gayi ho!"',
-    mess: 'Mumma starts to take the bag back — "Maine kaha tha, main saambhaa lunga."',
-    innerThought: 'She\'s been carrying it all day. Let me help.',
-    endingBeat: 'Ria hands it over: "Mere saath chalo, main saambhal ke rakhti hoon."',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, Mumma slumped on the couch, bag beside her',
+      sceneDetail: 'Ria standing, looking from the bag to Mumma\'s tired face',
+      dialogue: '"Tum itni thak gayi ho!"',
+      mess: 'Mumma starts to take the bag back — "Maine kaha tha, main saambhaa lunga."',
+      innerThought: 'She\'s been carrying it all day. Let me help.',
+      endingBeat: 'Ria hands it over: "Mere saath chalo, main saambhal ke rakhti hoon."',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon. Mumma slumped on the couch, bag beside her. Ria (sparkly pink star dress, pigtails) notices, picks up the bag from the floor and hands it. Mumma starts to take it back: "Maine kaha tha, main saambhaa lunga." Text on screen: "NOTICED TIREDNESS 👀" "SMALL HELP 💛" "GIVING SPACE TO LOVE ❤️"
 
 On-Screen Text:
@@ -2622,44 +2706,45 @@ Part 3 (20-30s): $kPartStyle. Ria sits beside Mumma, hands her the bag. "Tumhara
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-
-  // Navratri: Problem → Jugaad → Result → Moral.
-HookIdea(
-    id: 'idea_41',
-    category: 'Navratri',
-    cover: 'Garba Se Ghar Kaise Laayein?',
-    title: 'Garba Se Ghar Kaise Laayein?',
-    opening: 'Ria nach rahi thi Garba mein... Mumma boli "Chalo ghar!" Ria: "Nahi!"',
-    problem: 'Child refuses to leave a fun event when it\'s time to go',
-    lesson: 'Give a warning, offer a small keepsake, and make the goodbye a promise to return',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Garba mein bachcha ghar nahi jaana chahta? Ek warning, ek sticker, aur "kal phir milenge!" 🪔 #NavratriWithKids #ParentingHack #FunLearningWithPalak #IndianParents #GarbaTime',
-    pinnedComment: 'Tip: Garba se pehle 5 minute "one more song" sunao — phir packup signal dikhao',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    // Navratri: Problem → Jugaad → Result → Moral.
+    HookIdea(
+      id: 'idea_41',
+      category: 'Navratri',
+      cover: 'Garba Se Ghar Kaise Laayein?',
+      title: 'Garba Se Ghar Kaise Laayein?',
+      opening: 'Ria nach rahi thi Garba mein... Mumma boli "Chalo ghar!" Ria: "Nahi!"',
+      problem: 'Child refuses to leave a fun event when it\'s time to go',
+      lesson: 'Give a warning, offer a small keepsake, and make the goodbye a promise to return',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Garba mein bachcha ghar nahi jaana chahta? Ek warning, ek sticker, aur "kal phir milenge!" 🪔 #NavratriWithKids #ParentingHack #FunLearningWithPalak #IndianParents #GarbaTime',
+      pinnedComment: 'Tip: Garba se pehle 5 minute "one more song" sunao — phir packup signal dikhao',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: Ria is dancing happily at Garba, but when Mumma says it's time to leave, she protests — "Nahi, aur ghoomna hai!"
 Twist: Ria spots other parents also packing up their kids — "Dekho, sab bachche yahan se jaa rahe hain!"
 Resolution: Mumma gives Ria a "Garba star" sticker and lets her put her tiny bangles in her pocket to keep for home — "Kal phir milenge!"
 Moral: One more song, then it's time to go — goodbyes feel easier with a small promise.
 ''',
-    setting: 'Garba ground, evening, fairy lights strung, Ria in chaniya choli',
-    sceneDetail: 'Garba circle mid-dance, fairy lights overhead, other families already packing up at the edges',
-    dialogue: '"Nahi, aur ghoomna hai!" "Kal phir milenge!"',
-    mess: 'Ria plants her feet mid-circle, refusing to stop even as the music winds down',
-    innerThought: 'One more song always turns into five. Tonight I need a plan, not a fight.',
-    endingBeat: 'Ria pockets her Garba star sticker and tiny bangles, waving goodbye to the circle. "Kal phir milenge!"',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Garba ground, evening, fairy lights strung, Ria in chaniya choli',
+      sceneDetail: 'Garba circle mid-dance, fairy lights overhead, other families already packing up at the edges',
+      dialogue: '"Nahi, aur ghoomna hai!" "Kal phir milenge!"',
+      mess: 'Ria plants her feet mid-circle, refusing to stop even as the music winds down',
+      innerThought: 'One more song always turns into five. Tonight I need a plan, not a fight.',
+      endingBeat: 'Ria pockets her Garba star sticker and tiny bangles, waving goodbye to the circle. "Kal phir milenge!"',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Garba ground, evening, fairy lights overhead. Mumma: "Chalo ghar!" Ria plants her feet: "Nahi, aur ghoomna hai!" Text on screen: "GARBA SE GHAR KAISE LAAYEIN? 🪔" "EK WARNING, EK STICKER! ⭐"
 
 On-Screen Text:
@@ -2679,42 +2764,46 @@ Part 3 (20-30s): $kPartStyle. Ria pockets her sticker and bangles, waving goodby
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_42',
-    category: 'Navratri',
-    cover: 'Garba Mein Bachcha Roye? Quiet Corner!',
-    title: 'Garba Mein Bachcha Roye? Quiet Corner!',
-    opening: 'Garba ka dhol baj raha tha... Cuty apne kaan duba ke ro rahi thi.',
-    problem: 'Loud music and crowds overwhelm a sensitive child at a festival',
-    lesson: 'Find a quiet spot beforehand; let the child celebrate at their own pace',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Garba mein bachcha roye toh? Quiet corner dhundho, uske pace pe celebrate karo! 🪔 #NavratriTips #ToddlerLife #FunLearningWithPalak #IndianParents #SensoryFriendly',
-    pinnedComment: 'Tip: Venue par pehle se quiet family corner dhoondh ke rakhein!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_42',
+      category: 'Navratri',
+      cover: 'Garba Mein Bachcha Roye? Quiet Corner!',
+      title: 'Garba Mein Bachcha Roye? Quiet Corner!',
+      opening:
+          'Garba ka dhol baj raha tha... Cuty apne kaan duba ke ro rahi thi.',
+      problem:
+          'Loud music and crowds overwhelm a sensitive child at a festival',
+      lesson: 'Find a quiet spot beforehand; let the child celebrate at their own pace',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Garba mein bachcha roye toh? Quiet corner dhundho, uske pace pe celebrate karo! 🪔 #NavratriTips #ToddlerLife #FunLearningWithPalak #IndianParents #SensoryFriendly',
+      pinnedComment:
+          'Tip: Venue par pehle se quiet family corner dhoondh ke rakhein!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: Ria and Rio are excited for Garba, but the loud dhol and flashing lights make Cuty cover her ears and cry.
 Twist: Mumma moves the kids to the quiet corner where Daadi is sitting — "Yahan se bhi Garba dikhai dega!"
 Resolution: Daadi teaches Cuty to clap along to a softer beat, and soon Cuty is smiling and joining in her own way.
 Moral: Every child celebrates differently — finding their comfort rhythm is its own kind of joy.
 ''',
-    setting: 'Garba ground, evening, loud dhol, Cuty covering ears',
-    sceneDetail: 'Garba ground at peak volume, dhol drums thumping, flashing string lights, Cuty with paws over her ears',
-    dialogue: '"Yahan se bhi Garba dikhai dega!"',
-    mess: 'Cuty presses her paws to her ears and curls up, overwhelmed by the drums and flashing lights',
-    innerThought: 'The noise that thrills Ria and Rio is too much for Cuty — she needs a different way in, not a push through.',
-    endingBeat: 'Daadi claps a softer beat beside Cuty; Cuty uncurls, smiles, and claps along at her own pace.',
-    defaultCast: ['Ria', 'Mumma', 'Daadi'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Garba ground, evening, loud dhol, Cuty covering ears',
+      sceneDetail: 'Garba ground at peak volume, dhol drums thumping, flashing string lights, Cuty with paws over her ears',
+      dialogue: '"Yahan se bhi Garba dikhai dega!"',
+      mess: 'Cuty presses her paws to her ears and curls up, overwhelmed by the drums and flashing lights',
+      innerThought: 'The noise that thrills Ria and Rio is too much for Cuty — she needs a different way in, not a push through.',
+      endingBeat: 'Daadi claps a softer beat beside Cuty; Cuty uncurls, smiles, and claps along at her own pace.',
+      defaultCast: ['Ria', 'Mumma', 'Daadi'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Garba ground, evening, dhol drums thumping, string lights flashing. Ria and Rio dance excitedly. Cuty presses her paws over her ears and curls up. Text on screen: "GARBA MEIN BACHCHA ROYE? 😢" "QUIET CORNER! 🤫"
 
 On-Screen Text:
@@ -2734,42 +2823,43 @@ Part 3 (20-30s): $kPartStyle. Cuty uncurls, smiles, and claps along at her own p
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_43',
-    category: 'Navratri',
-    cover: 'Garba Snack Boundary!',
-    title: 'Garba Snack Boundary!',
-    opening: 'Ria Garba ke liye taiyaar... par "Mummy, chips chahiye!"',
-    problem: 'Child asks for unhealthy snacks before a festival event',
-    lesson: 'Pack a healthy snack box; allow one small treat after the first activity — no shaming',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Garba jaate waqt bachche ke snack tantrums? Lunch box mein favorite healthy snack saath le jao! 🥜 #NavratriFood #ToddlerTips #FunLearningWithPalak #IndianParents #HealthySnacks',
-    pinnedComment: 'Tip: Small snack pouch — 5 bites before Garba, 5 after. Tantrum-free!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_43',
+      category: 'Navratri',
+      cover: 'Garba Snack Boundary!',
+      title: 'Garba Snack Boundary!',
+      opening: 'Ria Garba ke liye taiyaar... par "Mummy, chips chahiye!"',
+      problem: 'Child asks for unhealthy snacks before a festival event',
+      lesson: 'Pack a healthy snack box; allow one small treat after the first activity — no shaming',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Garba jaate waqt bachche ke snack tantrums? Lunch box mein favorite healthy snack saath le jao! 🥜 #NavratriFood #ToddlerTips #FunLearningWithPalak #IndianParents #HealthySnacks',
+      pinnedComment: 'Tip: Small snack pouch — 5 bites before Garba, 5 after. Tantrum-free!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: Ria is ready for Garba but keeps asking for chips and sweets, saying "Mummy, bhookh lagi hai!"
 Twist: Mumma offers the healthy snack box she packed — "Pehle yeh khao, phir Garba!" — but Ria still wants the chips.
 Resolution: Mumma lets Ria choose one small sweet after the first round of Garba — balancing treat and fun.
 Moral: Hunger at parties is often excitement — redirect with healthy fuel, then a small treat.
 ''',
-    setting: 'Society compound, afternoon snack time before Garba',
-    sceneDetail: 'Society compound, snack box open on the table, chips packet visible nearby',
-    dialogue: '"Mummy, bhookh lagi hai! Chips chahiye!" "Pehle yeh khao, phir Garba!"',
-    mess: 'Ria keeps pointing at the chips packet even after the healthy snack box is opened in front of her',
-    innerThought: 'She is not really hungry for chips — she is hungry for the excitement starting around her.',
-    endingBeat: 'After the first round of Garba, Ria picks one small sweet from the treat box, happy and full.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society compound, afternoon snack time before Garba',
+      sceneDetail: 'Society compound, snack box open on the table, chips packet visible nearby',
+      dialogue: '"Mummy, bhookh lagi hai! Chips chahiye!" "Pehle yeh khao, phir Garba!"',
+      mess: 'Ria keeps pointing at the chips packet even after the healthy snack box is opened in front of her',
+      innerThought: 'She is not really hungry for chips — she is hungry for the excitement starting around her.',
+      endingBeat: 'After the first round of Garba, Ria picks one small sweet from the treat box, happy and full.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society compound, afternoon, snack box open on the table, a chips packet visible nearby. Ria: "Mummy, bhookh lagi hai! Chips chahiye!" Text on screen: "GARBA SNACK BOUNDARY! 🥜" "PEHLE YEH, PHIR GARBA! ✅"
 
 On-Screen Text:
@@ -2789,42 +2879,45 @@ Part 3 (20-30s): $kPartStyle. After the first round of Garba, Ria picks one smal
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_44',
-    category: 'Navratri',
-    cover: 'Late Night Garba Vs Neend!',
-    title: 'Late Night Garba Vs Neend!',
-    opening: 'Raat 10 baje... Ria nach rahi thi, phir achanak: "Mummy, thak gayi!"',
-    problem: 'Child enjoys late-night festivities but gets overtired and cranky',
-    lesson: 'Set a clear end time; bring a comfort item; transition gently to bedtime',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Late-night Garba vs bachche ki sleep! 9 baje tak enjoy karo, phir cozy bedtime. 🌙 #LateNightParenting #Navratri #FunLearningWithPalak #IndianParents #BedtimeRoutine',
-    pinnedComment: 'Tip: Toddler ka comfort item (chhoti blanket ya soft toy) zaroor saath rakhein.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_44',
+      category: 'Navratri',
+      cover: 'Late Night Garba Vs Neend!',
+      title: 'Late Night Garba Vs Neend!',
+      opening: 'Raat 10 baje... Ria nach rahi thi, phir achanak: "Mummy, thak gayi!"',
+      problem:
+          'Child enjoys late-night festivities but gets overtired and cranky',
+      lesson: 'Set a clear end time; bring a comfort item; transition gently to bedtime',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Late-night Garba vs bachche ki sleep! 9 baje tak enjoy karo, phir cozy bedtime. 🌙 #LateNightParenting #Navratri #FunLearningWithPalak #IndianParents #BedtimeRoutine',
+      pinnedComment: 'Tip: Toddler ka comfort item (chhoti blanket ya soft toy) zaroor saath rakhein.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: It's 10 PM and Ria is enjoying Garba, but suddenly she yawns and says, "Mummy, main thak gayi hoon."
 Twist: Mumma checks the clock — only one more song left, but Ria is already sleepy and cranky.
 Resolution: Mumma whispers, "Ek last dance, then straight to bed" — Ria dances one more time, then happily goes home.
 Moral: Late nights are okay sometimes, but knowing the end is near helps kids say goodbye.
 ''',
-    setting: 'Garba ground, 10 PM, party music still audible, Ria yawning',
-    sceneDetail: 'Garba ground near the exit, 10 PM, Ria\'s eyelids drooping between claps',
-    dialogue: '"Mummy, main thak gayi hoon." "Ek last dance, phir seedha bed."',
-    mess: 'Ria rubs her eyes between dance steps, caught between wanting to stay and needing to sleep',
-    innerThought: 'She would dance through exhaustion all night if I let her. Naming the end helps her let go of it.',
-    endingBeat: 'Ria dances her last song with a sleepy grin, then walks out holding Mumma\'s hand, already half-asleep.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Garba ground, 10 PM, party music still audible, Ria yawning',
+      sceneDetail: 'Garba ground near the exit, 10 PM, Ria\'s eyelids drooping between claps',
+      dialogue:
+          '"Mummy, main thak gayi hoon." "Ek last dance, phir seedha bed."',
+      mess: 'Ria rubs her eyes between dance steps, caught between wanting to stay and needing to sleep',
+      innerThought: 'She would dance through exhaustion all night if I let her. Naming the end helps her let go of it.',
+      endingBeat: 'Ria dances her last song with a sleepy grin, then walks out holding Mumma\'s hand, already half-asleep.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Garba ground near the exit, 10 PM, party music still audible. Ria's eyelids droop between claps. "Mummy, main thak gayi hoon." Text on screen: "LATE NIGHT GARBA VS NEEND! 🌙" "EK LAST DANCE, PHIR BED! 😴"
 
 On-Screen Text:
@@ -2844,42 +2937,43 @@ Part 3 (20-30s): $kPartStyle. Ria walks out holding Mumma's hand, already half-a
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_45',
-    category: 'Navratri',
-    cover: 'Outfit Pehante Hi Rona Shuru? Comfort First!',
-    title: 'Outfit Pehante Hi Rona Shuru? Comfort First!',
-    opening: 'Outfit toh cute hai... par bachcha sirf "nikal do, nikal do" bol raha hai!',
-    problem: 'Fancy clothes, tight waistbands, or heavy accessories irritate a toddler',
-    lesson: 'Cute outfit se pehle comfortable outfit!',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Navratri outfit pehna diya, ab bachcha chidchid kar raha hai? Comfort pe focus karo — style apne aap aayega! 👗 #NavratriFashion #ToddlerLife #FunLearningWithPalak #IndianParents #ComfortFirst',
-    pinnedComment: 'Tip: Heavy accessories pehnane se pehle 5-minute comfort test zaroor karein!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_45',
+      category: 'Navratri',
+      cover: 'Outfit Pehante Hi Rona Shuru? Comfort First!',
+      title: 'Outfit Pehante Hi Rona Shuru? Comfort First!',
+      opening: 'Outfit toh cute hai... par bachcha sirf "nikal do, nikal do" bol raha hai!',
+      problem: 'Fancy clothes, tight waistbands, or heavy accessories irritate a toddler',
+      lesson: 'Cute outfit se pehle comfortable outfit!',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Navratri outfit pehna diya, ab bachcha chidchid kar raha hai? Comfort pe focus karo — style apne aap aayega! 👗 #NavratriFashion #ToddlerLife #FunLearningWithPalak #IndianParents #ComfortFirst',
+      pinnedComment: 'Tip: Heavy accessories pehnane se pehle 5-minute comfort test zaroor karein!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria's new lehenga is itchy — "Nikal do, nikal do!" She refuses to wear it at all.
 Twist: Mumma offers two options: "Option one, lehenga without the heavy dupatta. Option two, comfortable chaniya."
 Resolution: Ria picks Option 2 — comfy chaniya and light jhumkas. She twirls and grins. "Maa, main khoobsurat lag rahi hoon!"
 Moral: Comfort before style — when kids feel good, they shine.
 ''',
-    setting: 'Changing room, pre-party, mirror lit',
-    sceneDetail: 'One strap of the lehenga keeps slipping',
-    dialogue: '"Yeh bahut tight hai, Mumma!"',
-    mess: 'Ria walks with tiny steps, adjusting the outfit every three steps',
-    innerThought: 'Two more hours. Can I survive two more hours?',
-    endingBeat: 'Ria sits on the bed, "comfort over couture" with Mumma.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Changing room, pre-party, mirror lit',
+      sceneDetail: 'One strap of the lehenga keeps slipping',
+      dialogue: '"Yeh bahut tight hai, Mumma!"',
+      mess: 'Ria walks with tiny steps, adjusting the outfit every three steps',
+      innerThought: 'Two more hours. Can I survive two more hours?',
+      endingBeat: 'Ria sits on the bed, "comfort over couture" with Mumma.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Changing room, pre-party, mirror lit. Ria tugs at her new lehenga: "Nikal do, nikal do!" One strap keeps slipping. Text on screen: "OUTFIT PEHANTE HI RONA SHURU? 👗" "COMFORT FIRST! ✅"
 
 On-Screen Text:
@@ -2899,78 +2993,82 @@ Part 3 (20-30s): $kPartStyle. Ria sits on the bed with Mumma, comfortable and ha
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_46',
-    category: 'Navratri',
-    cover: 'Archived — Generic Content',
-    title: 'Archived — Generic Content',
-    opening: 'Archived — generic content.',
-    problem: 'Archived: no real child problem',
-    lesson: 'No real child problem',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Chhote bachchon ko Garba mein kaise include karein? Simple steps aur extra smiles — perfection se zyada khushi zaroori hai. #InclusiveGarba #KidsDance #FunLearningWithPalak #NavratriTips #ToddlerRoutine',
-    pinnedComment: 'Tip: Toddler ke saath simple 2-step taali banayein — kids energy copy karte hain!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_46',
+      category: 'Navratri',
+      cover: 'Archived — Generic Content',
+      title: 'Archived — Generic Content',
+      opening: 'Archived — generic content.',
+      problem: 'Archived: no real child problem',
+      lesson: 'No real child problem',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Chhote bachchon ko Garba mein kaise include karein? Simple steps aur extra smiles — perfection se zyada khushi zaroori hai. #InclusiveGarba #KidsDance #FunLearningWithPalak #NavratriTips #ToddlerRoutine',
+      pinnedComment: 'Tip: Toddler ke saath simple 2-step taali banayein — kids energy copy karte hain!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: Ria sees older kids dancing and wants to join, but she can't follow the complex steps — "Mummy, main nahi kar paa rahi!"
 Twist: Papa joins her with a simple 2-step twist — "Ria-style dance, papa-style dance!" — and soon Rio and Cuty copy them.
 Resolution: Ria's simple steps become the hit of the circle — everyone wants to learn the "toddler twist."
 Moral: You don't need to follow — it's better to create your own way to celebrate.
 ''',
-    setting: 'Garba ground, evening, lights strung overhead',
-    sceneDetail: 'One partner has a broken jhumka',
-    dialogue: '"Koi nahi hai meri saath ghoomne ke liye!"',
-    mess: 'Ria looks for a partner, all her friends have pairs',
-    innerThought: 'I should have arranged pairs in advance.',
-    endingBeat: 'Daadi says "main hoon na", both dance without looking for pairs.',
-    defaultCast: ['Ria', 'Daadi', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '',
-  ),
+      setting: 'Garba ground, evening, lights strung overhead',
+      sceneDetail: 'One partner has a broken jhumka',
+      dialogue: '"Koi nahi hai meri saath ghoomne ke liye!"',
+      mess: 'Ria looks for a partner, all her friends have pairs',
+      innerThought: 'I should have arranged pairs in advance.',
+      endingBeat:
+          'Daadi says "main hoon na", both dance without looking for pairs.',
+      defaultCast: ['Ria', 'Daadi', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '',
+    ),
 
-  HookIdea(
-    id: 'idea_47',
-    category: 'Navratri',
-    cover: 'Late For Garba, Toddler Not Ready!',
-    title: 'Late For Garba, Toddler Not Ready!',
-    opening: 'Garba ke liye sab taiyyar the... par bachcha joote pehan hi nahi raha tha!',
-    problem: 'Parents are ready but the toddler refuses to get dressed or put on shoes',
-    lesson: 'Ready hone ka pressure kam, routine simple rakho — game banao!',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Garba party ke liye late ho rahe hain aur bachcha ready hi nahi? Game banao, pressure nahi! 👟 #LastMinuteGarba #ToddlerRoutine #FunLearningWithPalak #IndianParents #ParentingHack',
-    pinnedComment: 'Tip: Shoes pehne ke baad "Garba star" sticker challenge try karke dekhiye!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_47',
+      category: 'Navratri',
+      cover: 'Late For Garba, Toddler Not Ready!',
+      title: 'Late For Garba, Toddler Not Ready!',
+      opening: 'Garba ke liye sab taiyyar the... par bachcha joote pehan hi nahi raha tha!',
+      problem: 'Parents are ready but the toddler refuses to get dressed or put on shoes',
+      lesson: 'Ready hone ka pressure kam, routine simple rakho — game banao!',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Garba party ke liye late ho rahe hain aur bachcha ready hi nahi? Game banao, pressure nahi! 👟 #LastMinuteGarba #ToddlerRoutine #FunLearningWithPalak #IndianParents #ParentingHack',
+      pinnedComment: 'Tip: Shoes pehne ke baad "Garba star" sticker challenge try karke dekhiye!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Garba is starting in 5 minutes, but Ria is still struggling with her jootey — "Jootey pehne mein dikkat ho rahi hai!"
 Twist: Papa turns it into a game — "Jootey pehne, superhero ban jao!" — Ria giggles and slips them on.
 Resolution: Ria runs to join the Garba circle just in time, her "superhero jootey" clicking as she dances.
 Moral: Rushing creates resistance — transform the race into play and everything falls into place.
 ''',
-    setting: 'Bedroom, evening, outfit laid out on the bed, shoes by the door',
-    sceneDetail: 'One shoe strap keeps slipping, Ria tugging at it in frustration',
-    dialogue: '"Jootey pehne mein dikkat ho rahi hai!" "Jootey pehne, superhero ban jao!"',
-    mess: 'Ria struggles with her shoe strap while the clock ticks down to Garba time',
-    innerThought: 'We will miss the first aarti.',
-    endingBeat: 'Ria runs to join the Garba circle just in time, her "superhero jootey" clicking as she dances.',
-    defaultCast: ['Ria', 'Mumma', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Bedroom, evening, outfit laid out on the bed, shoes by the door',
+      sceneDetail:
+          'One shoe strap keeps slipping, Ria tugging at it in frustration',
+      dialogue: '"Jootey pehne mein dikkat ho rahi hai!" "Jootey pehne, superhero ban jao!"',
+      mess: 'Ria struggles with her shoe strap while the clock ticks down to Garba time',
+      innerThought: 'We will miss the first aarti.',
+      endingBeat: 'Ria runs to join the Garba circle just in time, her "superhero jootey" clicking as she dances.',
+      defaultCast: ['Ria', 'Mumma', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, evening, outfit laid out on the bed, shoes by the door. Garba starts in 5 minutes. Ria tugs at her shoe strap: "Jootey pehne mein dikkat ho rahi hai!" Text on screen: "GARBA MEIN LATE?! ⏰" "GAME BANAO, PRESSURE NAHI! 🦸"
 
 On-Screen Text:
@@ -2990,42 +3088,46 @@ Part 3 (20-30s): $kPartStyle. Ria runs to join the Garba circle just in time, he
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_48',
-    category: 'Navratri',
-    cover: 'Garba Crowd Mein Bachcha Safe!',
-    title: 'Garba Crowd Mein Bachcha Safe!',
-    opening: 'Garba floor packed tha... Ria ko dhakka laga, woh Mumma se chipak gayi.',
-    problem: 'Crowded festival overwhelm a toddler; child gets bumped and scared',
-    lesson: 'Pre-identify a family meeting spot; hold hands; lift child for a better view',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Crowded Garba mein toddler ko safe kaise rakhein? Family boundary banayein, sides mein enjoy karein! 🪔 #SafeGarba #CrowdedEvents #FunLearningWithPalak #IndianParents #CrowdSafety',
-    pinnedComment: 'Tip: Event entry par hi family corner aur quiet spot pehle dekh lein.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: true,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_48',
+      category: 'Navratri',
+      cover: 'Garba Crowd Mein Bachcha Safe!',
+      title: 'Garba Crowd Mein Bachcha Safe!',
+      opening: 'Garba floor packed tha... Ria ko dhakka laga, woh Mumma se chipak gayi.',
+      problem:
+          'Crowded festival overwhelm a toddler; child gets bumped and scared',
+      lesson: 'Pre-identify a family meeting spot; hold hands; lift child for a better view',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Crowded Garba mein toddler ko safe kaise rakhein? Family boundary banayein, sides mein enjoy karein! 🪔 #SafeGarba #CrowdedEvents #FunLearningWithPalak #IndianParents #CrowdSafety',
+      pinnedComment: 'Tip: Event entry par hi family corner aur quiet spot pehle dekh lein.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: true,
+      storyDetail: '''
 Story: The Garba floor is packed and Ria gets accidentally bumped — she looks scared and clings to Mumma.
 Twist: Mumma lifts Ria onto her shoulders so she can see over the crowd — "Ab dekho, yeh sab kuch badiya lag raha hai!"
 Resolution: From above, Ria sees the beautiful lights and starts waving at other dancers — her fear turns to wonder.
 Moral: A new perspective can turn overwhelm into magic — sometimes elevation helps us see the beauty.
 ''',
-    setting: 'Garba ground, peak hour, crowd moving, Ria on Mumma\'s shoulders',
-    sceneDetail: 'Garba ground at peak hour, a dense crowd of dancers, Mumma lifting Ria onto her shoulders',
-    dialogue: '"Ria, mere paas aao!" "Ab dekho, yeh sab kuch badiya lag raha hai!"',
-    mess: 'Ria gets jostled by the crowd, loses her footing for a second, and clings tight to Mumma\'s leg',
-    innerThought: 'From down here the crowd feels like a wall. She just needs a different view of it.',
-    endingBeat: 'From Mumma\'s shoulders, Ria waves at the dancers below, fear melted into delight.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Garba ground, peak hour, crowd moving, Ria on Mumma\'s shoulders',
+      sceneDetail: 'Garba ground at peak hour, a dense crowd of dancers, Mumma lifting Ria onto her shoulders',
+      dialogue:
+          '"Ria, mere paas aao!" "Ab dekho, yeh sab kuch badiya lag raha hai!"',
+      mess: 'Ria gets jostled by the crowd, loses her footing for a second, and clings tight to Mumma\'s leg',
+      innerThought: 'From down here the crowd feels like a wall. She just needs a different view of it.',
+      endingBeat: 'From Mumma\'s shoulders, Ria waves at the dancers below, fear melted into delight.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Garba ground at peak hour, a dense crowd of dancers. Ria gets jostled, clings tight to Mumma's leg, scared. Text on screen: "GARBA CROWD MEIN BACHCHA SAFE! 🪔" "NAYA PERSPECTIVE! 👀"
 
 On-Screen Text:
@@ -3045,43 +3147,43 @@ Part 3 (20-30s): $kPartStyle. From Mumma's shoulders, Ria waves at the dancers b
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-
-  HookIdea(
-    id: 'idea_49',
-    category: 'Navratri',
-    cover: 'Festival Prep Mein Bachche Ko Kaise Sambhalein?',
-    title: 'Festival Prep Mein Bachche Ko Kaise Sambhalein?',
-    opening: 'Mumma decoration mein busy thi... aur bachcha bola "mere saath khelo na!"',
-    problem: 'Parents are busy with festival preparations and the toddler seeks constant attention',
-    lesson: 'Har baar alag playtime zaroori nahi — bachche ko apne saath chhote kaamo mein shaamil karo',
-    postFormat: 'Reel',
-    strategy: 'parenting-relatability',
-    caption: 'Navratri preparations mein bachche ko time nahi mil raha? Unhe helping hands banaiye! 🪔 #MomLife #NavratriPrep #FunLearningWithPalak #IndianParents #FestivalPrep',
-    pinnedComment: 'Tip: Decor items arrange karne ya phool ginne ka task dijiye — bachcha khush!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_49',
+      category: 'Navratri',
+      cover: 'Festival Prep Mein Bachche Ko Kaise Sambhalein?',
+      title: 'Festival Prep Mein Bachche Ko Kaise Sambhalein?',
+      opening: 'Mumma decoration mein busy thi... aur bachcha bola "mere saath khelo na!"',
+      problem: 'Parents are busy with festival preparations and the toddler seeks constant attention',
+      lesson: 'Har baar alag playtime zaroori nahi — bachche ko apne saath chhote kaamo mein shaamil karo',
+      postFormat: 'Reel',
+      strategy: 'parenting-relatability',
+      caption: 'Navratri preparations mein bachche ko time nahi mil raha? Unhe helping hands banaiye! 🪔 #MomLife #NavratriPrep #FunLearningWithPalak #IndianParents #FestivalPrep',
+      pinnedComment: 'Tip: Decor items arrange karne ya phool ginne ka task dijiye — bachcha khush!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma is setting the Navratri thali, but Ria keeps grabbing things. "Mere saath khelo!"
 Twist: Mumma hands Ria a stack of napkins: "Tum bhi Maa ki helper ho, napkins ghoomao."
 Resolution: Ria carefully places each napkin beside a plate. "Mainne madad ki!" "Perfect," Mumma says.
 Moral: Invitations beat interruptions — when kids feel helpful, they don't compete for attention.
 ''',
-    setting: 'Kitchen, morning, Garba prep in progress',
-    sceneDetail: 'One pot of dal is boiling over',
-    dialogue: '"Mumma sirf Mumma ko hi dhyan do!"',
-    mess: 'Ria competes with every household task for attention',
-    innerThought: 'I can\'t be everywhere at once.',
-    endingBeat: 'Ria sits on the counter, "teaching" Cuty to stir the dal.',
-    defaultCast: ['Ria', 'Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, morning, Garba prep in progress',
+      sceneDetail: 'One pot of dal is boiling over',
+      dialogue: '"Mumma sirf Mumma ko hi dhyan do!"',
+      mess: 'Ria competes with every household task for attention',
+      innerThought: 'I can\'t be everywhere at once.',
+      endingBeat: 'Ria sits on the counter, "teaching" Cuty to stir the dal.',
+      defaultCast: ['Ria', 'Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, morning, Navratri thali prep in progress. Ria keeps grabbing things: "Mere saath khelo!" Mumma hands her a stack of napkins. Text on screen: "FESTIVAL PREP MEIN BACHCHE KO KAISE SAMBHALEIN? 🪔" "HELPER BANO! 🤝"
 
 On-Screen Text:
@@ -3101,44 +3203,46 @@ Part 3 (20-30s): $kPartStyle. Ria sits on the counter, "teaching" Cuty to stir t
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-
-  // ── New 30s Reel Stories ──
-  HookIdea(
-    id: 'idea_50',
-    category: 'Funny',
-    cover: 'Plate Patana!',
-    title: 'Plate Patana!',
-    opening: 'Ria plate mein khana rakhti thi — phir "Mumma, sab mix ho gaya!"',
-    problem: 'Plate mein dal, rice, aur vegetable sab mix ho gaya.',
-    lesson: 'Ek chhota sa separation — dal ka swimming pool.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Dal chawal mix ho gaya? Ek chhoti bowl lao, alag karo — mood fix! 🍚 #PlatePatana #ToddlerMeals #ParentingHack #FunLearningWithPalak #IndianParents',
-    pinnedComment: 'Aapke bachche ko bhi pasand nahi mix khana?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // ── New 30s Reel Stories ──
+    HookIdea(
+      id: 'idea_50',
+      category: 'Funny',
+      cover: 'Plate Patana!',
+      title: 'Plate Patana!',
+      opening:
+          'Ria plate mein khana rakhti thi — phir "Mumma, sab mix ho gaya!"',
+      problem: 'Plate mein dal, rice, aur vegetable sab mix ho gaya.',
+      lesson: 'Ek chhota sa separation — dal ka swimming pool.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Dal chawal mix ho gaya? Ek chhoti bowl lao, alag karo — mood fix! 🍚 #PlatePatana #ToddlerMeals #ParentingHack #FunLearningWithPalak #IndianParents',
+      pinnedComment: 'Aapke bachche ko bhi pasand nahi mix khana?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria plate mein khana rakhti thi — phir "Mumma, sab mix ho gaya!" Dal, chawal, aur vegetable sab ek saath ghubhrey.
 Twist: Mumma ek chhota sa bowl le aati hain: "Ek minute, maaro ek alag." Rio bhi dekh rahe hain.
 Resolution: Dal ka swimming pool alag, chawal phir se — "Bachcha ne engineering shuru kar di!"
 Moral: Ek minute separation, poora mood badal jaata hai.
 ''',
-    setting: 'Dining table, lunch time, dal and chawal in the same plate',
-    sceneDetail: 'Dal swimming in the rice, vegetable pieces floating',
-    dialogue: '"Mumma, sab mix ho gaya!"',
-    mess: 'Ria pushes dal away from chawal with her spoon, more mixing happens',
-    innerThought: 'One small bowl, one big calm.',
-    endingBeat: 'Dal ka swimming pool alag, chawal phir se — "Bachcha ne engineering shuru kar di!"',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Dining table, lunch time, dal and chawal in the same plate',
+      sceneDetail: 'Dal swimming in the rice, vegetable pieces floating',
+      dialogue: '"Mumma, sab mix ho gaya!"',
+      mess:
+          'Ria pushes dal away from chawal with her spoon, more mixing happens',
+      innerThought: 'One small bowl, one big calm.',
+      endingBeat: 'Dal ka swimming pool alag, chawal phir se — "Bachcha ne engineering shuru kar di!"',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Dining table, lunch time. Ria looks down at her plate — dal swimming into the rice, vegetable pieces floating through both. "Mumma, sab mix ho gaya!" Text on screen: "PLATE PATANA! 🍚" "EK CHHOTA SA SEPARATION ✅"
 
 On-Screen Text:
@@ -3158,42 +3262,44 @@ Part 3 (20-30s): $kPartStyle. Dal in its own bowl, rice clean again. Mumma laugh
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_51',
-    category: 'Child Chaos',
-    cover: 'He grabbed her car.',
-    title: 'He grabbed her car.',
-    opening: '"Yeh mera hai!" — and the whole park turns around to look at me.',
-    problem: 'Sunday morning, society park. Rio pulls the red car out of Ria\'s hand mid-race. Ria screams. Four mothers turn around.',
-    lesson: 'Turn-taking needs a handle the child can hold — a timer, a song, a hand.',
-    postFormat: 'Reel',
-    strategy: 'Public-meltdown shame hook',
-    caption: 'The car has one broken wheel, so it always veers left. So do most of my parenting solutions. 🚗 #ToySharing #PublicMeltdown #ParentingReality #FunLearningWithPalak #IndianParents',
-    pinnedComment: '"Gaana khatam hone tak" is the only line that has ever worked in this house. What\'s yours?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_51',
+      category: 'Child Chaos',
+      cover: 'He grabbed her car.',
+      title: 'He grabbed her car.',
+      opening:
+          '"Yeh mera hai!" — and the whole park turns around to look at me.',
+      problem: 'Sunday morning, society park. Rio pulls the red car out of Ria\'s hand mid-race. Ria screams. Four mothers turn around.',
+      lesson: 'Turn-taking needs a handle the child can hold — a timer, a song, a hand.',
+      postFormat: 'Reel',
+      strategy: 'Public-meltdown shame hook',
+      caption: 'The car has one broken wheel, so it always veers left. So do most of my parenting solutions. 🚗 #ToySharing #PublicMeltdown #ParentingReality #FunLearningWithPalak #IndianParents',
+      pinnedComment: '"Gaana khatam hone tak" is the only line that has ever worked in this house. What\'s yours?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Sunday morning, society park. Rio pulls the red car out of Ria's hand mid-race. Ria screams. Four mothers turn around.
 Twist: Mumma steps in: "Gaana khatam hone tak. Phir tumhari baari."
 Resolution: Ria still cries for another ten minutes. Mumma ends up holding one hand of each kid, standing between them.
 Moral: Turn-taking needs a handle the child can hold — a timer, a song, a hand.
 ''',
-    setting: 'Society park, Sunday, 8:40am, Ria on the last free swing',
-    sceneDetail: 'The car is missing one wheel, so it always veers left.',
-    dialogue: '"Gaana khatam hone tak. Phir tumhari baari."',
-    mess: 'Ria still cries for another ten minutes. Mumma ends up holding one hand of each kid, standing between them.',
-    innerThought: 'I want to just hand the car back and walk home.',
-    endingBeat: 'Both kids on the same swing, the car lying between them, nobody holding it.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society park, Sunday, 8:40am, Ria on the last free swing',
+      sceneDetail: 'The car is missing one wheel, so it always veers left.',
+      dialogue: '"Gaana khatam hone tak. Phir tumhari baari."',
+      mess: 'Ria still cries for another ten minutes. Mumma ends up holding one hand of each kid, standing between them.',
+      innerThought: 'I want to just hand the car back and walk home.',
+      endingBeat: 'Both kids on the same swing, the car lying between them, nobody holding it.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society park, Sunday morning, 8:40am. Rio pulls the red toy car — missing one wheel, always veering left — out of Ria's hand mid-race. Ria screams. Text on screen: "YEH MERA HAI! 🚗" "GAANA KHATAM HONE TAK... 🎵"
 
 On-Screen Text:
@@ -3213,42 +3319,43 @@ Part 3 (20-30s): $kPartStyle. Both kids end up on the same swing, the car lying 
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_52',
-    category: 'Child Chaos',
-    cover: 'It took her 9 minutes.',
-    title: 'It took her 9 minutes.',
-    opening: 'Nine minutes of building. Two seconds to fall.',
-    problem: 'Cuty the bunny stacks six blocks on the biscuit tin. Rio walks past and flattens it with one arm.',
-    lesson: 'Rebuilding together is sometimes the whole repair — the apology comes later.',
-    postFormat: 'Reel',
-    strategy: 'Countdown-to-disaster hook',
-    caption: 'The second crash was her own doing. I have stopped intervening in that one. 🧱 #BlockTower #SiblingDynamics #ToddlerPlay #FunLearningWithPalak #IndianParents',
-    pinnedComment: 'How many minutes does your child build before someone in the family destroys it? Ours is 9.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_52',
+      category: 'Child Chaos',
+      cover: 'It took her 9 minutes.',
+      title: 'It took her 9 minutes.',
+      opening: 'Nine minutes of building. Two seconds to fall.',
+      problem: 'Cuty the bunny stacks six blocks on the biscuit tin. Rio walks past and flattens it with one arm.',
+      lesson: 'Rebuilding together is sometimes the whole repair — the apology comes later.',
+      postFormat: 'Reel',
+      strategy: 'Countdown-to-disaster hook',
+      caption: 'The second crash was her own doing. I have stopped intervening in that one. 🧱 #BlockTower #SiblingDynamics #ToddlerPlay #FunLearningWithPalak #IndianParents',
+      pinnedComment: 'How many minutes does your child build before someone in the family destroys it? Ours is 9.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Cuty the bunny stacks six blocks on the biscuit tin. Rio walks past and flattens it with one arm.
 Twist: Cuty cries, then rebuilds it herself, then knocks it down herself and laughs. Everyone is confused. Papa gets blamed anyway.
 Resolution: Cuty sitting inside the collapsed pile of blocks, looking very proud.
 Moral: Rebuilding together is sometimes the whole repair — the apology comes later.
 ''',
-    setting: 'Hall floor, after lunch, TV off, Papa\'s socks on the sofa',
-    sceneDetail: 'The tower sits on the Britannia biscuit tin, so it wobbles before it even starts.',
-    dialogue: '"Ek... do... teen... RIOOO!"',
-    mess: 'Cuty cries, then rebuilds it herself, then knocks it down herself and laughs. Everyone is confused. Papa gets blamed anyway.',
-    innerThought: 'If I say one word right now, I become part of it.',
-    endingBeat: 'Cuty sitting inside the collapsed pile of blocks, looking very proud.',
-    defaultCast: ['Cuty', 'Rio', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Hall floor, after lunch, TV off, Papa\'s socks on the sofa',
+      sceneDetail: 'The tower sits on the Britannia biscuit tin, so it wobbles before it even starts.',
+      dialogue: '"Ek... do... teen... RIOOO!"',
+      mess: 'Cuty cries, then rebuilds it herself, then knocks it down herself and laughs. Everyone is confused. Papa gets blamed anyway.',
+      innerThought: 'If I say one word right now, I become part of it.',
+      endingBeat: 'Cuty sitting inside the collapsed pile of blocks, looking very proud.',
+      defaultCast: ['Cuty', 'Rio', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Hall floor, after lunch, TV off, Papa's socks on the sofa. Cuty carefully stacks the sixth block onto a tower balanced on the Britannia biscuit tin. Rio walks past and flattens it with one arm. Text on screen: "9 MINUTES OF BUILDING 🧱" "2 SECONDS TO FALL 💥"
 
 On-Screen Text:
@@ -3268,42 +3375,46 @@ Part 3 (20-30s): $kPartStyle. Cuty sits inside the collapsed pile of blocks, loo
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_53',
-    category: 'Child Chaos',
-    cover: 'She got the tin... but got stuck!',
-    title: 'She got the tin... but got stuck!',
-    opening: 'Cuty wants the Parle-G tin on the top shelf. She drags the blue plastic stool over.',
-    problem: 'Cuty wants the Parle-G tin kept on the top shelf. She drags the blue plastic stool over but can\'t reach and gets scared to climb down.',
-    lesson: 'The skill was asking for help — and staying calm while waiting.',
-    postFormat: 'Reel',
-    strategy: 'Half-success hook (child wins, then loses)',
-    caption: 'Cuty tin tak pahunch gayi par neeche nahi utar paayi! "Mumma! Main khud uthaya!" — stay calm, ask for help. 🍪 #SnackReach #ToddlerIndependence #AskForHelp #FunLearningWithPalak #IndianParents',
-    pinnedComment: 'What is the one shelf in your house that your child has conquered?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_53',
+      category: 'Child Chaos',
+      cover: 'She got the tin... but got stuck!',
+      title: 'She got the tin... but got stuck!',
+      opening: 'Cuty wants the Parle-G tin on the top shelf. She drags the blue plastic stool over.',
+      problem: 'Cuty wants the Parle-G tin kept on the top shelf. She drags the blue plastic stool over but can\'t reach and gets scared to climb down.',
+      lesson: 'The skill was asking for help — and staying calm while waiting.',
+      postFormat: 'Reel',
+      strategy: 'Half-success hook (child wins, then loses)',
+      caption: 'Cuty tin tak pahunch gayi par neeche nahi utar paayi! "Mumma! Main khud uthaya!" — stay calm, ask for help. 🍪 #SnackReach #ToddlerIndependence #AskForHelp #FunLearningWithPalak #IndianParents',
+      pinnedComment:
+          'What is the one shelf in your house that your child has conquered?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Cuty wants the Parle-G tin kept on the top shelf. Nobody is in the kitchen. She drags the blue plastic stool over, climbs up, and grabs the tin — but it\'s one shelf higher than she can reach even on the stool.
 Twist: She is stranded on the stool with the tin in one hand, too scared to climb down, and refuses to put it back.
 Resolution: Mumma\'s hand appears, holding the tin; Cuty\'s legs still dangling off the stool. "Mumma! Main khud uthaya!" Mumma smiles: "Badiya kiya! Ab neeche utro."
 Moral: The skill wasn't just reaching — it was asking for help and staying calm.
 ''',
-    setting: 'Kitchen, 5pm, atta still out from lunch',
-    sceneDetail: 'The tin is one shelf higher than she can reach even standing on the stool',
-    dialogue: '"Mumma! I got it MYSELF."',
-    mess: 'She is stranded on the stool with the tin, too scared to climb down',
-    innerThought: 'This is entirely my fault for moving the tin up last week.',
-    endingBeat: 'Mumma\'s hand holding the tin; Cuty\'s legs still dangling off the stool.',
-    defaultCast: ['Cuty', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, 5pm, atta still out from lunch',
+      sceneDetail: 'The tin is one shelf higher than she can reach even standing on the stool',
+      dialogue: '"Mumma! I got it MYSELF."',
+      mess:
+          'She is stranded on the stool with the tin, too scared to climb down',
+      innerThought:
+          'This is entirely my fault for moving the tin up last week.',
+      endingBeat: 'Mumma\'s hand holding the tin; Cuty\'s legs still dangling off the stool.',
+      defaultCast: ['Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, 5pm, atta still out from lunch. Cuty drags the blue plastic stool to the counter, climbs up, and stretches for the Parle-G tin on the top shelf — one shelf higher than even the stool reaches. Text on screen: "SHE GOT THE TIN... 🍪" "BUT GOT STUCK! 😬"
 
 On-Screen Text:
@@ -3323,42 +3434,44 @@ Part 3 (20-30s): $kPartStyle. Mumma's hand holds the tin steady while Cuty's leg
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_54',
-    category: 'Ria Chaos',
-    cover: '11:40pm. Still stitching.',
-    title: '11:40pm. Still stitching.',
-    opening: 'The costume is a bedsheet. Her annual day is in eight hours.',
-    problem: 'Ria announces at bedtime that she is a butterfly tomorrow and needs wings "in blue". The shops shut at 9.',
-    lesson: 'Sometimes the win is just that she walks in wearing something on her back — preparation helps but perfection isn\'t required.',
-    postFormat: 'Reel',
-    strategy: 'Deadline-panic hook (no resolution shown)',
-    caption: 'Every year I say I will prepare in advance. Every year it is a bedsheet, a safety pin, and me. 🪡 #AnnualDayPrep #ParentingReality #FunLearningWithPalak #IndianParents #LastMinuteParenting',
-    pinnedComment: 'Annual day, fancy dress, Diwali function — which one has cost you the most sleep?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_54',
+      category: 'Ria Chaos',
+      cover: '11:40pm. Still stitching.',
+      title: '11:40pm. Still stitching.',
+      opening: 'The costume is a bedsheet. Her annual day is in eight hours.',
+      problem: 'Ria announces at bedtime that she is a butterfly tomorrow and needs wings "in blue". The shops shut at 9.',
+      lesson: 'Sometimes the win is just that she walks in wearing something on her back — preparation helps but perfection isn\'t required.',
+      postFormat: 'Reel',
+      strategy: 'Deadline-panic hook (no resolution shown)',
+      caption: 'Every year I say I will prepare in advance. Every year it is a bedsheet, a safety pin, and me. 🪡 #AnnualDayPrep #ParentingReality #FunLearningWithPalak #IndianParents #LastMinuteParenting',
+      pinnedComment: 'Annual day, fancy dress, Diwali function — which one has cost you the most sleep?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria announces at bedtime that she is a butterfly tomorrow and needs wings "in blue". The shops shut at 9.
 Twist: The safety pin snaps halfway through the second wing. Ria, half asleep: "Mumma, blue neela nahi hota na?"
 Resolution: The wing is still unfinished at midnight. Ria is asleep. There is no stage shot, no proud moment, no payoff — the reel ends before the morning.
 Moral: Sometimes the win is just that she walks in wearing something on her back.
 ''',
-    setting: 'Bedroom, 11:40pm, one bedside lamp on, Ria asleep in the middle of the bed',
-    sceneDetail: 'The safety pin snaps halfway through the second wing.',
-    dialogue: 'Ria, half asleep: "Mumma, blue neela nahi hota na?"',
-    mess: 'The wing is still unfinished at midnight. Ria is asleep. There is no stage shot, no proud moment, no payoff — the reel ends before the morning.',
-    innerThought: 'I will fix this and she will not even remember it tomorrow.',
-    endingBeat: 'One wing finished on the chair, one still a bedsheet; phone alarm visible: 6:00am.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bedroom, 11:40pm, one bedside lamp on, Ria asleep in the middle of the bed',
+      sceneDetail: 'The safety pin snaps halfway through the second wing.',
+      dialogue: 'Ria, half asleep: "Mumma, blue neela nahi hota na?"',
+      mess: 'The wing is still unfinished at midnight. Ria is asleep. There is no stage shot, no proud moment, no payoff — the reel ends before the morning.',
+      innerThought:
+          'I will fix this and she will not even remember it tomorrow.',
+      endingBeat: 'One wing finished on the chair, one still a bedsheet; phone alarm visible: 6:00am.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, 11:40pm, one bedside lamp on. Ria announced at bedtime that she's a butterfly tomorrow and needs wings "in blue" — the shops shut at 9. Mumma is cutting a bedsheet into wing shapes. Text on screen: "11:40PM. STILL STITCHING. 🪡" "EIGHT HOURS TO GO. ⏰"
 
 On-Screen Text:
@@ -3378,42 +3491,43 @@ Part 3 (20-30s): $kPartStyle. Midnight: one wing finished on the chair, one stil
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_55',
-    category: 'Ria Chaos',
-    cover: 'She is "helping" — ASMR style!',
-    title: 'She is "helping" — ASMR style!',
-    opening: 'The atta was on the floor. She has now added water.',
-    problem: 'Ria spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like to her.',
-    lesson: 'Toddler help is often just mess with better intentions — and that\'s okay.',
-    postFormat: 'Reel',
-    strategy: 'ASMR-hook inversion (calm setup, chaos payoff)',
-    caption: 'Sound on. The squelch at 0:06 is the reason I own a second mop. 🧹 #ToddlerCleaning #ASMR #MessyPlay #FunLearningWithPalak #IndianParents',
-    pinnedComment: 'What has your child "cleaned" for you this week? Be honest about the floor.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_55',
+      category: 'Ria Chaos',
+      cover: 'She is "helping" — ASMR style!',
+      title: 'She is "helping" — ASMR style!',
+      opening: 'The atta was on the floor. She has now added water.',
+      problem: 'Ria spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like to her.',
+      lesson: 'Toddler help is often just mess with better intentions — and that\'s okay.',
+      postFormat: 'Reel',
+      strategy: 'ASMR-hook inversion (calm setup, chaos payoff)',
+      caption: 'Sound on. The squelch at 0:06 is the reason I own a second mop. 🧹 #ToddlerCleaning #ASMR #MessyPlay #FunLearningWithPalak #IndianParents',
+      pinnedComment: 'What has your child "cleaned" for you this week? Be honest about the floor.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like.
 Twist: The dry atta turns into a sticky paste. Ria's hands are covered in flour, and Mumma starts laughing instead of scolding.
 Resolution: Mumma kneels down: "Let me show you the right way — dry wipe first, then damp cloth." Together they clean it properly.
 Moral: Toddler help is often just mess with better intentions — guide gently, don't shame.
 ''',
-    setting: 'Kitchen floor, right after rolling rotis, steel plate still on the counter',
-    sceneDetail: 'The atta was dry, sweepable, and is now a sticky paste that needs proper cleaning',
-    dialogue: '"Dekho Mumma, saaf!"',
-    mess: 'Ria tries to mop with a dry cloth, but the wet atta sticks to everything — her hands and the cloth',
-    innerThought: 'My grandmother would have shouted. I am laughing because I have no other option left.',
-    endingBeat: 'Mumma shows Ria the proper technique: dry brush first, then damp cloth.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''PROMPT: A warm, soft 3D Pixar-style kitchen (cream walls, wooden countertops, natural window light) at toddler scale. Vertical 9:16, 30 seconds total. Characters: Ria (3-year-old girl, pink star dress, pigtails with two pink bows, curious eyes), Mumma (yellow kurta, gentle smile). ASMR-style sound design: atta rustling, water pouring, soft cloth swishing.
+      setting: 'Kitchen floor, right after rolling rotis, steel plate still on the counter',
+      sceneDetail: 'The atta was dry, sweepable, and is now a sticky paste that needs proper cleaning',
+      dialogue: '"Dekho Mumma, saaf!"',
+      mess: 'Ria tries to mop with a dry cloth, but the wet atta sticks to everything — her hands and the cloth',
+      innerThought: 'My grandmother would have shouted. I am laughing because I have no other option left.',
+      endingBeat: 'Mumma shows Ria the proper technique: dry brush first, then damp cloth.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''PROMPT: A warm, soft 3D Pixar-style kitchen (cream walls, wooden countertops, natural window light) at toddler scale. Vertical 9:16, 30 seconds total. Characters: Ria (3-year-old girl, pink star dress, pigtails with two pink bows, curious eyes), Mumma (yellow kurta, gentle smile). ASMR-style sound design: atta rustling, water pouring, soft cloth swishing.
 
 On-Screen Text: [0-3s] "MUMMA, MAIN MADAD KAR SAKTI HOON!" [4-7s] "AAG LAGI THI!" [8-11s] "PAANI DAAL DIYA!" [12-15s] "DRY BRUSH PEHLE" [16-19s] "PHIR DAMP CLOTH" [20-23s] "SAATH MILKE SAAF" [24-27s] "MUMMA KA GUIDANCE ❤️" [28-30s] "LEARNING IS A HABIT"
 
@@ -3427,42 +3541,43 @@ Part 3 (20-30s): $kPartStyle. Mumma kneels, not scolding — laughing. She takes
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_56',
-    category: 'Child Chaos',
-    cover: 'Ghar Mein 2 Minute Ki Shanti... DANGER!',
-    title: 'Ghar Mein 2 Minute Ki Shanti... DANGER!',
-    opening: 'Mummy heard two minutes of dead silence from the toddlers.',
-    problem: 'When toddlers are suddenly quiet for two minutes, creative chaos is unfolding.',
-    lesson: 'Check on quiet toddlers — creative chaos always follows.',
-    postFormat: 'Reel',
-    strategy: 'Suspense hook, then reveal',
-    caption: 'Ghar mein 2 minute ki shanti... DANGER! 😱 Jab bachche bilkul silent ho jaate hain, toh bura haal hota hai. Watched the full video to see what Cuty was up to! #ToddlerChaos #IndianParents #FunLearningWithPalak #PreschoolMeltdown #ToddlerHumor',
-    pinnedComment: 'Tip: The silence is always louder than the chaos that came before. Check on them! 🐰',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_56',
+      category: 'Child Chaos',
+      cover: 'Ghar Mein 2 Minute Ki Shanti... DANGER!',
+      title: 'Ghar Mein 2 Minute Ki Shanti... DANGER!',
+      opening: 'Mummy heard two minutes of dead silence from the toddlers.',
+      problem: 'When toddlers are suddenly quiet for two minutes, creative chaos is unfolding.',
+      lesson: 'Check on quiet toddlers — creative chaos always follows.',
+      postFormat: 'Reel',
+      strategy: 'Suspense hook, then reveal',
+      caption: 'Ghar mein 2 minute ki shanti... DANGER! 😱 Jab bachche bilkul silent ho jaate hain, toh bura haal hota hai. Watched the full video to see what Cuty was up to! #ToddlerChaos #IndianParents #FunLearningWithPalak #PreschoolMeltdown #ToddlerHumor',
+      pinnedComment: 'Tip: The silence is always louder than the chaos that came before. Check on them! 🐰',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Two minutes of dead silence from the toddlers. Mummy tiptoes toward the kitchen — suspiciously quiet.
 Twist: Flour footprints lead across the floor: tiny bare feet, Cuty's paw prints, and a trail of white dust.
 Resolution: Round the corner — Ria and Rio, flour-covered, sitting in a cloud of spilled wheat, building a "snowman."
 Moral: The most suspicious silences always end with creative chaos to clean up.
 ''',
-    setting: 'Kitchen, evening, flour bag tipped over',
-    sceneDetail: 'Flour footprints — tiny bare feet, Cuty\'s paw prints, white dust trail',
-    dialogue: '"Mummy heard two minutes of dead silence..."',
-    mess: 'Ria and Rio, flour-covered, sitting in a cloud of spilled wheat, building a "snowman"',
-    innerThought: 'The silence was too good to be true.',
-    endingBeat: 'They stand up, snowman wobbles, flour explodes — creative chaos confirmed.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, evening, flour bag tipped over',
+      sceneDetail: 'Flour footprints — tiny bare feet, Cuty\'s paw prints, white dust trail',
+      dialogue: '"Mummy heard two minutes of dead silence..."',
+      mess: 'Ria and Rio, flour-covered, sitting in a cloud of spilled wheat, building a "snowman"',
+      innerThought: 'The silence was too good to be true.',
+      endingBeat: 'They stand up, snowman wobbles, flour explodes — creative chaos confirmed.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, evening, flour bag tipped over. Mumma notices two full minutes of dead silence and tiptoes toward the kitchen. Flour footprints — tiny bare feet, Cuty's paw prints — lead across the floor. Text on screen: "2 MINUTE KI SHANTI... 😱" "DANGER?! 🚨"
 
 On-Screen Text:
@@ -3482,42 +3597,45 @@ Part 3 (20-30s): $kPartStyle. They stand up, the snowman wobbles, flour explodes
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_57',
-    category: 'Child Chaos',
-    cover: 'Ek Joota Gayab — 7:55 AM Panic!',
-    title: 'Ek Joota Gayab — 7:55 AM Panic!',
-    opening: 'School van honking downstairs, but one shoe has vanished.',
-    problem: 'At 7:55 AM school rush, one shoe disappears into another dimension.',
-    lesson: 'The things we lose are just having their own adventure — check the stroller first!',
-    postFormat: 'Reel',
-    strategy: 'Morning rush comedy, relatable chaos',
-    caption: 'School van neeche aa gayi... aur ek joota gayab! 🚐 Joota kho gaya, par kahaan gaya? Full video dekho. #morningrush #toddlerlife #funlearningwithpalak #indianparents #MomLife',
-    pinnedComment: 'Tip: Always check the balcony curtains — shoes love to hide there! 👟',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_57',
+      category: 'Child Chaos',
+      cover: 'Ek Joota Gayab — 7:55 AM Panic!',
+      title: 'Ek Joota Gayab — 7:55 AM Panic!',
+      opening: 'School van honking downstairs, but one shoe has vanished.',
+      problem:
+          'At 7:55 AM school rush, one shoe disappears into another dimension.',
+      lesson: 'The things we lose are just having their own adventure — check the stroller first!',
+      postFormat: 'Reel',
+      strategy: 'Morning rush comedy, relatable chaos',
+      caption: 'School van neeche aa gayi... aur ek joota gayab! 🚐 Joota kho gaya, par kahaan gaya? Full video dekho. #morningrush #toddlerlife #funlearningwithpalak #indianparents #MomLife',
+      pinnedComment: 'Tip: Always check the balcony curtains — shoes love to hide there! 👟',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: School van at 7:55 AM, but one shoe has vanished into another dimension.
 Twist: Visual clues only: tiny footprint in flour (Rio), a trail of blocks (Cuty the bunny), and a doll stroller with one shoe tucked inside.
 Resolution: With seconds to spare, they pull the shoe from the stroller. "Doll ne bhi date ki hai!" Rio grins.
 Moral: Lost things usually have simple explanations — check the stroller.
 ''',
-    setting: 'Bedroom floor, morning, backpack by the door',
-    sceneDetail: 'One shoe is missing, the other is kicked under the bed, doll stroller nearby',
-    dialogue: '"Joota kahan hai?" — "Main jaanta hoon, beta."',
-    mess: 'Flour footprint, trail of blocks, and a trail toward the stroller — clues everywhere',
-    innerThought: 'Clues first, panic second — the stroller always holds secrets.',
-    endingBeat: 'They pull the shoe from the stroller — "Doll ne bhi date ki hai!" Rio grins.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Bedroom floor, morning, backpack by the door',
+      sceneDetail: 'One shoe is missing, the other is kicked under the bed, doll stroller nearby',
+      dialogue: '"Joota kahan hai?" — "Main jaanta hoon, beta."',
+      mess: 'Flour footprint, trail of blocks, and a trail toward the stroller — clues everywhere',
+      innerThought:
+          'Clues first, panic second — the stroller always holds secrets.',
+      endingBeat: 'They pull the shoe from the stroller — "Doll ne bhi date ki hai!" Rio grins.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom floor, 7:55am, backpack by the door, school van honking downstairs. One shoe is missing — the other kicked under the bed. "Joota kahan hai?" Text on screen: "EK JOOTA GAYAB! 👟" "7:55 AM PANIC! 🚐"
 
 On-Screen Text:
@@ -3537,42 +3655,45 @@ Part 3 (20-30s): $kPartStyle. They pull the shoe from the stroller with seconds 
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_58',
-    category: 'Ria Chaos',
-    cover: 'Biscuit Toota — Duniya Khatam!',
-    title: 'Biscuit Toota — Duniya Khatam!',
-    opening: 'Mummy snaps a cookie in half to share, Ria acts like the world ended.',
-    problem: 'A snapped cookie causes dramatic toddler despair.',
-    lesson: 'A shared laugh turns every broken thing into something sweet.',
-    postFormat: 'Reel',
-    strategy: 'Exaggerated emotion, then sweet payoff',
-    caption: 'Biscuit toota matlab duniya khatam! 🍪😭 Doctor Rio ne banaya jugaad repair, par Cuty ne bhi ek nibble liya! #toddlerlogic #biscuitcrisis #funlearningwithpalak #ToddlerHumor #BiscuitDrama',
-    pinnedComment: 'When your toddler snaps a cookie and treats it like breaking the Mona Lisa! 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_58',
+      category: 'Ria Chaos',
+      cover: 'Biscuit Toota — Duniya Khatam!',
+      title: 'Biscuit Toota — Duniya Khatam!',
+      opening: 'Mummy snaps a cookie in half to share, Ria acts like the world ended.',
+      problem: 'A snapped cookie causes dramatic toddler despair.',
+      lesson: 'A shared laugh turns every broken thing into something sweet.',
+      postFormat: 'Reel',
+      strategy: 'Exaggerated emotion, then sweet payoff',
+      caption: 'Biscuit toota matlab duniya khatam! 🍪😭 Doctor Rio ne banaya jugaad repair, par Cuty ne bhi ek nibble liya! #toddlerlogic #biscuitcrisis #funlearningwithpalak #ToddlerHumor #BiscuitDrama',
+      pinnedComment: 'When your toddler snaps a cookie and treats it like breaking the Mona Lisa! 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mummy snapped a big round cookie in half to share, and Ria acted dramatic shock as if the world itself had shattered.
 Twist: Rio became "Doctor Rio," dipping his finger in warm milk to glue the broken halves back together, but Cuty took a nibble right on the seam.
 Resolution: Instead of tears, both kids burst into uncontrollable belly laughs — the broken biscuit became the funniest thing ever.
 Moral: A shared laugh turns every broken thing into something sweet.
 ''',
-    setting: 'Kitchen, afternoon snack, biscuit tin open',
-    sceneDetail: 'One biscuit is broken perfectly in half',
-    dialogue: '"Yeh toh doosri poori tarah se toot gaya!"',
-    mess: 'Ria has a meltdown over the broken biscuit, refuses the other half',
-    innerThought: 'I should have bought more biscuits.',
-    endingBeat: 'Mumma breaks another biscuit, "now they match", Ria eats both.',
-    defaultCast: ['Ria', 'Mumma', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, afternoon snack, biscuit tin open',
+      sceneDetail: 'One biscuit is broken perfectly in half',
+      dialogue: '"Yeh toh doosri poori tarah se toot gaya!"',
+      mess:
+          'Ria has a meltdown over the broken biscuit, refuses the other half',
+      innerThought: 'I should have bought more biscuits.',
+      endingBeat:
+          'Mumma breaks another biscuit, "now they match", Ria eats both.',
+      defaultCast: ['Ria', 'Mumma', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, afternoon snack, biscuit tin open. Mumma snaps a big round cookie in half to share. Ria gasps as if the world has shattered: "Yeh toh doosri poori tarah se toot gaya!" Text on screen: "BISCUIT TOOTA! 🍪" "DUNIYA KHATAM?! 😭"
 
 On-Screen Text:
@@ -3592,44 +3713,46 @@ Part 3 (20-30s): $kPartStyle. Mumma breaks another biscuit in half: "Ab dono mat
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-
-  // ── Ria Talking to AI Robot Series ──
-  HookIdea(
-    id: 'idea_59',
-    category: 'Series',
-    cover: 'Phone Rakh Do!',
-    title: 'Phone Rakh Do!',
-    opening: 'Robot, phone rakh do — par haath mein hi hai!',
-    problem: 'Ria asks Robot to put her phone away, but she is still holding it.',
-    lesson: 'Robot scans literally and finds the phone in Ria\'s own hand — a gentle reminder to check your own hands first.',
-    postFormat: 'Reel',
-    strategy: 'AI comedy misunderstanding, family situation, physical comedy payoff',
-    caption: 'Jab Mumma ka phone haath mein hai lekin woh kho dhundh rahi hai... aur Robot ne phone wapas dedi! 😂 Har mummy ko yehi dekhna chahiye. #RiaAndRobot #IndianMomLife #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'We all need a personal robot who tells us the truth — and hands back our phone from our own hand! 🤖',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // ── Ria Talking to AI Robot Series ──
+    HookIdea(
+      id: 'idea_59',
+      category: 'Series',
+      cover: 'Phone Rakh Do!',
+      title: 'Phone Rakh Do!',
+      opening: 'Robot, phone rakh do — par haath mein hi hai!',
+      problem:
+          'Ria asks Robot to put her phone away, but she is still holding it.',
+      lesson: 'Robot scans literally and finds the phone in Ria\'s own hand — a gentle reminder to check your own hands first.',
+      postFormat: 'Reel',
+      strategy: 'AI comedy misunderstanding, family situation, physical comedy payoff',
+      caption: 'Jab Mumma ka phone haath mein hai lekin woh kho dhundh rahi hai... aur Robot ne phone wapas dedi! 😂 Har mummy ko yehi dekhna chahiye. #RiaAndRobot #IndianMomLife #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'We all need a personal robot who tells us the truth — and hands back our phone from our own hand! 🤖',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria: "Robot, phone rakh do!" But her hand is still gripping it.
 Twist: Robot: "Object is resting. Hand is still attached." Robot scans behind couch, under pillows, in Cuty's bed.
 Resolution: Robot points at Ria's own hand: "Object located." Ria laughs: "Meri hi toh thi!"
 Moral: Sometimes the thing we want help finding is already in our hand.
 ''',
-    setting: 'Living room, afternoon, Robot charging on dock',
-    sceneDetail: 'One LED on Robot\'s chest blinking erratically',
-    dialogue: '"Robot, phone rakh do!"',
-    mess: 'Ria asks Robot to put the phone away, but she\'s still holding it — Robot scans everywhere',
-    innerThought: 'Sometimes the thing we want found is already in our hand.',
-    endingBeat: 'Robot points at Ria\'s own hand: "Object located." Ria laughs.',
-    defaultCast: ['Ria', 'Robot', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, Robot charging on dock',
+      sceneDetail: 'One LED on Robot\'s chest blinking erratically',
+      dialogue: '"Robot, phone rakh do!"',
+      mess: 'Ria asks Robot to put the phone away, but she\'s still holding it — Robot scans everywhere',
+      innerThought: 'Sometimes the thing we want found is already in our hand.',
+      endingBeat:
+          'Robot points at Ria\'s own hand: "Object located." Ria laughs.',
+      defaultCast: ['Ria', 'Robot', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room afternoon. Ria (sparkly pink star dress, pigtails, no glasses) sits on the floor playing. Robot charging dock glows nearby. Ria: "Robot, phone rakh do!" but her hand still grips the phone. Text on screen: "PHONE RAKH DO? 📱" "LEKIN HAATH MEIN HAI 🤖"
 
 On-Screen Text:
@@ -3649,42 +3772,46 @@ Part 3 (20-30s): $kPartStyle. Robot's hand extends, points at Ria's own hand: "O
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_60',
-    category: 'Series',
-    cover: 'Sabzi Rejection Form',
-    title: 'Sabzi Rejection Form',
-    opening: 'Mujhe yeh sabzi bilkul nahi chahiye!',
-    problem: 'Ria rejects food without trying, wants a formal rejection form from Robot.',
-    lesson: 'Robot prints a Sabzi Rejection Form with checkboxes — a playful way to give the child agency while encouraging one tiny bite.',
-    postFormat: 'Reel',
-    strategy: 'Food refusal humor, gentle parenting lesson',
-    caption: 'Palak se pehle ek bite, aur suddenly "Mumma, aur thoda dena!" 😂 Har meal time fight ka asan hal. #RiaAndRobot #ToddlerMeals #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'The robot was right — one tiny bite can change everything! 👶',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_60',
+      category: 'Series',
+      cover: 'Sabzi Rejection Form',
+      title: 'Sabzi Rejection Form',
+      opening: 'Mujhe yeh sabzi bilkul nahi chahiye!',
+      problem: 'Ria rejects food without trying, wants a formal rejection form from Robot.',
+      lesson: 'Robot prints a Sabzi Rejection Form with checkboxes — a playful way to give the child agency while encouraging one tiny bite.',
+      postFormat: 'Reel',
+      strategy: 'Food refusal humor, gentle parenting lesson',
+      caption: 'Palak se pehle ek bite, aur suddenly "Mumma, aur thoda dena!" 😂 Har meal time fight ka asan hal. #RiaAndRobot #ToddlerMeals #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment:
+          'The robot was right — one tiny bite can change everything! 👶',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria: "Mujhe yeh sabzi bilkul nahi chahiye!" She pushes the plate away.
 Twist: Robot whirs: "Sabzi Rejection Form — Item Code: Green." Prints a form with checkboxes: too slimy / too green / too much. Ria checks "too green."
 Resolution: Robot replies: "Noted. Try cheese next time." She tries one bite with cheese. "Thik hai!"
 Moral: Even rejections can be filed — and sometimes re-tried with a tiny twist.
 ''',
-    setting: 'Dining table, lunch time, Ria\'s plate in front of her',
-    sceneDetail: 'Green sabzi on the plate, Ria pushing it away with her spoon',
-    dialogue: '"Mujhe yeh sabzi bilkul nahi chahiye!"',
-    mess: 'Ria rejects the sabzi, refuses to try, wants a formal rejection form',
-    innerThought: 'Even rejections can be filed — and sometimes re-tried.',
-    endingBeat: 'Ria checks "too green" on the form, tries cheese, says "Thik hai!"',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Dining table, lunch time, Ria\'s plate in front of her',
+      sceneDetail:
+          'Green sabzi on the plate, Ria pushing it away with her spoon',
+      dialogue: '"Mujhe yeh sabzi bilkul nahi chahiye!"',
+      mess: 'Ria rejects the sabzi, refuses to try, wants a formal rejection form',
+      innerThought: 'Even rejections can be filed — and sometimes re-tried.',
+      endingBeat:
+          'Ria checks "too green" on the form, tries cheese, says "Thik hai!"',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Dining table, lunch time. Ria (sparkly pink star dress, pigtails) pushes away her plate: "Mujhe yeh sabzi bilkul nahi chahiye!" Robot (silver box-shaped body, blue LED eyes) whirs and extends a printer head. Text on screen: "REJECTION FORM 📝" "TOO GREEN ✅" "TRY CHEESE! 🧀"
 
 On-Screen Text:
@@ -3704,42 +3831,46 @@ Part 3 (20-30s): $kPartStyle. Ria happily eats more of the cheese-topped sabzi. 
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_61',
-    category: 'Series',
-    cover: 'Can You Fix My Broken Heart?',
-    title: 'Can You Fix My Broken Heart?',
-    opening: 'Robot, Rio ne mera heart tod diya!',
-    problem: 'Ria\'s sibling damages her favorite toy and doesn\'t apologise, leaving Ria upset.',
-    lesson: 'Robot suggests a heart-shaped bandage and helps Ria talk to Rio about sharing and saying sorry — humor helps healing.',
-    postFormat: 'Reel',
-    strategy: 'Emotional expression, sibling dynamics, heart-shaped bandage visual',
-    caption: 'Jab bhaiya ne toy kharab kar diya, toh Robot ne diya heart bandage! ❤️ Sibling love, properly patched. #RiaAndRobot #SiblingLove #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Every broken heart needs a robot and a heart-shaped bandage. ❤️🩹',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_61',
+      category: 'Series',
+      cover: 'Can You Fix My Broken Heart?',
+      title: 'Can You Fix My Broken Heart?',
+      opening: 'Robot, Rio ne mera heart tod diya!',
+      problem: 'Ria\'s sibling damages her favorite toy and doesn\'t apologise, leaving Ria upset.',
+      lesson: 'Robot suggests a heart-shaped bandage and helps Ria talk to Rio about sharing and saying sorry — humor helps healing.',
+      postFormat: 'Reel',
+      strategy:
+          'Emotional expression, sibling dynamics, heart-shaped bandage visual',
+      caption: 'Jab bhaiya ne toy kharab kar diya, toh Robot ne diya heart bandage! ❤️ Sibling love, properly patched. #RiaAndRobot #SiblingLove #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment:
+          'Every broken heart needs a robot and a heart-shaped bandage. ❤️🩹',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio accidentally breaks Ria's favorite toy, and Ria is devastated, declaring her heart is broken.
 Twist: The robot takes "broken heart" literally and produces a large adhesive bandage shaped like a heart, applying it to Ria's chest.
 Resolution: Seeing the silly bandage, both kids laugh, Rio apologises, and they repair the toy together with the robot's help.
 Moral: A little humor and teamwork can mend both toys and feelings.
 ''',
-    setting: 'Living room floor, toy pieces scattered',
-    sceneDetail: 'Ria\'s favorite toy blocks, one piece cracked in the middle',
-    dialogue: '"Mera heart toot gaya!"',
-    mess: 'Ria holds the broken toy, tears streaming, Rio looks guilty beside it',
-    innerThought: 'A little humor can mend both toys and feelings.',
-    endingBeat: 'Heart bandage applied, toy repaired, both kids laughing.',
-    defaultCast: ['Ria', 'Rio', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, toy pieces scattered',
+      sceneDetail:
+          'Ria\'s favorite toy blocks, one piece cracked in the middle',
+      dialogue: '"Mera heart toot gaya!"',
+      mess: 'Ria holds the broken toy, tears streaming, Rio looks guilty beside it',
+      innerThought: 'A little humor can mend both toys and feelings.',
+      endingBeat: 'Heart bandage applied, toy repaired, both kids laughing.',
+      defaultCast: ['Ria', 'Rio', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, toy pieces scattered. Rio (blue t-shirt, shorts) accidentally knocks over Ria's tower. Ria's eyes well up: "Mera heart toot gaya!" Robot (blue LED eyes softening) extends a large heart-shaped bandage. Text on screen: "BROKEN HEART 🫀" "HEART BANDAGE ❤️🩹" "TEAM REPAIR 🔧"
 
 On-Screen Text:
@@ -3759,42 +3890,43 @@ Part 3 (20-30s): $kPartStyle. Ria and Rio rebuild the tower together, Robot hand
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_62',
-    category: 'Series',
-    cover: 'Mera Sab Kharab!',
-    title: 'Mera Sab Kharab!',
-    opening: 'Mera sab kharab! Robot, ek block hi do.',
-    problem: 'Everything feels ruined — Robot offers one block to restart.',
-    lesson: 'One block starts a new tower — small steps rebuild big things.',
-    postFormat: 'Reel',
-    strategy: 'Chore avoidance comedy, collaborative cleanup dance',
-    caption: 'Mess gayab karne ke liye ek robot nahi… ek dance playlist aur Ria milake hi chahiye! 💃🧹 #RiaAndRobot #CleanUpDance #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'The robot may start, but Ria finishing makes it a win! 10/10 teamwork.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_62',
+      category: 'Series',
+      cover: 'Mera Sab Kharab!',
+      title: 'Mera Sab Kharab!',
+      opening: 'Mera sab kharab! Robot, ek block hi do.',
+      problem: 'Everything feels ruined — Robot offers one block to restart.',
+      lesson: 'One block starts a new tower — small steps rebuild big things.',
+      postFormat: 'Reel',
+      strategy: 'Chore avoidance comedy, collaborative cleanup dance',
+      caption: 'Mess gayab karne ke liye ek robot nahi… ek dance playlist aur Ria milake hi chahiye! 💃🧹 #RiaAndRobot #CleanUpDance #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'The robot may start, but Ria finishing makes it a win! 10/10 teamwork.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: "Mera sab kharab!" Ria throws her arms up — everything is ruined.
 Twist: Robot sits stiffly, holds out one block: "Problem identified. Solution: one block."
 Resolution: Ria laughs: "Ek hi block?" Robot: "Ek block se shuru hota hai." They build a tiny tower together.
 Moral: A single block can start a new tower — and a robot's deadpan can reset a mood.
 ''',
-    setting: 'Living room floor, scattered blocks, Ria throwing her arms up',
-    sceneDetail: 'Robot holding out one block, tray extended',
-    dialogue: '"Mera sab kharab!" — "Ek block se shuru hota hai."',
-    mess: 'Ria declares everything ruined, Robot sits stiffly holding one block',
-    innerThought: 'A robot\'s deadpan can reset a mood.',
-    endingBeat: 'They build a tiny tower together — one block at a time.',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, scattered blocks, Ria throwing her arms up',
+      sceneDetail: 'Robot holding out one block, tray extended',
+      dialogue: '"Mera sab kharab!" — "Ek block se shuru hota hai."',
+      mess: 'Ria declares everything ruined, Robot sits stiffly holding one block',
+      innerThought: 'A robot\'s deadpan can reset a mood.',
+      endingBeat: 'They build a tiny tower together — one block at a time.',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, scattered blocks. Ria (sparkly pink star dress, pigtails) throws her arms up: "Mera sab kharab!" Robot (stiff posture, blue LED eyes) extends a single block on its tray. Text on screen: "SAB KHARAB! 💥" "EK BLOCK SE SHURU 🎯" "RESET! 🔄"
 
 On-Screen Text:
@@ -3814,42 +3946,47 @@ Part 3 (20-30s): $kPartStyle. A tiny tower stands, both kids beaming. Robot's LE
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_63',
-    category: 'Series',
-    cover: 'Ek Chhota Sa Saans',
-    title: 'Ek Chhota Sa Saans',
-    opening: 'Tower gir gaya... Rio ne saans li.',
-    problem: 'Tower falls and Rio is ready to shout — Robot teaches one tiny breath.',
-    lesson: 'One breath before the shout saves the tower — a simple regulation tool.',
-    postFormat: 'Reel',
-    strategy: 'Overstimulation handling, emotional regulation, breathing exercise',
-    caption: 'Jab sabse zindagi mein bahut kuchh ho raha hai... toh ek robot breathing cards ke saath madad karta hai! 🧘‍♀️ #RiaAndRobot #EmotionalRegulation #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Five minutes of quiet, a breathing card, and Ria was back to her playful self. 💙',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_63',
+      category: 'Series',
+      cover: 'Ek Chhota Sa Saans',
+      title: 'Ek Chhota Sa Saans',
+      opening: 'Tower gir gaya... Rio ne saans li.',
+      problem: 'Tower falls and Rio is ready to shout — Robot teaches one tiny breath.',
+      lesson: 'One breath before the shout saves the tower — a simple regulation tool.',
+      postFormat: 'Reel',
+      strategy:
+          'Overstimulation handling, emotional regulation, breathing exercise',
+      caption: 'Jab sabse zindagi mein bahut kuchh ho raha hai... toh ek robot breathing cards ke saath madad karta hai! 🧘‍♀️ #RiaAndRobot #EmotionalRegulation #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'Five minutes of quiet, a breathing card, and Ria was back to her playful self. 💙',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Tower falls. Rio inhales to shout — "NOOOOO!" — but the card he grabbed flies out of his hand.
 Twist: "Ek chhota sa saans." Ria whispers. She holds one tiny breath with him — in for two, out for two.
 Resolution: Rio tries again. The card lands softly in his palm. They rebuild the tower, one block at a time.
 Moral: A breath before the shout can save the whole tower.
 ''',
-    setting: 'Drawing room floor, blocks scattered, breathing cards fanned out',
-    sceneDetail: 'One tower block lies alone, a purple "breathe" card beside it',
-    dialogue: '"NOOOO!" — then "Ek chhota sa saans."',
-    mess: 'Rio stomps, tower crumbles a second time, blocks flying everywhere',
-    innerThought: 'My lungs feel like they are going to explode.',
-    endingBeat: 'They rebuild the tower together, one block at a time, counting breaths.',
-    defaultCast: ['Rio', 'Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Drawing room floor, blocks scattered, breathing cards fanned out',
+      sceneDetail:
+          'One tower block lies alone, a purple "breathe" card beside it',
+      dialogue: '"NOOOO!" — then "Ek chhota sa saans."',
+      mess:
+          'Rio stomps, tower crumbles a second time, blocks flying everywhere',
+      innerThought: 'My lungs feel like they are going to explode.',
+      endingBeat: 'They rebuild the tower together, one block at a time, counting breaths.',
+      defaultCast: ['Rio', 'Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Floor scattered with blocks, purple breathe cards fanned out. Tower lies in pieces. Rio (blue t-shirt, shorts) inhales to shout: "NOOOO!" — but Ria (sparkly pink star dress, pigtails) holds up a purple card: "Ek chhota sa saans." Text on screen: "TOWER FELL 💥" "BREATH BEFORE SHOUT 🌬️" "REBUILD TOGETHER 🧱"
 
 On-Screen Text:
@@ -3869,42 +4006,46 @@ Part 3 (20-30s): $kPartStyle. Tower rebuilt, block by block, as they count breat
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_64',
-    category: 'Series',
-    cover: 'Rio Copy Kar Raha Hai!',
-    title: 'Rio Copy Kar Raha Hai!',
-    opening: 'Robot, Rio har cheez copy karta hai!',
-    problem: 'Rio copies everything Ria does, escalating to silly robot noises.',
-    lesson: 'Robot turns copying into a joint silly pose game — mimicry becomes collaboration.',
-    postFormat: 'Reel',
-    strategy: 'Sibling mimicry, parallel play setup, individual attention',
-    caption: 'Rio har baat copy karta hai, toh Robot ne banaya "me time" aur "Rio time" stations! ✨ #RiaAndRobot #SiblingDynamics #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'A me-station and a Rio-station — problem solved! Everyone gets their own space. 😍',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_64',
+      category: 'Series',
+      cover: 'Rio Copy Kar Raha Hai!',
+      title: 'Rio Copy Kar Raha Hai!',
+      opening: 'Robot, Rio har cheez copy karta hai!',
+      problem:
+          'Rio copies everything Ria does, escalating to silly robot noises.',
+      lesson: 'Robot turns copying into a joint silly pose game — mimicry becomes collaboration.',
+      postFormat: 'Reel',
+      strategy: 'Sibling mimicry, parallel play setup, individual attention',
+      caption: 'Rio har baat copy karta hai, toh Robot ne banaya "me time" aur "Rio time" stations! ✨ #RiaAndRobot #SiblingDynamics #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'A me-station and a Rio-station — problem solved! Everyone gets their own space. 😍',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio copies EVERYTHING — Ria's sip, Ria's walk, Ria's "I'm a big cat!" He escalates to silly robot noises.
 Twist: Ria's patience frays. Robot interrupts: "Copy complete. Initiating joint silly pose protocol."
 Resolution: Robot strikes a pose — "Left hand broccoli, right hand ice cream." Both kids mirror. Laughter breaks the tension.
 Moral: Copying can flip into collaboration when you turn it into a game.
 ''',
-    setting: 'Living room floor, Ria and Rio side by side',
-    sceneDetail: 'Rio mirroring Ria\'s every move — sip, walk, big cat impression',
-    dialogue: '"Left hand broccoli, right hand ice cream."',
-    mess: 'Rio escalates to silly robot noises, Ria\'s patience frays',
-    innerThought: 'Copying can flip into collaboration when you turn it into a game.',
-    endingBeat: 'Robot strikes a pose, both kids mirror — laughter breaks the tension.',
-    defaultCast: ['Ria', 'Rio', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, Ria and Rio side by side',
+      sceneDetail:
+          'Rio mirroring Ria\'s every move — sip, walk, big cat impression',
+      dialogue: '"Left hand broccoli, right hand ice cream."',
+      mess: 'Rio escalates to silly robot noises, Ria\'s patience frays',
+      innerThought:
+          'Copying can flip into collaboration when you turn it into a game.',
+      endingBeat: 'Robot strikes a pose, both kids mirror — laughter breaks the tension.',
+      defaultCast: ['Ria', 'Rio', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, afternoon. Rio (blue t-shirt, shorts) copying Ria (sparkly pink star dress, pigtails) — mirroring sip, walk, big-cat growl. Ria's face showing patience, then slight strain. Robot (blue LED eyes whirring) steps between them. Text on screen: "COPY COPY COPY! 🤖" "COPY COMPLETE! 🔄" "JOINT POSE! 🤝"
 
 On-Screen Text:
@@ -3924,42 +4065,46 @@ Part 3 (20-30s): $kPartStyle. Both kids hold the silly pose, laughing, Robot's L
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_65',
-    category: 'Series',
-    cover: 'My Drawing Is Wrong!',
-    title: 'My Drawing Is Wrong!',
-    opening: 'Robot, meri drawing kharab ho gayi!',
-    problem: 'Ria compares her drawing to an example and feels she made a mistake.',
-    lesson: 'The robot scans Ria\'s drawing and highlights her unique style — there\'s no "wrong" in art, only your style.',
-    postFormat: 'Reel',
-    strategy: 'Artistic confidence, drawing validation, animated gallery',
-    caption: 'Jab "kharab" drawing Robot ke saamne magic ban gayi! ✨ Har art perfect hota hai. #RiaAndRobot #ArtConfidence #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Your unique style is what makes your art special — the robot said so!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_65',
+      category: 'Series',
+      cover: 'My Drawing Is Wrong!',
+      title: 'My Drawing Is Wrong!',
+      opening: 'Robot, meri drawing kharab ho gayi!',
+      problem: 'Ria compares her drawing to an example and feels she made a mistake.',
+      lesson: 'The robot scans Ria\'s drawing and highlights her unique style — there\'s no "wrong" in art, only your style.',
+      postFormat: 'Reel',
+      strategy: 'Artistic confidence, drawing validation, animated gallery',
+      caption: 'Jab "kharab" drawing Robot ke saamne magic ban gayi! ✨ Har art perfect hota hai. #RiaAndRobot #ArtConfidence #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'Your unique style is what makes your art special — the robot said so!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria shows her drawing to the robot, upset that it doesn't look like the example picture.
 Twist: The robot scans the drawing and projects an animated version, highlighting how her unique style brings the picture to life in ways the example never could.
 Resolution: Ria beams with pride — "Mere drawings alive hote hain!" — and wants to draw ten more.
 Moral: There's no "wrong" way to create art — your style is your superpower.
 ''',
-    setting: 'Drawing table, afternoon, Ria\'s drawing beside an example picture',
-    sceneDetail: 'Ria\'s drawing — a lopsided sun, crooked tree, wobbly house',
-    dialogue: '"Mere drawings alive hote hain!"',
-    mess: 'Ria compares her drawing to the example, upset that hers looks different',
-    innerThought: 'There\'s no "wrong" way to create art — your style is your superpower.',
-    endingBeat: 'Robot projects Ria\'s drawing as animation, she beams with pride.',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Drawing table, afternoon, Ria\'s drawing beside an example picture',
+      sceneDetail:
+          'Ria\'s drawing — a lopsided sun, crooked tree, wobbly house',
+      dialogue: '"Mere drawings alive hote hain!"',
+      mess: 'Ria compares her drawing to the example, upset that hers looks different',
+      innerThought: 'There\'s no "wrong" way to create art — your style is your superpower.',
+      endingBeat:
+          'Robot projects Ria\'s drawing as animation, she beams with pride.',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Drawing table, afternoon. Ria (sparkly pink star dress, pigtails) shows her lopsided drawing to Robot: "Robot, meri drawing kharab ho gayi!" Robot (blue LED eyes brightening) scans it and projects an animated version. Text on screen: "KHARAB? NAHIN! ✨" "YOUR STYLE = SUPERPOWER 🎨" "ART ALIVE! 🖼️"
 
 On-Screen Text:
@@ -3979,42 +4124,46 @@ Part 3 (20-30s): $kPartStyle. Ria grabs a fresh sheet: "Do I get ten more?" Robo
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_66',
-    category: 'Series',
-    cover: 'Mumma Sun Leti Hai!',
-    title: 'Mumma Sun Leti Hai!',
-    opening: 'Robot, kya Mumma ko bhi peeche dikta hai?',
-    problem: 'Ria is caught doing something she shouldn\'t, but it isn\'t magic — Mumma heard the clues.',
-    lesson: 'The robot shows how parents pick up sounds and signs, not superpowers — "sunna hi kaafi hota hai."',
-    postFormat: 'Reel',
-    strategy: 'Parental awareness, hearing clues, playful acknowledgment',
-    caption: 'Robot ne bataya: "Mumma ne suna — steps, crinkles, timer beep!" 🔄👂 #RiaAndRobot #ParentSuperpower #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'It\'s not magic — it\'s Mumma\'s ears! We hear EVERYTHING. 😉',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_66',
+      category: 'Series',
+      cover: 'Mumma Sun Leti Hai!',
+      title: 'Mumma Sun Leti Hai!',
+      opening: 'Robot, kya Mumma ko bhi peeche dikta hai?',
+      problem: 'Ria is caught doing something she shouldn\'t, but it isn\'t magic — Mumma heard the clues.',
+      lesson: 'The robot shows how parents pick up sounds and signs, not superpowers — "sunna hi kaafi hota hai."',
+      postFormat: 'Reel',
+      strategy: 'Parental awareness, hearing clues, playful acknowledgment',
+      caption: 'Robot ne bataya: "Mumma ne suna — steps, crinkles, timer beep!" 🔄👂 #RiaAndRobot #ParentSuperpower #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment:
+          'It\'s not magic — it\'s Mumma\'s ears! We hear EVERYTHING. 😉',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria tries to sneak a cookie, but Mumma calls out — "Ruk jao, meri aankh bhi nahi todegi!"
 Twist: Mumma explains: "Maine tumhare steps suna, aur wrapper ki awaaz li." The robot projects a "clue chart" — footsteps, crinkles, timer beep.
 Resolution: Ria laughs instead of protests. "Toh main kabhi bhi nahi chupke se cookie le sakti?"
 Moral: Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.
 ''',
-    setting: 'Kitchen corner, afternoon, cookie jar on the counter',
-    sceneDetail: 'Ria sneaking toward the jar, a wrapper crinkling under her foot',
-    dialogue: '"Ruk jao, meri aankh bhi nahi todegi!"',
-    mess: 'Ria tries to sneak a cookie, steps creak, wrapper crinkles — Mumma ears are open',
-    innerThought: 'Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.',
-    endingBeat: 'Mumma explains the clue chart: "Maine tumhare steps suna." Ria laughs instead of protests.',
-    defaultCast: ['Ria', 'Mumma', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen corner, afternoon, cookie jar on the counter',
+      sceneDetail:
+          'Ria sneaking toward the jar, a wrapper crinkling under her foot',
+      dialogue: '"Ruk jao, meri aankh bhi nahi todegi!"',
+      mess: 'Ria tries to sneak a cookie, steps creak, wrapper crinkles — Mumma ears are open',
+      innerThought:
+          'Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.',
+      endingBeat: 'Mumma explains the clue chart: "Maine tumhare steps suna." Ria laughs instead of protests.',
+      defaultCast: ['Ria', 'Mumma', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen corner, afternoon. Ria (sparkly pink star dress, pigtails) sneaking toward the cookie jar. Robot (blue LED eyes scanning) projects a floating clue chart — footsteps, crinkles, timer beep. Mumma (yellow kurti, top bun) watches with a knowing smile. Text on screen: "COOKIE HEIST? 🍪" "CLUE CHART! 🕵️‍♀️" "LOVE > MAGIC ❤️"
 
 On-Screen Text:
@@ -4034,39 +4183,43 @@ Part 3 (20-30s): $kPartStyle. Mumma kneels, offers a tiny cookie on a proper pla
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_67',
-    category: 'Series',
-    cover: 'Ek Haath Ka Space',
-    title: 'Ek Haath Ka Space',
-    opening: 'Robot, mujhe ek haath ka space chahiye!',
-    problem: 'Rio crowds Ria while she builds, knocking puzzle pieces sideways.',
-    lesson: 'Robot stretches a ruler to mark each child\'s space — boundaries can be visual and respectful.',
-    postFormat: 'Reel',
-    strategy: 'Personal boundaries, calm-down space, respectful communication',
-    caption: 'Jab thoda space chahiye ho... toh Robot banata hai "calm-down tent"! 🏕️ #RiaAndRobot #Boundaries #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Respecting "I need space" makes everyone calmer — kids and adults alike.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_67',
+      category: 'Series',
+      cover: 'Ek Haath Ka Space',
+      title: 'Ek Haath Ka Space',
+      opening: 'Robot, mujhe ek haath ka space chahiye!',
+      problem:
+          'Rio crowds Ria while she builds, knocking puzzle pieces sideways.',
+      lesson: 'Robot stretches a ruler to mark each child\'s space — boundaries can be visual and respectful.',
+      postFormat: 'Reel',
+      strategy:
+          'Personal boundaries, calm-down space, respectful communication',
+      caption: 'Jab thoda space chahiye ho... toh Robot banata hai "calm-down tent"! 🏕️ #RiaAndRobot #Boundaries #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'Respecting "I need space" makes everyone calmer — kids and adults alike.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria is building a puzzle. Rio looms too close, knocking pieces sideways. "Mujhe thoda space chahiye!"
 Twist: Robot stretches a ruler across the table: "Ek haath ka space." Red line for Ria, blue line for Rio.
 Resolution: "Line ke andar raho." They both stay in their zones, finish the puzzle together.
 Moral: Space to create is peace to create.
 ''',
-    setting: 'Living room table, puzzle in progress, Ria concentrating',
-    sceneDetail: 'Puzzle pieces scattered, Rio looming too close, pieces knocked sideways',
-    dialogue: '"Mujhe thoda space chahiye!" "Ek haath ka space."',
-    mess: 'Rio crowds Ria while she builds, knocking puzzle pieces everywhere',
-    innerThought: 'Line ke andar raho — both stay in their zones.',
-    endingBeat: 'Red line for Ria, blue line for Rio — they finish the puzzle together.',
-    defaultCast: ['Ria', 'Rio', 'Robot'],
-    keepMoralOffScreen: false,
-    readyPrompt: '''
+      setting: 'Living room table, puzzle in progress, Ria concentrating',
+      sceneDetail: 'Puzzle pieces scattered, Rio looming too close, pieces knocked sideways',
+      dialogue: '"Mujhe thoda space chahiye!" "Ek haath ka space."',
+      mess:
+          'Rio crowds Ria while she builds, knocking puzzle pieces everywhere',
+      innerThought: 'Line ke andar raho — both stay in their zones.',
+      endingBeat: 'Red line for Ria, blue line for Rio — they finish the puzzle together.',
+      defaultCast: ['Ria', 'Rio', 'Robot'],
+      keepMoralOffScreen: false,
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room table, puzzle in progress. Rio leans in too close, knocking pieces sideways. Ria: "Mujhe thoda space chahiye!" Robot (blue LED eyes) extends a ruler across the table. Text on screen: "EK HAATH KA SPACE 📏" "RESPECTFUL BOUNDARIES! 🤝"
 
 On-Screen Text:
@@ -4086,45 +4239,49 @@ Part 3 (20-30s): $kPartStyle. Both finish the puzzle together, each staying insi
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-    quote: '',
-    detail: '',
-    punchline: '',
-  ),
+      quote: '',
+      detail: '',
+      punchline: '',
+    ),
 
-  HookIdea(
-    id: 'idea_68',
-    category: 'Series',
-    cover: 'There Are Butterflies in My Tummy!',
-    title: 'There Are Butterflies in My Tummy!',
-    opening: 'Robot, mere pet mein titliyan udd rahi hain!',
-    problem: 'Ria gets pre-performance jitters before showing her artwork or speaking in front of others.',
-    lesson: 'The robot explains that "butterflies" are excitement and courage, not fear — a simple reframe.',
-    postFormat: 'Reel',
-    strategy: 'Performance anxiety, excitement vs fear, courage visualization',
-    caption: 'Jab "butterflies" ke matlab excitement hota hai, na ki darr... toh Robot ne samjhaana mushkil nahi! 🦋 #RiaAndRobot #Courage #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Those butterflies? They\'re cheering you on, not warning you away. 💪',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_68',
+      category: 'Series',
+      cover: 'There Are Butterflies in My Tummy!',
+      title: 'There Are Butterflies in My Tummy!',
+      opening: 'Robot, mere pet mein titliyan udd rahi hain!',
+      problem: 'Ria gets pre-performance jitters before showing her artwork or speaking in front of others.',
+      lesson: 'The robot explains that "butterflies" are excitement and courage, not fear — a simple reframe.',
+      postFormat: 'Reel',
+      strategy:
+          'Performance anxiety, excitement vs fear, courage visualization',
+      caption: 'Jab "butterflies" ke matlab excitement hota hai, na ki darr... toh Robot ne samjhaana mushkil nahi! 🦋 #RiaAndRobot #Courage #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'Those butterflies? They\'re cheering you on, not warning you away. 💪',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria feels butterflies in her tummy before showing her drawing to the class and says the robot about them.
 Twist: The robot scans her and displays "Excitement Detected: 97% — Butterflies = Courage, Not Fear."
 Resolution: The robot teaches her a "butterfly breath" and Ria confidently shows her drawing to everyone.
 Moral: Butterflies mean you care — and caring is the first step to courage.
 ''',
-    setting: 'Classroom, afternoon, Ria clutching her drawing',
-    sceneDetail: 'Ria\'s drawing pinned on the wall, her stomach visibly fluttery',
-    dialogue: '"Mere pet mein titliyan udd rahi hain!"',
-    mess: 'Ria is paralyzed with jitters, classmates waiting to see her artwork',
-    innerThought: 'Butterflies = excitement. Not fear.',
-    endingBeat: 'Ria confidently shows her drawing — "This is my butterfly garden!"',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Classroom, afternoon, Ria clutching her drawing',
+      sceneDetail:
+          'Ria\'s drawing pinned on the wall, her stomach visibly fluttery',
+      dialogue: '"Mere pet mein titliyan udd rahi hain!"',
+      mess: 'Ria is paralyzed with jitters, classmates waiting to see her artwork',
+      innerThought: 'Butterflies = excitement. Not fear.',
+      endingBeat:
+          'Ria confidently shows her drawing — "This is my butterfly garden!"',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Classroom, afternoon. Ria (sparkly pink star dress, pigtails) clutching her drawing, stomach visibly fluttery. Robot (blue LED eyes gentle) scans her: "Excitement Detected: 97%." Projects: "Butterflies = Courage, Not Fear." Text on screen: "BUTTERFLIES 🦋" "COURAGE = EXCITEMENT 💪" "SHOW YOUR ART! 🎨"
 
 On-Screen Text:
@@ -4144,42 +4301,43 @@ Part 3 (20-30s): $kPartStyle. Ria confidently: "This is my butterfly garden!" Cl
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_69',
-    category: 'Series',
-    cover: 'I\'m Dying of Boredom!',
-    title: 'I\'m Dying of Boredom!',
-    opening: 'Main bore ho rahi hoon!',
-    problem: 'Ria has finished all her activities and declares nothing is left to do.',
-    lesson: 'The robot suggests the "boredom jar" — a list of simple activities she can pick from. Boredom is the spark for creativity.',
-    postFormat: 'Reel',
-    strategy: 'Boredom productivity, creativity prompts, activity jar system',
-    caption: 'Boredom se pa gaya, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'A boredom jar is a happiness jar waiting to happen. Which activity will you pick? ❤️',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_69',
+      category: 'Series',
+      cover: 'I\'m Dying of Boredom!',
+      title: 'I\'m Dying of Boredom!',
+      opening: 'Main bore ho rahi hoon!',
+      problem: 'Ria has finished all her activities and declares nothing is left to do.',
+      lesson: 'The robot suggests the "boredom jar" — a list of simple activities she can pick from. Boredom is the spark for creativity.',
+      postFormat: 'Reel',
+      strategy: 'Boredom productivity, creativity prompts, activity jar system',
+      caption: 'Boredom se pa gaya, Robot ne banaya "boredom jar"! Har ghoont mein naya activity. 🎨 #RiaAndRobot #BoredomHack #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'A boredom jar is a happiness jar waiting to happen. Which activity will you pick? ❤️',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria has finished everything — drawing, puzzle, snack, dance — and declares, "Ab kuchh nahi bacha!"
 Twist: The robot produces a "Boredom Jar" filled with tiny scrolls, each with a creative activity she hasn't tried yet.
 Resolution: Ria draws a scroll — "Build a blanket fort!" — and spends the afternoon on an epic adventure.
 Moral: Boredom is just the moment before creativity kicks in.
 ''',
-    setting: 'Living room, afternoon, boredom jar on the table',
-    sceneDetail: 'Scrolls peeking out of the jar, Ria\'s hand reaching in',
-    dialogue: '"Ab kuchh nahi bacha!" "Boredom Jar se ek scroll!"',
-    mess: 'Ria declares nothing left to do — drawing, puzzle, snack, dance all finished',
-    innerThought: 'Boredom is just the moment before creativity kicks in.',
-    endingBeat: 'Ria draws "Build a blanket fort!" — epic adventure begins.',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, boredom jar on the table',
+      sceneDetail: 'Scrolls peeking out of the jar, Ria\'s hand reaching in',
+      dialogue: '"Ab kuchh nahi bacha!" "Boredom Jar se ek scroll!"',
+      mess: 'Ria declares nothing left to do — drawing, puzzle, snack, dance all finished',
+      innerThought: 'Boredom is just the moment before creativity kicks in.',
+      endingBeat: 'Ria draws "Build a blanket fort!" — epic adventure begins.',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon, a jar full of tiny scrolls on the table. Ria flops down: "Ab kuchh nahi bacha!" Robot extends the jar toward her: "Boredom Jar se ek scroll." Text on screen: "I'M DYING OF BOREDOM! 😩" "BOREDOM JAR! 🫙"
 
 On-Screen Text:
@@ -4199,42 +4357,43 @@ Part 3 (20-30s): $kPartStyle. Ria spends the afternoon building an epic blanket 
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_70',
-    category: 'Series',
-    cover: 'Rio Ne Surprise Diya!',
-    title: 'Rio Ne Surprise Diya!',
-    opening: 'Robot, Rio ne ek surprise plan kiya hai!',
-    problem: 'Rio tells everyone about a surprise Ria planned for Mumma, but Ria wanted it to stay secret until the big reveal.',
-    lesson: 'The robot explains that surprises are meant to share, but secrets that make you uncomfortable must always be told to a trusted grown-up — a safety lesson.',
-    postFormat: 'Reel',
-    strategy: 'Privacy boundaries, secret vs surprise, sibling communication',
-    caption: 'Jab Rio ne surprise sabko bata diya... toh Robot ne banaya Surprise vs Secret chart! 🎁 #RiaAndRobot #KidSafety #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'Surprises are fun to share later. Secrets that feel icky? Tell a grown-up right away!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_70',
+      category: 'Series',
+      cover: 'Rio Ne Surprise Diya!',
+      title: 'Rio Ne Surprise Diya!',
+      opening: 'Robot, Rio ne ek surprise plan kiya hai!',
+      problem: 'Rio tells everyone about a surprise Ria planned for Mumma, but Ria wanted it to stay secret until the big reveal.',
+      lesson: 'The robot explains that surprises are meant to share, but secrets that make you uncomfortable must always be told to a trusted grown-up — a safety lesson.',
+      postFormat: 'Reel',
+      strategy: 'Privacy boundaries, secret vs surprise, sibling communication',
+      caption: 'Jab Rio ne surprise sabko bata diya... toh Robot ne banaya Surprise vs Secret chart! 🎁 #RiaAndRobot #KidSafety #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'Surprises are fun to share later. Secrets that feel icky? Tell a grown-up right away!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria tells the robot about a surprise she is planning for Mumma. Rio overhears and blurts it out to everyone — "Ria ne Mumma ko surprise gift banaya hai!"
 Twist: The robot draws a picture chart in two columns. One side: "Surprise = fun to share later!" Other side: "Secret = if it makes you sad or scared, tell Mumma or Papa right away."
 Resolution: Rio understands: surprises are exciting when shared at the right time, and any feeling that feels icky must be told to a trusted grown-up immediately.
 Moral: Surprises are sweet to share; secrets that make you uncomfortable must be told to a grown-up right away.
 ''',
-    setting: 'Living room, afternoon, gift wrapping paper and ribbons',
-    sceneDetail: 'Half-wrapped gift box, ribbons and tape scattered',
-    dialogue: '"Ria ne Mumma ko surprise gift banaya hai!"',
-    mess: 'Rio blurts out the surprise to everyone, Ria face falls',
-    innerThought: 'Some secrets are meant to be shared at the right time.',
-    endingBeat: 'Robot draws a two-column chart — surprise vs secret — Rio understands.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, gift wrapping paper and ribbons',
+      sceneDetail: 'Half-wrapped gift box, ribbons and tape scattered',
+      dialogue: '"Ria ne Mumma ko surprise gift banaya hai!"',
+      mess: 'Rio blurts out the surprise to everyone, Ria face falls',
+      innerThought: 'Some secrets are meant to be shared at the right time.',
+      endingBeat: 'Robot draws a two-column chart — surprise vs secret — Rio understands.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon. Half-wrapped gift box, ribbons scattered. Rio (blue t-shirt, shorts) blurts out: "Ria ne Mumma ko surprise gift banaya hai!" Ria (sparkly pink star dress, pigtails) face falls. Robot (blue LED eyes flickering) projects a two-column chart. Text on screen: "SURPRISE? ✨" "SECRET = TELL GROWN-UP! 🚨" "RIGHT TIME = RIGHT! ⏰"
 
 On-Screen Text:
@@ -4254,42 +4413,44 @@ Part 3 (20-30s): $kPartStyle. Rio: "Mujhe pata hai, main dhyaan rakhunga!" Ria h
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_71',
-    category: 'Series',
-    cover: 'I Want to Eat the Whole World!',
-    title: 'I Want to Eat the Whole World!',
-    opening: 'Robot, mujhe poori duniya khana hai!',
-    problem: 'Ria is curious about every food she sees and wants to try everything at once.',
-    lesson: 'The robot creates a "world foods adventure map" so Ria could explore tastes one country at a time — one bite at a time.',
-    postFormat: 'Reel',
-    strategy: 'Food curiosity, cultural exploration, adventure map',
-    caption: 'Poori duniya khana hai? Robot ne banaya "world foods adventure map!" Har din ek naya desh. 🌍 #RiaAndRobot #WorldFoods #FunLearningWithPalak #IndianMoms #KidsComedy',
-    pinnedComment: 'One country, one flavor at a time — the robot\'s recipe for culinary courage!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_71',
+      category: 'Series',
+      cover: 'I Want to Eat the Whole World!',
+      title: 'I Want to Eat the Whole World!',
+      opening: 'Robot, mujhe poori duniya khana hai!',
+      problem: 'Ria is curious about every food she sees and wants to try everything at once.',
+      lesson: 'The robot creates a "world foods adventure map" so Ria could explore tastes one country at a time — one bite at a time.',
+      postFormat: 'Reel',
+      strategy: 'Food curiosity, cultural exploration, adventure map',
+      caption: 'Poori duniya khana hai? Robot ne banaya "world foods adventure map!" Har din ek naya desh. 🌍 #RiaAndRobot #WorldFoods #FunLearningWithPalak #IndianMoms #KidsComedy',
+      pinnedComment: 'One country, one flavor at a time — the robot\'s recipe for culinary courage!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria sees a table full of international foods and declares, "Mujhe poori duniya khana hai!" — she wants to eat everything.
 Twist: The robot produces a world map where each country lights up as Ria tastes its cuisine — one bite at a time.
 Resolution: Ria marks countries on her adventure map, trying one dish per day and learning about each culture.
 Moral: The world is huge — best to explore it one bite at a time.
 ''',
-    setting: 'Dining table, afternoon, world foods map spread out',
-    sceneDetail: 'International dishes arranged like a rainbow on the table',
-    dialogue: '"Mujhe poori duniya khana hai!" "Ek bite at a time."',
-    mess: 'Ria points at everything on the table, wanting to try all at once',
-    innerThought: 'The world is huge — best to explore it one bite at a time.',
-    endingBeat: 'Ria marks her first country on the adventure map, takes one careful bite.',
-    defaultCast: ['Ria', 'Robot'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Dining table, afternoon, world foods map spread out',
+      sceneDetail: 'International dishes arranged like a rainbow on the table',
+      dialogue: '"Mujhe poori duniya khana hai!" "Ek bite at a time."',
+      mess: 'Ria points at everything on the table, wanting to try all at once',
+      innerThought:
+          'The world is huge — best to explore it one bite at a time.',
+      endingBeat: 'Ria marks her first country on the adventure map, takes one careful bite.',
+      defaultCast: ['Ria', 'Robot'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Dining table, afternoon. Rainbow of international dishes arranged. Ria (sparkly pink star dress, pigtails) pointing at everything: "Mujhe poori duniya khana hai!" Robot (blue LED eyes whirring) produces a world map where each country lights up. Text on screen: "WORLD MENU 🌍" "ONE BITE AT A TIME! 🍽️" "ADVENTURE MAP! 🗺️"
 
 On-Screen Text:
@@ -4309,43 +4470,46 @@ Part 3 (20-30s): $kPartStyle. Ria marks "India" on her adventure map with a gold
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-  // Real mess parenting stories.
-HookIdea(
-    id: 'idea_72',
-    category: 'Funny',
-    cover: 'Plan: Perfect!',
-    title: 'Plan: Perfect!',
-    opening: 'Ria presents a crumpled blueprint: "Maine plan banaya hai!"',
-    problem: 'Child confidently solves a family problem in the wrong way',
-    lesson: 'The child\'s solution is creative but completely misses the brief — listen to what they actually need',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Ria ka plan: "Step 1: Papa ko gulaab do." Mast plan, par Papa allergic hain! 😂 #ToddlerPlans #ParentingHumor #FunLearningWithPalak #IndianParents #ToddlerLogic',
-    pinnedComment: 'Aapke bachche ne kab "perfect plan" banaya jo galat nikla? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Real mess parenting stories.
+    HookIdea(
+      id: 'idea_72',
+      category: 'Funny',
+      cover: 'Plan: Perfect!',
+      title: 'Plan: Perfect!',
+      opening: 'Ria presents a crumpled blueprint: "Maine plan banaya hai!"',
+      problem: 'Child confidently solves a family problem in the wrong way',
+      lesson: 'The child\'s solution is creative but completely misses the brief — listen to what they actually need',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Ria ka plan: "Step 1: Papa ko gulaab do." Mast plan, par Papa allergic hain! 😂 #ToddlerPlans #ParentingHumor #FunLearningWithPalak #IndianParents #ToddlerLogic',
+      pinnedComment:
+          'Aapke bachche ne kab "perfect plan" banaya jo galat nikla? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria: "Dekho plan!" She unfolds a paper: "Step 1: Papa ko gulaab do." "Step 2: Mummy ko paani do." "Step 3: Rio ko TV chalu karo." "Step 4: Sab milke — PROBLEM SOLVED!" Mumma: "Ria beta, yeh kya plan hai?" Ria: "Galti kya hogi agar sabko pyaar milta hai?"
 Twist: Papa: "Beta, main gulaab se allergic hoon." Rio: "Main TV nahi dekhna chahta, book maanga hai." Mumma: "Main paani nahi peeti, darrakchunni hai."
 Resolution: Ria crumples the plan: "Toh... naya plan?" She draws a new one: "Step 1: Papa tofa mile." "Step 2: Mummy book mile." "Step 3: Rio dinosaur mile." "Step 4: Sab khush hain." Everyone laughs.
 Moral: Bachche apni tareeke se solution dhoondhte hain — unki creativity ko encourage karo, par unki zaroorat pucho.
 ''',
-    setting: 'Living room floor, scattered toys, crumpled paper plan',
-    sceneDetail: 'Ria\'s blueprint with "STEP 4: PROBLEM SOLVED!" in wobbly letters',
-    dialogue: 'Maine plan banaya hai!',
-    mess: 'Ria keeps adding steps — "Step 5: Cake cut" "Step 6: Everyone nap" — each more elaborate',
-    innerThought: 'Agar maine yeh plan suna toh sab theek ho jayega, why do adults always need to change it',
-    endingBeat: 'Ria\'s new plan with everyone getting what they actually asked for — crumpled again',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room floor, scattered toys, crumpled paper plan',
+      sceneDetail:
+          'Ria\'s blueprint with "STEP 4: PROBLEM SOLVED!" in wobbly letters',
+      dialogue: 'Maine plan banaya hai!',
+      mess: 'Ria keeps adding steps — "Step 5: Cake cut" "Step 6: Everyone nap" — each more elaborate',
+      innerThought: 'Agar maine yeh plan suna toh sab theek ho jayega, why do adults always need to change it',
+      endingBeat: 'Ria\'s new plan with everyone getting what they actually asked for — crumpled again',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, scattered toys, crumpled paper plan in Ria's hands. Ria (sparkly pink star dress, pigtails) proudly unfolds blueprint: "Step 1: Papa ko gulaab do!" "Step 2: Mummy ko paani do." "Step 3: Rio ko TV chalu karo." Papa: "Beta, main gulaab se allergic hoon!" Text on screen: "PERFECT PLAN! 📋" "ALLERGY ALERT! 🌹" "REVISE & RESUBMIT! ✨"
 
 On-Screen Text:
@@ -4365,42 +4529,45 @@ Part 3 (20-30s): $kPartStyle. Everyone gets what they actually wanted. Ria: "Mer
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_73',
-    category: 'Child Chaos',
-    cover: 'Park Se Nikalna!',
-    title: 'Park Se Nikalna!',
-    opening: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab Papa ne time khatam kaha.',
-    problem: 'Child refuses to leave the park when playtime ends',
-    lesson: 'Turn the transition into a game — first step wins the countdown!',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Park se nikalna hai? Game banao — "Jiska pehla step niklega, wohi countdown karega!" 🏃‍♂️ #ParkTransition #ToddlerTantrum #ParentingHack #FunLearningWithPalak #IndianParents',
-    pinnedComment: 'Timer ya countdown game try kariye — transition smooth hota hai!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_73',
+      category: 'Child Chaos',
+      cover: 'Park Se Nikalna!',
+      title: 'Park Se Nikalna!',
+      opening: 'Ria ne kaha — "Main yahan nahi jaungi park se!" jab Papa ne time khatam kaha.',
+      problem: 'Child refuses to leave the park when playtime ends',
+      lesson:
+          'Turn the transition into a game — first step wins the countdown!',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Park se nikalna hai? Game banao — "Jiska pehla step niklega, wohi countdown karega!" 🏃‍♂️ #ParkTransition #ToddlerTantrum #ParentingHack #FunLearningWithPalak #IndianParents',
+      pinnedComment:
+          'Timer ya countdown game try kariye — transition smooth hota hai!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Park time is over. Papa checks his watch — "Time to go." Ria plants her feet — "Main yahan nahi jaungi park se!"
 Twist: Rio joins the protest — "Mujhe bhi nahi jaana!" — both sit on the ground.
 Resolution: Papa turns it into a game — "Jiska pehla step niklega, wohi jeeti ka countdown karega." First step taken, countdown begins.
 Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega.
 ''',
-    setting: 'Society park exit, morning, Papa checking his watch',
-    sceneDetail: 'Ria sitting on the bench, arms crossed, refusing to move',
-    dialogue: '"Main yahan nahi jaungi park se!" "Time to go."',
-    mess: 'Ria plants her feet, Rio joins in protest, both sit on the ground',
-    innerThought: 'A game beats a demand — every time.',
-    endingBeat: 'First step to the gate, then countdown begins: "Jiska pehla step niklega, wohi jeeti ka countdown karega!"',
-    defaultCast: ['Ria', 'Rio', 'Papa'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Society park exit, morning, Papa checking his watch',
+      sceneDetail: 'Ria sitting on the bench, arms crossed, refusing to move',
+      dialogue: '"Main yahan nahi jaungi park se!" "Time to go."',
+      mess: 'Ria plants her feet, Rio joins in protest, both sit on the ground',
+      innerThought: 'A game beats a demand — every time.',
+      endingBeat: 'First step to the gate, then countdown begins: "Jiska pehla step niklega, wohi jeeti ka countdown karega!"',
+      defaultCast: ['Ria', 'Rio', 'Papa'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Society park exit, morning. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both sitting on the bench, arms crossed. Papa checking watch: "Time to go." Text on screen: "PARK EXIT DRAMA! 🏃" "GAME OVER DEMANDS! 🏁" "FIRST STEP WINS! 🏆"
 
 On-Screen Text:
@@ -4420,42 +4587,44 @@ Part 3 (20-30s): $kPartStyle. Both walk out, hand in hand with Papa. "Mission co
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-HookIdea(
-    id: 'idea_74',
-    category: 'Funny',
-    cover: 'Wohi Toh Tha!',
-    title: 'Wohi Toh Tha!',
-    opening: 'Ria freezes mid-bite. "Arre... yehi toh tha jo tumne kaha tha!"',
-    problem: 'Rio copies Mumma exact words at the worst possible moment',
-    lesson: 'Toddlers are walking tape recorders — speak carefully',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Rio ne Mumma ke alfaaz dohra diye — "Mummy ne kaha..." 😂 Bachche tape recorder hain! #ToddlerQuotes #ParentingMirror #FunLearningWithPalak #IndianParents #ToddlerLife',
-    pinnedComment: 'Aapke bachche ne kab aapki baat dohra di? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_74',
+      category: 'Funny',
+      cover: 'Wohi Toh Tha!',
+      title: 'Wohi Toh Tha!',
+      opening:
+          'Ria freezes mid-bite. "Arre... yehi toh tha jo tumne kaha tha!"',
+      problem: 'Rio copies Mumma exact words at the worst possible moment',
+      lesson: 'Toddlers are walking tape recorders — speak carefully',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Rio ne Mumma ke alfaaz dohra diye — "Mummy ne kaha..." 😂 Bachche tape recorder hain! #ToddlerQuotes #ParentingMirror #FunLearningWithPalak #IndianParents #ToddlerLife',
+      pinnedComment: 'Aapke bachche ne kab aapki baat dohra di? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma to Papa in the hallway: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio, eating breakfast, looks up. "Mummy ne kaha — aaj tak nahi dekhna." Papa: "Kya?" Mumma's face goes white.
 Twist: Mumma: "Maine kaha tha tumhe? Kisko bhi nahi kaha." Papa: "Tumne kaha tha — " Rio, matter-of-fact: "Mummy ne kaha tha tumhe — tumhare saath nahi dekhna."
 Resolution: Mumma pinches her own arm: "Rio, tumhara breakfast khatam karo." Rio: "Wohi toh tha jo tumne kaha!" Mumma: "Haan bhi kaha."
 Moral: Bachche har baat yaad rakhte hain — bolo soch ke.
 ''',
-    setting: 'Kitchen, breakfast table, morning light',
-    sceneDetail: 'Half-eaten dosa on Rio\'s plate, Mumma\'s dupatta caught on the door handle',
-    dialogue: 'Wohi toh tha jo tumne kaha tha!',
-    mess: 'Rio keeps repeating "Mummy ne kaha" every time Mumma tries to backtrack',
-    innerThought: 'Maine kya bigaara, when did my offhand comment become a courtroom testimony',
-    endingBeat: 'Rio shrugs, takes another bite, and says "Bas yehi toh tha" for the last time',
-    defaultCast: ['Rio', 'Mumma', 'Papa'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Kitchen, breakfast table, morning light',
+      sceneDetail: 'Half-eaten dosa on Rio\'s plate, Mumma\'s dupatta caught on the door handle',
+      dialogue: 'Wohi toh tha jo tumne kaha tha!',
+      mess: 'Rio keeps repeating "Mummy ne kaha" every time Mumma tries to backtrack',
+      innerThought: 'Maine kya bigaara, when did my offhand comment become a courtroom testimony',
+      endingBeat: 'Rio shrugs, takes another bite, and says "Bas yehi toh tha" for the last time',
+      defaultCast: ['Rio', 'Mumma', 'Papa'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kitchen, breakfast table, morning light. Half-eaten dosa on Rio's plate. Mumma's dupatta caught on the door handle. Mumma: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio freezes mid-bite: "Arre... yehi toh tha jo tumne kaha tha!" Text on screen: "TAPE RECORDER! 🎙️" "BACKTRACK FAIL! ❌" "LISTEN FIRST 👂"
 
 On-Screen Text:
@@ -4475,42 +4644,43 @@ Part 3 (20-30s): $kPartStyle. Mumma laughs: "Beta, tumne samajh gaya!" Rio grins
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_75',
-    category: 'Funny',
-    cover: 'Secret Agent Cuty!',
-    title: 'Secret Agent Cuty!',
-    opening: 'Cuty trots between Mumma\'s legs, nose twitching — something is wrong.',
-    problem: 'Child misunderstands a private adult conversation about money',
-    lesson: 'Overheard snippets become a child\'s own private soap opera — explain simply',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bachche bade ki baatein sun ke apni duniya bana lete hain! "Budget? Main bhi budget ke andar hoon!" 💰 #ToddlerLogic #MisunderstoodConversations #FunLearningWithPalak #IndianParents #MoneyTalk',
-    pinnedComment: 'Aapke bachche ne kab aapki baat ka apna matlab nikala?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_75',
+      category: 'Funny',
+      cover: 'Secret Agent Cuty!',
+      title: 'Secret Agent Cuty!',
+      opening: 'Cuty trots between Mumma\'s legs, nose twitching — something is wrong.',
+      problem: 'Child misunderstands a private adult conversation about money',
+      lesson: 'Overheard snippets become a child\'s own private soap opera — explain simply',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bachche bade ki baatein sun ke apni duniya bana lete hain! "Budget? Main bhi budget ke andar hoon!" 💰 #ToddlerLogic #MisunderstoodConversations #FunLearningWithPalak #IndianParents #MoneyTalk',
+      pinnedComment: 'Aapke bachche ne kab aapki baat ka apna matlab nikala?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma on the phone: "Nahi, yeh month toh budget mein nahi aayega." Ria: "Budget? Kya budget?" Mumma: "Apna ghar ka budget." Ria: "Ghar ka budget? Par main toh ghar ka part hoon!" Cuty sniffs Mumma's purse and trots away.
 Twist: Ria: "Toh kya main budget se bahar hoon?" Mumma: "Nahi beta..." Rio: "Main bhi budget se bahar hoon?" Mumma, defeated: "Sab koi budget ke andar hi hoon."
 Resolution: Cuty emerges with a single coin from the purse. Drops it at Ria's feet. Everyone stares at the coin.
 Moral: Bachche bade ki baatein apne tareeke se samajhte hain — unhe simple shabdon mein samjhao.
 ''',
-    setting: 'Hallway outside the bedroom, morning',
-    sceneDetail: 'Mumma\'s purse on the floor, single coin glinting',
-    dialogue: 'Par main toh ghar ka part hoon!',
-    mess: 'Ria keeps asking "kitna budget hai?" and "kiska share hai"',
-    innerThought: 'Agar main bahar hoon toh kya main free hoon... kya mujhe pyar ki jayegi?',
-    endingBeat: 'Cuty drops the coin, everyone stares at it like it just solved everything',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: true,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Hallway outside the bedroom, morning',
+      sceneDetail: 'Mumma\'s purse on the floor, single coin glinting',
+      dialogue: 'Par main toh ghar ka part hoon!',
+      mess: 'Ria keeps asking "kitna budget hai?" and "kiska share hai"',
+      innerThought: 'Agar main bahar hoon toh kya main free hoon... kya mujhe pyar ki jayegi?',
+      endingBeat: 'Cuty drops the coin, everyone stares at it like it just solved everything',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: true,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Hallway outside bedroom, morning. Mumma's purse on the floor, single coin glinting. Mumma on phone: "Nahi, yeh month budget mein nahi aayega." Ria: "Par main toh ghar ka part hoon!" Cuty sniffs the purse. Text on screen: "BUDGET CONFUSION! 💰" "COIN LOGIC! 🪙" "SIMPLE WORDS MATTER! 💬"
 
 On-Screen Text:
@@ -4530,43 +4700,45 @@ Part 3 (20-30s): $kPartStyle. Everyone stares at the coin. "Evidence hai — hai
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-  // New ideas (added by hand; blanks to be filled later)
-  HookIdea(
-    id: 'idea_76',
-    category: 'Diwali',
-    cover: 'Safety First, Sparkle Always!',
-    title: 'Safety First, Sparkle Always!',
-    opening: 'Phataka jalaane se pehle, safety checklist dikhana zaroori hai.',
-    problem: 'Diwali fireworks safety — children must not light fireworks independently',
-    lesson: 'Adult supervision is mandatory. Teach one safety rule before each firework: safe distance, water bucket ready, cotton clothes only.',
-    postFormat: 'Reel',
-    strategy: 'Teach one safety rule before lighting any firework.',
-    caption: 'Safety first, Diwali second ✨🪔 Bacche kabhi khud phataka na jalayein — adult supervision zaroori! #DiwaliSafety #FireworkSafety #FunLearningWithPalak #IndianParents #SafeDiwali',
-    pinnedComment: 'What safety rule do you teach your kids before Diwali?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // New ideas (added by hand; blanks to be filled later)
+    HookIdea(
+      id: 'idea_76',
+      category: 'Diwali',
+      cover: 'Safety First, Sparkle Always!',
+      title: 'Safety First, Sparkle Always!',
+      opening:
+          'Phataka jalaane se pehle, safety checklist dikhana zaroori hai.',
+      problem: 'Diwali fireworks safety — children must not light fireworks independently',
+      lesson: 'Adult supervision is mandatory. Teach one safety rule before each firework: safe distance, water bucket ready, cotton clothes only.',
+      postFormat: 'Reel',
+      strategy: 'Teach one safety rule before lighting any firework.',
+      caption: 'Safety first, Diwali second ✨🪔 Bacche kabhi khud phataka na jalayein — adult supervision zaroori! #DiwaliSafety #FireworkSafety #FunLearningWithPalak #IndianParents #SafeDiwali',
+      pinnedComment: 'What safety rule do you teach your kids before Diwali?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria ke saamne Diwali phataka jalaane se pehle, Mumma safety rules samjhati hai — kya doori rakhna hai, paani ki balti taiyaar, soot ke kapde pehenne hain. Ria ek safe zone banane ki koshish karti hai lekin Mumma kehta hai ki kuch bhi safe zone nahi banata — sirf adult hi handle karta hai.
 Twist: Ria phataka ke saath ghoomne ki koshish karti hai, par Mumma use rukna padta hai. "Beta, phataka sirf adult ke haath mein!" kehkar Mumma sparkler apni ungli pakad ke jalaati hai — Ria paas se dekhti hai.
 Resolution: Har safety rule follow karne ke baad, Ria ek Safety Star badge paati hai. Do ladke — ek jo safe raha, ek jo unsafe ki koshish ki — dono Mumma ke saath phataka dekhte hain.
 Moral: Safety rules follow karne se hi Diwali ka maza safe rehta hai. Bacche kabhi khud phataka na jalayein.
 ''',
-    setting: 'Courtyard at dusk, fireworks laid out on the ground, water bucket nearby',
-    sceneDetail: 'Mumma stands behind the safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her.',
-    dialogue: '"Pehle safety samjho, phir phataka jalao!"',
-    mess: 'Ria tries to reach the sparkler but remembers the rule and stops. Mumma holds it safely, showing Ria how to watch without touching.',
-    innerThought: 'How do I make safety fun and not boring?',
-    endingBeat: 'Ria wears her "Safety Star" badge while Mumma lights sparklers at a safe distance.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'Safe kids light up Diwali brighter — with adult help.',
-    detail: 'Teach one rule before every firework. Adult lights, child watches from safe distance.',
-    punchline: 'Safety first, sparkle always — with adult help!',
-    readyPrompt: '''
+      setting: 'Courtyard at dusk, fireworks laid out on the ground, water bucket nearby',
+      sceneDetail: 'Mumma stands behind the safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her.',
+      dialogue: '"Pehle safety samjho, phir phataka jalao!"',
+      mess: 'Ria tries to reach the sparkler but remembers the rule and stops. Mumma holds it safely, showing Ria how to watch without touching.',
+      innerThought: 'How do I make safety fun and not boring?',
+      endingBeat: 'Ria wears her "Safety Star" badge while Mumma lights sparklers at a safe distance.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Safe kids light up Diwali brighter — with adult help.',
+      detail: 'Teach one rule before every firework. Adult lights, child watches from safe distance.',
+      punchline: 'Safety first, sparkle always — with adult help!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Courtyard at dusk. Mumma behind safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her. "Pehle safety samjho, phir phataka jalao!" Text on screen: "SAFETY FIRST! 🪔" "ADULTS HANDLE IT!"
 
 On-Screen Text:
@@ -4587,41 +4759,42 @@ Part 3 (20-30s): $kPartStyle. Ria wears her "Safety Star" badge while Mumma ligh
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_77',
-    category: 'Diwali',
-    cover: 'Saf Safai = Happy Diwali!',
-    title: 'Saf Safai = Happy Diwali!',
-    opening: 'Diwali se pehle saf safai ki dhun bajna shuru ho jaati hai.',
-    problem: 'Diwali cleaning chaos at home — making it a family game',
-    lesson: '5-minute cleanup race with timer before decorating. Teamwork makes cleaning fun.',
-    postFormat: 'Reel',
-    strategy: '5-minute cleanup race with timer before decorating.',
-    caption: 'Clean house, happy house 🪔🧹 5-minute timer laga ke saath saaf karo! #DiwaliCleaning #FamilyTeamwork #FunLearningWithPalak #IndianParents #DiwaliPrep',
-    pinnedComment: 'Tag your cleanup partner!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_77',
+      category: 'Diwali',
+      cover: 'Saf Safai = Happy Diwali!',
+      title: 'Saf Safai = Happy Diwali!',
+      opening: 'Diwali se pehle saf safai ki dhun bajna shuru ho jaati hai.',
+      problem: 'Diwali cleaning chaos at home — making it a family game',
+      lesson: '5-minute cleanup race with timer before decorating. Teamwork makes cleaning fun.',
+      postFormat: 'Reel',
+      strategy: '5-minute cleanup race with timer before decorating.',
+      caption: 'Clean house, happy house 🪔🧹 5-minute timer laga ke saath saaf karo! #DiwaliCleaning #FamilyTeamwork #FunLearningWithPalak #IndianParents #DiwaliPrep',
+      pinnedComment: 'Tag your cleanup partner!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria aur Mumma Diwali se pehle poore ghar ki saf safai shuru karti hai. Cheezein har jagah phaili ho jaati hain, par dono ek saath kaam karte ho toh maza aa jaata hai.
 Twist: Mumma ek 5-minute timer laga deti hai: "Race against time, Mumma! 5 min yaar!" Rio apne toys bhi jaldi se jaldi apni jagah rakhta hai.
 Resolution: Sab milkar 5 minute mein poora ghar saf kar liya, aur phir diya jalane lagi.
 Moral: Ek saath kaam karo, toh safai bhi game ban jaati hai.
 ''',
-    setting: 'Living room, Diwali decorations half-unpacked',
-    sceneDetail: 'A toy racing track scattered with diyas and ribbons',
-    dialogue: '"Race against time, Mumma! 5 min yaar!"',
-    mess: 'Toys, diyas, and ribbons scattered everywhere before the 5-minute timer starts',
-    innerThought: 'How do I keep this fun without making more mess?',
-    endingBeat: 'Ria hangs the last diya on the cleaned window, glowing in the evening light.',
-    defaultCast: ['Ria', 'Mumma', 'Rio'],
-    keepMoralOffScreen: false,
-    quote: 'Clean together, celebrate together.',
-    detail: 'Use a 5-minute timer to make cleanup a game.',
-    punchline: '5 minutes mein ghar bhi, khushi bhi!',
-    readyPrompt: '''
+      setting: 'Living room, Diwali decorations half-unpacked',
+      sceneDetail: 'A toy racing track scattered with diyas and ribbons',
+      dialogue: '"Race against time, Mumma! 5 min yaar!"',
+      mess: 'Toys, diyas, and ribbons scattered everywhere before the 5-minute timer starts',
+      innerThought: 'How do I keep this fun without making more mess?',
+      endingBeat: 'Ria hangs the last diya on the cleaned window, glowing in the evening light.',
+      defaultCast: ['Ria', 'Mumma', 'Rio'],
+      keepMoralOffScreen: false,
+      quote: 'Clean together, celebrate together.',
+      detail: 'Use a 5-minute timer to make cleanup a game.',
+      punchline: '5 minutes mein ghar bhi, khushi bhi!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, Diwali decorations half-unpacked, diyas and ribbons scattered over a toy racing track. Mumma sets a timer: "Race against time, Mumma! 5 min yaar!" Text on screen: "SAF SAFAI = HAPPY DIWALI! 🧹" "5 MINUTE TIMER! ⏱️"
 
 On-Screen Text:
@@ -4641,41 +4814,45 @@ Part 3 (20-30s): $kPartStyle. Ria hangs the last diya on the cleaned window, glo
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_78',
-    category: 'Diwali',
-    cover: 'Rangoli Ki Rani — Imperfect Perfect!',
-    title: 'Rangoli Ki Rani — Imperfect Perfect!',
-    opening: 'Mumma kehti hain — rangoli perfect hone se pehle, pyaar ka mauka.',
-    problem: 'Diwali rangoli chaos — colors everywhere, but made with love',
-    lesson: 'Messy rangoli bhi wahi pyara lagta hai jab usse banane waala pyaar se banaye — perfect imperfection.',
-    postFormat: 'Reel',
-    strategy: 'Make rangoli with hands, not tools — kids love the mess. Washable colors, adult supervision.',
-    caption: 'Imperfect rangoli, perfect memories 💐 Adult supervision, washable colors only! #RangoliLove #DiwaliMess #FunLearningWithPalak #IndianParents #CreativeKids',
-    pinnedComment: 'Show us your messy rangoli!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_78',
+      category: 'Diwali',
+      cover: 'Rangoli Ki Rani — Imperfect Perfect!',
+      title: 'Rangoli Ki Rani — Imperfect Perfect!',
+      opening:
+          'Mumma kehti hain — rangoli perfect hone se pehle, pyaar ka mauka.',
+      problem: 'Diwali rangoli chaos — colors everywhere, but made with love',
+      lesson: 'Messy rangoli bhi wahi pyara lagta hai jab usse banane waala pyaar se banaye — perfect imperfection.',
+      postFormat: 'Reel',
+      strategy: 'Make rangoli with hands, not tools — kids love the mess. Washable colors, adult supervision.',
+      caption: 'Imperfect rangoli, perfect memories 💐 Adult supervision, washable colors only! #RangoliLove #DiwaliMess #FunLearningWithPalak #IndianParents #CreativeKids',
+      pinnedComment: 'Show us your messy rangoli!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria rangoli banane ki koshish karti hai, lekin rang sab jagah phail jaata hai — star, floor, even her nose tak pahunche.
 Twist: Jab sab soch rahe hain ki rangoli ab kharab ho gayi, Rio kehta hai ki yeh "abstract art" hai.
 Resolution: Ghar wale rangoli ke saath khush hokar photo le li, kyunki asli rangoli toh family ka pyaar hota hai. Mumma wipes colors off Ria's nose.
 Moral: Jo bhi ban raha ho, agar pyaar ke saath ban raha ho, toh wahi perfect hai — colors wash off, memories stay.
 ''',
-    setting: 'Front courtyard, rangoli powder scattered everywhere, washable colors',
-    sceneDetail: 'Pink powder all over Ria\'s nose and ears, rainbow spillage on the floor',
-    dialogue: '"Yeh abstract art hai na, Mumma?"',
-    mess: 'Ria\'s nose and ears covered in pink powder — washes off easily',
-    innerThought: 'Maybe messy is the best kind of messy.',
-    endingBeat: 'Ria gives a thumbs up, covered in colors, holding her "masterpiece". Mumma cleans up together.',
-    defaultCast: ['Ria', 'Mumma', 'Rio'],
-    keepMoralOffScreen: false,
-    quote: 'Messy hands, happy heart — washable colors, adult nearby.',
-    detail: 'Use washable colors and let kids go wild. Adult supervises cleanup.',
-    punchline: 'Rangoli nahi, rang-birangi baat ban gayi — imperfect perfect!',
-    readyPrompt: '''
+      setting: 'Front courtyard, rangoli powder scattered everywhere, washable colors',
+      sceneDetail: 'Pink powder all over Ria\'s nose and ears, rainbow spillage on the floor',
+      dialogue: '"Yeh abstract art hai na, Mumma?"',
+      mess: 'Ria\'s nose and ears covered in pink powder — washes off easily',
+      innerThought: 'Maybe messy is the best kind of messy.',
+      endingBeat: 'Ria gives a thumbs up, covered in colors, holding her "masterpiece". Mumma cleans up together.',
+      defaultCast: ['Ria', 'Mumma', 'Rio'],
+      keepMoralOffScreen: false,
+      quote: 'Messy hands, happy heart — washable colors, adult nearby.',
+      detail:
+          'Use washable colors and let kids go wild. Adult supervises cleanup.',
+      punchline:
+          'Rangoli nahi, rang-birangi baat ban gayi — imperfect perfect!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Front courtyard, washable rangoli colors scattered everywhere. Ria tries to make rangoli — color spreads to the floor, her nose, her ears. Text on screen: "RANGOLI KI RANI! 💐" "IMPERFECT = PERFECT! ✨"
 
 On-Screen Text:
@@ -4695,41 +4872,42 @@ Part 3 (20-30s): $kPartStyle. Ria gives a thumbs up, covered in colors, holding 
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_79',
-    category: 'Ria Chaos',
-    cover: 'Baal Ka Mahasangram!',
-    title: 'Baal Ka Mahasangram!',
-    opening: 'Jab bhi Mumma haath jodne lage, Ria udas ho jaati thi.',
-    problem: 'Ria gets upset when Mumma tries to braid her hair — sitting still is hard.',
-    lesson: 'Sing a hair-braiding song to make the wait fun. Patience makes pretty braids.',
-    postFormat: 'Reel',
-    strategy: 'Sing a hair-braiding song to make the wait fun.',
-    caption: 'Patience is the prettiest hairstyle 💁‍♀️ #HairTime #ToddlerRoutine #FunLearningWithPalak #IndianParents #Patience',
-    pinnedComment: 'What song do you sing while braiding?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_79',
+      category: 'Ria Chaos',
+      cover: 'Baal Ka Mahasangram!',
+      title: 'Baal Ka Mahasangram!',
+      opening: 'Jab bhi Mumma haath jodne lage, Ria udas ho jaati thi.',
+      problem: 'Ria gets upset when Mumma tries to braid her hair — sitting still is hard.',
+      lesson: 'Sing a hair-braiding song to make the wait fun. Patience makes pretty braids.',
+      postFormat: 'Reel',
+      strategy: 'Sing a hair-braiding song to make the wait fun.',
+      caption: 'Patience is the prettiest hairstyle 💁‍♀️ #HairTime #ToddlerRoutine #FunLearningWithPalak #IndianParents #Patience',
+      pinnedComment: 'What song do you sing while braiding?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria ke baal banate time bahut hi zyada hilne lagti thi aur Mumma ke haath thok deti thi. Mumma ko ek geet gana padta tha taaki woh aaram se baal bana sake.
 Twist: Beech mein Ria ne ek chhoti si dua maangi — woh chahti thi ki uske baal "zyada lambe" hon.
 Resolution: Mumma ne geet gaate hue baal banaye aur Ria ko ek "badi behen" bankar dikhaya.
 Moral: Thoda intezaar aur ek geet, toh baal bhi sundar ho jaate hain.
 ''',
-    setting: 'Bedroom in the morning, hair clip and rubber bands ready',
-    sceneDetail: 'A half-braided pigtail dangling from Ria\'s head',
-    dialogue: '"Mumma, yeh itna der kyun lag raha hai?!"',
-    mess: 'Rubber bands snap and fly across the room',
-    innerThought: 'Why does braiding take so long with three helpers?',
-    endingBeat: 'Ria runs her fingers through the finished braids and strikes a pose.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'Good hair days come after patience plays.',
-    detail: 'Use a timer and reward stickers for sitting still.',
-    punchline: 'Baal bhi, patience bhi — dono mil gaye!',
-    readyPrompt: '''
+      setting: 'Bedroom in the morning, hair clip and rubber bands ready',
+      sceneDetail: 'A half-braided pigtail dangling from Ria\'s head',
+      dialogue: '"Mumma, yeh itna der kyun lag raha hai?!"',
+      mess: 'Rubber bands snap and fly across the room',
+      innerThought: 'Why does braiding take so long with three helpers?',
+      endingBeat: 'Ria runs her fingers through the finished braids and strikes a pose.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Good hair days come after patience plays.',
+      detail: 'Use a timer and reward stickers for sitting still.',
+      punchline: 'Baal bhi, patience bhi — dono mil gaye!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, morning, hair clips and rubber bands ready. Ria fidgets as Mumma starts braiding: "Mumma, yeh itna der kyun lag raha hai?!" A rubber band snaps and flies across the room. Text on screen: "BAAL KA MAHASANGRAM! 💁" "EK GEET, SAB THEEK! 🎵"
 
 On-Screen Text:
@@ -4749,41 +4927,43 @@ Part 3 (20-30s): $kPartStyle. Ria runs her fingers through the finished braids a
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_80',
-    category: 'Ria Chaos',
-    cover: 'Outfit Drama!',
-    title: 'Outfit Drama!',
-    opening: 'Ria poora closet khali kar rahi thi... phir Mumma ne sirf teen outfit nikale, aur 1 minute mein decision ho gaya!',
-    problem: 'With her whole closet to choose from, Ria can\'t decide what to wear — too many options lead to endless indecision.',
-    lesson: 'Give 3 outfit choices and let the child pick. Fewer options mean faster, more confident decisions.',
-    postFormat: 'Reel',
-    strategy: 'Give 3 outfit choices and let the child pick.',
-    caption: 'Let them choose, let them shine 👗✨ #OutfitChoice #ToddlerIndependence #FunLearningWithPalak #IndianParents #DecisionMaking',
-    pinnedComment: 'How many outfits does your little one try before deciding?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_80',
+      category: 'Ria Chaos',
+      cover: 'Outfit Drama!',
+      title: 'Outfit Drama!',
+      opening: 'Ria poora closet khali kar rahi thi... phir Mumma ne sirf teen outfit nikale, aur 1 minute mein decision ho gaya!',
+      problem: 'With her whole closet to choose from, Ria can\'t decide what to wear — too many options lead to endless indecision.',
+      lesson: 'Give 3 outfit choices and let the child pick. Fewer options mean faster, more confident decisions.',
+      postFormat: 'Reel',
+      strategy: 'Give 3 outfit choices and let the child pick.',
+      caption: 'Let them choose, let them shine 👗✨ #OutfitChoice #ToddlerIndependence #FunLearningWithPalak #IndianParents #DecisionMaking',
+      pinnedComment:
+          'How many outfits does your little one try before deciding?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria stands in front of her overflowing closet, pointing at dress after dress, changing her mind every few seconds — "Yeh? Nahi, woh? Nahi..."
 Twist: Mumma pulls out just three options — red, blue, green — and lays them on the bed: "Teen mein se ek choose karo."
 Resolution: Ria looks at all three for a moment, then grabs the green one: "Mumma, yehi pasand aaya!" No more flip-flopping.
 Moral: Fewer choices, faster decisions — three options give enough freedom without the overwhelm.
 ''',
-    setting: 'Bedroom, clothes all over the bed',
-    sceneDetail: 'Ria holding 3 different colored dresses, spinning in each',
-    dialogue: '"Yeh red? Nahi, blue? Haan, haan — green!"',
-    mess: 'Ria points at dress after dress from the closet before Mumma narrows it down to three',
-    innerThought: 'Why does picking one thing take forever?',
-    endingBeat: 'Ria gives herself a final twirl in the chosen outfit, confident and happy.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'A choice made with confidence is always right.',
-    detail: 'Use the "3 choices" trick to cut decision fatigue.',
-    punchline: 'Teen options, ek decision — full power!',
-    readyPrompt: '''
+      setting: 'Bedroom, clothes all over the bed',
+      sceneDetail: 'Ria holding 3 different colored dresses, spinning in each',
+      dialogue: '"Yeh red? Nahi, blue? Haan, haan — green!"',
+      mess: 'Ria points at dress after dress from the closet before Mumma narrows it down to three',
+      innerThought: 'Why does picking one thing take forever?',
+      endingBeat: 'Ria gives herself a final twirl in the chosen outfit, confident and happy.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'A choice made with confidence is always right.',
+      detail: 'Use the "3 choices" trick to cut decision fatigue.',
+      punchline: 'Teen options, ek decision — full power!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bedroom, clothes all over the bed. Ria stands in front of her overflowing closet, pointing at dress after dress: "Yeh? Nahi, woh? Nahi..." Text on screen: "OUTFIT DRAMA! 👗" "TEEN CHOICES, EK DECISION! ✨"
 
 On-Screen Text:
@@ -4803,41 +4983,43 @@ Part 3 (20-30s): $kPartStyle. Ria gives herself a final twirl in the green outfi
 
 Outro: "SHARE karo apne dost ke saath — aur kahaniyan aa rahi hain! 🔁"
 ''',
-  ),
-HookIdea(
-    id: 'idea_81',
-    category: 'Learning Lesson',
-    cover: 'The Family Tree Surprise!',
-    title: 'The Family Tree Surprise!',
-    opening: 'Jab Mumma ne ek purani book di, Ria ki curiosity ka level 100 ho gaya.',
-    problem: 'Ria receives a surprise gift of a family tree book — where does she fit?',
-    lesson: 'Apni jadon ko jaanna hi apni pehchaan banane ka pehla kadam hai. Family tree dikhata hai tum kahan se aaye ho — aur khaali jagah dikhati hai tum kahan jaa sakti ho.',
-    postFormat: 'Reel',
-    strategy: 'Use a visual family tree chart to make connections.',
-    caption: 'We are branches, we are roots 🌳❤️ #FamilyTree #RootsAndWings #FunLearningWithPalak #IndianParents #FamilyHistory',
-    pinnedComment: 'Tag your family tree buddy!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_81',
+      category: 'Learning Lesson',
+      cover: 'The Family Tree Surprise!',
+      title: 'The Family Tree Surprise!',
+      opening: 'Jab Mumma ne ek purani book di, Ria ki curiosity ka level 100 ho gaya.',
+      problem: 'Ria receives a surprise gift of a family tree book — where does she fit?',
+      lesson: 'Apni jadon ko jaanna hi apni pehchaan banane ka pehla kadam hai. Family tree dikhata hai tum kahan se aaye ho — aur khaali jagah dikhati hai tum kahan jaa sakti ho.',
+      postFormat: 'Reel',
+      strategy: 'Use a visual family tree chart to make connections.',
+      caption: 'We are branches, we are roots 🌳❤️ #FamilyTree #RootsAndWings #FunLearningWithPalak #IndianParents #FamilyHistory',
+      pinnedComment: 'Tag your family tree buddy!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria ko ek purani book mili jisme uska family tree likha tha. Har photo aur naam uski zindagi ka hissa tha — Mumma ke bachpan se lekar Ria ke pehle school din tak.
 Twist: Ria ne dekha ki uske saath ek photo bhi hai jisme ek khaali jagah tha — "Future Ria" ke liye.
 Resolution: Ria decides she'll fill that empty space herself, one day, as whoever she grows up to be — her own choice, not anyone else's.
 Moral: Apni jadon ko jaanna hi pehchaan ki shuruaat hai — aur khaali jagah tumhara apna safar likhne ke liye hai.
 ''',
-    setting: 'Grandparent\'s attic, old photo albums open',
-    sceneDetail: 'A large family tree chart with photos in tiny frames',
-    dialogue: '"Yeh toh main hun... par future?"',
-    mess: 'Photos fall off the tree chart when Ria touches it eagerly',
-    innerThought: 'I want to know who I really am.',
-    endingBeat: 'Ria pins her own photo into the empty spot on the tree, smiling.',
-    defaultCast: ['Ria', 'Mumma', 'Daadi'],
-    keepMoralOffScreen: false,
-    quote: 'Roots don\'t hold us back - they lift us forward.',
-    detail: 'Create a living family tree with new photos every year.',
-    punchline: 'Main bhi toh ek branch hoon!',
-    readyPrompt: '''
+      setting: 'Grandparent\'s attic, old photo albums open',
+      sceneDetail: 'A large family tree chart with photos in tiny frames',
+      dialogue: '"Yeh toh main hun... par future?"',
+      mess: 'Photos fall off the tree chart when Ria touches it eagerly',
+      innerThought: 'I want to know who I really am.',
+      endingBeat:
+          'Ria pins her own photo into the empty spot on the tree, smiling.',
+      defaultCast: ['Ria', 'Mumma', 'Daadi'],
+      keepMoralOffScreen: false,
+      quote: 'Roots don\'t hold us back - they lift us forward.',
+      detail: 'Create a living family tree with new photos every year.',
+      punchline: 'Main bhi toh ek branch hoon!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Grandparent's attic, old photo albums open. Mumma hands Ria an old book — a large family tree chart with photos in tiny frames. Ria's curiosity lights up. Text on screen: "THE FAMILY TREE SURPRISE! 🌳" "WHERE DO I FIT? 🔍"
 
 On-Screen Text:
@@ -4857,41 +5039,43 @@ Part 3 (20-30s): $kPartStyle. Ria pins her own photo into the empty spot on the 
 
 Outro: "LIKE, COMMENT, SHARE — aise hi pyare pal ke liye! 💛"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_82',
-    category: 'Ria Chaos',
-    cover: 'Shopping Ka Jungle!',
-    title: 'Shopping Ka Jungle!',
-    opening: 'Jab bhi mall jaate hain, Ria keh deti hai — main sirf ek chiz mangti hoon.',
-    problem: 'Ria wants everything at the mall — makeup, clothes, accessories, even a toy for Rio.',
-    lesson: 'Set a limit: one item per shopping trip. Limits create freedom.',
-    postFormat: 'Reel',
-    strategy: 'One-item rule: pick only one thing per shopping trip.',
-    caption: 'One is plenty 💝 #ShoppingLimit #ToddlerWants #FunLearningWithPalak #IndianParents #ShoppingWithKids',
-    pinnedComment: 'What\'s your one essential?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_82',
+      category: 'Ria Chaos',
+      cover: 'Shopping Ka Jungle!',
+      title: 'Shopping Ka Jungle!',
+      opening: 'Jab bhi mall jaate hain, Ria keh deti hai — main sirf ek chiz mangti hoon.',
+      problem: 'Ria wants everything at the mall — makeup, clothes, accessories, even a toy for Rio.',
+      lesson: 'Set a limit: one item per shopping trip. Limits create freedom.',
+      postFormat: 'Reel',
+      strategy: 'One-item rule: pick only one thing per shopping trip.',
+      caption: 'One is plenty 💝 #ShoppingLimit #ToddlerWants #FunLearningWithPalak #IndianParents #ShoppingWithKids',
+      pinnedComment: 'What\'s your one essential?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria ko mall mein jaate hi sab kuch chahiye — makeup, clothes, accessories, Rio ke liye toy bhi. Mumma thak jaati hai.
 Twist: Ria ne ek "wish list" banayi — par sirf 3 lines tak hi likhne di.
 Resolution: Woh ek cheez pakad kar khush hi thi — ek sparkly hair clip.
 Moral: Limitation create karni padti hai freedom ki tarah.
 ''',
-    setting: 'Mall corridor, toy aisle',
-    sceneDetail: 'Ria holding 5 different items, wide eyes scanning every shelf',
-    dialogue: '"Mumma, yeh bhi toh chahiye! Aur yeh bhi!"',
-    mess: 'Everything ends up in the cart before the limit is explained',
-    innerThought: 'Why can\'t I have just one of everything?',
-    endingBeat: 'Ria walks out with her one hair clip, already planning what to buy next time.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'One thing chosen with joy beats everything half-wanted.',
-    detail: 'Use a "3 wishes" rule for younger kids, "1 item" for older.',
-    punchline: 'Ek hi chiz, pura pyaar!',
-    readyPrompt: '''
+      setting: 'Mall corridor, toy aisle',
+      sceneDetail:
+          'Ria holding 5 different items, wide eyes scanning every shelf',
+      dialogue: '"Mumma, yeh bhi toh chahiye! Aur yeh bhi!"',
+      mess: 'Everything ends up in the cart before the limit is explained',
+      innerThought: 'Why can\'t I have just one of everything?',
+      endingBeat: 'Ria walks out with her one hair clip, already planning what to buy next time.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'One thing chosen with joy beats everything half-wanted.',
+      detail: 'Use a "3 wishes" rule for younger kids, "1 item" for older.',
+      punchline: 'Ek hi chiz, pura pyaar!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Mall corridor, toy aisle. Ria scans every shelf, wide-eyed, grabbing item after item: "Mumma, yeh bhi toh chahiye! Aur yeh bhi!" Text on screen: "SHOPPING KA JUNGLE! 🛍️" "ONE ITEM RULE! ✅"
 
 On-Screen Text:
@@ -4911,41 +5095,44 @@ Part 3 (20-30s): $kPartStyle. Ria walks out holding her one hair clip, happy, al
 
 Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
-  ),
-HookIdea(
-    id: 'idea_83',
-    category: 'Learning Lesson',
-    cover: 'Office Wali Mumma vs WFH Mumma!',
-    title: 'Office Wali Mumma vs WFH Mumma!',
-    opening: '"Work from home" kehti hoon, par office wali jaisi lagti hoon.',
-    problem: 'Office going mom vs work from home moms — both work hard, just differently.',
-    lesson: 'Dono tarah ki mummy hoti hain — ek doosre ki help ke liye hamesha maujood.',
-    postFormat: 'Reel',
-    strategy: 'Split-screen comparison of both moms\' daily routines.',
-    caption: 'All moms are superhero moms 🦸‍♀️ #OfficeMomVsWFHMom #SuperheroMoms #FunLearningWithPalak #IndianParents #MomLife',
-    pinnedComment: 'Which type of mom are you?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_83',
+      category: 'Learning Lesson',
+      cover: 'Office Wali Mumma vs WFH Mumma!',
+      title: 'Office Wali Mumma vs WFH Mumma!',
+      opening: '"Work from home" kehti hoon, par office wali jaisi lagti hoon.',
+      problem: 'Office going mom vs work from home moms — both work hard, just differently.',
+      lesson: 'Dono tarah ki mummy hoti hain — ek doosre ki help ke liye hamesha maujood.',
+      postFormat: 'Reel',
+      strategy: 'Split-screen comparison of both moms\' daily routines.',
+      caption: 'All moms are superhero moms 🦸‍♀️ #OfficeMomVsWFHMom #SuperheroMoms #FunLearningWithPalak #IndianParents #MomLife',
+      pinnedComment: 'Which type of mom are you?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria ko do Mummies dikhai de rahi hain — ek office jati hai, ek home pe kaam karti hai. Dono ka apna alag tarah ka swag hai.
 Twist: Office wali Mumma ka lunch break Rio ke saath video call pe hota hai, jisme WFH wali Mumma bhi join hoti hai.
 Resolution: Dono mammi mil kar ek "Hybrid mom" ban jati hain — best of both worlds.
 Moral: It's not about where you work — it's about how much you love.
 ''',
-    setting: 'Two sides of the same kitchen, split-screen',
-    sceneDetail: 'One side has a laptop and coffee mug, the other has a sari and diya',
-    dialogue: 'Office Mumma: "5 PM deadline, but I\'m still your mom first." WFH Mumma: "3 PM soccer pickup, but I\'m still your hero."',
-    mess: 'A spilled coffee lands on the WFH mom\'s work shirt',
-    innerThought: 'Why does everyone think I have it "easier"?',
-    endingBeat: 'Both moms laugh over spilled coffee, trading places for a day.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'Whether in heels or slippers, every mom walks the same path.',
-    detail: 'Celebrate both work styles — they both matter.',
-    punchline: 'Jahan bhi ho, mummy hi toh hai!',
-    readyPrompt: '''
+      setting: 'Two sides of the same kitchen, split-screen',
+      sceneDetail:
+          'One side has a laptop and coffee mug, the other has a sari and diya',
+      dialogue: 'Office Mumma: "5 PM deadline, but I\'m still your mom first." WFH Mumma: "3 PM soccer pickup, but I\'m still your hero."',
+      mess: 'A spilled coffee lands on the WFH mom\'s work shirt',
+      innerThought: 'Why does everyone think I have it "easier"?',
+      endingBeat:
+          'Both moms laugh over spilled coffee, trading places for a day.',
+      defaultCast: ['Ria', 'Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Whether in heels or slippers, every mom walks the same path.',
+      detail: 'Celebrate both work styles — they both matter.',
+      punchline: 'Jahan bhi ho, mummy hi toh hai!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Split-screen of the same kitchen, two different days. Left side: Mumma at a laptop with a coffee mug — an office day. Right side: Mumma in a sari near a diya — a work-from-home day. Text on screen: "OFFICE WALI MUMMA VS WFH MUMMA! 🦸" "BOTH ARE SUPERHEROES! 💛"
 
 On-Screen Text:
@@ -4965,41 +5152,43 @@ Part 3 (20-30s): $kPartStyle. Both versions of Mumma's day merge into one proud 
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_84',
-    category: 'Child Chaos',
-    cover: 'Game Mode: Busy!',
-    title: 'Game Mode: Busy!',
-    opening: 'Jab bhi phone uthate hain, Rio kehta hai — "Papa call aa raha hai, par main game mein hoon!".',
-    problem: 'Rio refuses to pause his game to take a call from Papa.',
-    lesson: 'Game bhi time hote hain, call bhi time hote hain — dono important hain. Timer laga ke transition banao.',
-    postFormat: 'Reel',
-    strategy: 'Set an alarm for game switch — when it dings, it\'s phone time.',
-    caption: 'Balance, baby! 🎮📞 #GameTimeVsFamilyTime #ParentingHacks #FunLearningWithPalak #IndianParents #ScreenTimeBalance',
-    pinnedComment: 'How do you handle game time vs family time?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_84',
+      category: 'Child Chaos',
+      cover: 'Game Mode: Busy!',
+      title: 'Game Mode: Busy!',
+      opening: 'Jab bhi phone uthate hain, Rio kehta hai — "Papa call aa raha hai, par main game mein hoon!".',
+      problem: 'Rio refuses to pause his game to take a call from Papa.',
+      lesson: 'Game bhi time hote hain, call bhi time hote hain — dono important hain. Timer laga ke transition banao.',
+      postFormat: 'Reel',
+      strategy:
+          'Set an alarm for game switch — when it dings, it\'s phone time.',
+      caption: 'Balance, baby! 🎮📞 #GameTimeVsFamilyTime #ParentingHacks #FunLearningWithPalak #IndianParents #ScreenTimeBalance',
+      pinnedComment: 'How do you handle game time vs family time?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio ka favorite game chal raha hota hai jab Papa se call aata hai. Woh call khatam hone tak nahi janta — "Bas ek aur level!".
 Twist: Papa ne ek naya trick ki — usne apne voice message ke saath ek mini game bheja: "Call karo jab game over ho."
 Resolution: Rio ne apne game se bahar nikal kar call liya — aur dono together ek level complete kiya.
 Moral: Time boundaries without punishment = happy kids.
 ''',
-    setting: 'Living room floor, console glowing',
-    sceneDetail: 'Rio with headphones, controller in hands, Papa\'s call flashing on screen',
-    dialogue: '"5 more minutes, Papa! Just one more level!"',
-    mess: 'Controller throws when Rio loses a level right before the call',
-    innerThought: 'Why does Papa always call when I am about to win?',
-    endingBeat: 'Rio pauses the game, calls Papa back, and explains his strategy between levels.',
-    defaultCast: ['Rio', 'Papa', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'The pause button is a powerful tool.',
-    detail: 'Use a kitchen timer for game-to-call transitions.',
-    punchline: 'Level up, then call up!',
-    readyPrompt: '''
+      setting: 'Living room floor, console glowing',
+      sceneDetail: 'Rio with headphones, controller in hands, Papa\'s call flashing on screen',
+      dialogue: '"5 more minutes, Papa! Just one more level!"',
+      mess: 'Controller throws when Rio loses a level right before the call',
+      innerThought: 'Why does Papa always call when I am about to win?',
+      endingBeat: 'Rio pauses the game, calls Papa back, and explains his strategy between levels.',
+      defaultCast: ['Rio', 'Papa', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'The pause button is a powerful tool.',
+      detail: 'Use a kitchen timer for game-to-call transitions.',
+      punchline: 'Level up, then call up!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room floor, console glowing. Rio, headphones on, controller in hand, deep in his game. Papa's call flashes on screen. Rio: "5 more minutes, Papa! Just one more level!" Text on screen: "GAME MODE: BUSY! 🎮" "TIMER FOR TRANSITIONS! ⏱️"
 
 On-Screen Text:
@@ -5019,24 +5208,24 @@ Part 3 (20-30s): $kPartStyle. Rio and Papa complete a level together over the ca
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_85',
-    category: 'Learning Lesson',
-    cover: 'Calm Down Corner!',
-    title: 'Calm Down Corner!',
-    opening: 'Jab Ria koi cheez ke liye bahut zaroorat mehsoos karti hai — like wanting a specific snack or needing a hug — Mumma calm corner le aati hai.',
-    problem: 'Ria communicates big needs through gentle persistence, and Mumma guides her to a calm-down space with comfort items instead of saying no.',
-    lesson: 'Big feelings are okay. A calm-down space with comfort items helps little ones reset with gentle guidance.',
-    postFormat: 'Reel',
-    strategy: 'The "calm-down corner": 3 deep breaths, 2 comfort items, 1 reconnect hug.',
-    caption: 'Connection before correction 💛 #EmotionalRegulation #CalmDownCorner #FunLearningWithPalak #IndianParents #GentleParenting',
-    pinnedComment: 'What works for your child\'s big feelings?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_85',
+      category: 'Learning Lesson',
+      cover: 'Calm Down Corner!',
+      title: 'Calm Down Corner!',
+      opening: 'Jab Ria koi cheez ke liye bahut zaroorat mehsoos karti hai — like wanting a specific snack or needing a hug — Mumma calm corner le aati hai.',
+      problem: 'Ria communicates big needs through gentle persistence, and Mumma guides her to a calm-down space with comfort items instead of saying no.',
+      lesson: 'Big feelings are okay. A calm-down space with comfort items helps little ones reset with gentle guidance.',
+      postFormat: 'Reel',
+      strategy: 'The "calm-down corner": 3 deep breaths, 2 comfort items, 1 reconnect hug.',
+      caption: 'Connection before correction 💛 #EmotionalRegulation #CalmDownCorner #FunLearningWithPalak #IndianParents #GentleParenting',
+      pinnedComment: 'What works for your child\'s big feelings?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Jab Ria ko koi badi chahat hoati hai — jaise ek specific snack chahiye ya ek hug — Mumma dekhti hai. Ria nudge karti hai Mumma's hand gently, then sits by her calm-down corner with her soft cushion.
 
 Twist: Har deep breath ke baad Ria aur bhi soft ho jaati hai, aur last step tak usey pata chalta hai ki sab theek ho jayega — par pehle ek chhota sa hug bhi zaroori hai.
@@ -5045,18 +5234,19 @@ Resolution: Ria kehti hai (softly, in her quiet way) — nudge, nudge — and Mu
 
 Moral: Connection before correction. A calm space with comfort beats any timeout chair.
 ''',
-    setting: 'Corner of the room where tantrums happen, calm-down corner with cushion and favorite toy',
-    sceneDetail: 'Ria nudging Mumma\'s hand, sitting by her calm-down corner with soft cushion',
-    dialogue: '"Beta, chalo calm down corner mein chalte hain. Teen deep breaths lete hain."',
-    mess: 'Ria nudges Mumma\'s hand again and again, gently insistent, before settling into the calm-down corner',
-    innerThought: 'This looks simple, but it is working.',
-    endingBeat: 'Ria rests her head on Mumma\'s shoulder after breathing, then sits up ready for a new game.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'Deep breaths and a hug can deflate anger faster than any timeout chair.',
-    detail: 'Always kneel to eye level — no "above" positioning. Create a calm-down corner with soft items.',
-    punchline: 'Gussa bhi, pyaar bhi — breathing se mit jaye!',
-    readyPrompt: '''
+      setting: 'Corner of the room where tantrums happen, calm-down corner with cushion and favorite toy',
+      sceneDetail: 'Ria nudging Mumma\'s hand, sitting by her calm-down corner with soft cushion',
+      dialogue: '"Beta, chalo calm down corner mein chalte hain. Teen deep breaths lete hain."',
+      mess: 'Ria nudges Mumma\'s hand again and again, gently insistent, before settling into the calm-down corner',
+      innerThought: 'This looks simple, but it is working.',
+      endingBeat: 'Ria rests her head on Mumma\'s shoulder after breathing, then sits up ready for a new game.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Deep breaths and a hug can deflate anger faster than any timeout chair.',
+      detail: 'Always kneel to eye level — no "above" positioning. Create a calm-down corner with soft items.',
+      punchline: 'Gussa bhi, pyaar bhi — breathing se mit jaye!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Corner of the room, a calm-down corner with a soft cushion and favorite toy. Ria nudges Mumma's hand gently, again and again. Mumma kneels to her eye level: "Beta, chalo calm down corner mein chalte hain. Teen deep breaths lete hain." Text on screen: "CALM DOWN CORNER! 💛" "CONNECTION BEFORE CORRECTION ❤️"
 
 On-Screen Text:
@@ -5076,41 +5266,44 @@ Part 3 (20-30s): $kPartStyle. Ria rests her head on Mumma's shoulder after breat
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_86',
-    category: 'Ria Chaos',
-    cover: 'Mehfil vs Mess!',
-    title: 'Mehfil vs Mess!',
-    opening: 'Mumma ki mehndi khatam hone se pehle, Ria ki messy hair ka kya fasana?',
-    problem: 'Mummy spends 20 minutes on hairstyle, Ria messes it up in 2 minutes.',
-    lesson: 'Mehenat ki koshish, par results kabhi perfect nahi hota. Embrace the mess!',
-    postFormat: 'Reel',
-    strategy: 'Embrace the 2-minute mess — quick ponytail and go!',
-    caption: 'Perfect is boring — messy is magnetic 💁‍♀️ #MessyHair #MomLife #FunLearningWithPalak #IndianParents #MessyIsBeautiful',
-    pinnedComment: 'How fast can YOU do a ponytail?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_86',
+      category: 'Ria Chaos',
+      cover: 'Mehfil vs Mess!',
+      title: 'Mehfil vs Mess!',
+      opening: 'Mumma ki mehndi khatam hone se pehle, Ria ki messy hair ka kya fasana?',
+      problem: 'Mummy spends 20 minutes on hairstyle, Ria messes it up in 2 minutes.',
+      lesson: 'Mehenat ki koshish, par results kabhi perfect nahi hota. Embrace the mess!',
+      postFormat: 'Reel',
+      strategy: 'Embrace the 2-minute mess — quick ponytail and go!',
+      caption: 'Perfect is boring — messy is magnetic 💁‍♀️ #MessyHair #MomLife #FunLearningWithPalak #IndianParents #MessyIsBeautiful',
+      pinnedComment: 'How fast can YOU do a ponytail?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma ko 20 minute lagti hai apni Mehndi aur hairstyle banane mein, lekin Ria sirf 2 minute mein sab kuch bigaad sakti hai.
 Twist: Jab sab soch rahe hain ki kuchh bhi nahi bacha, Ria ne ek "messy look" ko ek naye fashion trend kehte hain.
 Resolution: Mumma ne accept kar liya ki messy hairstyle bhi ek tarah ki beauty hai.
 Moral: Effort matters more than perfection.
 ''',
-    setting: 'Bathroom counter, Mumma\'s dupatta and Ria\'s toys everywhere',
-    sceneDetail: 'Ria\'s hair full of bows, clips, and one random lollipop stick',
-    dialogue: '"Mumma, look! I am a fairy princess mess!"',
-    mess: 'Hair gel spills on Mumma\'s dupatta',
-    innerThought: 'Why does it take me 20 minutes but her just 2 to ruin it?',
-    endingBeat: 'Both Mumma and Ria walk out together, hair messy but hearts full.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: 'Effort with love always looks better than flawless with none.',
-    detail: 'Use a "messy bun" rule for quick mornings.',
-    punchline: 'Mehfilon ki shag, messy hair ka swag!',
-    readyPrompt: '''
+      setting: 'Bathroom counter, Mumma\'s dupatta and Ria\'s toys everywhere',
+      sceneDetail:
+          'Ria\'s hair full of bows, clips, and one random lollipop stick',
+      dialogue: '"Mumma, look! I am a fairy princess mess!"',
+      mess: 'Hair gel spills on Mumma\'s dupatta',
+      innerThought: 'Why does it take me 20 minutes but her just 2 to ruin it?',
+      endingBeat:
+          'Both Mumma and Ria walk out together, hair messy but hearts full.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Effort with love always looks better than flawless with none.',
+      detail: 'Use a "messy bun" rule for quick mornings.',
+      punchline: 'Mehfilon ki shag, messy hair ka swag!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bathroom counter, Mumma's dupatta and Ria's toys everywhere. Mumma spent 20 minutes on her mehndi and hairstyle. Ria's hair is now full of bows, clips, and a random lollipop stick. Text on screen: "MEHFIL VS MESS! 💁" "EFFORT > PERFECTION! 💛"
 
 On-Screen Text:
@@ -5130,41 +5323,44 @@ Part 3 (20-30s): $kPartStyle. Both Mumma and Ria walk out together, hair messy b
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
-HookIdea(
-    id: 'idea_87',
-    category: 'Learning Lesson',
-    cover: 'Team Siblings!',
-    title: 'Team Siblings!',
-    opening: 'Jab koi bhi badi problem aaye, toh Ria-Rio-Cuty ek saath mil kar solve karte hain.',
-    problem: 'Ria, Rio, Cuty fight with each other, but whenever anyone else tries to bother one of them, they become a team.',
-    lesson: 'Jab tak bhai-behen mil kar khade rahte hain, toh koi bhi problem hal ho sakti hai. Unity is strength.',
-    postFormat: 'Reel',
-    strategy: 'Use sibling teamwork to help someone in need at the park.',
-    caption: 'United we stand 💪👧👦 #SiblingTeamwork #FamilyUnity #FunLearningWithPalak #IndianParents #SiblingLove',
-    pinnedComment: 'What\'s your sibling super-power?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_87',
+      category: 'Learning Lesson',
+      cover: 'Team Siblings!',
+      title: 'Team Siblings!',
+      opening: 'Jab koi bhi badi problem aaye, toh Ria-Rio-Cuty ek saath mil kar solve karte hain.',
+      problem: 'Ria, Rio, Cuty fight with each other, but whenever anyone else tries to bother one of them, they become a team.',
+      lesson: 'Jab tak bhai-behen mil kar khade rahte hain, toh koi bhi problem hal ho sakti hai. Unity is strength.',
+      postFormat: 'Reel',
+      strategy: 'Use sibling teamwork to help someone in need at the park.',
+      caption: 'United we stand 💪👧👦 #SiblingTeamwork #FamilyUnity #FunLearningWithPalak #IndianParents #SiblingLove',
+      pinnedComment: 'What\'s your sibling super-power?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria, Rio, Cuty hamesha ek dusre se ladte rehte hain — par jab koi stranger unse baat karta hai, toh ve ek team ban jaate hain.
 Twist: Auntie at the park looks confused, pointing around: "Kya koi bachcha dekha? Main apna dog kho diya hai!" Ria sees her distress.
 Resolution: Teenon milkar ek proper search team ban gaye — Ria tracks footprints, Rio checks under benches, Cuty uses her keen ears. After a few minutes, they find the lost dog wagging its tail near the swings.
 Moral: Unity is strength — when siblings work together, even strangers feel safe.
 ''',
-    setting: 'Neighborhood park, afternoon',
-    sceneDetail: 'Three kids forming a line, then switching to a triangle formation',
-    dialogue: 'Ria: "We don\'t fight outsiders - we fight FOR each other."',
-    mess: 'Their own toy fight ends when a lost auntie needs help — the siblings unite.',
-    innerThought: 'Why do we only unite when someone else is in trouble?',
-    endingBeat: 'The three siblings bow together with the auntie and her dog after a happy reunion.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: 'When siblings unite, even giants look small.',
-    detail: 'Teach the "Buddy System" early — always look out for each other.',
-    punchline: 'Teenon mile toh team, bina toh dream!',
-    readyPrompt: '''
+      setting: 'Neighborhood park, afternoon',
+      sceneDetail:
+          'Three kids forming a line, then switching to a triangle formation',
+      dialogue: 'Ria: "We don\'t fight outsiders - we fight FOR each other."',
+      mess: 'Their own toy fight ends when a lost auntie needs help — the siblings unite.',
+      innerThought: 'Why do we only unite when someone else is in trouble?',
+      endingBeat: 'The three siblings bow together with the auntie and her dog after a happy reunion.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: 'When siblings unite, even giants look small.',
+      detail:
+          'Teach the "Buddy System" early — always look out for each other.',
+      punchline: 'Teenon mile toh team, bina toh dream!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Neighborhood park, afternoon. Ria, Rio, and Cuty are mid-squabble over a toy when a worried auntie approaches, pointing around: "Kya koi bachcha dekha? Main apna dog kho diya hai!" Text on screen: "TEAM SIBLINGS! 💪" "UNITY IS STRENGTH! 🤝"
 
 On-Screen Text:
@@ -5184,41 +5380,44 @@ Part 3 (20-30s): $kPartStyle. They find the lost dog wagging its tail near the s
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
-  HookIdea(
-    id: 'idea_88',
-    category: 'Learning Lesson',
-    cover: 'Confidence Hack Pack!',
-    title: 'Confidence Hack Pack!',
-    opening: 'Har ek trick batane ka maza aata hai jab bachche use khud se try karte hain.',
-    problem: 'Tricks which we can try to make kids confident and learn life skills',
-    lesson: 'Confidence build karne ke liye sabse best trick hai — "try karo, fail mat socho".',
-    postFormat: 'Carousel',
-    strategy: '5 daily confidence-builders: mirror talk, small wins, "I did it" moment.',
-    caption: 'Confidence is a muscle — flex it daily 💪 #ConfidenceBuilding #KidsConfidence #FunLearningWithPalak #IndianParents #LifeSkills',
-    pinnedComment: 'Start with one today. Which trick will you try?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    ),
+    HookIdea(
+      id: 'idea_88',
+      category: 'Learning Lesson',
+      cover: 'Confidence Hack Pack!',
+      title: 'Confidence Hack Pack!',
+      opening: 'Har ek trick batane ka maza aata hai jab bachche use khud se try karte hain.',
+      problem: 'Tricks which we can try to make kids confident and learn life skills',
+      lesson: 'Confidence build karne ke liye sabse best trick hai — "try karo, fail mat socho".',
+      postFormat: 'Carousel',
+      strategy: '5 daily confidence-builders: mirror talk, small wins, "I did it" moment.',
+      caption: 'Confidence is a muscle — flex it daily 💪 #ConfidenceBuilding #KidsConfidence #FunLearningWithPalak #IndianParents #LifeSkills',
+      pinnedComment: 'Start with one today. Which trick will you try?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Mumma ko 5 life skill tricks pata chali hain jo bachchon ko confident banati hain: mirror self-talk, small daily wins, "I can" affirmations, safe failure zones, aur celebration rituals.
 Twist: Rio ne pehla try kiya — mirror talk. Pehle bahut hi awkward laga, par dusre din usne khud se compete karna shuru kar diya.
 Resolution: Teenon children ne apni confidence diary banayi — har din ek nayi skill try karte hue.
 Moral: Confidence grows in the soil of consistent small actions.
 ''',
-    setting: 'Kids\' room mirror, morning routine time',
-    sceneDetail: 'A "Confidence Jar" filled with small notes — "Today I tied my shoes"',
-    dialogue: '"Main yeh kar sakta hun!" — Rio to his reflection.',
-    mess: 'The mirror gets foggy during the emotional talk',
-    innerThought: 'What if they laugh at me?',
-    endingBeat: 'All three kids add their daily win to the jar before bedtime.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: 'Confidence isn\'t about never failing — it\'s about trying anyway.',
-    detail: 'Create a "Wins Wall" with sticky notes for every small victory.',
-    punchline: 'Confidence = small steps, big heart!',
-    readyPrompt: '''
+      setting: 'Kids\' room mirror, morning routine time',
+      sceneDetail: 'A "Confidence Jar" filled with small notes — "Today I tied my shoes"',
+      dialogue: '"Main yeh kar sakta hun!" — Rio to his reflection.',
+      mess: 'The mirror gets foggy during the emotional talk',
+      innerThought: 'What if they laugh at me?',
+      endingBeat:
+          'All three kids add their daily win to the jar before bedtime.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote:
+          'Confidence isn\'t about never failing — it\'s about trying anyway.',
+      detail: 'Create a "Wins Wall" with sticky notes for every small victory.',
+      punchline: 'Confidence = small steps, big heart!',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Kids' room mirror, morning routine time, a "Confidence Jar" filled with small notes nearby. Rio stands in front of the mirror: "Main yeh kar sakta hun!" It feels awkward at first. Text on screen: "CONFIDENCE HACK PACK! 💪" "5 DAILY BUILDERS! 🌟"
 
 On-Screen Text:
@@ -5238,43 +5437,45 @@ Part 3 (20-30s): $kPartStyle. All three kids add their daily win to the Confiden
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-  // New ideas (added by hand)
-  HookIdea(
-    id: 'idea_89',
-    category: 'Learning Lesson',
-    cover: 'Mumma Ke Chappal Mein Dhamaal! 👡',
-    title: 'Mumma Ke Chappal Mein Dhamaal! 👡',
-    opening: 'Ria ne pehen li Mumma ki badi chappal… aur dhup-dhup chalne lagi!',
-    problem: 'Ria insists on walking around in Mumma\'s oversized chappals for fun. Mumma warns her they are too big and she could trip, but Ria does not listen.',
-    lesson: 'Jab bade log warning dete hain, usse sunna zaroori hai — apni marzi se zyada important hota hai safe rehna.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Bade logo ki chappal mein chalna maza toh aata hai, par size match na ho toh girne ka risk bhi hota hai! Mumma-Papa ki warning ko pehli baar mein hi sun lo. #ListenToMumma #ToddlerSafety #IndianParents #ParentingTips #FunLearningWithPalak',
-    pinnedComment: 'Kya aapka bachcha bhi bade logo ke jhoote/chappal pehenne ki koshish karta hai? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // New ideas (added by hand)
+    HookIdea(
+      id: 'idea_89',
+      category: 'Learning Lesson',
+      cover: 'Mumma Ke Chappal Mein Dhamaal! 👡',
+      title: 'Mumma Ke Chappal Mein Dhamaal! 👡',
+      opening:
+          'Ria ne pehen li Mumma ki badi chappal… aur dhup-dhup chalne lagi!',
+      problem: 'Ria insists on walking around in Mumma\'s oversized chappals for fun. Mumma warns her they are too big and she could trip, but Ria does not listen.',
+      lesson: 'Jab bade log warning dete hain, usse sunna zaroori hai — apni marzi se zyada important hota hai safe rehna.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Bade logo ki chappal mein chalna maza toh aata hai, par size match na ho toh girne ka risk bhi hota hai! Mumma-Papa ki warning ko pehli baar mein hi sun lo. #ListenToMumma #ToddlerSafety #IndianParents #ParentingTips #FunLearningWithPalak',
+      pinnedComment: 'Kya aapka bachcha bhi bade logo ke jhoote/chappal pehenne ki koshish karta hai? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria spots Mumma's flip-flops by the door and slides her tiny feet in, clip-clopping around proudly: "Dekho, main bhi bada ho gayi!" Mumma watches, amused but cautious: "Ria, woh chappal tumhare liye bade hain, gir jaogi — utaar do."
 Twist: Ria ignores her, speeding up to show off a "dance" in the oversized chappals — and her foot slips right out mid-step. She tumbles onto the rug, chappal flying off.
 Resolution: Mumma rushes over, checks her knee — just a small scare, no real injury — and holds her close: "Dekho, Mumma ne pehle hi bola tha. Jab main warning deti hoon, usko sunna padta hai." Ria nods, lip trembling: "Sorry Mumma, ab sunoongi."
 Moral: Mumma-Papa ki baat pehli baar mein sun lena — warning ignore karne ka result girna bhi ho sakta hai.
 ''',
-    setting: 'Living room near the front door, afternoon, Mumma\'s chappals left by the shoe rack',
-    sceneDetail: 'Mumma\'s flip-flops, way too big for Ria\'s small feet, flopping loosely with every step',
-    dialogue: '"Dekho, main bhi bada ho gayi!" "Ria, woh chappal tumhare liye bade hain, gir jaogi — utaar do."',
-    mess: 'Ria speeds up to show off instead of stopping, chappal slips, she tumbles onto the rug',
-    innerThought: 'I warned her once — I should have taken the chappals away the moment she picked them up.',
-    endingBeat: 'Ria sits in Mumma\'s lap, then puts the chappals back neatly by the door herself.',
-    defaultCast: ['Ria', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room near the front door, afternoon, Mumma\'s chappals left by the shoe rack',
+      sceneDetail: 'Mumma\'s flip-flops, way too big for Ria\'s small feet, flopping loosely with every step',
+      dialogue: '"Dekho, main bhi bada ho gayi!" "Ria, woh chappal tumhare liye bade hain, gir jaogi — utaar do."',
+      mess: 'Ria speeds up to show off instead of stopping, chappal slips, she tumbles onto the rug',
+      innerThought: 'I warned her once — I should have taken the chappals away the moment she picked them up.',
+      endingBeat: 'Ria sits in Mumma\'s lap, then puts the chappals back neatly by the door herself.',
+      defaultCast: ['Ria', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room near the front door, afternoon light. Ria slides her feet into Mumma's oversized flip-flops and clip-clops around proudly: "Dekho, main bhi bada ho gayi!" Mumma watches, cautious: "Ria, woh chappal tumhare liye bade hain, gir jaogi — utaar do." Text on screen: "MUMMA KE CHAPPAL MEIN DHAMAAL! 👡" "WARNING: BADE CHAPPAL! ⚠️"
 
 On-Screen Text:
@@ -5294,42 +5495,44 @@ Part 3 (20-30s): $kPartStyle. Ria sits in Mumma's lap, then carefully places the
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_90',
-    category: 'Funny',
-    cover: 'Towel Race: Mumma Vs Rio! 🏃🛁',
-    title: 'Towel Race: Mumma Vs Rio! 🏃🛁',
-    opening: 'Nahane ke baad towel mein lipta Rio bhaagta hua nikla… race shuru!',
-    problem: 'Rio refuses to get dressed after his bath and instead turns it into a running race with Mumma around the house, towel flying.',
-    lesson: 'Routine kaamo ko game banane se sabka mood accha ho jaata hai — aur kaam bhi ho jaata hai!',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Nahane ke baad kapde pehnana sabse mushkil kaam? Isse race bana do! 🏃 #AfterBathFun #ToddlerGames #MummaAndRio #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Aapke ghar mein bhi after-bath towel-race hota hai? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_90',
+      category: 'Funny',
+      cover: 'Towel Race: Mumma Vs Rio! 🏃🛁',
+      title: 'Towel Race: Mumma Vs Rio! 🏃🛁',
+      opening:
+          'Nahane ke baad towel mein lipta Rio bhaagta hua nikla… race shuru!',
+      problem: 'Rio refuses to get dressed after his bath and instead turns it into a running race with Mumma around the house, towel flying.',
+      lesson: 'Routine kaamo ko game banane se sabka mood accha ho jaata hai — aur kaam bhi ho jaata hai!',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Nahane ke baad kapde pehnana sabse mushkil kaam? Isse race bana do! 🏃 #AfterBathFun #ToddlerGames #MummaAndRio #IndianParents #FunLearningWithPalak',
+      pinnedComment: 'Aapke ghar mein bhi after-bath towel-race hota hai? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Bath done, Rio wraps his towel around himself like a cape and bolts out of the bathroom: "Pakad ke dikhao, Mumma!" Mumma calls after him: "Pehle kapde pehno, Rio!" — but he is already sprinting down the hallway.
 Twist: Instead of chasing in frustration, Mumma turns it into a game: "Teen tak counting — jo pehle sofa tak pahunchega!" Both race down the hallway, Mumma slowing just enough near the end.
 Resolution: Rio reaches the sofa first, arms up in victory: "Main jeet gaya!" Breathless and happy, he lets Mumma dress him right away, no fuss at all.
 Moral: Ek chhota sa race se sabse mushkil kaam bhi asaan ho gaya — play se hi parenting kabhi kabhi sabse simple hoti hai.
 ''',
-    setting: 'Hallway between the bathroom and living room, evening, towel still damp',
-    sceneDetail: 'Rio\'s towel trailing behind him like a cape, small wet footprints on the floor',
-    dialogue: '"Pakad ke dikhao, Mumma!" "Teen tak counting — jo pehle sofa tak pahunchega!"',
-    mess: 'Wet footprints across the hallway floor, towel nearly slipping off mid-sprint',
-    innerThought: 'If I chase him annoyed, this turns into a fight. If I race him, it turns into a memory.',
-    endingBeat: 'Rio, still catching his breath, lifts his arms for Mumma to dress him — proud and cooperative.',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Hallway between the bathroom and living room, evening, towel still damp',
+      sceneDetail: 'Rio\'s towel trailing behind him like a cape, small wet footprints on the floor',
+      dialogue: '"Pakad ke dikhao, Mumma!" "Teen tak counting — jo pehle sofa tak pahunchega!"',
+      mess: 'Wet footprints across the hallway floor, towel nearly slipping off mid-sprint',
+      innerThought: 'If I chase him annoyed, this turns into a fight. If I race him, it turns into a memory.',
+      endingBeat: 'Rio, still catching his breath, lifts his arms for Mumma to dress him — proud and cooperative.',
+      defaultCast: ['Rio', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Hallway between bathroom and living room, evening. Rio, wrapped in a towel like a cape, bolts out of the bathroom: "Pakad ke dikhao, Mumma!" Mumma calls: "Pehle kapde pehno, Rio!" Text on screen: "TOWEL RACE: MUMMA VS RIO! 🏃🛁" "READY, SET, GO! 🏁"
 
 On-Screen Text:
@@ -5349,42 +5552,43 @@ Part 3 (20-30s): $kPartStyle. Rio lifts his arms up for Mumma to dress him, happ
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_91',
-    category: 'Funny',
-    cover: 'Papa Ka Makeover! 💄👨',
-    title: 'Papa Ka Makeover! 💄👨',
-    opening: 'Papa so rahe the… aur Ria ne unka chehra "paint" kar diya! 😂',
-    problem: 'Ria sees Papa fast asleep on the sofa and secretly does his makeup with her toy kit while he sleeps — blush, giant eyebrows, lipstick, everything.',
-    lesson: 'Family mein thoda masti aur pyaar bhara hasi-mazaak hi sabse pyaare memories banata hai.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Papa so rahe the, Ria ka makeup kit active ho gaya! 😂💄 Jab Papa ko pata chala... #DaddyDaughter #SleepingPapaPrank #FunLearningWithPalak #IndianParents #FamilyLaughs',
-    pinnedComment: 'Kya aapke ghar mein bhi koi so raha ho toh "target" ban jaata hai? 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_91',
+      category: 'Funny',
+      cover: 'Papa Ka Makeover! 💄👨',
+      title: 'Papa Ka Makeover! 💄👨',
+      opening: 'Papa so rahe the… aur Ria ne unka chehra "paint" kar diya! 😂',
+      problem: 'Ria sees Papa fast asleep on the sofa and secretly does his makeup with her toy kit while he sleeps — blush, giant eyebrows, lipstick, everything.',
+      lesson: 'Family mein thoda masti aur pyaar bhara hasi-mazaak hi sabse pyaare memories banata hai.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Papa so rahe the, Ria ka makeup kit active ho gaya! 😂💄 Jab Papa ko pata chala... #DaddyDaughter #SleepingPapaPrank #FunLearningWithPalak #IndianParents #FamilyLaughs',
+      pinnedComment: 'Kya aapke ghar mein bhi koi so raha ho toh "target" ban jaata hai? 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Papa naps on the sofa after lunch. Ria tiptoes over with her toy makeup kit, giggling: "Shh… Papa so rahe hain, main unhe surprise doongi!" She carefully paints pink blush on his cheeks, draws giant eyebrows, and smears bright lipstick on — all while he sleeps peacefully.
 Twist: Papa wakes up, stretches, and walks into the living room completely unaware — to find Daadi, Mumma, Rio and Cuty all bursting into laughter at the sight of him.
 Resolution: Confused, Papa rushes to the mirror and gasps at his own reflection — pink cheeks, giant eyebrows, lipstick everywhere. He laughs louder than everyone else: "Ria, yeh kya kar diya tumne?!" The whole family gathers around for a group photo, Papa still in full "makeover."
 Moral: Thoda masti, thoda hasi — ghar ki sabse pyaari yaadein aise hi bante hain.
 ''',
-    setting: 'Living room, afternoon, Papa asleep on the sofa after lunch',
-    sceneDetail: 'Ria\'s toy makeup kit open on the center table, Papa\'s face covered in pink blush, giant drawn eyebrows, and smeared lipstick',
-    dialogue: '"Shh… Papa so rahe hain, main unhe surprise doongi!" "Ria, yeh kya kar diya tumne?!"',
-    mess: 'Loose glitter and powder on the sofa cushion, lipstick smudged all the way to Papa\'s ears',
-    innerThought: 'He\'s going to wake up any second — I need to finish before he opens his eyes!',
-    endingBeat: 'Everyone squeezes together for a family photo, Papa still fully "made over," laughing the hardest of all.',
-    defaultCast: ['Ria', 'Papa', 'Mumma', 'Daadi', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Living room, afternoon, Papa asleep on the sofa after lunch',
+      sceneDetail: 'Ria\'s toy makeup kit open on the center table, Papa\'s face covered in pink blush, giant drawn eyebrows, and smeared lipstick',
+      dialogue: '"Shh… Papa so rahe hain, main unhe surprise doongi!" "Ria, yeh kya kar diya tumne?!"',
+      mess: 'Loose glitter and powder on the sofa cushion, lipstick smudged all the way to Papa\'s ears',
+      innerThought: 'He\'s going to wake up any second — I need to finish before he opens his eyes!',
+      endingBeat: 'Everyone squeezes together for a family photo, Papa still fully "made over," laughing the hardest of all.',
+      defaultCast: ['Ria', 'Papa', 'Mumma', 'Daadi', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Living room, afternoon light, Papa asleep on the sofa after lunch. Ria tiptoes over with her toy makeup kit, giggling: "Shh… Papa so rahe hain, main unhe surprise doongi!" She carefully paints his face. Text on screen: "PAPA KA MAKEOVER! 💄👨" "OPERATION: SLEEPING PAPA 🤫"
 
 On-Screen Text:
@@ -5404,42 +5608,44 @@ Part 3 (20-30s): $kPartStyle. Papa rushes to the mirror, gasps at his pink cheek
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_92',
-    category: 'Learning Lesson',
-    cover: 'Fatela Pant Vs Daadi Ki Silai! 🧵',
-    title: 'Fatela Pant Vs Daadi Ki Silai! 🧵',
-    opening: 'Ria ka favorite pant ghutne se fat gaya… "Yeh toh kharab ho gaya!"',
-    problem: 'Ria\'s favorite pants tear at the knee while playing, and she assumes they are ruined and will be thrown away.',
-    lesson: 'Purani cheezein phenkne se pehle, unhe theek karne ka tareeka sochna chahiye — Daadi ki silai jaisi purani skills aaj bhi kaam aati hain.',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: 'Fatela pant = kharab pant? Nahi! Daadi ki silai ne banaya usse aur bhi special. 🧵❤️ #DaadiKiSilai #FixItDontThrowIt #IndianParents #FunLearningWithPalak #FamilySkills',
-    pinnedComment: 'Kya aapke ghar mein bhi Daadi/Nani purane kapde silkar naye jaisa bana deti hain?',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_92',
+      category: 'Learning Lesson',
+      cover: 'Fatela Pant Vs Daadi Ki Silai! 🧵',
+      title: 'Fatela Pant Vs Daadi Ki Silai! 🧵',
+      opening:
+          'Ria ka favorite pant ghutne se fat gaya… "Yeh toh kharab ho gaya!"',
+      problem: 'Ria\'s favorite pants tear at the knee while playing, and she assumes they are ruined and will be thrown away.',
+      lesson: 'Purani cheezein phenkne se pehle, unhe theek karne ka tareeka sochna chahiye — Daadi ki silai jaisi purani skills aaj bhi kaam aati hain.',
+      postFormat: 'Reel',
+      strategy: '',
+      caption: 'Fatela pant = kharab pant? Nahi! Daadi ki silai ne banaya usse aur bhi special. 🧵❤️ #DaadiKiSilai #FixItDontThrowIt #IndianParents #FunLearningWithPalak #FamilySkills',
+      pinnedComment: 'Kya aapke ghar mein bhi Daadi/Nani purane kapde silkar naye jaisa bana deti hain?',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria trips while playing and her favorite star-print pant tears at the knee. She bursts into tears: "Yeh toh kharab ho gaya, phenk do!" Mumma: "Ek minute, chalo Daadi ke paas."
 Twist: Daadi pulls out her old sewing box, threads a needle with practiced hands, and patches the tear with a tiny embroidered star right over the hole: "Dekho, ab yeh aur bhi special ho gaya!"
 Resolution: Ria stares at the patch, delighted: "Mera favorite pant ban gaya extra favorite!" She wears it the very next day, showing off the star patch to everyone.
 Moral: Daadi ki purani silai ka hunar naye cheezon se kam nahi — kabhi kabhi repair karna, phenkne se zyada better hota hai.
 ''',
-    setting: 'Daadi\'s room, afternoon, an old wooden sewing box with colourful threads',
-    sceneDetail: 'A small torn hole at the knee of Ria\'s star-print pant, Daadi\'s needle and thread ready',
-    dialogue: '"Yeh toh kharab ho gaya, phenk do!" "Dekho, ab yeh aur bhi special ho gaya!"',
-    mess: 'Loose threads on the floor, Ria sniffling and holding the torn pant out to Daadi',
-    innerThought: 'Everything doesn\'t need to be new to be loved — sometimes it just needs a little care.',
-    endingBeat: 'Ria proudly points out her star patch to Rio and Cuty: "Daadi ne banaya, special hai!"',
-    defaultCast: ['Ria', 'Daadi', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Daadi\'s room, afternoon, an old wooden sewing box with colourful threads',
+      sceneDetail: 'A small torn hole at the knee of Ria\'s star-print pant, Daadi\'s needle and thread ready',
+      dialogue: '"Yeh toh kharab ho gaya, phenk do!" "Dekho, ab yeh aur bhi special ho gaya!"',
+      mess: 'Loose threads on the floor, Ria sniffling and holding the torn pant out to Daadi',
+      innerThought: 'Everything doesn\'t need to be new to be loved — sometimes it just needs a little care.',
+      endingBeat: 'Ria proudly points out her star patch to Rio and Cuty: "Daadi ne banaya, special hai!"',
+      defaultCast: ['Ria', 'Daadi', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Daadi's room, afternoon light, an old wooden sewing box with colourful threads on the table. Ria holds out her torn star-print pant, tearful: "Yeh toh kharab ho gaya, phenk do!" Daadi reaches for her sewing box. Text on screen: "FATELA PANT VS DAADI KI SILAI! 🧵" "DAADI KO DO, UDAHARAN DEKHO! 🪡"
 
 On-Screen Text:
@@ -5459,45 +5665,46 @@ Part 3 (20-30s): $kPartStyle. The next day, Ria proudly shows off her star patch
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
-  ),
+    ),
 
-  // Former "14-Day Post Package" entries, folded into this same list and the
-  // same HookIdea shape as everything else, so there is one format, not
-  // three lists and two classes.
-  HookIdea(
-    id: 'idea_93',
-    category: 'Funny',
-    cover: 'Which One Doesn\'t Belong? 🧩',
-    title: 'Which One Doesn\'t Belong?',
-    opening: 'Four illustrated figures: Ria, Rio, Cuty, and a banana. Which one is different?',
-    problem: 'Four illustrated figures side by side: Ria (child), Rio (child), Cuty (bunny), and a yellow banana.',
-    lesson: 'The banana — it\'s the only food! (Round 2: pattern game — who holds what?)',
-    postFormat: 'Static Image',
-    strategy: 'For parents of 3-6 year olds — a save-worthy observation-skill puzzle card.',
-    caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
-    pinnedComment: 'Comment your child\'s answer below 👇',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    // Former "14-Day Post Package" entries, folded into this same list and the
+    // same HookIdea shape as everything else, so there is one format, not
+    // three lists and two classes.
+    HookIdea(
+      id: 'idea_93',
+      category: 'Funny',
+      cover: 'Which One Doesn\'t Belong? 🧩',
+      title: 'Which One Doesn\'t Belong?',
+      opening: 'Four illustrated figures: Ria, Rio, Cuty, and a banana. Which one is different?',
+      problem: 'Four illustrated figures side by side: Ria (child), Rio (child), Cuty (bunny), and a yellow banana.',
+      lesson: 'The banana — it\'s the only food! (Round 2: pattern game — who holds what?)',
+      postFormat: 'Static Image',
+      strategy: 'For parents of 3-6 year olds — a save-worthy observation-skill puzzle card.',
+      caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
+      pinnedComment: 'Comment your child\'s answer below 👇',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Four pictures sit side by side on a cream puzzle card — Ria, Rio, Cuty, and a single yellow banana.
 Twist: At first glance all four just look like "characters," so kids scan for a while before it clicks.
 Resolution: The banana is the only one that isn't a character — it's food! Round 2 swaps in a pattern game asking who holds what.
 Moral: Simple observation games sharpen thinking far more than they look like they would.
 ''',
-    setting: 'A cream puzzle card, square format',
-    sceneDetail: 'Ria, Rio, Cuty and a yellow banana lined up as four equal-looking icons',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Round 2 keeps the game going with a who-holds-what pattern twist.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'A cream puzzle card, square format',
+      sceneDetail: 'Ria, Rio, Cuty and a yellow banana lined up as four equal-looking icons',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat:
+          'Round 2 keeps the game going with a who-holds-what pattern twist.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Create a bright, clean preschool puzzle card, square format, cream pastel background. Four large, simple, colorful illustrations in a row: Ria (pigtails, pink dress), Rio (blue shirt), Cuty (white bunny with pink bow), and a single yellow banana. Rounded card border, soft drop shadow under each figure, minimal clutter, no text inside the image, playful children's illustration style.
 
 On-Screen Text: "WHICH ONE DOESN'T BELONG? 🧩"
@@ -5506,42 +5713,43 @@ Answer: The banana — it's the only food! Round 2: a pattern game asking who ho
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_94',
-    category: 'Funny',
-    cover: 'Mumma Says This 100x a Day 😂',
-    title: 'Mumma Says This 100x a Day',
-    opening: 'Fast-cut relatable moments of things parents repeat all day.',
-    problem: 'Put your shoes on / Where\'s your water bottle / Don\'t run / Stop fighting / Come here',
-    lesson: 'Tag a parent who needs to see this',
-    postFormat: 'Reel',
-    strategy: 'For parents of 2-5 year olds — relatable, share-worthy fast-cut humor.',
-    caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
-    pinnedComment: 'Be honest — how many times today? 👇',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_94',
+      category: 'Funny',
+      cover: 'Mumma Says This 100x a Day 😂',
+      title: 'Mumma Says This 100x a Day',
+      opening: 'Fast-cut relatable moments of things parents repeat all day.',
+      problem: 'Put your shoes on / Where\'s your water bottle / Don\'t run / Stop fighting / Come here',
+      lesson: 'Tag a parent who needs to see this',
+      postFormat: 'Reel',
+      strategy: 'For parents of 2-5 year olds — relatable, share-worthy fast-cut humor.',
+      caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
+      pinnedComment: 'Be honest — how many times today? 👇',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Five everyday lines repeat on loop in every house — "put your shoes on," "where's your water bottle," "don't run," "stop fighting," "come here."
 Twist: Each line gets the exact same response: Ria stays barefoot five minutes later, Rio shrugs with the bottle sitting right beside him, and Cuty sleeps through all of it.
 Resolution: By the fifth "come here," the only answer is silence — followed by a louder "COME HERE!"
 Moral: If it feels like you're saying the same five things on repeat, you basically are — every parent is.
 ''',
-    setting: 'A regular day at home, cream background, fast cuts',
-    sceneDetail: 'Ria barefoot holding her shoes, Rio\'s water bottle sitting right beside him untouched',
-    dialogue: '"Coming!" "I don\'t know." "COME HERE!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty sleeps through every single scene.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'A regular day at home, cream background, fast cuts',
+      sceneDetail: 'Ria barefoot holding her shoes, Rio\'s water bottle sitting right beside him untouched',
+      dialogue: '"Coming!" "I don\'t know." "COME HERE!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Cuty sleeps through every single scene.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Cream background, fast-cut reel. Scene 1: Ria barefoot holding her shoes: "Coming!" — five minutes later, still barefoot. Scene 2: Rio shrugs, water bottle sitting right beside him. Scene 3: Ria and Rio sprint past, Cuty asleep. Scene 4: Both with angry faces mid-argument, Cuty still asleep. Scene 5: A parent calls, silence, then "COME HERE!" Text on screen: "MUMMA SAYS THIS 100x A DAY 😂"
 
 On-Screen Text:
@@ -5561,42 +5769,42 @@ Part 3 (20-30s): $kPartStyle. Silence after the fifth call, then a louder "COME 
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_95',
-    category: 'Learning Lesson',
-    cover: '5-Minute Kitchen Challenge 🥄',
-    title: '5-Minute Kitchen Challenge',
-    opening: 'Safe kitchen items kids can explore with adult supervision — cold items only, no stove.',
-    problem: 'Safe items: plastic bowls, wooden spoons, cold pasta, large spoon — all adult-supervised.',
-    lesson: '1. Adult sets out 5 safe items. 2. Child explores textures, makes sounds. 3. "What feels bumpy? What sounds splashy?"',
-    postFormat: 'Carousel',
-    strategy: 'For parents of 2-4 year olds — a save-worthy practical activity using things already in the kitchen drawer.',
-    caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
-    pinnedComment: 'Save this for your next kitchen moment ❤️',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_95',
+      category: 'Learning Lesson',
+      cover: '5-Minute Kitchen Challenge 🥄',
+      title: '5-Minute Kitchen Challenge',
+      opening: 'Safe kitchen items kids can explore with adult supervision — cold items only, no stove.',
+      problem: 'Safe items: plastic bowls, wooden spoons, cold pasta, large spoon — all adult-supervised.',
+      lesson: '1. Adult sets out 5 safe items. 2. Child explores textures, makes sounds. 3. "What feels bumpy? What sounds splashy?"',
+      postFormat: 'Carousel',
+      strategy: 'For parents of 2-4 year olds — a save-worthy practical activity using things already in the kitchen drawer.',
+      caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
+      pinnedComment: 'Save this for your next kitchen moment ❤️',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Five safe, cold kitchen items — a wooden spoon, a plastic bowl, cold pasta, a large spoon, a measuring cup — get laid out on the counter for exploring.
 Twist: No stove, no sharp edges — just textures and sounds, with an adult staying close the whole time.
 Resolution: "What feels bumpy? What sounds splashy?" turns five minutes of waiting for dinner into sorting-and-counting practice.
 Moral: You don't need fancy toys — your own kitchen drawer already has five minutes of learning in it.
 ''',
-    setting: 'Cream kitchen countertop, five safe items arranged playfully',
-    sceneDetail: 'Wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup laid out together',
-    dialogue: '"What feels bumpy? What sounds splashy?"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Counting all five items together — "1, 2, 3, 4, 5!"',
-    defaultCast: ['Ria', 'Rio'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream kitchen countertop, five safe items arranged playfully',
+      sceneDetail: 'Wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup laid out together',
+      dialogue: '"What feels bumpy? What sounds splashy?"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Counting all five items together — "1, 2, 3, 4, 5!"',
+      defaultCast: ['Ria', 'Rio'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream kitchen countertop background, five safe kitchen items (wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup) arranged playfully, a small illustrated child's hands exploring them with an adult hand nearby, warm cozy lighting, minimal text, square format.
 
 On-Screen Text:
@@ -5609,126 +5817,129 @@ On-Screen Text:
 
 Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_96',
-    category: 'Learning Lesson',
-    cover: 'Ask Your Child This Tonight 🗣️',
-    title: 'Ask Your Child This Tonight',
-    opening: 'A conversation-starter question for bedtime or dinner.',
-    problem: 'Prompts:\n1. "If your teddy could talk, what would it say?"\n2. "What makes you feel safe?"\n3. "What would you invent today?"\n4. "If you could be any animal at dinner, which one?"',
-    lesson: 'Encourages imagination and gives you a window into how your child thinks.',
-    postFormat: 'Static Image',
-    strategy: 'For parents of 2-6 year olds — a conversation-starter with real window-into-their-head value.',
-    caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
-    pinnedComment: 'What did they say? Comment below 👇',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_96',
+      category: 'Learning Lesson',
+      cover: 'Ask Your Child This Tonight 🗣️',
+      title: 'Ask Your Child This Tonight',
+      opening: 'A conversation-starter question for bedtime or dinner.',
+      problem: 'Prompts:\n1. "If your teddy could talk, what would it say?"\n2. "What makes you feel safe?"\n3. "What would you invent today?"\n4. "If you could be any animal at dinner, which one?"',
+      lesson: 'Encourages imagination and gives you a window into how your child thinks.',
+      postFormat: 'Static Image',
+      strategy: 'For parents of 2-6 year olds — a conversation-starter with real window-into-their-head value.',
+      caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
+      pinnedComment: 'What did they say? Comment below 👇',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria sits on her bed hugging Cuty, Rio peeks in from the doorway — tonight's question is waiting: "If your teddy could talk, what would it say?"
 Twist: It's a small swap from the usual "how was school" — just one imaginative question instead.
 Resolution: The answer says more about how a child thinks than a dozen ordinary questions would.
 Moral: One good question opens a bigger conversation than ten routine ones.
 ''',
-    setting: 'Cream bedroom, warm evening lighting',
-    sceneDetail: 'Ria hugging Cuty on her bed, a thought bubble with a question mark above Cuty\'s head',
-    dialogue: '"If your teddy could talk, what would it say?"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Rio peeks in curiously from the doorway, waiting for his turn to answer too.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream bedroom, warm evening lighting',
+      sceneDetail: 'Ria hugging Cuty on her bed, a thought bubble with a question mark above Cuty\'s head',
+      dialogue: '"If your teddy could talk, what would it say?"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Rio peeks in curiously from the doorway, waiting for his turn to answer too.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream bedroom background, warm evening lighting. Ria (pigtails with pink bows, pink star dress) sitting on her bed hugging Cuty the white bunny, a small thought bubble above Cuty's head with a question mark. Rio (blue-grey t-shirt) peeking in from the doorway curiously. Square format, gentle cozy mood.
 
 On-Screen Text: "ASK YOUR CHILD THIS TONIGHT" - "If your teddy could talk, what would it say?" / "What makes you feel safe?" / "What would you invent today?" / "If you could be any animal at dinner, which one?"
 
 Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_97',
-    category: 'Learning Lesson',
-    cover: 'Can Your 3-Year-Old Do These? ✅',
-    title: 'Can Your 3-Year-Old Do These?',
-    opening: 'A quick skill-check reference for parents of 3-year-olds.',
-    problem: 'Age group: 3 Years',
-    lesson: '1. Identify basic colours\n2. Name 5 fruits\n3. Recognise their own name\n4. Count 1–10\n5. Identify body parts',
-    postFormat: 'Carousel',
-    strategy: 'For parents of 3-year-olds — a gentle milestone reference, not a pressure checklist.',
-    caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
-    pinnedComment: 'Bookmark this for your 3-year-old\'s next milestone check 📌',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_97',
+      category: 'Learning Lesson',
+      cover: 'Can Your 3-Year-Old Do These? ✅',
+      title: 'Can Your 3-Year-Old Do These?',
+      opening: 'A quick skill-check reference for parents of 3-year-olds.',
+      problem: 'Age group: 3 Years',
+      lesson: '1. Identify basic colours\n2. Name 5 fruits\n3. Recognise their own name\n4. Count 1–10\n5. Identify body parts',
+      postFormat: 'Carousel',
+      strategy: 'For parents of 3-year-olds — a gentle milestone reference, not a pressure checklist.',
+      caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
+      pinnedComment:
+          'Bookmark this for your 3-year-old\'s next milestone check 📌',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Five simple checks for age three — colours, fruits, their own name, counting to 10, body parts.
 Twist: It reads like a test, but it's framed as a gentle guide, not a race against other kids.
 Resolution: Parents check off what their child can already do, and quietly note what's still growing.
 Moral: Every child grows at their own pace — this is a mirror, not a measuring stick.
 ''',
-    setting: 'Clean checklist card, soft pastel icons',
-    sceneDetail: 'Ria and Rio pointing at a floating checklist icon, Cuty sitting nearby',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Save this to check off with your little one this week.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Clean checklist card, soft pastel icons',
+      sceneDetail: 'Ria and Rio pointing at a floating checklist icon, Cuty sitting nearby',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Save this to check off with your little one this week.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background. Ria and Rio standing together pointing at a floating checklist icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, square format.
 
 On-Screen Text: "CAN YOUR 3-YEAR-OLD DO THESE?" - Identify basic colours / Name 5 fruits / Recognise their own name / Count 1-10 / Identify body parts / "Save this to check off with your little one this week!"
 
 Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_98',
-    category: 'Funny',
-    cover: 'Toddler Mathematics 😂',
-    title: 'Toddler Mathematics',
-    opening: 'A funny, exaggerated "math lesson" about biscuit logic.',
-    problem: '1 biscuit = hungry / 2 biscuits = still hungry / 3 biscuits = MUMMA, MORE!',
-    lesson: 'Tag a parent who has lived this exact equation',
-    postFormat: 'Reel',
-    strategy: 'For parents of 1-4 year olds — bold meme-style humor built for sharing.',
-    caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
-    pinnedComment: 'Tag a parent who gets this 😅',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_98',
+      category: 'Funny',
+      cover: 'Toddler Mathematics 😂',
+      title: 'Toddler Mathematics',
+      opening: 'A funny, exaggerated "math lesson" about biscuit logic.',
+      problem: '1 biscuit = hungry / 2 biscuits = still hungry / 3 biscuits = MUMMA, MORE!',
+      lesson: 'Tag a parent who has lived this exact equation',
+      postFormat: 'Reel',
+      strategy: 'For parents of 1-4 year olds — bold meme-style humor built for sharing.',
+      caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
+      pinnedComment: 'Tag a parent who gets this 😅',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Rio holds one biscuit — "1 biscuit = hungry," neutral face.
 Twist: Two biscuits later, same neutral face — "2 biscuits = still hungry." It's only at three that the real equation shows up.
 Resolution: "3 biscuits = MUMMA, MORE!" — arms out, face lit up, while Cuty stays calm nibbling one single carrot the whole time.
 Moral: Toddler math doesn't follow normal rules, and every parent has lived this exact equation.
 ''',
-    setting: 'Cream background, bold meme-style reel',
-    sceneDetail: 'Rio holding biscuits one at a time, Cuty nibbling one carrot unbothered throughout',
-    dialogue: '"MUMMA, MORE!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty stays completely unimpressed through the entire equation.',
-    defaultCast: ['Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream background, bold meme-style reel',
+      sceneDetail: 'Rio holding biscuits one at a time, Cuty nibbling one carrot unbothered throughout',
+      dialogue: '"MUMMA, MORE!"',
+      mess: '',
+      innerThought: '',
+      endingBeat:
+          'Cuty stays completely unimpressed through the entire equation.',
+      defaultCast: ['Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bold bright meme-style reel, cream background. Scene 1: "1 biscuit = hungry" — Rio holding one biscuit, neutral face. Scene 2: "2 biscuits = still hungry" — same neutral face. Scene 3: "3 biscuits = 'MUMMA, MORE!'" — dramatic happy face, arms outstretched. Scene 4: Cuty unimpressed, nibbling one carrot. Text on screen: "TODDLER MATHEMATICS"
 
 On-Screen Text:
@@ -5747,84 +5958,87 @@ Part 3 (20-30s): $kPartStyle. Cuty sits nearby, calm, still nibbling one single 
 
 Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_99',
-    category: 'Funny',
-    cover: 'Find the Hidden Cuty! 👀',
-    title: 'Find the Hidden Cuty!',
-    opening: 'A "spot the character" observation game.',
-    problem: 'A busy, colorful garden scene with Cuty the bunny camouflaged somewhere.',
-    lesson: 'Cuty was hidden behind a flower pot — look for the pink bow!',
-    postFormat: 'Static Image',
-    strategy: 'For parents of 2-5 year olds — a playful observation game that holds attention.',
-    caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
-    pinnedComment: 'How fast did you find him? ⏱️ Comment below!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_99',
+      category: 'Funny',
+      cover: 'Find the Hidden Cuty! 👀',
+      title: 'Find the Hidden Cuty!',
+      opening: 'A "spot the character" observation game.',
+      problem: 'A busy, colorful garden scene with Cuty the bunny camouflaged somewhere.',
+      lesson: 'Cuty was hidden behind a flower pot — look for the pink bow!',
+      postFormat: 'Static Image',
+      strategy: 'For parents of 2-5 year olds — a playful observation game that holds attention.',
+      caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
+      pinnedComment: 'How fast did you find him? ⏱️ Comment below!',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A busy garden scene hides Cuty somewhere among the flowers and bushes — only the ears and pink bow give it away.
 Twist: Ria and Rio look all around the scene, scanning every bush before anyone spots the tell-tale bow.
 Resolution: Cuty was tucked behind the flower pot the whole time — the pink bow was the clue.
 Moral: Slowing down to really look is its own kind of fun, not just a chore.
 ''',
-    setting: 'Illustrated garden scene, cream and green tones, flowers and bushes',
-    sceneDetail: 'Cuty tucked behind a flower pot, only ears and pink bow peeking out',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Found behind the flower pot — the pink bow gave it away.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Illustrated garden scene, cream and green tones, flowers and bushes',
+      sceneDetail:
+          'Cuty tucked behind a flower pot, only ears and pink bow peeking out',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Found behind the flower pot — the pink bow gave it away.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, illustrated garden scene, cream and green tones, flowers, bushes, small toys scattered around. Cuty the small white bunny cleverly tucked partially behind a bush or flower pot with only ears and pink bow peeking out. Ria and Rio standing to the side looking around playfully. Square format.
 
 On-Screen Text: "FIND THE HIDDEN CUTY!" - Answer: behind the flower pot, look for the pink bow!
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_100',
-    category: 'Learning Lesson',
-    cover: 'The Sock Hunt 🧦',
-    title: 'The Sock Hunt',
-    opening: 'Before: laundry basket dumped, socks everywhere. After: all pairs matched and folded.',
-    problem: 'Before: socks scattered everywhere, no pairs in sight. After: sorted pairs stacked neatly, Cuty napping on the finished pile.',
-    lesson: '1. Dump the basket. 2. Find matches by color/size. 3. Stack pairs together and celebrate!',
-    postFormat: 'Reel',
-    strategy: 'For parents of 1-4 year olds — turns a chore into a sorting game and buys five quiet minutes.',
-    caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
-    pinnedComment: 'Try this before your next laundry day 😂',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_100',
+      category: 'Learning Lesson',
+      cover: 'The Sock Hunt 🧦',
+      title: 'The Sock Hunt',
+      opening: 'Before: laundry basket dumped, socks everywhere. After: all pairs matched and folded.',
+      problem: 'Before: socks scattered everywhere, no pairs in sight. After: sorted pairs stacked neatly, Cuty napping on the finished pile.',
+      lesson: '1. Dump the basket. 2. Find matches by color/size. 3. Stack pairs together and celebrate!',
+      postFormat: 'Reel',
+      strategy: 'For parents of 1-4 year olds — turns a chore into a sorting game and buys five quiet minutes.',
+      caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
+      pinnedComment: 'Try this before your next laundry day 😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: The laundry basket gets dumped out and Ria and Rio dive straight into the pile of mismatched socks.
 Twist: Rio holds up two different-colored socks and shakes his head — "no match" — while Ria finds a true pair and holds it up like a trophy.
 Resolution: Pairs stack up one by one until the whole pile is sorted, with Cuty curling up for a nap on top of the finished stack.
 Moral: A chore becomes a game the moment you hand it over as a hunt instead of a task.
 ''',
-    setting: 'Cream laundry room, pile of mismatched socks on the floor',
-    sceneDetail: 'Rio comparing two different-colored socks, Ria holding up a matching pair triumphantly',
-    dialogue: '"No match!" "Found it!"',
-    mess: 'Socks scattered everywhere before the sort begins',
-    innerThought: '',
-    endingBeat: 'Cuty naps on top of the neatly finished pile.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream laundry room, pile of mismatched socks on the floor',
+      sceneDetail: 'Rio comparing two different-colored socks, Ria holding up a matching pair triumphantly',
+      dialogue: '"No match!" "Found it!"',
+      mess: 'Socks scattered everywhere before the sort begins',
+      innerThought: '',
+      endingBeat: 'Cuty naps on top of the neatly finished pile.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Cream laundry room background. Scene 1: Pile of mismatched colorful socks on floor, Ria and Rio diving in curiously. Scene 2: Rio holds two socks of different colors, shakes head "no match." Scene 3: Ria finds matching pair, holds triumphantly. Scene 4: Montage of pairs stacking, Cuty sitting on finished pile. Text on screen: "THE SOCK HUNT"
 
 On-Screen Text:
@@ -5843,168 +6057,177 @@ Part 3 (20-30s): $kPartStyle. The last pair stacks on top, and Cuty curls up for
 
 Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_101',
-    category: 'Learning Lesson',
-    cover: '3 Questions to Ask Your Child This Week',
-    title: '3 Questions Every Parent Should Ask This Week',
-    opening: 'A small set of conversation-starter questions for the week ahead.',
-    problem: 'Questions:\n1. "What made you happy today?"\n2. "What would you build with 100 blocks?"\n3. "Which animal would you want as a friend?"',
-    lesson: 'Small questions can open up the biggest conversations.',
-    postFormat: 'Carousel',
-    strategy: 'For parents of 2-6 year olds — a gentle weekly conversation-starter series.',
-    caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
-    pinnedComment: 'Save this — ask one each night this week.',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_101',
+      category: 'Learning Lesson',
+      cover: '3 Questions to Ask Your Child This Week',
+      title: '3 Questions Every Parent Should Ask This Week',
+      opening:
+          'A small set of conversation-starter questions for the week ahead.',
+      problem: 'Questions:\n1. "What made you happy today?"\n2. "What would you build with 100 blocks?"\n3. "Which animal would you want as a friend?"',
+      lesson: 'Small questions can open up the biggest conversations.',
+      postFormat: 'Carousel',
+      strategy: 'For parents of 2-6 year olds — a gentle weekly conversation-starter series.',
+      caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
+      pinnedComment: 'Save this — ask one each night this week.',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria and Rio sit together in conversation on the floor, Cuty curled up nearby — tonight is question night.
 Twist: Instead of the usual "how was your day," three specific questions wait to be asked, one a night.
 Resolution: "What would you build with 100 blocks?" gets a bigger answer than any routine question ever would.
 Moral: Small, specific questions open up the biggest conversations.
 ''',
-    setting: 'Cream background, warm evening lighting',
-    sceneDetail: 'Ria and Rio sitting together in conversation, Cuty curled up nearby',
-    dialogue: '"What made you happy today?"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'One question a night, all week.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream background, warm evening lighting',
+      sceneDetail:
+          'Ria and Rio sitting together in conversation, Cuty curled up nearby',
+      dialogue: '"What made you happy today?"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'One question a night, all week.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background, warm evening lighting. Ria and Rio sitting together on the floor in conversation, Cuty curled nearby. Square format, gentle cozy family mood.
 
 On-Screen Text: "3 QUESTIONS TO ASK YOUR CHILD THIS WEEK" - "What made you happy today?" / "What would you build with 100 blocks?" / "Which animal would you want as a friend?" / "Save this — ask one each night this week!"
 
 Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_102',
-    category: 'Learning Lesson',
-    cover: 'Can Your 4-Year-Old Do These? ✅',
-    title: 'Can Your 4-Year-Old Do These?',
-    opening: 'A skill-check reference for parents of 4-year-olds.',
-    problem: 'Age group: 4 Years',
-    lesson: '1. Count 1–20\n2. Recognise A–Z\n3. Name the days of the week\n4. Sort objects by category\n5. Follow 2–3 step instructions',
-    postFormat: 'Carousel',
-    strategy: 'For parents of 4-year-olds — same gentle checklist format as the 3-year-old series, for consistency.',
-    caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
-    pinnedComment: 'Bookmark this for your 4-year-old\'s next milestone check 📌',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_102',
+      category: 'Learning Lesson',
+      cover: 'Can Your 4-Year-Old Do These? ✅',
+      title: 'Can Your 4-Year-Old Do These?',
+      opening: 'A skill-check reference for parents of 4-year-olds.',
+      problem: 'Age group: 4 Years',
+      lesson: '1. Count 1–20\n2. Recognise A–Z\n3. Name the days of the week\n4. Sort objects by category\n5. Follow 2–3 step instructions',
+      postFormat: 'Carousel',
+      strategy: 'For parents of 4-year-olds — same gentle checklist format as the 3-year-old series, for consistency.',
+      caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
+      pinnedComment:
+          'Bookmark this for your 4-year-old\'s next milestone check 📌',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Five checks for age four — counting to 20, the alphabet, days of the week, sorting, and following multi-step instructions.
 Twist: It looks harder than the 3-year-old version, but it's framed the same way — a guide, not a race.
 Resolution: Parents check off what's already there and quietly note what's still growing.
 Moral: Growth has a pace of its own — this is a gentle guide, not pressure.
 ''',
-    setting: 'Clean checklist card, same visual series as the 3-year-old version',
-    sceneDetail: 'Rio and Ria pointing at a floating icon, Cuty sitting nearby',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Bookmark this for the next milestone check.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Clean checklist card, same visual series as the 3-year-old version',
+      sceneDetail:
+          'Rio and Ria pointing at a floating icon, Cuty sitting nearby',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Bookmark this for the next milestone check.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background. Rio and Ria standing together pointing at a floating icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, square format.
 
 On-Screen Text: "CAN YOUR 4-YEAR-OLD DO THESE?" - Count 1-20 / Recognise A-Z / Name the days of the week / Sort objects by category / Follow 2-3 step instructions / "Bookmark this for your 4-year-old's next milestone check!"
 
 Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_103',
-    category: 'Funny',
-    cover: 'Three Types of Kids at Dinner 🍽️',
-    title: 'Three Types of Kids at Dinner',
-    opening: 'A character-based relatable meme using the established Ria/Rio/Cuty personalities.',
-    problem: '🌸 Ria = "What\'s this?" (curious, poking at food) / 💙 Rio = "I don\'t want it." (arms crossed, ziddi) / 🐰 Cuty = peacefully eating, unbothered',
-    lesson: 'Every family has all three at the dinner table',
-    postFormat: 'Static Image',
-    strategy: 'For parents of 1-5 year olds — character-driven relatable humor for sharing.',
-    caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
-    pinnedComment: 'Which one is your child? 👇',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_103',
+      category: 'Funny',
+      cover: 'Three Types of Kids at Dinner 🍽️',
+      title: 'Three Types of Kids at Dinner',
+      opening: 'A character-based relatable meme using the established Ria/Rio/Cuty personalities.',
+      problem: '🌸 Ria = "What\'s this?" (curious, poking at food) / 💙 Rio = "I don\'t want it." (arms crossed, ziddi) / 🐰 Cuty = peacefully eating, unbothered',
+      lesson: 'Every family has all three at the dinner table',
+      postFormat: 'Static Image',
+      strategy: 'For parents of 1-5 year olds — character-driven relatable humor for sharing.',
+      caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
+      pinnedComment: 'Which one is your child? 👇',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Three panels, one dinner table — Ria pokes curiously at her plate: "What's this?" Rio sits with arms crossed, refusing his entirely.
 Twist: While both of them negotiate and resist in their own way, Cuty just eats a carrot, completely unbothered.
 Resolution: Every family has all three reactions at the same table, sometimes in the same child on different nights.
 Moral: Dinner drama is universal — you're not doing anything wrong.
 ''',
-    setting: 'Dinner table, three-panel layout, cream background',
-    sceneDetail: 'Ria poking at her plate, Rio with arms crossed, Cuty calmly eating a carrot',
-    dialogue: '"What\'s this?" "I don\'t want it."',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty finishes her carrot before the other two finish arguing.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Dinner table, three-panel layout, cream background',
+      sceneDetail: 'Ria poking at her plate, Rio with arms crossed, Cuty calmly eating a carrot',
+      dialogue: '"What\'s this?" "I don\'t want it."',
+      mess: '',
+      innerThought: '',
+      endingBeat:
+          'Cuty finishes her carrot before the other two finish arguing.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, three-panel layout on cream background, dinner table setting. Panel 1: Ria poking curiously at a plate of food, questioning expression. Panel 2: Rio with arms crossed, refusing his plate, stubborn expression. Panel 3: Cuty the white bunny calmly and happily eating a carrot from a small bowl. Square format.
 
 On-Screen Text: "THREE TYPES OF KIDS AT DINNER" - Ria: "What's this?" / Rio: "I don't want it." / Cuty: peacefully eating
 
 Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_104',
-    category: 'Funny',
-    cover: 'What Comes Next? Round 1 + Round 2!',
-    title: 'What Comes Next? Two Rounds!',
-    opening: 'Two pattern rounds — color patterns and shape patterns — for growing minds.',
-    problem: 'Round 1: yellow, blue, yellow, blue — then a pause on question mark.\nRound 2: circle, square, circle, square — then a pause.',
-    lesson: 'Round 1: Yellow. Round 2: Circle. Build a pattern, then break it — and rebuild!',
-    postFormat: 'Reel',
-    strategy: 'For parents of 2-5 year olds — a satisfying early-math pattern game.',
-    caption: 'Can your child guess what comes next? A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
-    pinnedComment: 'Did your child guess it before the reveal? 😄',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_104',
+      category: 'Funny',
+      cover: 'What Comes Next? Round 1 + Round 2!',
+      title: 'What Comes Next? Two Rounds!',
+      opening: 'Two pattern rounds — color patterns and shape patterns — for growing minds.',
+      problem: 'Round 1: yellow, blue, yellow, blue — then a pause on question mark.\nRound 2: circle, square, circle, square — then a pause.',
+      lesson: 'Round 1: Yellow. Round 2: Circle. Build a pattern, then break it — and rebuild!',
+      postFormat: 'Reel',
+      strategy: 'For parents of 2-5 year olds — a satisfying early-math pattern game.',
+      caption: 'Can your child guess what comes next? A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
+      pinnedComment: 'Did your child guess it before the reveal? 😄',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Yellow, blue, yellow, blue circles appear one at a time — then a big question mark where the next one should go.
 Twist: Ria taps her chin, thinking it through, while the pattern waits.
 Resolution: Yellow slides into place and Ria claps — then round two swaps in shapes, and Rio shouts "Circle!" before the reveal even lands.
 Moral: Spotting a pattern feels like a tiny win every single time — for kids and for the parent watching.
 ''',
-    setting: 'Cream background, bold simple shapes, clean animation-style reveal',
-    sceneDetail: 'A large question mark hovering where the next shape should go',
-    dialogue: '"Circle!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Rio calls out the answer before the reveal lands.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Cream background, bold simple shapes, clean animation-style reveal',
+      sceneDetail:
+          'A large question mark hovering where the next shape should go',
+      dialogue: '"Circle!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Rio calls out the answer before the reveal lands.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Bold simple animation-style reel, cream background. Yellow and blue circles appear in sequence. Then a large question mark where the next circle should go. Ria taps her chin, thinking. Yellow circle slides into place, Ria claps, Cuty hops happily. Text on screen: "WHAT COMES NEXT? ROUND 1 + ROUND 2!"
 
 On-Screen Text:
@@ -6023,168 +6246,175 @@ Part 3 (20-30s): $kPartStyle. Rio shouts "Circle!" before the reveal even lands,
 
 Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_105',
-    category: 'Series',
-    cover: 'Which New Format Was Your Favorite?',
-    title: 'Which New Format Was Your Favorite?',
-    opening: 'A visual recap of the 5 buckets tested this week, inviting audience feedback.',
-    problem: 'Five content types tested this week:\nPuzzles & Challenges\nTalk With Your Child\nTry This at Home\nParent-Relatable Humor\nAge-Based Skill Checks',
-    lesson: 'Use this post\'s engagement + Insights data to decide bucket weighting for the next series.',
-    postFormat: 'Carousel',
-    strategy: 'Community feedback post kicking off the Missions series — existing followers.',
-    caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
-    pinnedComment: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_105',
+      category: 'Series',
+      cover: 'Which New Format Was Your Favorite?',
+      title: 'Which New Format Was Your Favorite?',
+      opening: 'A visual recap of the 5 buckets tested this week, inviting audience feedback.',
+      problem: 'Five content types tested this week:\nPuzzles & Challenges\nTalk With Your Child\nTry This at Home\nParent-Relatable Humor\nAge-Based Skill Checks',
+      lesson: 'Use this post\'s engagement + Insights data to decide bucket weighting for the next series.',
+      postFormat: 'Carousel',
+      strategy: 'Community feedback post kicking off the Missions series — existing followers.',
+      caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
+      pinnedComment: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Five very different formats went out this week — puzzles, conversation-starters, a kitchen activity, parent humor, and age-based checklists.
 Twist: Instead of just moving on to the next idea, the page pauses to ask which one actually landed.
 Resolution: Votes and comments decide what gets made more of — starting with the Missions series that follows.
 Moral: Asking the audience what they want is itself part of making good content.
 ''',
-    setting: 'Clean 5-tile grid or carousel, cream background',
-    sceneDetail: 'Five small icons — puzzle piece, speech bubble, house, laughing face, checklist',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'The winning format sets up the next series.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Clean 5-tile grid or carousel, cream background',
+      sceneDetail: 'Five small icons — puzzle piece, speech bubble, house, laughing face, checklist',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'The winning format sets up the next series.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background, small icon representing the bucket theme (puzzle piece / speech bubble / house / laughing face / checklist), Ria, Rio, or Cuty featured lightly in the corner depending on tile. Square format.
 
 On-Screen Text: "WHICH NEW FORMAT WAS YOUR FAVORITE?" - Puzzles & Challenges / Talk With Your Child / Try This at Home / Parent-Relatable Humor / Age-Based Skill Checks
 
 Outro: "Vote karo aur batao — agla kaunsa format dekhna hai?"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_106',
-    category: 'Series',
-    cover: 'No Special Toys Needed — Here\'s What to Use!',
-    title: 'How to Play Each Mission With Household Items',
-    opening: 'A practical substitution guide showing exactly what household item replaces each mission\'s prop.',
-    problem: 'Parents may think missions need special equipment (hurdles, treasure boxes, detective kits).',
-    lesson: 'Race Track to broomstick + 2 chairs as hurdle, dupatta as line | Concert to wooden spoon mic, steel plate drums | Art Studio to any paper + slate/notebook, kitchen chalk on floor | Detective to sunglasses/toy binoculars or cupped hands | Rescue Team to laundry basket, dupatta/old rope | Treasure Box to any box/tiffin with lid, small toys inside | Daily Care to owned tiffin, water bottle, toothbrush',
-    postFormat: 'Carousel',
-    strategy: 'Sets up the 7 Missions series with zero shopping required.',
-    caption: 'Promised, delivered! Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Save this — now you have zero excuses to skip a mission! 📌',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_106',
+      category: 'Series',
+      cover: 'No Special Toys Needed — Here\'s What to Use!',
+      title: 'How to Play Each Mission With Household Items',
+      opening: 'A practical substitution guide showing exactly what household item replaces each mission\'s prop.',
+      problem: 'Parents may think missions need special equipment (hurdles, treasure boxes, detective kits).',
+      lesson: 'Race Track to broomstick + 2 chairs as hurdle, dupatta as line | Concert to wooden spoon mic, steel plate drums | Art Studio to any paper + slate/notebook, kitchen chalk on floor | Detective to sunglasses/toy binoculars or cupped hands | Rescue Team to laundry basket, dupatta/old rope | Treasure Box to any box/tiffin with lid, small toys inside | Daily Care to owned tiffin, water bottle, toothbrush',
+      postFormat: 'Carousel',
+      strategy: 'Sets up the 7 Missions series with zero shopping required.',
+      caption: 'Promised, delivered! Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment:
+          'Save this — now you have zero excuses to skip a mission! 📌',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Seven missions are coming, and every single one worried parents might need special gear — hurdles, a detective kit, a treasure box.
 Twist: Each "official" prop gets swapped for something already sitting at home — a broomstick, a dupatta, a steel plate, a tiffin box.
 Resolution: Zero shopping list, zero special toys — just a week of play using things already in the house.
 Moral: The best play equipment is usually already in your kitchen drawer.
 ''',
-    setting: 'Cream background, split-view slides: official prop vs. at-home swap',
-    sceneDetail: 'A broomstick between two chairs standing in for a hurdle',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Seven swaps, zero shopping — the week is ready to start.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting:
+          'Cream background, split-view slides: official prop vs. at-home swap',
+      sceneDetail: 'A broomstick between two chairs standing in for a hurdle',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Seven swaps, zero shopping — the week is ready to start.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background, vertical carousel format. Consistent Ria and Rio appear across all slides with Cuty the white bunny. Each slide shows a split view: left side "official" mission prop, right side "at-home swap" using household items — broomstick + dupatta line, wooden spoon mic + steel plates, paper/slate + kitchen chalk, sunglasses/binoculars + cupped hands, laundry basket + dupatta rope, tiffin box with toys, tiffin + water bottle + toothbrush.
 
 On-Screen Text: "NO SPECIAL TOYS NEEDED — HERE'S WHAT TO USE!" with one swap per slide for all 7 missions, ending on "Save this — zero excuses to skip a mission!"
 
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_107',
-    category: 'Series',
-    cover: 'The Votes Are In!',
-    title: 'You Voted! Here\'s Which Mission Won',
-    opening: 'A results reveal based on which mission number got the most comments, turning passive voters into repeat engagers.',
-    problem: 'N/A (results format, no puzzle needed)',
-    lesson: 'Reveal the winning mission with a small "why this one might be the most popular" note (e.g., "Detective Mission is your favorite — mystery never gets old!")',
-    postFormat: 'Static Image',
-    strategy: 'Closes the loop on the Missions poll and keeps the series moving.',
-    caption: 'You voted, and Mission 5 won! Detective Mission is your favorite — mystery never gets old! Try it today and show us how it goes! #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
-    pinnedComment: 'Try today\'s winning mission and tag us in your Story! 🏆',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_107',
+      category: 'Series',
+      cover: 'The Votes Are In!',
+      title: 'You Voted! Here\'s Which Mission Won',
+      opening: 'A results reveal based on which mission number got the most comments, turning passive voters into repeat engagers.',
+      problem: 'N/A (results format, no puzzle needed)',
+      lesson: 'Reveal the winning mission with a small "why this one might be the most popular" note (e.g., "Detective Mission is your favorite — mystery never gets old!")',
+      postFormat: 'Static Image',
+      strategy:
+          'Closes the loop on the Missions poll and keeps the series moving.',
+      caption: 'You voted, and Mission 5 won! Detective Mission is your favorite — mystery never gets old! Try it today and show us how it goes! #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
+      pinnedComment:
+          'Try today\'s winning mission and tag us in your Story! 🏆',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: The comments are counted and the votes are in — one mission clearly won the room.
 Twist: Mission 5, the Detective Mission, takes it — mystery never gets old, apparently.
 Resolution: Ria and Rio hold up a trophy while Cuty cheers, and the winning mission gets a replay invite.
 Moral: Letting the audience pick what comes next turns watching into playing along.
 ''',
-    setting: 'Cream background, celebratory mood with confetti',
-    sceneDetail: 'Ria and Rio holding a trophy, Cuty cheering beside them',
-    dialogue: '"Mission 5 won!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'The winning mission gets tagged and replayed by followers.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream background, celebratory mood with confetti',
+      sceneDetail: 'Ria and Rio holding a trophy, Cuty cheering beside them',
+      dialogue: '"Mission 5 won!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'The winning mission gets tagged and replayed by followers.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background, celebratory mood with confetti. Ria and Rio holding a trophy, Cuty the white bunny cheering. Winning mission number displayed prominently ("Mission 5 Won!"). Colorful, joyful, square format.
 
 On-Screen Text: "THE VOTES ARE IN!" - "Mission 5 Won! Detective Mission is your favorite — mystery never gets old!"
 
 Outro: "Agli kahani miss na ho — abhi FOLLOW karo!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_108',
-    category: 'Series',
-    cover: 'Mission 1: On Your Mark!',
-    title: 'Mission 1: On Your Mark!',
-    opening: 'Ria and Rio running, jumping a pillow hurdle, walking a line - Mission 1 of the 7 Mission Week.',
-    problem: 'Parents need a simple, structured movement activity for toddlers.',
-    lesson: 'Race Track builds coordination, listening skills, and gross motor confidence.',
-    postFormat: 'Reel',
-    strategy: 'Mission 1 of 7 — a home race track using pillows and tape.',
-    caption: 'Mission 1: Race Track! Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Tag us trying this mission! 🏁',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_108',
+      category: 'Series',
+      cover: 'Mission 1: On Your Mark!',
+      title: 'Mission 1: On Your Mark!',
+      opening: 'Ria and Rio running, jumping a pillow hurdle, walking a line - Mission 1 of the 7 Mission Week.',
+      problem:
+          'Parents need a simple, structured movement activity for toddlers.',
+      lesson: 'Race Track builds coordination, listening skills, and gross motor confidence.',
+      postFormat: 'Reel',
+      strategy: 'Mission 1 of 7 — a home race track using pillows and tape.',
+      caption: 'Mission 1: Race Track! Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Tag us trying this mission! 🏁',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Ria and Rio line up at the start of a home-made race track — a pillow hurdle, a taped line on the floor.
 Twist: Rio jumps the pillow hurdle, Ria carefully walks the taped line, and Cuty cheers from the side.
 Resolution: Both run to the finish, and Cuty hands over a spoon as the "medal."
 Moral: Coordination and listening skills build through play, not drills.
 ''',
-    setting: 'Home hallway/living room, pillow hurdle and taped line',
-    sceneDetail: 'A cushion hurdle and a strip of tape marking the walking line',
-    dialogue: '"Jump!" "Walk the line." "Run!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty hands over a spoon as the finish-line "medal."',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home hallway/living room, pillow hurdle and taped line',
+      sceneDetail:
+          'A cushion hurdle and a strip of tape marking the walking line',
+      dialogue: '"Jump!" "Walk the line." "Run!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Cuty hands over a spoon as the finish-line "medal."',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home hallway/living room. Ria and Rio at a start line. Rio jumping over a pillow "hurdle" made from cushions, Ria walking a taped line on the floor, Cuty the white bunny cheering from the side. Bright morning light, energetic movement. Text on screen: "MISSION 1: ON YOUR MARK!"
 
 On-Screen Text:
@@ -6203,42 +6433,43 @@ Part 3 (20-30s): $kPartStyle. Cuty hands them a spoon as their "medal." Final te
 
 Outro: "Try Mission 2 today! Tag us!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_109',
-    category: 'Series',
-    cover: 'Mission 2: Living Room Concert!',
-    title: 'Mission 2: Living Room Concert!',
-    opening: 'Singing into a spoon mic, dancing, clapping to rhythm - Mission 2 of the 7 Mission Week.',
-    problem: 'Parents need a simple music and movement activity.',
-    lesson: 'Concert builds rhythm awareness, self-expression, and language through song.',
-    postFormat: 'Reel',
-    strategy: 'Mission 2 of 7 — a kitchen-utensil concert.',
-    caption: 'Mission 2: Concert! Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Show us your concert! 🎤',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_109',
+      category: 'Series',
+      cover: 'Mission 2: Living Room Concert!',
+      title: 'Mission 2: Living Room Concert!',
+      opening: 'Singing into a spoon mic, dancing, clapping to rhythm - Mission 2 of the 7 Mission Week.',
+      problem: 'Parents need a simple music and movement activity.',
+      lesson: 'Concert builds rhythm awareness, self-expression, and language through song.',
+      postFormat: 'Reel',
+      strategy: 'Mission 2 of 7 — a kitchen-utensil concert.',
+      caption: 'Mission 2: Concert! Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Show us your concert! 🎤',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A wooden spoon becomes a microphone, and the living room turns into a stage.
 Twist: Ria sings, Rio dances and claps to the rhythm, and Cuty taps a steel plate like a drum.
 Resolution: The whole family takes a bow together at the end of the show.
 Moral: Kitchen utensils are instruments if you just decide they are.
 ''',
-    setting: 'Home living room, wooden spoon mic and steel plate drums',
-    sceneDetail: 'A wooden spoon held up to the mouth like a microphone',
-    dialogue: '"La la la!" "Drum solo!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'The whole family bows together to end the show.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home living room, wooden spoon mic and steel plate drums',
+      sceneDetail: 'A wooden spoon held up to the mouth like a microphone',
+      dialogue: '"La la la!" "Drum solo!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'The whole family bows together to end the show.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home living room. Ria singing into a wooden spoon microphone, Rio clapping and dancing, Cuty the white bunny tapping a steel plate like a drum. Kitchen utensils as instruments visible. Joyful musical chaos, warm family energy. Text on screen: "MISSION 2: LIVING ROOM CONCERT!"
 
 On-Screen Text:
@@ -6257,42 +6488,43 @@ Part 3 (20-30s): $kPartStyle. The whole family bows together to end the show. Fi
 
 Outro: "Your turn! Show us your concert!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_110',
-    category: 'Series',
-    cover: 'Mission 3: Art Corner Time!',
-    title: 'Mission 3: Art Corner Time!',
-    opening: 'Drawing round shapes only (circles, wheels, suns) — Mission 3 of the 7 Mission Week, with circle constraint.',
-    problem: 'Parents need a fine motor creative activity with a simple constraint.',
-    lesson: 'Art Studio builds fine motor skills, shape recognition, and creative confidence — circle shapes only!',
-    postFormat: 'Reel',
-    strategy: 'Mission 3 of 7 — a circles-only art constraint.',
-    caption: 'Mission 3: Art Studio! Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Share your child\'s masterpiece! 🎨',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_110',
+      category: 'Series',
+      cover: 'Mission 3: Art Corner Time!',
+      title: 'Mission 3: Art Corner Time!',
+      opening: 'Drawing round shapes only (circles, wheels, suns) — Mission 3 of the 7 Mission Week, with circle constraint.',
+      problem: 'Parents need a fine motor creative activity with a simple constraint.',
+      lesson: 'Art Studio builds fine motor skills, shape recognition, and creative confidence — circle shapes only!',
+      postFormat: 'Reel',
+      strategy: 'Mission 3 of 7 — a circles-only art constraint.',
+      caption: 'Mission 3: Art Studio! Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Share your child\'s masterpiece! 🎨',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: The art corner opens with one simple rule — circles only.
 Twist: Ria draws a big yellow sun on paper, Rio writes his name on a slate with chalk, and kitchen chalk turns the floor into a giant canvas.
 Resolution: Cuty hops through the drawings, admiring every piece, no matter how wobbly the circles are.
 Moral: A simple constraint doesn't limit creativity — it focuses it.
 ''',
-    setting: 'Home art corner — paper, slate, chalk',
-    sceneDetail: 'A big yellow sun drawn in wobbly circles on paper',
-    dialogue: '"Look, a sun!" "R-I-O"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty hops through all the finished drawings.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home art corner — paper, slate, chalk',
+      sceneDetail: 'A big yellow sun drawn in wobbly circles on paper',
+      dialogue: '"Look, a sun!" "R-I-O"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'Cuty hops through all the finished drawings.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home art corner. Ria drawing a big yellow sun on paper, Rio writing his name on a slate with chalk, Cuty the white bunny watching curiously. Kitchen chalk drawing on floor visible. Cozy creative atmosphere, warm light. Text on screen: "MISSION 3: ART CORNER TIME!"
 
 On-Screen Text:
@@ -6311,42 +6543,44 @@ Part 3 (20-30s): $kPartStyle. Cuty hops through all the finished drawings, delig
 
 Outro: "Show us your masterpiece!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_111',
-    category: 'Series',
-    cover: 'Mission 4: Case Open!',
-    title: 'Mission 4: Case Open!',
-    opening: 'Two fair clues: a footprint in flour, a dropped magnifying glass — solve where Cuty hid the snack.',
-    problem: 'Parents need an observation activity with visual clues, not magic.',
-    lesson: 'Detective builds observation, logical thinking, and evidence collection — fair clues only!',
-    postFormat: 'Reel',
-    strategy: 'Mission 4 of 7 — a fair-clue detective game.',
-    caption: 'Mission 4: Detective! Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Did your detective solve it? 🕵️',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_111',
+      category: 'Series',
+      cover: 'Mission 4: Case Open!',
+      title: 'Mission 4: Case Open!',
+      opening: 'Two fair clues: a footprint in flour, a dropped magnifying glass — solve where Cuty hid the snack.',
+      problem:
+          'Parents need an observation activity with visual clues, not magic.',
+      lesson: 'Detective builds observation, logical thinking, and evidence collection — fair clues only!',
+      postFormat: 'Reel',
+      strategy: 'Mission 4 of 7 — a fair-clue detective game.',
+      caption: 'Mission 4: Detective! Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Did your detective solve it? 🕵️',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A mystery is on — Cuty hid something, and two fair clues are waiting to be found.
 Twist: Ria looks through cardboard tube binoculars, Rio cups his hands around his eyes, then stops to listen closely instead.
 Resolution: The clue turns up fast, and the case is solved with real observation, not a trick.
 Moral: Looking and listening closely is its own kind of superpower.
 ''',
-    setting: 'Home setting, cardboard tube binoculars or cupped hands',
-    sceneDetail: 'A toy footprint clue left on the floor',
-    dialogue: '"I see something!" "Shhh, I hear it!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'The clue is found and the case is officially closed.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home setting, cardboard tube binoculars or cupped hands',
+      sceneDetail: 'A toy footprint clue left on the floor',
+      dialogue: '"I see something!" "Shhh, I hear it!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'The clue is found and the case is officially closed.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home setting. Ria looking through cardboard tube binoculars, Rio with cupped hands around his eyes, Cuty the white bunny with a magnifying glass. A "clue" (toy footprint) on the floor. Playful mystery mood. Text on screen: "MISSION 4: CASE OPEN!"
 
 On-Screen Text:
@@ -6365,42 +6599,45 @@ Part 3 (20-30s): $kPartStyle. The clue is found and the whole case is solved tog
 
 Outro: "Did your detective solve it?"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_112',
-    category: 'Series',
-    cover: 'Mission 5: Rescue Time!',
-    title: 'Mission 5: Rescue Time!',
-    opening: 'Pushing a laundry basket, pulling a rope, helping tidy up - Mission 5 of the 7 Mission Week.',
-    problem: 'Parents need a heavy work / proprioception activity.',
-    lesson: 'Rescue Team builds gross motor strength, teamwork, and helpfulness.',
-    postFormat: 'Reel',
-    strategy: 'Mission 5 of 7 — heavy work play using a laundry basket and rope.',
-    caption: 'Mission 5: Rescue Team! Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Teamwork tip from your house? 🧸',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_112',
+      category: 'Series',
+      cover: 'Mission 5: Rescue Time!',
+      title: 'Mission 5: Rescue Time!',
+      opening: 'Pushing a laundry basket, pulling a rope, helping tidy up - Mission 5 of the 7 Mission Week.',
+      problem: 'Parents need a heavy work / proprioception activity.',
+      lesson:
+          'Rescue Team builds gross motor strength, teamwork, and helpfulness.',
+      postFormat: 'Reel',
+      strategy:
+          'Mission 5 of 7 — heavy work play using a laundry basket and rope.',
+      caption: 'Mission 5: Rescue Team! Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Teamwork tip from your house? 🧸',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A laundry basket becomes a rescue vehicle, with a dupatta tied on as a tow rope.
 Twist: Ria pushes the basket, Rio pulls the rope, and Cuty rides along inside like precious cargo.
 Resolution: A high-five teamwork moment finishes the rescue mission.
 Moral: Pushing and pulling together builds strength and teamwork at the same time.
 ''',
-    setting: 'Home setting, laundry basket and dupatta rope',
-    sceneDetail: 'Cuty riding inside the laundry basket like a passenger',
-    dialogue: '"Coming through!" "Pulling hard!" "Rescue complete!"',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'A high-five seals the completed rescue mission.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home setting, laundry basket and dupatta rope',
+      sceneDetail: 'Cuty riding inside the laundry basket like a passenger',
+      dialogue: '"Coming through!" "Pulling hard!" "Rescue complete!"',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'A high-five seals the completed rescue mission.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home setting. Ria pushing a laundry basket with toys inside, Rio pulling a dupatta rope attached to the basket, Cuty the white bunny riding in the basket. Heavy work play, teamwork energy, warm home setting. Text on screen: "MISSION 5: RESCUE TIME!"
 
 On-Screen Text:
@@ -6419,42 +6656,45 @@ Part 3 (20-30s): $kPartStyle. A high-five teamwork moment finishes the mission. 
 
 Outro: "Your teamwork tip?"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_113',
-    category: 'Series',
-    cover: 'Mission 6: Treasure Hunt!',
-    title: 'Mission 6: Treasure Hunt!',
-    opening: 'Two clues found: a trail of crumbs, then a torn paper. Follow both to find the hidden treasure.',
-    problem: 'Parents need an object permanence activity with two clear clues.',
-    lesson: 'Treasure Hunt builds fine motor skills, logical sequencing, and nurturing play — two clues!',
-    postFormat: 'Reel',
-    strategy: 'Mission 6 of 7 — a tiffin-box treasure hunt that ends in a bedtime wind-down.',
-    caption: 'Mission 6: Treasure Box! Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'What treasure did you hide? 🎁',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_113',
+      category: 'Series',
+      cover: 'Mission 6: Treasure Hunt!',
+      title: 'Mission 6: Treasure Hunt!',
+      opening: 'Two clues found: a trail of crumbs, then a torn paper. Follow both to find the hidden treasure.',
+      problem:
+          'Parents need an object permanence activity with two clear clues.',
+      lesson: 'Treasure Hunt builds fine motor skills, logical sequencing, and nurturing play — two clues!',
+      postFormat: 'Reel',
+      strategy: 'Mission 6 of 7 — a tiffin-box treasure hunt that ends in a bedtime wind-down.',
+      caption: 'Mission 6: Treasure Box! Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'What treasure did you hide? 🎁',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: A tiffin box holds a hidden treasure, waiting to be opened.
 Twist: Ria opens it to find a small toy inside, and Rio closes the box carefully afterward, keeping it "safe."
 Resolution: The mission winds down gently into bedtime, with Cuty getting tucked into a blanket nearby.
 Moral: Opening, finding, and closing something carefully is its own small, satisfying skill.
 ''',
-    setting: 'Home setting, tiffin box or any box with a lid',
-    sceneDetail: 'A small toy discovered inside the tiffin box',
-    dialogue: '"What\'s inside?" "Treasure!" "Night night bunny."',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'Cuty gets tucked into a blanket, closing the mission out gently.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home setting, tiffin box or any box with a lid',
+      sceneDetail: 'A small toy discovered inside the tiffin box',
+      dialogue: '"What\'s inside?" "Treasure!" "Night night bunny."',
+      mess: '',
+      innerThought: '',
+      endingBeat:
+          'Cuty gets tucked into a blanket, closing the mission out gently.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home setting. Ria opening a tiffin box to find a small toy, Rio closing the box carefully, Cuty the white bunny being tucked into a blanket nearby. Cozy bedtime transition energy. Text on screen: "MISSION 6: TREASURE HUNT!"
 
 On-Screen Text:
@@ -6473,42 +6713,44 @@ Part 3 (20-30s): $kPartStyle. Cuty gets tucked into a blanket nearby, winding th
 
 Outro: "What treasure did you hide?"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_114',
-    category: 'Series',
-    cover: 'Mission 7: Self-Care Squad!',
-    title: 'Mission 7: Self-Care Squad!',
-    opening: 'Eating fruit, drinking water, brushing teeth, bedtime routine - Mission 7 of the 7 Mission Week.',
-    problem: 'Parents need to build independent self-care routines.',
-    lesson: 'Daily Care builds independence, body awareness, and healthy habits. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.',
-    postFormat: 'Reel',
-    strategy: 'Mission 7 of 7 — the final mission, built around the 5-second wait technique.',
-    caption: 'Mission 7: Daily Care! Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    pinnedComment: 'Which routine is hardest at your house? 🍎',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_114',
+      category: 'Series',
+      cover: 'Mission 7: Self-Care Squad!',
+      title: 'Mission 7: Self-Care Squad!',
+      opening: 'Eating fruit, drinking water, brushing teeth, bedtime routine - Mission 7 of the 7 Mission Week.',
+      problem: 'Parents need to build independent self-care routines.',
+      lesson: 'Daily Care builds independence, body awareness, and healthy habits. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.',
+      postFormat: 'Reel',
+      strategy: 'Mission 7 of 7 — the final mission, built around the 5-second wait technique.',
+      caption: 'Mission 7: Daily Care! Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+      pinnedComment: 'Which routine is hardest at your house? 🍎',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: The final mission is the quietest one — eating, drinking, brushing, winding down for bed.
 Twist: Ria struggles to brush on her own; instead of jumping in immediately, Mumma waits about five seconds first.
 Resolution: Ria tries again on her own and gets it — Mumma only helps when it's actually needed.
 Moral: A five-second pause before helping lets independence actually grow.
 ''',
-    setting: 'Home bathroom/kitchen setting',
-    sceneDetail: 'Ria pausing mid-brush while Mumma waits instead of stepping in right away',
-    dialogue: '"Crunch!" "Glug glug" "Scrub scrub"',
-    mess: '',
-    innerThought: 'Five seconds feels long when you want to just do it for them.',
-    endingBeat: 'Cuty watches the whole self-care routine from the counter.',
-    defaultCast: ['Ria', 'Rio', 'Mumma', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Home bathroom/kitchen setting',
+      sceneDetail: 'Ria pausing mid-brush while Mumma waits instead of stepping in right away',
+      dialogue: '"Crunch!" "Glug glug" "Scrub scrub"',
+      mess: '',
+      innerThought:
+          'Five seconds feels long when you want to just do it for them.',
+      endingBeat: 'Cuty watches the whole self-care routine from the counter.',
+      defaultCast: ['Ria', 'Rio', 'Mumma', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt:
+          '''
 PROMPT: $kPromptStyle. Home bathroom/kitchen setting. Ria eating apple slices from her tiffin, Rio drinking from his water bottle, both brushing teeth side by side, Cuty the white bunny watching from the counter. Cozy bathroom/kitchen routine atmosphere. Text on screen: "MISSION 7: SELF-CARE SQUAD!"
 
 On-Screen Text:
@@ -6527,92 +6769,95 @@ Part 3 (20-30s): $kPartStyle. Ria completes brushing on her own, Mumma only help
 
 Outro: "Which routine is hardest at your house?"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_115',
-    category: 'Series',
-    cover: '7 Screen-Free Missions in 60 Seconds',
-    title: '7 Missions in 60 Seconds',
-    opening: 'A fast-cut compilation reel showing one shot from each of the 7 missions back to back, building toward the "We Did It!" celebration.',
-    problem: 'Parents scrolling don\'t know screen-free play can look this structured and fun.',
-    lesson: 'Recap card at the end listing all 7 mission names quickly.',
-    postFormat: 'Reel',
-    strategy: 'Non-follower reach post recapping the full Missions week in one fast cut.',
-    caption: '7 screen-free missions, 60 seconds, zero shopping required. Follow along as we play through all of them with Ria and Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
-    pinnedComment: 'Follow for a new mission every day this week! 🏠',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_115',
+      category: 'Series',
+      cover: '7 Screen-Free Missions in 60 Seconds',
+      title: '7 Missions in 60 Seconds',
+      opening: 'A fast-cut compilation reel showing one shot from each of the 7 missions back to back, building toward the "We Did It!" celebration.',
+      problem: 'Parents scrolling don\'t know screen-free play can look this structured and fun.',
+      lesson: 'Recap card at the end listing all 7 mission names quickly.',
+      postFormat: 'Reel',
+      strategy: 'Non-follower reach post recapping the full Missions week in one fast cut.',
+      caption: '7 screen-free missions, 60 seconds, zero shopping required. Follow along as we play through all of them with Ria and Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
+      pinnedComment: 'Follow for a new mission every day this week! 🏠',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: One shot from each of the seven missions flashes by, back to back, in just sixty seconds.
 Twist: Race Track, Concert, Art Studio, Detective, Rescue, Treasure, Self-Care — all seven in quick succession.
 Resolution: The final frame lands on a "We Did It!" celebration grid with Ria, Rio, and Cuty.
 Moral: A full week of screen-free play fits into sixty seconds when you actually commit to it.
 ''',
-    setting: 'Cream background, fast-cut vertical reel montage',
-    sceneDetail: 'All seven mission icons lined up in a final celebration grid',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: '"We Did It!" celebration with all three characters together.',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream background, fast-cut vertical reel montage',
+      sceneDetail:
+          'All seven mission icons lined up in a final celebration grid',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat:
+          '"We Did It!" celebration with all three characters together.',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Fast-cut vertical 9:16 reel montage, soft 3D Pixar/Disney-style render, cream background. Quick 1-2 second shots: 1) jumping pillow hurdle (Race Track) 2) singing into spoon, plate drums (Concert) 3) drawing sun, slate (Art Studio) 4) binoculars, cupped hands (Detective) 5) pushing laundry basket, pulling rope (Rescue) 6) opening tiffin box (Treasure) 7) eating fruit, drinking water, brushing (Daily Care). Final frame: all 7 mission icons in a grid, "We Did It!" celebration with Ria, Rio, Cuty.
 
 On-Screen Text: 0-3s Race Track / 3-6s Concert / 6-9s Art Studio / 9-12s Detective / 12-15s Rescue / 15-18s Treasure / 18-21s Daily Care / 21-60s Recap grid + "We Did It!"
 
 Outro: "Follow for a new mission every day this week!"
 ''',
-  ),
+    ),
 
-  HookIdea(
-    id: 'idea_116',
-    category: 'Series',
-    cover: 'We Did It — All 7 Missions Complete!',
-    title: 'We Completed All 7 Missions! Here\'s What Happened',
-    opening: 'A recap carousel celebrating the full week, featuring any parent responses/tags from the week if available.',
-    problem: 'N/A',
-    lesson: 'One slide per mission with a one-line "what we learned" note, then a final "what\'s next" teaser.',
-    postFormat: 'Carousel',
-    strategy: 'Closes out the Missions series and teases what comes next.',
-    caption: 'A full week of screen-free missions, complete! From racing to detective work to bedtime routines, Ria and Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
-    pinnedComment: 'Which mission will you repeat this week? Comment below! 🎉',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
+    HookIdea(
+      id: 'idea_116',
+      category: 'Series',
+      cover: 'We Did It — All 7 Missions Complete!',
+      title: 'We Completed All 7 Missions! Here\'s What Happened',
+      opening: 'A recap carousel celebrating the full week, featuring any parent responses/tags from the week if available.',
+      problem: 'N/A',
+      lesson: 'One slide per mission with a one-line "what we learned" note, then a final "what\'s next" teaser.',
+      postFormat: 'Carousel',
+      strategy: 'Closes out the Missions series and teases what comes next.',
+      caption: 'A full week of screen-free missions, complete! From racing to detective work to bedtime routines, Ria and Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
+      pinnedComment:
+          'Which mission will you repeat this week? Comment below! 🎉',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
 Story: Seven missions, one full week, and a trophy to show for it.
 Twist: Each mission gets a one-line lesson of its own — movement builds confidence, music is self-expression, creativity needs no fancy tools.
 Resolution: The recap closes with one open question — what should come next?
 Moral: A full week of small missions adds up to one very big celebration.
 ''',
-    setting: 'Cream background, celebratory confetti/trophy theme',
-    sceneDetail: 'Ria, Rio and Cuty together with a trophy, confetti falling',
-    dialogue: '',
-    mess: '',
-    innerThought: '',
-    endingBeat: 'The carousel ends on "What\'s next? Tell us below!"',
-    defaultCast: ['Ria', 'Rio', 'Cuty'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '''
+      setting: 'Cream background, celebratory confetti/trophy theme',
+      sceneDetail: 'Ria, Rio and Cuty together with a trophy, confetti falling',
+      dialogue: '',
+      mess: '',
+      innerThought: '',
+      endingBeat: 'The carousel ends on "What\'s next? Tell us below!"',
+      defaultCast: ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: false,
+      quote: '',
+      detail: '',
+      punchline: '',
+      readyPrompt: '''
 PROMPT: Soft 3D Pixar/Disney-style render, cream background, square carousel format. Consistent Ria, Rio, Cuty across all slides. Celebratory confetti/trophy theme.
 
 On-Screen Text: "WE DID IT — ALL 7 MISSIONS COMPLETE!" with one lesson per mission (Race Track to confidence, Concert to self-expression, Art Studio to creativity needs no fancy tools, Detective to observation is a superpower, Rescue Team to teamwork, Treasure Box to small things bring big joy, Daily Care to routines build independence), ending on "What's next? Tell us below!"
 
 Outro: "Which mission will you repeat this week? Comment below!"
 ''',
-  ),
-];
+    ),
+  ];
 
   return list;
 }
@@ -6623,12 +6868,27 @@ final kDefaultHooks = buildDefaultHooks();
 /// The 6 built-in Kids Safety hooks (idea_1 through idea_6).
 /// Spread into [kDefaultHooks] via the build function; also exposed separately
 /// so tests and the safety-specific logic can reference them directly.
-final kSafetyHooks = kDefaultHooks.where((h) => h.category == 'Safety').toList();
+final kSafetyHooks = kDefaultHooks
+    .where((h) => h.category == 'Safety')
+    .toList();
 
 /// Built-in hooks with all rewrites and moments applied.
 /// Since [kRewrittenStories] and [kMomentUpgrades] have been merged
 /// directly into [kDefaultHooks], this is now a simple alias.
 final kDefaultHooksWithRewrite = kDefaultHooks;
+
+/// The former 14-day post packages, migrated into [kDefaultHooks].
+///
+/// Their stable IDs are kept so the Quick Content picker can continue to offer
+/// them without maintaining a second copy of the package data.
+final kDay14PostIdeas = kDefaultHooks
+    .where((idea) {
+      final id = idea.id;
+      if (!id.startsWith('idea_')) return false;
+      final number = int.tryParse(id.substring('idea_'.length));
+      return number != null && number >= 93 && number <= 116;
+    })
+    .toList(growable: false);
 
 // ── Bulk Parser ───────────────────────────────────────────────────────────────
 
@@ -6765,7 +7025,8 @@ ParsedPostPackage parseBulkPaste(String text) {
   for (int i = 0; i < headerLines.length; i++) {
     final line = headerLines[i];
     final colonIdx = line.indexOf(':');
-    final isNewKey = colonIdx > 0 &&
+    final isNewKey =
+        colonIdx > 0 &&
         line.substring(0, colonIdx).trim().split(' ').length <= 4 &&
         !line.startsWith('---') &&
         !line.startsWith(' ');
@@ -6798,7 +7059,9 @@ ParsedPostPackage parseBulkPaste(String text) {
   return ParsedPostPackage(
     title: readKey('Title'),
     postType: _normalizePostType(
-      readKey('Post Type').isNotEmpty ? readKey('Post Type') : readKey('PostType'),
+      readKey('Post Type').isNotEmpty
+          ? readKey('Post Type')
+          : readKey('PostType'),
     ),
     audience: readKey('Audience').isNotEmpty
         ? readKey('Audience')
@@ -6816,7 +7079,9 @@ ParsedPostPackage parseBulkPaste(String text) {
     cta: readKey('CTA'),
     hashtags: readKey('Hashtags'),
     pinnedComment: _sectionText(sections, ['pinned comment', 'pin comment']),
-    replyComments: _parseComments(_sectionText(sections, ['reply comments', 'comments'])),
+    replyComments: _parseComments(
+      _sectionText(sections, ['reply comments', 'comments']),
+    ),
     script: _sectionText(sections, ['script', 'carousel text', 'carousel']),
     bucket: _resolveBucket(readKey('Bucket')),
     sceneDetail: _sectionText(sections, ['scene detail', 'scene']),
@@ -6824,7 +7089,8 @@ ParsedPostPackage parseBulkPaste(String text) {
     mess: _sectionText(sections, ['mess']),
     innerThought: _sectionText(sections, ['inner thought', 'inner', 'thought']),
     endingBeat: _sectionText(sections, ['ending beat', 'ending']),
-    keepMoralOffScreen: readKey('Keep Moral Off Screen').toLowerCase() == 'true',
+    keepMoralOffScreen:
+        readKey('Keep Moral Off Screen').toLowerCase() == 'true',
   );
 }
 

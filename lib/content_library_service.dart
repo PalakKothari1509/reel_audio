@@ -4,7 +4,7 @@
 //   * HookStore (hooks.json) — user-edited built-in HookIdeas
 //   * kDefaultHooks / kDefaultHooksWithRewrite — the const built-in list in memory
 //   * QuickIdeaStore (quick_ideas.json) — user-created QuickIdeas from the old inbox
-//   * kDay14Posts — the 14-day plan const list in memory
+//   * kDefaultHooks — built-in ideas, including the former 14-day post packages
 //
 // The Content Library screen only knew about ContentLibraryItem (the generated-package
 // store), not the idea sources above it. The Idea Vault screen only knew about
@@ -170,13 +170,20 @@ class ContentIdea {
     id: json['id'] as String? ?? '',
     title: json['title'] as String? ?? '',
     category: json['category'] as String? ?? 'Relatable',
-    collectionId: json['collectionId'] as String? ?? collectionOf(json['id'] as String? ?? '', custom: json['isCustom'] as bool? ?? false),
+    collectionId:
+        json['collectionId'] as String? ??
+        collectionOf(
+          json['id'] as String? ?? '',
+          custom: json['isCustom'] as bool? ?? false,
+        ),
     format: json['format'] as String? ?? 'Reel',
     problem: json['problem'] as String? ?? '',
     lesson: json['lesson'] as String? ?? '',
     opening: json['opening'] as String? ?? '',
     storyDetail: json['storyDetail'] as String? ?? '',
-    characterIds: ((json['characterIds'] as List?) ?? const []).map((e) => e as String).toList(),
+    characterIds: ((json['characterIds'] as List?) ?? const [])
+        .map((e) => e as String)
+        .toList(),
     caption: json['caption'] as String? ?? '',
     isCustom: json['isCustom'] as bool? ?? false,
     status: IdeaStatus.fromLegacy(json['status'] as String? ?? 'idea'),
@@ -200,7 +207,8 @@ class ContentLibraryService {
 
   ContentLibraryService._private();
 
-  static final ContentLibraryService instance = ContentLibraryService._private();
+  static final ContentLibraryService instance =
+      ContentLibraryService._private();
 
   // ── Caching ───────────────────────────────────────────────────────────
 
@@ -253,13 +261,16 @@ class ContentLibraryService {
     final q = query.toLowerCase();
     if (q.isEmpty) return getAllIdeas();
     final all = await getAllIdeas();
-    return all.where((i) =>
-      i.title.toLowerCase().contains(q) ||
-      i.opening.toLowerCase().contains(q) ||
-      i.problem.toLowerCase().contains(q) ||
-      i.lesson.toLowerCase().contains(q) ||
-      i.storyDetail.toLowerCase().contains(q)
-    ).toList();
+    return all
+        .where(
+          (i) =>
+              i.title.toLowerCase().contains(q) ||
+              i.opening.toLowerCase().contains(q) ||
+              i.problem.toLowerCase().contains(q) ||
+              i.lesson.toLowerCase().contains(q) ||
+              i.storyDetail.toLowerCase().contains(q),
+        )
+        .toList();
   }
 
   /// Look up a single idea by its stable ID.
@@ -297,10 +308,13 @@ class ContentLibraryService {
     final target = await getIdeaById(ideaId);
     if (target == null) return [];
     final all = await getAllIdeas();
-    return all.where((i) =>
-      (i.collectionId == target.collectionId && i.id != ideaId) ||
-      (i.category == target.category && i.id != ideaId)
-    ).toList();
+    return all
+        .where(
+          (i) =>
+              (i.collectionId == target.collectionId && i.id != ideaId) ||
+              (i.category == target.category && i.id != ideaId),
+        )
+        .toList();
   }
 
   // ── Public write API ──────────────────────────────────────────────────
@@ -401,14 +415,14 @@ class ContentLibraryService {
       result.add(_hookToIdea(h, isCustom: h.custom));
     }
 
-    // 4. User-added QuickIdeas from the store
+    // 3. User-added QuickIdeas from the store
     final savedQuickIdeas = await QuickIdeaStore.load();
     for (final q in savedQuickIdeas) {
       if (!seen.add(q.id)) continue;
       result.add(_quickIdeaToContentIdea(q));
     }
 
-    // 6. User-added ideas from the inbox
+    // 4. User-added ideas from the inbox
     final inboxItems = await IdeaInboxStore.load();
     for (final i in inboxItems) {
       if (!seen.add(i.id)) continue;
@@ -503,10 +517,18 @@ class ContentLibraryService {
     if (lower.contains('ria') || lower.contains('रिया')) ids.add('ria');
     if (lower.contains('rio') || lower.contains('रियो')) ids.add('rio');
     if (lower.contains('cuty') || lower.contains('क्यूटी')) ids.add('cuty');
-    if (lower.contains('mumma') || lower.contains('मम्मा') || lower.contains('माँ') || lower.contains('मम्मी')) ids.add('mumma');
-    if (lower.contains('papa') || lower.contains('पापा') || lower.contains('पिता')) ids.add('papa');
+    if (lower.contains('mumma') ||
+        lower.contains('मम्मा') ||
+        lower.contains('माँ') ||
+        lower.contains('मम्मी'))
+      ids.add('mumma');
+    if (lower.contains('papa') ||
+        lower.contains('पापा') ||
+        lower.contains('पिता'))
+      ids.add('papa');
     if (lower.contains('daadi') || lower.contains('दादी')) ids.add('daadi');
-    if (lower.contains('teacher') || lower.contains('शिक्षक')) ids.add('teacher');
+    if (lower.contains('teacher') || lower.contains('शिक्षक'))
+      ids.add('teacher');
     return ids;
   }
 
@@ -555,14 +577,20 @@ class ContentLibraryService {
       if (text.trim().isEmpty) return [];
       final raw = jsonDecode(text);
       if (raw is! List) return [];
-      return raw.whereType<Map>().map((json) {
-        try {
-          return ContentIdea.fromJson(Map<String, dynamic>.from(json));
-        } catch (e) {
-          debugPrint('ContentLibraryService: skipped one unreadable idea — $e');
-          return null;
-        }
-      }).whereType<ContentIdea>().toList();
+      return raw
+          .whereType<Map>()
+          .map((json) {
+            try {
+              return ContentIdea.fromJson(Map<String, dynamic>.from(json));
+            } catch (e) {
+              debugPrint(
+                'ContentLibraryService: skipped one unreadable idea — $e',
+              );
+              return null;
+            }
+          })
+          .whereType<ContentIdea>()
+          .toList();
     } catch (e) {
       debugPrint('ContentLibraryService: could not load user ideas — $e');
       return [];

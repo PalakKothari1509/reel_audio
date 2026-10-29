@@ -12,15 +12,21 @@ void main() {
         allIdsByCategory.putIfAbsent(cat, () => []).add(h.id);
       }
       for (final entry in allIdsByCategory.entries) {
-        expect(entry.value.length, greaterThan(0),
-            reason: 'Category "${entry.key}" has no hooks');
+        expect(
+          entry.value.length,
+          greaterThan(0),
+          reason: 'Category "${entry.key}" has no hooks',
+        );
       }
     });
 
     test('kDefaultHooks: all IDs are unique', () {
       final ids = kDefaultHooks.map((h) => h.id).toList();
-      expect(ids.toSet().length, ids.length,
-          reason: 'Duplicate IDs found in kDefaultHooks');
+      expect(
+        ids.toSet().length,
+        ids.length,
+        reason: 'Duplicate IDs found in kDefaultHooks',
+      );
     });
 
     test('kDefaultHooks: every hook has required fields populated', () {
@@ -30,14 +36,21 @@ void main() {
         expect(h.cover, isNotEmpty, reason: '${h.id} has empty cover');
         expect(h.problem, isNotEmpty, reason: '${h.id} has empty problem');
         expect(h.lesson, isNotEmpty, reason: '${h.id} has empty lesson');
-        expect(h.postFormat, isNotEmpty, reason: '${h.id} has empty postFormat');
+        expect(
+          h.postFormat,
+          isNotEmpty,
+          reason: '${h.id} has empty postFormat',
+        );
       }
     });
 
     test('kDefaultHooks: defaultCast has at most 3 characters', () {
       for (final h in kDefaultHooks) {
-        expect(h.defaultCast.length, lessThanOrEqualTo(3),
-            reason: '${h.id} has more than 3 cast members: ${h.defaultCast}');
+        expect(
+          h.defaultCast.length,
+          lessThanOrEqualTo(3),
+          reason: '${h.id} has more than 3 cast members: ${h.defaultCast}',
+        );
       }
     });
 
@@ -45,23 +58,34 @@ void main() {
       for (final h in kDefaultHooks) {
         if (h.caption.isNotEmpty) {
           final hashtags = RegExp(r'#\w+').allMatches(h.caption).toList();
-          expect(hashtags.length, 5,
-              reason: '${h.id} caption has ${hashtags.length} hashtags instead of 5');
+          expect(
+            hashtags.length,
+            5,
+            reason:
+                '${h.id} caption has ${hashtags.length} hashtags instead of 5',
+          );
         }
       }
     });
 
     test('kDefaultHooks: pinnedComment is non-empty', () {
       for (final h in kDefaultHooks) {
-        expect(h.pinnedComment, isNotEmpty, reason: '${h.id} has empty pinnedComment');
+        expect(
+          h.pinnedComment,
+          isNotEmpty,
+          reason: '${h.id} has empty pinnedComment',
+        );
       }
     });
 
     test('kDefaultHooks: readyPrompt with content contains Part 3', () {
       for (final h in kDefaultHooks) {
         if (h.readyPrompt.isNotEmpty) {
-          expect(h.readyPrompt, contains('Part 3'),
-              reason: '${h.id} readyPrompt missing Part 3 (20-30s)');
+          expect(
+            h.readyPrompt,
+            contains('Part 3'),
+            reason: '${h.id} readyPrompt missing Part 3 (20-30s)',
+          );
         }
       }
     });
@@ -71,33 +95,64 @@ void main() {
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 121,
-          reason: 'Expected exactly 121 populated readyPrompt entries');
+      expect(
+        hooks.length,
+        121,
+        reason: 'Expected exactly 121 populated readyPrompt entries',
+      );
 
       for (final h in hooks) {
-        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
-        expect(result.parts.length, 3,
-            reason: '${h.id}: expected 3 parts, got ${result.parts.length}');
+        final result = GeminiVideoResult.parseReadyPrompt(
+          h.readyPrompt,
+          h.cover,
+        );
+        expect(
+          result.parts.length,
+          3,
+          reason: '${h.id}: expected 3 parts, got ${result.parts.length}',
+        );
 
         for (final p in result.parts) {
-          expect(p.promptText.trim(), isNotEmpty,
-              reason: '${h.id}: Part ${p.partNumber} promptText is empty');
-          expect(p.fullPrompt.trim(), isNotEmpty,
-              reason: '${h.id}: Part ${p.partNumber} fullPrompt is empty');
+          expect(
+            p.promptText.trim(),
+            isNotEmpty,
+            reason: '${h.id}: Part ${p.partNumber} promptText is empty',
+          );
+          expect(
+            p.fullPrompt.trim(),
+            isNotEmpty,
+            reason: '${h.id}: Part ${p.partNumber} fullPrompt is empty',
+          );
         }
 
         final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
-        expect(p3.promptText, contains('Moral:'),
-            reason: '${h.id}: Part 3 missing Moral');
-        expect(p3.textOverlay, isNotEmpty,
-            reason: '${h.id}: Part 3 textOverlay field is empty');
-        expect(p3.promptText, isNot(contains('Final text overlay')),
-            reason: '${h.id}: Part 3 promptText still contains Final text overlay');
-        expect(p3.promptText, isNot(contains('\\')),
-            reason: '${h.id}: Part 3 contains backslash artifact');
+        expect(
+          p3.promptText,
+          contains('Moral:'),
+          reason: '${h.id}: Part 3 missing Moral',
+        );
+        expect(
+          p3.textOverlay,
+          isNotEmpty,
+          reason: '${h.id}: Part 3 textOverlay field is empty',
+        );
+        expect(
+          p3.promptText,
+          isNot(contains('Final text overlay')),
+          reason:
+              '${h.id}: Part 3 promptText still contains Final text overlay',
+        );
+        expect(
+          p3.promptText,
+          isNot(contains('\\')),
+          reason: '${h.id}: Part 3 contains backslash artifact',
+        );
 
-        expect(p3.purpose, contains('Resolut'),
-            reason: '${h.id}: Part 3 purpose not "Resolution & Moral"');
+        expect(
+          p3.purpose,
+          contains('Resolut'),
+          reason: '${h.id}: Part 3 purpose not "Resolution & Moral"',
+        );
       }
     });
 
@@ -140,21 +195,24 @@ Part 3 (20-30s): Resolution and Moral: Be kind to others.
       expect(p3.promptText, contains('Moral:'));
     });
 
-    test('parseReadyPrompt: handles overlay at end of prompt without Moral', () {
-      const readyPrompt = '''PROMPT: Foundation
+    test(
+      'parseReadyPrompt: handles overlay at end of prompt without Moral',
+      () {
+        const readyPrompt = '''PROMPT: Foundation
 
 Part 1 (0-10s): Hook introduction
 Part 2 (10-20s): Twist escalation
 Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
 ''';
-      final result = GeminiVideoResult.parseReadyPrompt(readyPrompt, 'Test');
-      final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+        final result = GeminiVideoResult.parseReadyPrompt(readyPrompt, 'Test');
+        final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
 
-      expect(p3.textOverlay, contains('BE KIND'));
-      expect(p3.promptText, isNot(contains('Final text overlay')));
-      expect(p3.promptText, isNot(contains('BE KIND')));
-      expect(p3.promptText, contains('Resolution.'));
-    });
+        expect(p3.textOverlay, contains('BE KIND'));
+        expect(p3.promptText, isNot(contains('Final text overlay')));
+        expect(p3.promptText, isNot(contains('BE KIND')));
+        expect(p3.promptText, contains('Resolution.'));
+      },
+    );
 
     test('parseReadyPrompt: repaired hooks retain apostrophes and quotes in Part 3', () {
       final checks = <String, List<String>>{
@@ -166,11 +224,17 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
 
       for (final entry in checks.entries) {
         final h = kDefaultHooks.firstWhere((e) => e.id == entry.key);
-        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        final result = GeminiVideoResult.parseReadyPrompt(
+          h.readyPrompt,
+          h.cover,
+        );
         final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
         for (final expected in entry.value) {
-          expect(p3.promptText, contains(expected),
-              reason: '${entry.key}: Part 3 missing "$expected"');
+          expect(
+            p3.promptText,
+            contains(expected),
+            reason: '${entry.key}: Part 3 missing "$expected"',
+          );
         }
       }
     });
@@ -178,33 +242,59 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
     test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 121 hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
-          if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
+          if (h.readyPrompt.isNotEmpty &&
+              h.readyPrompt.contains('Final text overlay'))
+            h,
       ];
       for (final h in hooks) {
-        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        final result = GeminiVideoResult.parseReadyPrompt(
+          h.readyPrompt,
+          h.cover,
+        );
         final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
-        expect(p3.textOverlay, isNotEmpty,
-            reason: '${h.id}: textOverlay should be populated');
-        expect(p3.textOverlay, isNot(contains('Final text overlay')),
-            reason: '${h.id}: textOverlay should not contain the label');
-        expect(p3.promptText, isNot(contains('Final text overlay')),
-            reason: '${h.id}: promptText should not contain overlay label');
-        expect(p3.promptText, isNot(contains('LEARNING IS A HABIT')),
-            reason: '${h.id}: promptText should not contain overlay value');
+        expect(
+          p3.textOverlay,
+          isNotEmpty,
+          reason: '${h.id}: textOverlay should be populated',
+        );
+        expect(
+          p3.textOverlay,
+          isNot(contains('Final text overlay')),
+          reason: '${h.id}: textOverlay should not contain the label',
+        );
+        expect(
+          p3.promptText,
+          isNot(contains('Final text overlay')),
+          reason: '${h.id}: promptText should not contain overlay label',
+        );
+        expect(
+          p3.promptText,
+          isNot(contains('LEARNING IS A HABIT')),
+          reason: '${h.id}: promptText should not contain overlay value',
+        );
       }
     });
 
     test('parseReadyPrompt: dialogue and scene content survives overlay extraction', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
-          if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
+          if (h.readyPrompt.isNotEmpty &&
+              h.readyPrompt.contains('Final text overlay'))
+            h,
       ];
       for (final h in hooks) {
-        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        final result = GeminiVideoResult.parseReadyPrompt(
+          h.readyPrompt,
+          h.cover,
+        );
         for (final p in result.parts) {
           // Dialogue and scene descriptions should remain
-          expect(p.promptText.trim(), isNotEmpty,
-              reason: '${h.id}: Part ${p.partNumber} promptText is empty after extraction');
+          expect(
+            p.promptText.trim(),
+            isNotEmpty,
+            reason:
+                '${h.id}: Part ${p.partNumber} promptText is empty after extraction',
+          );
         }
       }
     });
@@ -219,8 +309,14 @@ Part 3 (20-30s): Inline "quotes" and apostrophes here
 ''';
         final result = GeminiVideoResult.parseReadyPrompt(prompt, 'Test');
         expect(result.parts.length, 3);
-        expect(result.parts[0].promptText, contains('Inline content for part 1'));
-        expect(result.parts[1].promptText, contains('Inline content for part 2'));
+        expect(
+          result.parts[0].promptText,
+          contains('Inline content for part 1'),
+        );
+        expect(
+          result.parts[1].promptText,
+          contains('Inline content for part 2'),
+        );
         expect(result.parts[2].promptText, contains('Inline "quotes"'));
       });
 
@@ -274,84 +370,117 @@ Part 3 (20-30s): Content 3
       });
 
       test('non-part text falls back to single part', () {
-        final result = GeminiVideoResult.parseReadyPrompt('Just text', 'Fallback');
+        final result = GeminiVideoResult.parseReadyPrompt(
+          'Just text',
+          'Fallback',
+        );
         expect(result.parts.length, 1);
         expect(result.parts[0].purpose, 'Full Prompt');
       });
     });
 
-    test('QuickIdea: all hashtags fields have exactly 5 hashtags', () {
-      int checked = 0;
-      for (final q in kDay14Posts) {
-        final tags = q.hashtags.split(' ').where((t) => t.isNotEmpty).toList();
-        if (tags.isNotEmpty) {
-          expect(tags.length, 5,
-              reason: '${q.title} has ${tags.length} hashtags instead of 5');
-          checked++;
-        }
+    test('14-day post packages are retained in the built-in idea library', () {
+      expect(kDay14PostIdeas, hasLength(24));
+      for (final idea in kDay14PostIdeas) {
+        expect(idea.caption, isNotEmpty, reason: '${idea.id} has no caption');
+        expect(
+          idea.readyPrompt,
+          isNotEmpty,
+          reason: '${idea.id} has no prompt',
+        );
       }
-      expect(checked, greaterThan(0), reason: 'No QuickIdea hashtags were checked');
     });
 
     test("Safety hooks: all maintain keepMoralOffScreen = false", () {
       for (final h in kSafetyHooks) {
-        expect(h.keepMoralOffScreen, isFalse,
-            reason: '${h.id} in kSafetyHooks must keep moral visible');
+        expect(
+          h.keepMoralOffScreen,
+          isFalse,
+          reason: '${h.id} in kSafetyHooks must keep moral visible',
+        );
       }
     });
 
-    test('kDefaultHooksWithRewrite: all hook ids have moment fields populated', () {
-      // Moment upgrades are now embedded in kDefaultHooksWithRewrite.
-      // Verify that hooks which originally had moment upgrades have
-      // their setting/sceneDetail/dialogue/mess/innerThought/endingBeat populated.
-      for (final h in kDefaultHooksWithRewrite) {
-      // Hooks that had moment upgrades should have non-empty moment fields.
-      // Safety hooks and main hooks all received moment upgrades, so they
-      // should have these fields populated.
-      if (h.category == 'Safety' || h.id.startsWith('idea_')) {
-          expect(h.setting, isNotEmpty, reason: '${h.id} has empty setting');
-          expect(h.sceneDetail, isNotEmpty, reason: '${h.id} has empty sceneDetail');
-          expect(h.dialogue, isNotEmpty, reason: '${h.id} has empty dialogue');
-          expect(h.mess, isNotEmpty, reason: '${h.id} has empty mess');
-          expect(h.innerThought, isNotEmpty, reason: '${h.id} has empty innerThought');
-          expect(h.endingBeat, isNotEmpty, reason: '${h.id} has empty endingBeat');
+    test(
+      'kDefaultHooksWithRewrite: all hook ids have moment fields populated',
+      () {
+        // Moment upgrades are now embedded in kDefaultHooksWithRewrite.
+        // Verify that hooks which originally had moment upgrades have
+        // their setting/sceneDetail/dialogue/mess/innerThought/endingBeat populated.
+        for (final h in kDefaultHooksWithRewrite) {
+          // Hooks that had moment upgrades should have non-empty moment fields.
+          // Safety hooks and main hooks all received moment upgrades, so they
+          // should have these fields populated.
+          if (h.category == 'Safety' || h.id.startsWith('idea_')) {
+            expect(h.setting, isNotEmpty, reason: '${h.id} has empty setting');
+            expect(
+              h.sceneDetail,
+              isNotEmpty,
+              reason: '${h.id} has empty sceneDetail',
+            );
+            expect(
+              h.dialogue,
+              isNotEmpty,
+              reason: '${h.id} has empty dialogue',
+            );
+            expect(h.mess, isNotEmpty, reason: '${h.id} has empty mess');
+            expect(
+              h.innerThought,
+              isNotEmpty,
+              reason: '${h.id} has empty innerThought',
+            );
+            expect(
+              h.endingBeat,
+              isNotEmpty,
+              reason: '${h.id} has empty endingBeat',
+            );
+          }
         }
-      }
-    });
+      },
+    );
 
     test('kDefaultHooksWithRewrite: storyDetail is non-empty for hooks with stories', () {
       final mappedIds = kRewrittenStoryIds;
       for (final h in kDefaultHooksWithRewrite) {
         if (mappedIds.contains(h.id)) {
-          expect(h.storyDetail, isNotEmpty,
-              reason: '${h.id} should have a non-empty storyDetail');
+          expect(
+            h.storyDetail,
+            isNotEmpty,
+            reason: '${h.id} should have a non-empty storyDetail',
+          );
         }
       }
     });
 
-    test('kDefaultHooksWithRewrite: HookIdea round-trips through toJson/fromJson', () {
-      for (final h in kDefaultHooksWithRewrite.take(10)) {
-        final json = h.toJson();
-        final restored = HookIdea.fromJson(json);
-        expect(restored.id, h.id);
-        expect(restored.storyDetail, h.storyDetail);
-        expect(restored.setting, h.setting);
-        expect(restored.sceneDetail, h.sceneDetail);
-        expect(restored.dialogue, h.dialogue);
-        expect(restored.mess, h.mess);
-        expect(restored.endingBeat, h.endingBeat);
-        expect(restored.defaultCast, h.defaultCast);
-        expect(restored.keepMoralOffScreen, h.keepMoralOffScreen);
-      }
-    });
+    test(
+      'kDefaultHooksWithRewrite: HookIdea round-trips through toJson/fromJson',
+      () {
+        for (final h in kDefaultHooksWithRewrite.take(10)) {
+          final json = h.toJson();
+          final restored = HookIdea.fromJson(json);
+          expect(restored.id, h.id);
+          expect(restored.storyDetail, h.storyDetail);
+          expect(restored.setting, h.setting);
+          expect(restored.sceneDetail, h.sceneDetail);
+          expect(restored.dialogue, h.dialogue);
+          expect(restored.mess, h.mess);
+          expect(restored.endingBeat, h.endingBeat);
+          expect(restored.defaultCast, h.defaultCast);
+          expect(restored.keepMoralOffScreen, h.keepMoralOffScreen);
+        }
+      },
+    );
 
     test('kDefaultHooksWithRewrite: defaultCast has at most 3 characters for hooks', () {
       // Verify that hooks which originally had moment upgrades don't have
       // more than 3 cast members
       for (final h in kDefaultHooksWithRewrite) {
         if (h.category == 'Safety' || h.id.startsWith('idea_')) {
-          expect(h.defaultCast.length, lessThanOrEqualTo(3),
-              reason: '${h.id} has more than 3 cast members: ${h.defaultCast}');
+          expect(
+            h.defaultCast.length,
+            lessThanOrEqualTo(3),
+            reason: '${h.id} has more than 3 cast members: ${h.defaultCast}',
+          );
         }
       }
     });
@@ -359,47 +488,99 @@ Part 3 (20-30s): Content 3
     test('kDefaultHooksWithRewrite: endingBeat is non-empty for hooks with moments', () {
       for (final h in kDefaultHooksWithRewrite) {
         if (h.category == 'Safety' || h.id.startsWith('idea_')) {
-          expect(h.endingBeat, isNotEmpty,
-              reason: '${h.id} has empty endingBeat');
+          expect(
+            h.endingBeat,
+            isNotEmpty,
+            reason: '${h.id} has empty endingBeat',
+          );
         }
       }
     });
 
     test('New readyPrompt entries: each has 3 parts with Moral and Final text overlay', () {
       final newIds = [
-        'idea_11', 'idea_21', 'idea_23', 'idea_30', 'idea_31', 'idea_32',
-        'idea_33', 'idea_34', 'idea_35', 'idea_36', 'idea_37', 'idea_39',
-        'idea_40', 'idea_72', 'idea_73', 'idea_74', 'idea_75',
+        'idea_11',
+        'idea_21',
+        'idea_23',
+        'idea_30',
+        'idea_31',
+        'idea_32',
+        'idea_33',
+        'idea_34',
+        'idea_35',
+        'idea_36',
+        'idea_37',
+        'idea_39',
+        'idea_40',
+        'idea_72',
+        'idea_73',
+        'idea_74',
+        'idea_75',
       ];
       for (final id in newIds) {
-        final h = kDefaultHooks.firstWhere((e) => e.id == id, orElse: () =>
-            throw StateError('Hook not found: $id'));
+        final h = kDefaultHooks.firstWhere(
+          (e) => e.id == id,
+          orElse: () => throw StateError('Hook not found: $id'),
+        );
         expect(h.readyPrompt, isNotEmpty, reason: '$id readyPrompt is empty');
-        expect(h.readyPrompt, contains('Part 1 (0-10s)'),
-            reason: '$id missing Part 1 (0-10s)');
-        expect(h.readyPrompt, contains('Part 2 (10-20s)'),
-            reason: '$id missing Part 2 (10-20s)');
-        expect(h.readyPrompt, contains('Part 3 (20-30s)'),
-            reason: '$id missing Part 3 (20-30s)');
-        expect(h.readyPrompt, contains('Moral:'),
-            reason: '$id Part 3 missing Moral');
-        expect(h.readyPrompt, contains('Final text overlay:'),
-            reason: '$id missing Final text overlay');
-        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
-        expect(result.parts.length, 3,
-            reason: '$id: parseReadyPrompt failed - expected 3 parts, got ${result.parts.length}');
+        expect(
+          h.readyPrompt,
+          contains('Part 1 (0-10s)'),
+          reason: '$id missing Part 1 (0-10s)',
+        );
+        expect(
+          h.readyPrompt,
+          contains('Part 2 (10-20s)'),
+          reason: '$id missing Part 2 (10-20s)',
+        );
+        expect(
+          h.readyPrompt,
+          contains('Part 3 (20-30s)'),
+          reason: '$id missing Part 3 (20-30s)',
+        );
+        expect(
+          h.readyPrompt,
+          contains('Moral:'),
+          reason: '$id Part 3 missing Moral',
+        );
+        expect(
+          h.readyPrompt,
+          contains('Final text overlay:'),
+          reason: '$id missing Final text overlay',
+        );
+        final result = GeminiVideoResult.parseReadyPrompt(
+          h.readyPrompt,
+          h.cover,
+        );
+        expect(
+          result.parts.length,
+          3,
+          reason:
+              '$id: parseReadyPrompt failed - expected 3 parts, got ${result.parts.length}',
+        );
         final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
-        expect(p3.promptText, contains('Moral:'),
-            reason: '$id: Part 3 missing Moral after parse');
-        expect(p3.textOverlay, isNotEmpty,
-            reason: '$id: Part 3 textOverlay empty after parse');
-        expect(p3.textOverlay, contains('LEARNING IS A HABIT'),
-            reason: '$id: textOverlay should contain standard footer');
-        expect(p3.textOverlay, isNot(contains('Moral:')),
-            reason: '$id: textOverlay should not contain Moral');
+        expect(
+          p3.promptText,
+          contains('Moral:'),
+          reason: '$id: Part 3 missing Moral after parse',
+        );
+        expect(
+          p3.textOverlay,
+          isNotEmpty,
+          reason: '$id: Part 3 textOverlay empty after parse',
+        );
+        expect(
+          p3.textOverlay,
+          contains('LEARNING IS A HABIT'),
+          reason: '$id: textOverlay should contain standard footer',
+        );
+        expect(
+          p3.textOverlay,
+          isNot(contains('Moral:')),
+          reason: '$id: textOverlay should not contain Moral',
+        );
       }
     });
-
 
     test('New readyPrompt entries: correct characters mentioned', () {
       final characterChecks = {
@@ -420,34 +601,77 @@ Part 3 (20-30s): Content 3
       for (final entry in characterChecks.entries) {
         final h = kDefaultHooks.firstWhere((e) => e.id == entry.key);
         for (final character in entry.value) {
-          expect(h.readyPrompt, contains(character),
-              reason: '${entry.key}: expected character "$character" in readyPrompt');
+          expect(
+            h.readyPrompt,
+            contains(character),
+            reason:
+                '${entry.key}: expected character "$character" in readyPrompt',
+          );
         }
       }
     });
 
-    test('asmr-cleaning-reel: safety regression - no child sitting in paste', () {
-      final h = kDefaultHooks.firstWhere((e) => e.id == 'idea_55');;
-      final combined = '${h.storyDetail} ${h.sceneDetail} ${h.mess} ${h.endingBeat}';
-      expect(combined, isNot(contains('sitting in')),
-          reason: 'Child should not be described as sitting in paste');
-      expect(combined, isNot(contains('in the paste')),
-          reason: 'Child should not be in the paste');
-      expect(h.mess, contains('hands'),
-          reason: 'Mess should describe hands covered in flour, not paws');
-      expect(h.endingBeat, contains('dry brush'),
-          reason: 'Ending should describe proper technique');
-      expect(h.defaultCast, contains('Ria'),
-          reason: 'Default cast should include Ria');
-      expect(h.defaultCast, isNot(contains('Cuty')),
-          reason: 'Default cast should not include Cuty');
-    });
+    test(
+      'asmr-cleaning-reel: safety regression - no child sitting in paste',
+      () {
+        final h = kDefaultHooks.firstWhere((e) => e.id == 'idea_55');
+        ;
+        final combined =
+            '${h.storyDetail} ${h.sceneDetail} ${h.mess} ${h.endingBeat}';
+        expect(
+          combined,
+          isNot(contains('sitting in')),
+          reason: 'Child should not be described as sitting in paste',
+        );
+        expect(
+          combined,
+          isNot(contains('in the paste')),
+          reason: 'Child should not be in the paste',
+        );
+        expect(
+          h.mess,
+          contains('hands'),
+          reason: 'Mess should describe hands covered in flour, not paws',
+        );
+        expect(
+          h.endingBeat,
+          contains('dry brush'),
+          reason: 'Ending should describe proper technique',
+        );
+        expect(
+          h.defaultCast,
+          contains('Ria'),
+          reason: 'Default cast should include Ria',
+        );
+        expect(
+          h.defaultCast,
+          isNot(contains('Cuty')),
+          reason: 'Default cast should not include Cuty',
+        );
+      },
+    );
   });
 }
 
 const kRewrittenStoryIds = {
-  'idea_1', 'idea_2', 'idea_3', 'idea_4', 'idea_5', 'idea_6',
-  'idea_7', 'idea_8', 'idea_9', 'idea_10', 'idea_11', 'idea_12',
-  'idea_13', 'idea_23', 'idea_32', 'idea_33', 'idea_34', 'idea_35',
-  'idea_36', 'idea_38',
+  'idea_1',
+  'idea_2',
+  'idea_3',
+  'idea_4',
+  'idea_5',
+  'idea_6',
+  'idea_7',
+  'idea_8',
+  'idea_9',
+  'idea_10',
+  'idea_11',
+  'idea_12',
+  'idea_13',
+  'idea_23',
+  'idea_32',
+  'idea_33',
+  'idea_34',
+  'idea_35',
+  'idea_36',
+  'idea_38',
 };

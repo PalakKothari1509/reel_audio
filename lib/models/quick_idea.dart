@@ -1,11 +1,7 @@
 // QuickIdea and the stores that hold it.
 //
-// These were at the top of quick_content.dart, which put a domain model inside a
-// 4,600-line UI file. That is what created the import cycle: content_ideas.dart needs
-// QuickIdea to type its kDay14Posts list, and quick_content.dart needs content_ideas.dart
-// for the parser and the bucket lookups. Dart allows the cycle, but it drags all of
-// quick_content.dart into anything that touches content_ideas.dart — including
-// plan_data.dart, which needs only HookIdea.
+// This domain model lives outside quick_content.dart so storage and content code can
+// use it without importing the UI.
 //
 // Nothing here may import quick_content.dart or content_ideas.dart. That constraint is
 // the whole point of the file.
@@ -71,55 +67,59 @@ class QuickIdea {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'postType': postType,
-        'audience': audience,
-        'contentGoal': contentGoal,
-        'mood': mood,
-        'hook': hook,
-        'mainIdea': mainIdea,
-        'problem': problem,
-        'lesson': lesson,
-        'visualStyle': visualStyle,
-        'imagePrompt': imagePrompt,
-        'caption': caption,
-        'cta': cta,
-        'hashtags': hashtags,
-        'comments': comments,
-        'script': script,
-        'slidePrompts': slidePrompts,
-        'createdAt': createdAt.toIso8601String(),
-        'bucket': bucket,
-      };
+    'id': id,
+    'title': title,
+    'postType': postType,
+    'audience': audience,
+    'contentGoal': contentGoal,
+    'mood': mood,
+    'hook': hook,
+    'mainIdea': mainIdea,
+    'problem': problem,
+    'lesson': lesson,
+    'visualStyle': visualStyle,
+    'imagePrompt': imagePrompt,
+    'caption': caption,
+    'cta': cta,
+    'hashtags': hashtags,
+    'comments': comments,
+    'script': script,
+    'slidePrompts': slidePrompts,
+    'createdAt': createdAt.toIso8601String(),
+    'bucket': bucket,
+  };
 
   /// Every field defaults rather than throws. A hand-edited or partially written file
   /// should degrade to a blank idea, not take the whole library with it.
   factory QuickIdea.fromJson(Map<String, dynamic> json) => QuickIdea(
-        id: json['id'] as String? ?? '',
-        title: json['title'] as String? ?? '',
-        postType: json['postType'] as String? ?? 'Carousel',
-        audience: json['audience'] as String? ?? 'Indian moms and parents of children aged 1-4',
-        contentGoal: json['contentGoal'] as String? ?? 'Build connection',
-        mood: json['mood'] as String? ?? 'Relatable',
-        hook: json['hook'] as String? ?? '',
-        mainIdea: json['mainIdea'] as String? ?? '',
-        problem: json['problem'] as String? ?? '',
-        lesson: json['lesson'] as String? ?? '',
-        visualStyle: json['visualStyle'] as String? ?? 'Bright and playful',
-        imagePrompt: json['imagePrompt'] as String? ?? '',
-        caption: json['caption'] as String? ?? '',
-        cta: json['cta'] as String? ?? 'Save this for later',
-        hashtags: json['hashtags'] as String? ?? '',
-        comments:
-            ((json['comments'] as List?) ?? const []).whereType<String>().toList(),
-        script: json['script'] as String? ?? '',
-        slidePrompts:
-            ((json['slidePrompts'] as List?) ?? const []).whereType<String>().toList(),
-        createdAt:
-            DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
-        bucket: json['bucket'] as String? ?? '',
-      );
+    id: json['id'] as String? ?? '',
+    title: json['title'] as String? ?? '',
+    postType: json['postType'] as String? ?? 'Carousel',
+    audience:
+        json['audience'] as String? ??
+        'Indian moms and parents of children aged 1-4',
+    contentGoal: json['contentGoal'] as String? ?? 'Build connection',
+    mood: json['mood'] as String? ?? 'Relatable',
+    hook: json['hook'] as String? ?? '',
+    mainIdea: json['mainIdea'] as String? ?? '',
+    problem: json['problem'] as String? ?? '',
+    lesson: json['lesson'] as String? ?? '',
+    visualStyle: json['visualStyle'] as String? ?? 'Bright and playful',
+    imagePrompt: json['imagePrompt'] as String? ?? '',
+    caption: json['caption'] as String? ?? '',
+    cta: json['cta'] as String? ?? 'Save this for later',
+    hashtags: json['hashtags'] as String? ?? '',
+    comments: ((json['comments'] as List?) ?? const [])
+        .whereType<String>()
+        .toList(),
+    script: json['script'] as String? ?? '',
+    slidePrompts: ((json['slidePrompts'] as List?) ?? const [])
+        .whereType<String>()
+        .toList(),
+    createdAt:
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+    bucket: json['bucket'] as String? ?? '',
+  );
 }
 
 /// Reads a list of ideas, decoding each row on its own so one damaged entry costs
