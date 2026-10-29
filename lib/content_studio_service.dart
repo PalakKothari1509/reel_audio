@@ -1488,11 +1488,6 @@ Preserve each character's face, age, hair, outfit, colours and proportions acros
 
 PRODUCE A COMPLETE 30-SECOND REEL IN 3 CONNECTED 10-SECOND CLIPS.
 
-MASTER SPECIFICATION:
-- Ratio & Format: 9:16 Vertical Video (Reels / Shorts)
-- Visual Aesthetic: Soft 3D Disney/Pixar animation, warm pastel cream backdrop, expressive character animation, clear cinematic lighting.
-- Characters: Only characters from the CHARACTER LOCK below may appear.
-
 STORY IDEA: $idea
 LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
@@ -1501,38 +1496,36 @@ ${_videoBrandStyleBlock()}
 
 CHARACTER LOCK (do not deviate):
 $charBlock$voiceBlock
+$characterInstructions
 
-LANGUAGE RULES:
-  Adults speak natural, conversational Hindi or Hinglish — no stilted translations.
-  Children speak simple, age-appropriate Hinglish — short sentences, limited vocabulary.
-  Avoid formal, AI-sounding dialogue, repetitive catchphrases, and forced translations.
+STORY STRUCTURE GUIDANCE:
+- Clip 1 (0-10s): Hook & Problem — Show the real-life preschool problem from the STORY IDEA.
+  Open with the child's immediate physical action. End on a freeze-frame that sets up Clip 2's twist.
+- Clip 2 (10-20s): Twist & Escalation — A complication arises. The parent or another character
+  responds. Tension peaks around second 18-20s. End on the moment the resolution begins.
+- Clip 3 (20-30s): Resolution & Payoff — The small, believable solution. Warm family moment.
+  Holds for smooth loop. No explicit "moral of the story" spoken — show it through action.
 
-STORY QUALITY:
-  Every story starts from a recognizable real-life preschool problem (e.g. sharing toys,
-  bedtime resistance, picky eating, fear of loud noise).
-  Child reactions are believable — frustration, tears, joy — not perfectly compliant.
-  Parenting is imperfect but caring: mistakes happen, patience is shown.
-  Clear cause-and-effect progression: Problem → Child acts → Consequence → Parent step → Resolution.
-  Endings are satisfying but not artificially perfect — show a small, real-world improvement.
-  Lessons are demonstrated through actions and consequences, not forced dialogue or moralizing.
+For each clip, extract specific actions, dialogue, and on-screen text from the STORY IDEA.
+Do NOT use generic template placeholders — every field must contain STORY-SPECIFIC content.
 
-SAFETY:
-  Never depict unsafe behavior as entertainment — no choking hazards shown as play, no
+SAFETY: (overrides any conflicting idea field)
+- If the story involves fireworks, sparklers, flames, matches, candles, or similar items:
+  Children must NEVER light, touch, hold, or approach them. Adults always handle them.
+  Children watch from a genuinely safe distance. Show the safety rule first, then the payoff.
+- Never depict unsafe behavior as entertainment — no choking hazards shown as play, no
   climbing on furniture that could collapse, no small objects near babies under 3.
-  Solutions must show safe, realistic parenting — no magic fixes, no dismissing
+- Solutions must show safe, realistic parenting — no magic fixes, no dismissing
   genuine feelings.
-  No fear-based scenarios that could frighten a sensitive child.
-
-SHAREABILITY:
-  Before writing, answer: "Why would one parent send this to another parent?"
-  Include that specific, relatable hook. If the story cannot name a parent who would
-  send it, the concept is too generic — make it specific.
+- No fear-based scenarios that could frighten a sensitive child.
 
 CHARACTER CONTINUITY RULES:
   $characterInstructions
-  - Only the listed characters may appear. Never duplicate any character.
-  - Preserve each character's face, age, hair, outfit, colours and proportions across ALL parts.
-  - Preserve character positions, object locations, and scene continuity across all parts.
+
+SHAREABILITY:
+- Before writing, answer: "Why would one parent send this to another parent?"
+  Include that specific, relatable hook. If the story cannot name a parent who would
+  send it, the concept is too generic — make it specific.
 
 CONTINUITY:
 - Clip 1 ends at the exact frame Clip 2 starts from. Clip 2 ends at the exact frame Clip 3 starts from.
@@ -1542,38 +1535,6 @@ CONTINUITY:
 - No closing card, moral, quote or summary at the end.
 - Audience: Indian moms and parents of children aged 1-4
 - Brand: Fun Learning With Palak
-
-CLIP STRUCTURE (MANDATORY - FOLLOW EXACTLY):
-
-CLIP 1 (0–10s): THE HOOK & PROBLEM
-- Visual Action: [Direct physical action demonstrating the struggle or situation]
-- Camera Work: Slow push-in at child eye-level.
-- Editor Metadata (do NOT render in video — added post-generation):
-  - on_screen_text line_1_0_3s: [Bold Hook Headline - max 3 words, $language]
-  - on_screen_text line_2_4_7s: [Context Text - max 5 words, $language]
-- AI Video Generator Prompt: "Vibrant 3D Pixar-style vertical 9:16 animation. [Character] is [exact physical action]. Warm ambient room lighting, cream and pastel tones. Smooth eye-level slow push-in. Character shows dramatic, cute facial expression of [emotion]. At the 10-second mark, [character] freezes in posture, holding [object], facing [direction]."
-
-CLIP 2 (10–20s): THE TWIST & ESCALATION
-- Visual Action: [Unexpected turn, sibling joins, or humorous complication]
-- Camera Work: Steady medium tracking shot.
-- Editor Metadata (do NOT render in video — added post-generation):
-  - on_screen_text line_1_11_15s: [Relatable Parent Insight - max 5 words, $language]
-  - on_screen_text line_2_16_20s: [Tension / Anticipation Text - max 5 words, $language]
-- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 1. Vibrant 3D Pixar-style vertical 9:16 animation. [Character] maintains identical clothing and hairstyle. Suddenly, [second character/parent] steps in and [subtle action]. Fluid motion, consistent soft warm lighting. At the 20-second mark, [exact end pose]."
-
-CLIP 3 (20–30s): THE RESOLUTION & MORAL
-- Visual Action: [Gentle solution, teamwork, parent hug, or resolution action]
-- Camera Work: Slow pull-back to wide warm family shot.
-- Editor Metadata (do NOT render in video — added post-generation):
-  - on_screen_text line_1_21_26s: [The Moral / Takeaway - max 5 words, $language]
-  - on_screen_text line_2_27_30s: [Call to Action: 'Save this for later ❤️']
-- AI Video Generator Extension Prompt: "Continuing seamlessly from the final frame of Clip 2. Vibrant 3D Pixar-style vertical 9:16 animation. Identical character models and lighting. [Characters] smile and [final resolution action]. The scene resolves into a warm, joyful family tableau. Steady hold for smooth loop at second 30."
-
-CONTINUITY REQUIREMENTS (CRITICAL):
-- Clip 2 MUST start from the EXACT ending_state of Clip 1 (same character positions, props, lighting)
-- Clip 3 MUST start from the EXACT ending_state of Clip 2
-- The "AI Video Generator Prompt" for each clip must be copy-paste ready for Veo/Runway/Sora
-- Each clip's prompt must be self-contained but reference the previous clip's end frame
 
 Return ONLY valid JSON:
 
@@ -1587,61 +1548,61 @@ Return ONLY valid JSON:
     {
       "part_number": 1,
       "purpose": "Hook & Problem - Establish the relatable struggle",
-      "setting": "Exact location, background, lighting, props for Clip 1",
-      "starting_state": "Exact character positions, expressions, prop positions at 0s",
-      "action_0_4s": "Specific visually clear action in first 4 seconds",
+      "setting": "Exact location from the story idea (e.g. living room rug, kitchen counter, bedtime scene, Diwali courtyard at dusk)",
+      "starting_state": "Exact character positions, expressions, prop positions at 0s — use character names from CHARACTER LOCK",
+      "action_0_4s": "Specific visually clear action in first 4 seconds — name characters by their actual names from the story",
       "action_4_8s": "Continuation of action in seconds 4-8",
-      "action_8_10s": "Complete this beat and establish transition to Clip 2",
-      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
+      "action_8_10s": "Complete this beat and establish transition to Clip 2 — describe the exact end pose",
+      "dialogue": "Exact dialogue in Hinglish if required, assigned to the correct character, or empty string",
       "text_overlay": "Two lines max: Line 1 (0-3s hook), Line 2 (4-7s context)",
       "ending_state": "EXACT character positions, expressions, props at 10s - Clip 2 continues from HERE",
       "continuity_from": "Opening scene - establish the world",
       "continuity_into": "Describe the exact 10s frame that Clip 2 must continue from",
-       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
-      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 1 (0-10s) following the specification format above",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces. All text is editor metadata only — do NOT render in video.",
+      "visual_prompt": "Self-contained copy-paste-ready AI video prompt for Clip 1 (0-10s): describe the exact scene from the story — who does what, where, with what props, in what lighting. Reference characters by their CHARACTER LOCK names. No on-screen text rendered.",
       "on_screen_text": {
-        "line_1_0_3s": "Hook headline (max 3 words)",
-        "line_2_4_7s": "Context text (max 5 words)"
+        "line_1_0_3s": "Hook headline (max 3 words, Hinglish) — Editor Metadata, do NOT render in video",
+        "line_2_4_7s": "Context text (max 5 words, Hinglish) — Editor Metadata, do NOT render in video"
       }
     },
     {
       "part_number": 2,
       "purpose": "Twist & Escalation - Complicate the situation",
-      "setting": "Exact location, background, lighting, props for Clip 2 (same as Clip 1 unless changed)",
-      "starting_state": "MUST match Clip 1 ending_state exactly",
-      "action_0_4s": "Specific visually clear action in seconds 10-14",
-      "action_4_8s": "Continuation in seconds 14-18",
-      "action_8_10s": "Complete this beat and establish transition to Clip 3",
-      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
+      "setting": "Same location from Clip 1 unless the story moves. Background lighting and props must match.",
+      "starting_state": "MUST match Clip 1 ending_state exactly — same positions, same expressions, same props",
+      "action_0_4s": "Specific visually clear action in seconds 10-14 — a parent enters, a sibling joins, or the situation changes",
+      "action_4_8s": "Continuation in seconds 14-18 — tension builds as the parent addresses the child's action",
+      "action_8_10s": "Peak tension around second 18-20, then begin the resolution — describe exact end pose",
+      "dialogue": "Exact dialogue in Hinglish if required, assigned to the correct character, or empty string",
       "text_overlay": "Two lines max: Line 1 (11-15s insight), Line 2 (16-20s tension)",
       "ending_state": "EXACT character positions, expressions, props at 20s - Clip 3 continues from HERE",
       "continuity_from": "Clip 1 ended with [describe exact 10s frame]",
       "continuity_into": "Describe the exact 20s frame that Clip 3 must continue from",
-       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
-      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 2 (10-20s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 1'",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces. All text is editor metadata only — do NOT render in video.",
+      "visual_prompt": "Self-contained copy-paste-ready AI video prompt for Clip 2 (10-20s): MUST start with 'Continuing seamlessly from the final frame of Clip 1'. Describe the exact scene — which character enters, what they do, how the child reacts. Reference characters by their CHARACTER LOCK names. No on-screen text rendered.",
       "on_screen_text": {
-        "line_1_11_15s": "Parent insight (max 5 words)",
-        "line_2_16_20s": "Tension text (max 5 words)"
+        "line_1_11_15s": "Parent insight (max 5 words, Hinglish) — Editor Metadata, do NOT render in video",
+        "line_2_16_20s": "Tension text (max 5 words, Hinglish) — Editor Metadata, do NOT render in video"
       }
     },
     {
       "part_number": 3,
       "purpose": "Resolution & Moral - Heartwarming payoff",
-      "setting": "Exact location, background, lighting, props for Clip 3",
+      "setting": "Same location from Clip 2. Lighting stays consistent.",
       "starting_state": "MUST match Clip 2 ending_state exactly",
-      "action_0_4s": "Specific visually clear action in seconds 20-24",
-      "action_4_8s": "Continuation in seconds 24-28",
-      "action_8_10s": "Final resolution, warm hold for loop",
-      "dialogue": "Exact dialogue in Hinglish if required, or empty string",
-      "text_overlay": "Two lines max: Line 1 (21-26s moral), Line 2 (27-30s CTA: 'Save this for later ❤️')",
+      "action_0_4s": "Specific visually clear action in seconds 20-24 — the parent's solution is applied",
+      "action_4_8s": "Continuation in seconds 24-28 — characters react to the resolution, small improvement shown",
+      "action_8_10s": "Final warm family moment at second 28-30 — hold for smooth loop",
+      "dialogue": "Exact dialogue in Hinglish if required, assigned to the correct character, or empty string",
+      "text_overlay": "Two lines max: Line 1 (21-26s moral takeaway), Line 2 (27-30s CTA)",
       "ending_state": "Final warm family tableau at 30s, ready for smooth loop",
       "continuity_from": "Clip 2 ended with [describe exact 20s frame]",
       "continuity_into": "Final frame - loops back to beginning vibe",
-       "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces",
-      "visual_prompt": "Complete copy-paste-ready AI video prompt for Clip 3 (20-30s) following the specification format above - MUST reference 'Continuing seamlessly from the final frame of Clip 2'",
+      "negative_instructions": "No duplicate characters, no identity changes, no outfit changes, no distorted anatomy, no off-screen text, no blurry faces. All text is editor metadata only — do NOT render in video.",
+      "visual_prompt": "Self-contained copy-paste-ready AI video prompt for Clip 3 (20-30s): MUST start with 'Continuing directly from the final frame of Clip 2'. Describe the resolution — how the parent helps, how the child responds, the warm ending. Reference characters by their CHARACTER LOCK names. No on-screen text rendered.",
       "on_screen_text": {
-        "line_1_21_26s": "Moral/takeaway (max 5 words)",
-        "line_2_27_30s": "Save this for later ❤️"
+        "line_1_21_26s": "Moral takeaway (max 5 words, Hinglish) — Editor Metadata, do NOT render in video",
+        "line_2_27_30s": "Save this for later ❤️ — Editor Metadata, do NOT render in video"
       }
     }
   ]
@@ -1649,12 +1610,13 @@ Return ONLY valid JSON:
 
 RULES:
 - Return exactly $parts parts.
-- Every "visual_prompt" must be completely self-contained and follow the AI Video Generator Prompt format in the specification.
+- Every "visual_prompt" must be completely self-contained and describe specific, story-driven actions.
 - All on_screen_text must be in $language.
 - The story must be specific to an Indian household with relatable preschool moments.
 - Character actions must be physically clear and animation-friendly.
 - Only the listed characters (from CHARACTER LOCK above) may appear. Do NOT add characters not in that list.
-- NO on-screen text rendered in video frames — all text is editor metadata in the on_screen_text field only.
+- NO text rendered in video frames — all overlay text goes in the on_screen_text field only.
+- If the story involves hazardous items (fireworks, flames, sparklers, etc.), safety rules above take priority and children must never handle them.
 ''';
 }
 

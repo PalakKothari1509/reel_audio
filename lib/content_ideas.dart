@@ -346,18 +346,18 @@ HookIdea(
     custom: false,
     archived: false,
     storyDetail: '''
-Story: At Daadi's house, relatives gather. Uncle opens his arms: "Ria, hug? Ek pappi toh banti hai!" Ria feels the pressure — everyone's eyes are on her. She steps back, hides behind Mumma: "Nahi, mujhe hug nahi chahiye."
-Twist: An aunt insists: "Arre beta, itna bhi kya sharm? Uncle pyaar karte hain!" Mumma steps in calmly: "Beta, Ria ne mana kiya. Uske liye kaafi hai." Mumma turns to Ria: "Wave, high-five, ya kuch bhi nahi — tum choose karo." Ria gives a small wave from beside Mumma, shoulders relaxing.
-Resolution: Uncle smiles: "Wave bhi accha hai." End card: "Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai."
+Story: At Daadi's house, relatives gather. Daadi opens her arms: "Ria, hug? Ek pappi toh banti hai!" Ria feels the pressure — everyone's eyes are on her. She steps back, hides behind Mumma: "Nahi, mujhe hug nahi chahiye."
+Twist: An aunt insists: "Arre beta, itna bhi kya sharm? Daadi pyaar karte hain!" Mumma steps in calmly: "Beta, Ria ne mana kiya. Uske liye kaafi hai." Mumma turns to Ria: "Wave, high-five, ya kuch bhi nahi — tum choose karo." Ria gives a small wave from beside Mumma, shoulders relaxing.
+Resolution: Daadi smiles: "Wave bhi accha hai." End card: "Pyaar karne ke liye hug zaroori nahi. Ria ki marzi bhi zaroori hai."
 Moral: Body autonomy starts with a simple "no thank you" — and adults who respect it.
 ''',
     setting: 'Daadi\'s living room, afternoon light, family gathering',
-    sceneDetail: 'Uncle with open arms, Ria hiding behind Mumma\'s saree, aunt leaning in with expectant smile',
+    sceneDetail: 'Daadi with open arms, Ria hiding behind Mumma\'s saree, aunt leaning in with expectant smile',
     dialogue: '"Ria, hug? Ek pappi toh banti hai!" "Nahi, mujhe hug nahi chahiye."',
     mess: 'Relatives keep insisting — "Arre beta, itna bhi kya sharm?" — the pressure builds',
     innerThought: 'I need to show Ria that her "no" has power, without making her fear all touch.',
-    endingBeat: 'Uncle accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
-    defaultCast: ['Ria', 'Mumma', 'Uncle'],
+    endingBeat: 'Daadi accepts the wave. Ria breathes easy. Mumma squeezes her hand — "Main tumhare saath hoon."',
+    defaultCast: ['Ria', 'Mumma', 'Daadi'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -568,7 +568,7 @@ HookIdea(
     postFormat: 'Reel',
     strategy: '',
     caption: 'Preschool ke time pe bachche "main khud!" bolte hain toh dil khush bhi hota hai aur tension bhi hoti hai. Thoda time do, try karne do, zaroorat pade toh pyaar se help karo. 👟 #Independence #ToddlerLife #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Time tellne ke liye ek simple song ya rhyme banayein!',
+    pinnedComment: 'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -874,7 +874,7 @@ Moral: Clear timer, clear rules — no tears over sharing.
     postFormat: 'Reel',
     strategy: '',
     caption: 'Brush ke time pe Ria chhup gayi? Cuty ke daant brush karke dikhao, fir Ria khud try karegi. Pea-sized fluoride paste, bade ki supervision. 🪥 #BrushTime #ToddlerRoutine #ParentingHacks #IndianParents #FunLearningWithPalak',
-    pinnedComment: 'Tip: Time tellne ke liye ek simple song ya rhyme banayein!',
+    pinnedComment: 'Tip: Time teller ke liye ek simple song ya rhyme banayein!',
     forApp: true,
     usedOn: '',
     custom: false,
@@ -2334,18 +2334,18 @@ Moral: Dabba hi kaafi hai.
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Light flickers, fan cuts out mid-hum. Ria tugs Mumma's hand: "Bijli ko bolo band ho jaye!"
+Story: Light flickers, fan cuts out mid-hum. Ria tugs Mumma's hand: "Bijli ko bolo, band ho jaye!"
 Twist: Mumma kneels: "Thumbs up if you're worried. Bijli khel rahi thi—ab rest karegi."
 Resolution: They sit in the quiet. Ria discovers she can hear her own heartbeat. "Thump-thump!" "It means you're safe."
 Moral: Naming the noise makes the fear small enough to hold.
 ''',
     setting: 'Bedroom, bedtime, night light casting soft shadows',
-    sceneDetail: 'Night light still glowing, Rio clinging to Mumma in the sudden dark',
+    sceneDetail: 'Night light still glowing, Ria clinging to Mumma in the sudden dark',
     dialogue: '"Bijli band ho gayi! Ab kya karein?"',
-    mess: 'Power cuts at bedtime, Rio is afraid of the dark',
+    mess: 'Power cuts at bedtime, Ria is afraid of the dark',
     innerThought: 'I should have checked the inverter earlier.',
-    endingBeat: 'They sit in the quiet, Rio hears his own heartbeat.',
-    defaultCast: ['Rio', 'Ria', 'Mumma'],
+    endingBeat: 'They sit in the quiet, Ria hears her own heartbeat.',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2948,9 +2948,9 @@ Moral: You don't need to follow — it's better to create your own way to celebr
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Garba is starting in 5 minutes, but Ria is still struggling with her jootneys — "Jootey pehne mein dikkat ho rahi hai!"
+Story: Garba is starting in 5 minutes, but Ria is still struggling with her jootey — "Jootey pehne mein dikkat ho rahi hai!"
 Twist: Papa turns it into a game — "Jootey pehne, superhero ban jao!" — Ria giggles and slips them on.
-Resolution: Ria runs to join the Garba circle just in time, her "superhero jootneys" clicking as she dances.
+Resolution: Ria runs to join the Garba circle just in time, her "superhero jootey" clicking as she dances.
 Moral: Rushing creates resistance — transform the race into play and everything falls into place.
 ''',
     setting: 'Bedroom, evening, outfit laid out on the bed, shoes by the door',
@@ -2994,7 +2994,7 @@ Moral: A new perspective can turn overwhelm into magic — sometimes elevation h
     mess: 'Ria gets pushed, loses balance, the dupatta tangles more',
     innerThought: 'I should have arrived early.',
     endingBeat: 'A stranger helps untangle, Ria offers her a sip from her water bottle.',
-    defaultCast: ['Ria', 'Mumma', 'Crowd member'],
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -3109,42 +3109,7 @@ Moral: Ek minute separation, poora mood badal jaata hai.
     readyPrompt: '',
   ),
 
-HookIdea(
-    id: 'h19b',
-    category: 'Surprising',
-    cover: 'Bhaago Mat? Dheere Chalo!',
-    opening: 'Mumma ne "mat bhaago" bola... Rio aur tez bhaaga!',
-    problem: 'A child ignores "don\'t" but follows a clear "do"',
-    lesson: 'Kya nahi karna, nahi — kya karna hai, woh batao',
-    postFormat: 'Reel',
-    strategy: '',
-    caption: '"Mat bhaago" suna toh bachcha bhaaga! "Ungli pakdo" bola toh ruk gaya. Kya karna hai, woh bolo! 🏃‍♂️ #PositiveInstructions #ToddlerListening #FunLearningWithPalak #IndianParents #ParentingTips',
-    pinnedComment: '"Mat" ki jagah "Karo" bolo — dekhna farak!',
-    forApp: true,
-    usedOn: '',
-    custom: false,
-    archived: false,
-    storyDetail: '''
-Story: Parking mein Mumma: "Rio, mat bhaago!" Rio aur tez bhaagta hai.
-Twist: Mumma daud ke pakadti hai aur ab alag bolti hai: "Rio, meri ungli pakdo." Rio ruk jaata hai: "Kyun?"
-Resolution: "Gaadi aati hai. Ungli pakdo, hum dono saath cross karenge." Rio ungli kas ke pakad leta hai. Dono dhire dhire chalte hain.
-Moral: "Mat" nahi, "ungli pakdo".
-''',
-    setting: 'Society parking, afternoon, cars entering',
-    sceneDetail: 'One red car stops at the line, others pass',
-    dialogue: '"Rio, meri ungli pakho."',
-    mess: 'Rio starts to run, then stops when he feels Mumma\'s hand',
-    innerThought: 'He\'s faster than me, but safer with me.',
-    endingBeat: 'Both cross the road together, hand in hand.',
-    defaultCast: ['Rio', 'Mumma'],
-    keepMoralOffScreen: false,
-    quote: '',
-    detail: '',
-    punchline: '',
-    readyPrompt: '',
-  ),
-
-HookIdea(
+  HookIdea(
     id: 'toy-sharing',
     category: 'Relatable',
     cover: 'Toy Sharing!',
@@ -4111,23 +4076,41 @@ Moral: Bachche har cheez notice karte hain — unki curiosity ko sahi direction 
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Ria ke saamne phataka jalaane ka waqt, Mumma pehle safety rules samjhati hai — kya doori rakhna hai, paani ki balti taiyaar, soot ke kapde pehenne hain.
-Twist: Ria phataka ko turant light karne ki koshish karti hai, par safety rule yaad karti hai aur ruk jaati hai. Mumma uske haath mein sparkler deti hai — apni ungli pakad ke.
-Resolution: Har safety rule follow karne ke baad, Mumma ke saath phataka jalane ka maza do guna hone lagta hai.
+Story: Ria ke saamne Diwali phataka jalaane se pehle, Mumma safety rules samjhati hai — kya doori rakhna hai, paani ki balti taiyaar, soot ke kapde pehenne hain. Ria ek safe zone banane ki koshish karti hai lekin Mumma kehta hai ki kuch bhi safe zone nahi banata — sirf adult hi handle karta hai.
+Twist: Ria phataka ke saath ghoomne ki koshish karti hai, par Mumma use rukna padta hai. "Beta, phataka sirf adult ke haath mein!" kehkar Mumma sparkler apni ungli pakad ke jalaati hai — Ria paas se dekhti hai.
+Resolution: Har safety rule follow karne ke baad, Ria ek Safety Star badge paati hai. Do ladke — ek jo safe raha, ek jo unsafe ki koshish ki — dono Mumma ke saath phataka dekhte hain.
 Moral: Safety rules follow karne se hi Diwali ka maza safe rehta hai. Bacche kabhi khud phataka na jalayein.
 ''',
     setting: 'Courtyard at dusk, fireworks laid out on the ground, water bucket nearby',
-    sceneDetail: 'A small chalk-drawn circle marking the safe zone, Mumma holding sparkler with Ria',
+    sceneDetail: 'Mumma stands behind the safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her.',
     dialogue: '"Pehle safety samjho, phir phataka jalao!"',
-    mess: 'A spark lands on a curtain and starts to smolder — Mumma douses it instantly',
+    mess: 'Ria tries to reach the sparkler but remembers the rule and stops. Mumma holds it safely, showing Ria how to watch without touching.',
     innerThought: 'How do I make safety fun and not boring?',
-    endingBeat: 'Ria wears her "Safety Star" badge while holding sparkler with Mumma.',
+    endingBeat: 'Ria wears her "Safety Star" badge while Mumma lights sparklers at a safe distance.',
     defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: 'Safe kids light up Diwali brighter — with adult help.',
     detail: 'Teach one rule before every firework. Adult lights, child watches from safe distance.',
     punchline: 'Safety first, sparkle always — with adult help!',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Courtyard at dusk. Mumma behind safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her. "Pehle safety samjho, phir phataka jalao!" Text on screen: "SAFETY FIRST! 🪔" "ADULTS HANDLE IT!"
+
+On-Screen Text:
+- [0-3s]: "DIWALI KE PHATE! 🪔"
+- [3-7s]: "BUZZ WORD: ADULT SUPERVISION 🔥"
+- [7-12s]: "SAFE DISTANCE = SAFETY ✨"
+- [12-16s]: "WATCH & WONDER 🌟"
+- [16-20s]: "SAFETY STAR BADGE! ⭐"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Courtyard at dusk. Mumma stands behind the safe distance line, holding sparkler in her own hand. Ria watches from the marked spot beside her. "Pehle safety samjho, phir phataka jalao!" Text: "DIWALI KE PHATE! 🪔" "BUZZ WORD: ADULT SUPERVISION 🔥". Ria tries to reach the sparkler but remembers the rule and stops.
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma holds the sparkler safely, showing Ria how to watch without touching. "Beta, phataka sirf adult ke haath mein!" Ria's eyes wide with wonder. Water bucket ready nearby. Text: "SAFE DISTANCE = SAFETY ✨" "WATCH & WONDER 🌟".
+
+Audio/Dialogue (Hinglish): Mumma: "Pehle safety samjho, phir phataka jalao!" Ria curious: "Mumma, main khud jalayegi?" Mumma: "Beta, phataka sirf adult ke haath mein! Tum dekho, main kaise jalaati hoon." Ria: "Wow! Kitni chamak rahi hai!" Mumma: "Safe distance raho, beta. Dekho, par chuhne mat."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria wears her "Safety Star" badge while Mumma lights sparklers at a safe distance. Ria claps with joy, eyes sparkling. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Safety rules follow karne se hi Diwali ka maza safe rehta hai. Bacche kabhi khud phataka na jalayein. Adults always handle fireworks.
+
+''',
   ),
   HookIdea(
     id: 'h28',
@@ -4405,7 +4388,7 @@ Moral: It's not about where you work — it's about how much you love.
     id: 'h36',
     category: 'Relatable',
     cover: 'Game Mode: Busy!',
-    opening: 'Jab bhi phone uthate hain, Rio kehti — "Daddy call aa raha hai, par main game mein hoon!".',
+    opening: 'Jab bhi phone uthate hain, Rio kehti — "Papa call aa raha hai, par main game mein hoon!".',
     problem: 'Rio is not allowing me to answer calls from his father as he was playing game.',
     lesson: 'Game bhi time hote hain, call bhi time hote hain — dono important hain. Timer laga ke transition banao.',
     postFormat: 'Reel',
@@ -4417,18 +4400,18 @@ Moral: It's not about where you work — it's about how much you love.
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Rio ka favorite game chal raha hota hai jab daddy se call aata hai. Woh call khatam hone tak nahi janta — "Bas ek aur level!".
-Twist: Daddy ne ek naya trick ki — usne apne voice message ke saath ek mini game bheja: "Call karo jab game over ho."
+Story: Rio ka favorite game chal raha hota hai jab Papa se call aata hai. Woh call khatam hone tak nahi janta — "Bas ek aur level!".
+Twist: Papa ne ek naya trick ki — usne apne voice message ke saath ek mini game bheja: "Call karo jab game over ho."
 Resolution: Rio ne apne game se bahar nikal kar call liya — aur dono together ek level complete kiya.
 Moral: Time boundaries without punishment = happy kids.
 ''',
     setting: 'Living room floor, console glowing',
-    sceneDetail: 'Rio with headphones, controller in hands, Daddy\'s call flashing on screen',
-    dialogue: '"5 more minutes, Dad! Just one more level!"',
+    sceneDetail: 'Rio with headphones, controller in hands, Papa\'s call flashing on screen',
+    dialogue: '"5 more minutes, Papa! Just one more level!"',
     mess: 'Controller throws when Rio loses a level right before the call',
-    innerThought: 'Why does Daddy always call when I am about to win?',
-    endingBeat: 'Rio pauses the game, calls Daddy back, and explains his strategy between levels.',
-    defaultCast: ['Rio', 'Daddy', 'Mumma'],
+    innerThought: 'Why does Papa always call when I am about to win?',
+    endingBeat: 'Rio pauses the game, calls Papa back, and explains his strategy between levels.',
+    defaultCast: ['Rio', 'Papa', 'Mumma'],
     keepMoralOffScreen: false,
     quote: 'The pause button is a powerful tool.',
     detail: 'Use a kitchen timer for game-to-call transitions.',

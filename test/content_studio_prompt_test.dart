@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:reel_audio/brand_system.dart';
 import 'package:reel_audio/characters.dart';
+import 'package:reel_audio/content_ideas.dart';
 import 'package:reel_audio/content_studio_service.dart';
 import 'package:reel_audio/master_prompt.dart';
 
@@ -138,7 +139,7 @@ void main() {
       );
 
       expect(prompt, contains('Use the attached reference images as the definitive character references'));
-      expect(prompt, contains('Preserve each character\'s face, age, hair, outfit, colours and proportions across ALL parts'));
+      expect(prompt, contains('Do not redesign or replace characters'));
     });
 
     test('includes character descriptions when no reference images (fallback)', () {
@@ -481,6 +482,164 @@ void main() {
       expect(prompt, contains('Text is added later in the editor'));
       expect(prompt, contains('editor metadata'));
       expect(prompt, contains('do NOT render in video'));
+    });
+  });
+
+  group('buildMasterReelPrompt h27 Diwali safety story', () {
+    test('includes strong safety rules for fireworks stories', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria wants to light Diwali fireworks',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('SAFETY'));
+      expect(prompt, contains('fireworks'));
+      expect(prompt, contains('sparklers'));
+      expect(prompt, contains('Children must NEVER light'));
+      expect(prompt, contains('Adults always handle them'));
+    });
+
+    test('safety rules override unsafe story beats', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria holds sparklers and Mumma watches from a distance',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      // The prompt must instruct that children never handle hazardous items
+      expect(prompt, contains('Children must NEVER light, touch, hold'));
+      expect(prompt, contains('Adults always handle them'));
+      expect(prompt, contains('safety rules above take priority'));
+    });
+
+    test('does not imply chalk line alone makes area safe', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria draws a safety circle with chalk',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, isNot(contains('chalk line alone')));
+      expect(prompt, isNot(contains('chalk-drawn circle marking the safe zone')));
+    });
+  });
+
+  group('buildMasterReelPrompt story specificity', () {
+    test('does not contain generic placeholder brackets', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria refuses to wear shoes',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, isNot(contains('[Character]')));
+      expect(prompt, isNot(contains('[exact physical action]')));
+      expect(prompt, isNot(contains('[second character/parent]')));
+      expect(prompt, isNot(contains('the second character reacts')));
+    });
+
+    test('includes story structure guidance for 3 connected clips', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria shares her toys with Cuty',
+        characters: ['Ria', 'Cuty'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('Clip 1'));
+      expect(prompt, contains('Clip 2'));
+      expect(prompt, contains('Clip 3'));
+      expect(prompt, contains('Hook & Problem'));
+      expect(prompt, contains('Twist & Escalation'));
+      expect(prompt, contains('Resolution'));
+    });
+
+    test('instructs AI to use character names from CHARACTER LOCK', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns to share',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('CHARACTER LOCK'));
+      expect(prompt, contains('character names from CHARACTER LOCK'));
+    });
+  });
+
+  group('buildMasterReelPrompt JSON schema compatibility', () {
+    test('JSON schema has all required fields for each part', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns to share',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('"part_number"'));
+      expect(prompt, contains('"purpose"'));
+      expect(prompt, contains('"setting"'));
+      expect(prompt, contains('"starting_state"'));
+      expect(prompt, contains('"action_0_4s"'));
+      expect(prompt, contains('"action_4_8s"'));
+      expect(prompt, contains('"action_8_10s"'));
+      expect(prompt, contains('"dialogue"'));
+      expect(prompt, contains('"text_overlay"'));
+      expect(prompt, contains('"ending_state"'));
+      expect(prompt, contains('"continuity_from"'));
+      expect(prompt, contains('"continuity_into"'));
+      expect(prompt, contains('"negative_instructions"'));
+      expect(prompt, contains('"visual_prompt"'));
+      expect(prompt, contains('"on_screen_text"'));
+    });
+
+    test('hashtag count instruction specifies exactly 5', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns',
+        characters: ['Ria'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('["5 exactly"'));
+    });
+
+    test('caption and pin_comment fields present in schema', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns',
+        characters: ['Ria'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('"caption"'));
+      expect(prompt, contains('Instagram caption'));
+      expect(prompt, contains('"pin_comment"'));
+      expect(prompt, contains("parent's own house"));
+    });
+  });
+
+  group('buildMasterReelPrompt h27 HookIdea data integrity', () {
+    late HookIdea h27;
+
+    setUp(() {
+      h27 = buildDefaultHooks().firstWhere((h) => h.id == 'h27');
+    });
+
+    test('h27 sceneDetail does not show child holding sparklers', () {
+      expect(h27.sceneDetail, isNot(contains('holding sparkler with Ria')));
+      expect(h27.sceneDetail, contains('safe distance'));
+    });
+
+    test('h27 mess does not involve sparks on curtains', () {
+      expect(h27.mess, isNot(contains('spark lands on a curtain')));
+      expect(h27.mess, isNot(contains('smolder')));
+    });
+
+    test('h27 endingBeat does not show child holding sparkler', () {
+      expect(h27.endingBeat, isNot(contains('holding sparkler with Mumma')));
+      expect(h27.endingBeat, contains('lights sparklers at a safe distance'));
+    });
+
+    test('h27 detail states adult lights, child watches', () {
+      expect(h27.detail, contains('Adult lights'));
+      expect(h27.detail, contains('child watches from safe distance'));
     });
   });
 }

@@ -66,13 +66,13 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 26 prompts produce 3 valid parts with intact Part 3', () {
+    test('parseReadyPrompt: all 27 prompts produce 3 valid parts with intact Part 3', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 26,
-          reason: 'Expected exactly 26 populated readyPrompt entries');
+      expect(hooks.length, 27,
+          reason: 'Expected exactly 27 populated readyPrompt entries');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
