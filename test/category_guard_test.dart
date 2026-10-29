@@ -66,13 +66,13 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 27 prompts produce 3 valid parts with intact Part 3', () {
+    test('parseReadyPrompt: all 59 prompts produce 3 valid parts with intact Part 3', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 27,
-          reason: 'Expected exactly 27 populated readyPrompt entries');
+      expect(hooks.length, 59,
+          reason: 'Expected exactly 59 populated readyPrompt entries');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
@@ -175,7 +175,7 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
       }
     });
 
-    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 26 hooks', () {
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 59 hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
@@ -363,6 +363,83 @@ Part 3 (20-30s): Content 3
               reason: '${h.id} has empty endingBeat');
         }
       }
+    });
+
+    test('New readyPrompt entries: each has 3 parts with Moral and Final text overlay', () {
+      final newIds = [
+        'h06', 'pal10', 'pal12', 'h10', 'h11', 'h12', 'h13', 'h14', 'h15',
+        'h16', 'h17', 'h18', 'h20', 'h21', 'p05', 'h23', 'h24', 'h25', 'h26',
+        'park-se-nikalna',
+      ];
+      for (final id in newIds) {
+        final h = kDefaultHooks.firstWhere((e) => e.id == id, orElse: () =>
+            throw StateError('Hook not found: $id'));
+        expect(h.readyPrompt, isNotEmpty, reason: '$id readyPrompt is empty');
+        expect(h.readyPrompt, contains('Part 1 (0-10s)'),
+            reason: '$id missing Part 1 (0-10s)');
+        expect(h.readyPrompt, contains('Part 2 (10-20s)'),
+            reason: '$id missing Part 2 (10-20s)');
+        expect(h.readyPrompt, contains('Part 3 (20-30s)'),
+            reason: '$id missing Part 3 (20-30s)');
+        expect(h.readyPrompt, contains('Moral:'),
+            reason: '$id Part 3 missing Moral');
+        expect(h.readyPrompt, contains('Final text overlay:'),
+            reason: '$id missing Final text overlay');
+        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        expect(result.parts.length, 3,
+            reason: '$id: parseReadyPrompt failed - expected 3 parts, got ${result.parts.length}');
+        final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+        expect(p3.promptText, contains('Moral:'),
+            reason: '$id: Part 3 missing Moral after parse');
+        expect(p3.textOverlay, isNotEmpty,
+            reason: '$id: Part 3 textOverlay empty after parse');
+        expect(p3.textOverlay, contains('LEARNING IS A HABIT'),
+            reason: '$id: textOverlay should contain standard footer');
+      }
+    });
+
+    test('New readyPrompt entries: correct characters mentioned', () {
+      final characterChecks = {
+        'h06': ['Ria', 'Rio', 'Mumma'],
+        'pal12': ['Cuty', 'Mumma'],
+        'h10': ['Rio', 'Mumma'],
+        'h11': ['Ria', 'Mumma'],
+        'h12': ['Ria', 'Mumma'],
+        'h13': ['Ria', 'Cuty'],
+        'h14': ['Ria', 'Rio', 'Mumma'],
+        'h15': ['Rio', 'Mumma'],
+        'h16': ['Robot', 'Papa'],
+        'h17': ['Ria', 'Mumma'],
+        'h18': ['Rio', 'Mumma', 'Papa'],
+        'h20': ['Rio', 'Mumma'],
+        'h21': ['Ria', 'Mumma'],
+        'h23': ['Rio', 'Mumma', 'Papa'],
+        'p05': ['Ria', 'Rio', 'Cuty'],
+      };
+      for (final entry in characterChecks.entries) {
+        final h = kDefaultHooks.firstWhere((e) => e.id == entry.key);
+        for (final character in entry.value) {
+          expect(h.readyPrompt, contains(character),
+              reason: '${entry.key}: expected character "$character" in readyPrompt');
+        }
+      }
+    });
+
+    test('asmr-cleaning-reel: safety regression - no child sitting in paste', () {
+      final h = kDefaultHooks.firstWhere((e) => e.id == 'asmr-cleaning-reel');
+      final combined = '${h.storyDetail} ${h.sceneDetail} ${h.mess} ${h.endingBeat}';
+      expect(combined, isNot(contains('sitting in')),
+          reason: 'Child should not be described as sitting in paste');
+      expect(combined, isNot(contains('in the paste')),
+          reason: 'Child should not be in the paste');
+      expect(h.mess, contains('hands'),
+          reason: 'Mess should describe hands covered in flour, not paws');
+      expect(h.endingBeat, contains('dry brush'),
+          reason: 'Ending should describe proper technique');
+      expect(h.defaultCast, contains('Ria'),
+          reason: 'Default cast should include Ria');
+      expect(h.defaultCast, isNot(contains('Cuty')),
+          reason: 'Default cast should not include Cuty');
     });
   });
 }

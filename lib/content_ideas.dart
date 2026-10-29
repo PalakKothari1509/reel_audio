@@ -859,11 +859,26 @@ Moral: Clear timer, clear rules — no tears over sharing.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Hallway, morning rush. One pair of pink sparkly jootis by the door. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both grab for them. Mumma holds phone timer. Text on screen: "EKPairo SHOES 👟" "TIMER TRICK ⏱️" "PRINCESS WALK! 👸"
+
+On-Screen Text:
+- [0-3s]: "EK Joota, DO BACCHE 👟"
+- [3-7s]: "TUG OF WAR 💪"
+- [7-11s]: "TIMER SHURU! ⏱️"
+- [11-15s]: "PRINCESS WALK 👸"
+- [16-20s]: "SWITCH TIME! 🔄"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria and Rio tug at the same jooti: "Mere pair!" "Mera pair!" Mumma: "Jisne pehle pehna, uski 1 minute. Phir switch." Sets timer. Text: "EK Joota, DO BACCHE 👟" "TUG OF WAR 💪" "TIMER SHURU! ⏱️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria does a dramatic "princess walk" in the jootis, one minute left. Rio watches, giggling. Timer dings: "Time up, switch!" Text: "PRINCESS WALK 👸" "SWITCH TIME! 🔄".
+
+Audio/Dialogue (Hinglish): Ria: "Mere pair!" Rio: "Mera pair!" Mumma: "Jisne pehle pehna, uski 1 minute." Ria: "Timer ke saath!" Rio: "Mere bhi ek minute!" Ria (princess): "Thumka!" Mumma: "Time up, switch!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Switch — Rio puts on jootis, does his own silly walk. Both laughing. Mumma: "See? No tears, just timer." Text: "SWITCH TIME! 🔄". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A clear timer and simple rule — one minute each, then switch — prevents fights and makes sharing fun. When expectations are fair, even toddlers can wait their turn.
+''',
   ),
 
-  // Siblings: sharing, turn-taking, and the little wars between tiny humans
-  // who share a room and a parent.
   HookIdea(
     id: 'h07',
     category: 'Relatable',
@@ -1235,7 +1250,24 @@ Moral: One more story means one more minute — then it is sleep time.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Cuty's bedroom, bedtime. Soft night light glows. Cuty (fluffy white bunny, pink bow, large dark eyes) sits bolt upright in bed: "Ek aur story!" Mumma (yellow kurti, top bun) holds a 2-minute sand timer. Text on screen: "BEDTIME STORY? 📖" "SAND TIMER ⏰" "ONE MORE MINUTE... THEN SLEEP 💤"
+
+On-Screen Text:
+- [0-3s]: "BEDTIME STORY? 📖"
+- [3-7s]: "SAND TIMER ⏰"
+- [7-11s]: "WATCH THE SAND... ⏳"
+- [11-16s]: "STORY TIME IS DONE 📚"
+- [16-20s]: "SLEEP MODE ON 💤"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Cuty: "Ek aur story!" Mumma: "Time up, beta. Jab tak ravaan khatam ho jaye, tab tak ek story." Shows sand timer. Cuty watches sand fall, eyes wide. Text: "BEDTIME STORY? 📖" "SAND TIMER ⏰".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Last grain of sand falls. Mumma: "Ab sleep time." Cuty tries: "Ek aur?" Mumma: "Kal." Cuty sniffs: "Goodnight story?" Text: "WATCH THE SAND... ⏳" "STORY TIME IS DONE 📚".
+
+Audio/Dialogue (Hinglish): Cuty: "Ek aur story!" Mumma: "Jab tak ravaan khatam ho jaye, tab tak ek story." Cuty watching: "Khatam hone wala hai..." Mumma: "Ab sleep time, beta." Cuty: "Goodnight story?" Mumma: "Always."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Cuty snuggles under blanket, eyes already heavy. Mumma tucks her in, whispers one line: "Jab tak ravaan khatam... so jao beta." Text: "SLEEP MODE ON 💤". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One more story means one more minute — then it is sleep time. A visual timer makes the boundary fair and final.
+''',
   ),
 
   HookIdea(
@@ -1372,7 +1404,7 @@ Moral: Being first ready doesn't mean you leave everyone behind. True readiness 
     mess: 'Ria changes her hair clip three times, time slipping away; Cuty struggles with shoe; Rio watches clock',
     innerThought: 'Ready hona kaafi nahi — team ke saath ready hona asli ready hai.',
     endingBeat: 'Ria picks no-bow, helps Cuty with his shoe. "Team complete!" All three walk out together, on time.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -1486,7 +1518,24 @@ Moral: Ek chart, teen alag hurry — sab ek saath nikal jate hain.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Hallway mirror, morning. Ria (sparkly pink star dress, pigtails), Rio (blue t-shirt, shorts), Cuty (white bunny, pink bow) — all three in front of the mirror. Mumma holds a laminated routine chart. Text on screen: "MORNING CHAOS 🌅" "CHART TOH CHAMPION! ✅" "TEEN BACHCHE, EK CHART! 👨‍👩‍👧"
+
+On-Screen Text:
+- [0-3s]: "MORNING CHAOS 🌅"
+- [3-7s]: "BRUSH ✅"
+- [7-11s]: "DRESS ✅"
+- [11-15s]: "BREAKFAST ✅"
+- [15-19s]: "CHART TOH CHAMPION! ✅"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mumma: "Chalo, ek ek karo!" Holds up laminated chart: "Brush, dress, breakfast." Each kid grabs a Velcro sticker. Ria brushes teeth with a song, Rio struggles with shoes. Text: "MORNING CHAOS 🌅" "BRUSH ✅" "DRESS ✅".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Rio sticks "shoes" sticker: "Done!" Then looks down — socks missing. "Socks? Nahi socks!" Mumma: "Ek aur minute!" Rio finds socks, sticks final sticker. Text: "BREAKFAST ✅" "SOCKS? ❌" "EK AUR MINUTE! ⏱️" "CHART TOH CHAMPION! ✅".
+
+Audio/Dialogue (Hinglish): Mumma: "Chalo, ek ek karo!" Ria: "Brushing ke saath gana!" Rio: "Shoes pakad li!" Mumma: "Socks?" Rio: "Nahi socks!" Mumma: "Ek aur minute!" All: "Done!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Chart complete, all stickers filled. Kids high-five at the mirror. Mumma: "Aaj bhi chart jeet gaya!" Text: "TEEN BACHCHE, EK CHART! 👨‍👩‍👧". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: One chart, three different rushes — when everyone works together, morning wins as a team. A visual routine makes expectations fair and clear.
+''',
   ),
 
   HookIdea(
@@ -1631,7 +1680,24 @@ Moral: Brushing ek game hai — jab tak mazaa aa raha hai, koi dikkat nahi hoti.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Bathroom sink, morning light. Cuty (white bunny, pink bow) grabs the dinosaur toothbrush, puts it in her mouth: "Rawr! Brush nahi, chew!" Toothpaste foam drips everywhere. Mumma (yellow kurti, top bun) holds a timer. Text on screen: "DINOSAUR MODE! 🦖" "FOAM PARTY! 🧼" "SPARKLY SMILE! ✨"
+
+On-Screen Text:
+- [0-3s]: "BRUSHING TIME! 🪥"
+- [3-7s]: "DINOSAUR MODE! 🦖"
+- [7-12s]: "FOAM PARTY! 🧼"
+- [12-16s]: "2 MINUTES! ⏱️"
+- [16-20s]: "SPARKLY SMILE! ✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Cuty chews the toothbrush: "Rawr! Brush nahi, chew!" Foam everywhere — sink, mirror, her nose. Mumma: "Dinosaur ne toothpaste khaya!" Cuty giggles. Text: "BRUSHING TIME! 🪥" "DINOSAUR MODE! 🦖".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Cuty spits in sink: "Dinosaur sparkly now!" Sees her reflection, notices a loose tooth gap. "Nani story ke time?" Mumma shows 2-minute timer: "Abhi do minute." Text: "FOAM PARTY! 🧼" "2 MINUTES! ⏱️".
+
+Audio/Dialogue (Hinglish): Cuty: "Rawr! Brush nahi, chew!" Mumma: "Dinosaur ne toothpaste khaya!" Cuty: "Dinosaur sparkly now!" Mumma: "Ek minute aur brushing, phir nani story." Cuty: "OK OK!" Both: "Sparkly teeth!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Cuty brushes properly, eyes on mirror, timer running down. "Dinosaur done!" Raises toothbrush like trophy. Text: "SPARKLY SMILE! ✨". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Brushing is a game when it's fun — if she's laughing, you're winning. A timer gives clear expectations without power struggles.
+''',
   ),
 
   HookIdea(
@@ -1769,7 +1835,7 @@ Moral: Ek clear, fair transition — blocks ke baad shoes. Food reward nahi, scr
     mess: 'Rio wants more blocks, more time. Papa offers clear step: tower complete + two-minute timer = shoes on. Fair deal.',
     innerThought: 'Ek clear sa fair transition sabke liye kaam karta hai — food reward bina, screen time bina.',
     endingBeat: 'Timer dings. Rio puts on shoes. High-five! "Fair deal done!" Sab khush, door ke bahar.',
-    defaultCast: ['Ria', 'Rio', 'Mumma'],
+    defaultCast: ['Rio', 'Papa'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -2100,10 +2166,26 @@ Moral: A spill can look huge — but a little help makes it manageable.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Art table, morning, paint cups lined up. Rio (blue t-shirt, shorts) reaches for blue paint cup, it tips over — blue paint spreads across white tablecloth. Mumma (yellow kurti, top bun) moves the cup away, gives Rio a damp cloth. Text on screen: "OH NO! BLUE! 🎨" "NO SCOld, NO BLAME ❤️" "SAATH MILKE SAAF!"
+
+On-Screen Text:
+- [0-3s]: "PAINT SPILL ALERT! 🎨"
+- [3-7s]: "BLUE PAINT FLOOD 💙"
+- [7-11s]: "DAMP CLOTH TRICK 🧽"
+- [11-15s]: "WATCH BLUE DISAPPEAR 💧"
+- [15-20s]: "TEAM CLEANUP CHAMPIONS 🏆"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio paints at the art table, reaches for blue cup — it tips! Blue paint spreads across white tablecloth. "Arre, blue paint!" Napkin only smears wider. Text: "PAINT SPILL ALERT! 🎨" "BLUE PAINT FLOOD 💙".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma moves paint cup away, kneels beside Rio: "Table ko blue dress chahiye thi — let's clean together." Gives damp cloth. Rio scrubs. Text: "DAMP CLOTH TRICK 🧽" "WATCH BLUE DISAPPEAR 💧" "TEAM CLEANUP CHAMPIONS 🏆".
+
+Audio/Dialogue (Hinglish): Rio: "Arre, blue paint!" Mumma: "Table ko blue dress chahiye thi." Rio: "Mujhe maaf karo!" Mumma: "Koi baat nahi — saath milke saaf karte hain." Rio: "Maine saaf kiya!" Mumma: "Haan, achhe se kiya!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Table clean but Rio streaked with blue paint, grinning. "Main ne saaf kiya!" Mumma: "Haan, bohot achha!" Text: "TEAM CLEANUP CHAMPIONS 🏆". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A spill can look huge, but a little help together makes it manageable. No scolding — just cleaning side by side.
+''',
   ),
 
-  // Tantrums & big feelings: when emotions overflow and a calm reset helps.
   HookIdea(
     id: 'h11',
     category: 'Struggle first',
@@ -2136,7 +2218,24 @@ Moral: A meltdown is information — listen first, then guide.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Grocery store checkout lane, afternoon. Ria (sparkly pink star dress, pigtails) spots chips at checkout: "Mummy, chips chahiye!" Mumma says no — almost lunch. Ria drops to floor: "I WANT IT!" Text on screen: "CHIPS WANT 💔" "FEELINGS FIRST ❤️" "APPLE TRADE-OFF 🍎"
+
+On-Screen Text:
+- [0-3s]: "CHIPS WANT 💔"
+- [3-7s]: "FLOOR DROP MELTDOWN 😱"
+- [7-11s]: "FEELINGS FIRST ❤️"
+- [11-15s]: "APPLE TRADE-OFF 🍎"
+- [16-20s]: "HAND IN HAND 🤝"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria grabs chips packet at checkout: "Mummy, chips chahiye!" Mumma: "Nahi beta, lunch lagbhag ho raha hai." Ria drops to floor: "I WANT IT!" Other shoppers glance over. Text: "CHIPS WANT 💔" "FLOOR DROP MELTDOWN 😱".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma kneels beside her: "Main dekhi, tumhara gussa samajh gaya. Ab chips nahi hoga, lekin fruit ke saath kuchh aur chahiye?" Ria cries two minutes, then sniffles: "Apple?" Mumma: "Haan, apple." Text: "FEELINGS FIRST ❤️" "APPLE TRADE-OFF 🍎".
+
+Audio/Dialogue (Hinglish): Mumma: "Nahi beta, lunch lagbhag ho raha hai." Ria: "I WANT IT! I WANT IT!" Mumma: "Main dekhi, tumhara gussa samajh gaya." Ria (crying): "Chips chahiye!" Ria (sniffling): "Apple?" Mumma: "Haan, apple." Both: "Theek hai!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. They walk out, Ria holding Mumma's hand, apple in hand, chips forgotten. Text: "HAND IN HAND 🤝". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A meltdown is information — listen first, then guide. Validating feelings before offering alternatives makes transitions smoother.
+''',
   ),
 
   HookIdea(
@@ -2171,7 +2270,24 @@ Moral: When grown-ups rest, children learn that love doesn't always mean fixing 
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, afternoon, cushions scattered. Mumma lies on the floor with a cushion: "Bas five minute rest." Ria watches, tucks a blanket over her: "Ab paani nahi maangna, okay?" Text on screen: "MUMMY TIRED 😴" "RIA NOTICES 👀" "QUIET TOGETHERNESS 🧘"
+
+On-Screen Text:
+- [0-4s]: "MUMMY TIRED 😴"
+- [4-8s]: "RIA NOTICES 👀"
+- [8-12s]: "GENTLE BOUNDARY SETTER 💛"
+- [12-16s]: "QUIET TOGETHERNESS 🧘"
+- [16-20s]: "GIVING SPACE IS LOVE ❤️"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mumma sits down — "Bas five minute rest." Lies on the floor with a cushion. Ria watches, then tucks a blanket over her: "Ab paani nahi maangna, okay?" Mumma: "Main itni bhi dramatic hoon?" Text: "MUMMY TIRED 😴" "RIA NOTICES 👀".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria says: "Mumma, aap hi toh ho." She brings a small cup of water and sits quietly beside her. Text: "GENTLE BOUNDARY SETTER 💛" "QUIET TOGETHERNESS 🧘" "GIVING SPACE IS LOVE ❤️".
+
+Audio/Dialogue (Hinglish): Mumma: "Bas five minute rest... [lies down on floor cushion]" Ria: "Mumma, aap thak gayi ho." Mumma: "Beta, main saambhaa lungi." Ria: "Nahi, main madad karungi. Yeh lo paani." Mumma: "Shukriya beta." Ria: "Haan, bas itna hi kehna tha." Both whisper: "Shhh..." [ticking clock] "Main tumhe samajh sakti hoon."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Five minutes pass. Mumma sits up, Ria pats the cushion beside her. "Phir se promise?" "Haan." Text: "GIVING SPACE IS LOVE ❤️". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: When grown-ups rest, children learn that love doesn't always mean fixing — sometimes just being there quietly makes all the difference.
+''',
   ),
 
   HookIdea(
@@ -2206,7 +2322,24 @@ Moral: Meeting feelings first makes solutions stick.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, blocks scattered after tower fell. Ria (sparkly pink star dress, pigtails) looks up with tear-streaked face. Block pieces spread everywhere. Mumma crouches down: "Pehle cuddle ya paani?" Text on screen: "TOWER FELL 😢" "FEELINGS FIRST ❤️" "REBUILD TOGETHER 🔨"
+
+On-Screen Text:
+- [0-3s]: "TOWER FELL 😢"
+- [3-7s]: "TEARS FALL 💧"
+- [7-11s]: "FEELINGS FIRST ❤️"
+- [11-15s]: "HUG BEFORE FIX 🤗"
+- [15-20s]: "REBUILD TOGETHER 🔨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria's block tower gets knocked — pieces scatter. Mumma crouches: "Pehle cuddle ya paani?" Ria's shoulders drop, leans toward Mumma: "Cuddle." Text: "TOWER FELL 😢" "TEARS FALL 💧".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. One hug, Mumma: "Ab dekhte hain." They start picking up blocks. Cuty the bunny hops over, sniffs a block. Text: "FEELINGS FIRST ❤️" "HUG BEFORE FIX 🤗".
+
+Audio/Dialogue (Hinglish): Ria crying: "Tower toot gaya!" Mumma: "Pehle cuddle ya paani?" Ria (shoulders dropping): "Cuddle." Mumma: "Theek hai — ab rebuild karte hain." Ria: "Phir se banayenge!" Cuty: "Hop!" [bunny sound]. Both: "Shukriya, Cuty!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Tower rebuilt stronger. Cuty sits beside it. "Tower phir se lagega!" Text: "REBUILD TOGETHER 🔨" "TOWER PHIR SE LAGEGA 🏰". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Meeting feelings first makes solutions stick — a hug before fixing turns frustration into teamwork.
+''',
   ),
 
   HookIdea(
@@ -2242,11 +2375,26 @@ Moral: Tickets turn fights into fair turns — everyone wins a lap.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, red toy car between them, broken in two. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both grabbed the car — it snapped. Paper ticket #1 in Rio's hand, #2 in Ria's hand. Cuty the bunny sits beside the car. Text on screen: "CAR BREAK 💔" "TICKET SYSTEM! 🎫" "TEAMWORK WINS 🏆"
+
+On-Screen Text:
+- [0-3s]: "CAR TORE IN HALF 💔"
+- [3-7s]: "ARGUMENT OVER 🔥"
+- [7-11s]: "TICKET SYSTEM! 🎫"
+- [11-15s]: "ONE MINUTE EACH ⏱️"
+- [16-20s]: "TOGETHER LAPS 🏁"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Both grab the red car: "Mera pehle!" Arguing over whose lap it is. The car snaps in two. Mumma: "Rio one lap, Ria one lap." Makes paper tickets. Text: "CAR TORE IN HALF 💔" "ARGUMENT OVER 🔥" "TICKET SYSTEM! 🎫".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Cuty sits as ticket checker. Rio gets #1, Ria gets #2. One minute each, then together. Text: "ONE MINUTE EACH ⏱️" "TOGETHER LAPS 🏁".
+
+Audio/Dialogue (Hinglish): Ria: "Mera pehle!" Rio: "Nahi, mera pehle!" Car snaps: "Crack!" Mumma: "Rio ticket #1, Ria ticket #2." Rio: "Mere round first!" Ria: "Phir mera turn!" Cuty: "Hop!" Both: "Dono car, do laps!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Both drive cars together, one lap each. "Dono car, do laps!" Text: "TOGETHER LAPS 🏁". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Tickets turn fights into fair turns — everyone wins a lap. When conflict has a clear system, siblings discover they work better as a team.
+''',
   ),
 
-
-  // Surprising: says the opposite of what a parent expects, then shows it.
   HookIdea(
     id: 'h15',
     category: 'Surprising',
@@ -2280,10 +2428,27 @@ Moral: Badlaav ka intezaar karo, phir agla kadam lagao.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room, afternoon, song playing from phone on the couch. Rio (blue t-shirt, shorts) dancing to his favorite song — music suddenly stops mid-beat. Rio freezes, eyes wide. Mumma kneels: "Music bandh ho gayi. Ab kya karein?" Text on screen: "MUSIC STOPS! 🔇" "FREEZE MODE 😵" "NAME THE CHANGE 🗣️"
+
+On-Screen Text:
+- [0-3s]: "MUSIC STOPS! 🔇"
+- [3-7s]: "DANCE FREEZE! 😵"
+- [7-11s]: "NAME THE CHANGE 🗣️"
+- [11-15s]: "CHOICE OFFERED 💡"
+- [16-20s]: "TRANSITION WIN! ✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio dancing, phone music cuts off suddenly mid-beat. Rio freezes, eyes wide. Mumma: "Music bandh ho gayi. Ab kya karein?" Text: "MUSIC STOPS! 🔇" "DANCE FREEZE! 😵".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma offers: "Ek minute aur dance karo, ya turant room saaf karo?" Rio: "Ek minute!" They clean up toys together. Text: "NAME THE CHANGE 🗣️" "CHOICE OFFERED 💡".
+
+Audio/Dialogue (Hinglish): Rio dancing: "La la la!" [music cuts] Rio: "Aaaah!" Mumma: "Music bandh ho gayi. Ab kya karein?" Rio: "Ek minute aur dance karo!" Mumma: "Theek hai — ek minute." Rio: "Phir room saaf karenge!" Both: "Done!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Soft music restarts, room clean. "Next time phone use karoongi!" Text: "TRANSITION WIN! ✨". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Badlaav ka intezaar karo, phir agla kadam lagao — naming the change and offering a choice turns disruption into cooperation.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'h16',
     category: 'Surprising',
     cover: 'Dabba Ban Gaya Rocket!',
@@ -2315,7 +2480,24 @@ Moral: Dabba hi kaafi hai.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen, morning, delivery boxes on the counter. Empty cardboard box on the floor, Robot toy (silver, blue LED eyes) ignored nearby. Rio (blue t-shirt, shorts) crawls toward the box, ignoring the new robot toy. Papa enters. Text on screen: "BOX > ROBOT! 📦" "COUNTDOWN! 5-4-3-2-1" "IMAGINATION WINS 🎉"
+
+On-Screen Text:
+- [0-3s]: "NEW ROBOT! 🤖"
+- [3-7s]: "BUT THE BOX! 📦"
+- [7-11s]: "COUNTDOWN READY! 🔢"
+- [11-15s]: "5-4-3-2-1... BLAST OFF! 🚀"
+- [16-20s]: "IMAGINATION WINS 🎉"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Delivery boxes arrive. Papa brings out new Robot toy, but Rio ignores it, crawls into the empty box. Papa: "Ye kabaad mein jayega." Rio: "Ye mera rocket hai!" Text: "NEW ROBOT! 🤖" "BUT THE BOX! 📦".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Papa puts Robot in the box: "Ye astronaut hai." They count down: "5, 4, 3, 2, 1..." Text: "COUNTDOWN READY! 🔢" "5-4-3-2-1... BLAST OFF! 🚀".
+
+Audio/Dialogue (Hinglish): Papa: "Papa ke liye cover aaya. Rio ka naya robot bhi aaya." Rio (in box): "Mere saath bhi aayega!" Papa: "Abhi toh ye kabaad hi lag raha hai." Rio: "Nahi! Ye mera rocket hai! Aur ye Robot astronaut banega!" Papa: "Bilkul! Chalo, countdown karte hain!" All: "5, 4, 3, 2, 1... Chalo!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Box launches (Rio's imagination), Robot inside. Text: "IMAGINATION WINS 🎉". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Kam khilone, zyada kalpana — the best toy costs nothing and takes up no space. An empty box becomes a rocket when imagination drives the play.
+''',
   ),
 
   HookIdea(
@@ -2350,7 +2532,24 @@ Moral: Naming the noise makes the fear small enough to hold.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Bedroom, bedtime, night light casting soft shadows. Ria (sparkly pink star dress, pigtails) clinging to Mumma. Light flickers, fan cuts out mid-hum. Power gone. Mumma kneels: "Bijli khel rahi thi — ab rest karegi." Text on screen: "DARKNESS FALLS 🌙" "NAAMKARAN ❤️" "SAFE WITH LOVE 💛"
+
+On-Screen Text:
+- [0-3s]: "BIJLI BAND! ⚡"
+- [3-7s]: "DARKNESS FALLS 🌙"
+- [7-11s]: "NAAMKARAN NAME IT 🗣️"
+- [11-15s]: "HEARTBEAT FOUND 💓"
+- [16-20s]: "SAFE WITH LOVE 💛"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Light flickers, fan cuts out. Ria: "Bijli band ho gayi!" Tugs Mumma's hand. Mumma: "Thumbs up if you're worried." Text: "BIJLI BAND! ⚡" "DARKNESS FALLS 🌙".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma: "Bijli khel rahi thi — ab rest karegi." Kneels: "Thump-thump!" Ria listens to her own heartbeat. Text: "NAAMKARAN NAME IT 🗣️" "HEARTBEAT FOUND 💓".
+
+Audio/Dialogue (Hinglish): Ria: "Bijli band ho gayi!" Mumma: "Thumbs up if worried." Ria: "Mujhe dar lag raha hai." Mumma: "Bijli khel rahi thi — ab rest karegi." Ria (listening): "Thump-thump!" Mumma: "That means you're safe and strong." Both: "Main theek hoon."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Night light still glows. They sit in quiet, hand in hand. "Main theek hoon." Text: "SAFE WITH LOVE 💛". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Naming the noise makes the fear small enough to hold — when we acknowledge what frightens them, children discover their own strength and feel safe.
+''',
   ),
 
   HookIdea(
@@ -2385,7 +2584,24 @@ Moral: Cleaning up becomes a team win when the praise names what they did.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, box of blocks half-empty, pieces everywhere. Rio (blue t-shirt, shorts) dumps blocks all over the floor. One block hides behind the couch. Mumma points: "Tumne saare blocks box mein rakhe — thank you!" Text on screen: "BLOCK EXPLOSION! 🧱" "NAMED PRAISE! 👏" "TEAM CLEANUP! ✨"
+
+On-Screen Text:
+- [0-3s]: "BLOCK EXPLOSION! 🧱"
+- [3-7s]: "CHAOTIC FLOOR 😱"
+- [7-11s]: "NAMED PRAISE! 👏"
+- [11-15s]: "HIDDEN BLOCK HUNT 🔍"
+- [16-20s]: "TEAM CLEANUP! ✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio dumps box of blocks everywhere. Mumma points: "Tumne saare blocks box mein rakhe — thank you!" Rio beams. Text: "BLOCK EXPLOSION! 🧱" "CHAOTIC FLOOR 😱" "NAMED PRAISE! 👏".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Rio spots block behind couch: "Mummy, yeh bhi!" They pick it up together. Papa claps. Text: "HIDDEN BLOCK HUNT 🔍" "TEAM CLEANUP! ✨".
+
+Audio/Dialogue (Hinglish): Rio dumping: "Blocks everywhere!" Mumma: "Tumne saare blocks box mein rakhe — thank you!" Rio beaming: "Maine dekha!" Rio: "Mummy, yeh bhi!" Mumma: "Haan, saath milke." Papa: "Box full, heart full!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Empty box, full hearts. Papa: "Box full, heart full." Text: "TEAM CLEANUP! ✨". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: "Tumne saare blocks box mein rakhe — thank you!" — specific praise that names what they did builds confidence and turns cleanup into a team win.
+''',
   ),
 
   HookIdea(
@@ -2476,7 +2692,24 @@ Moral: Pyaar ke saath rule set karna, bachcha safe mehsoos karta hai.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen counter, morning, cookie jar on the table. Rio (yellow sundress, pigtails, holding cookie) sneaks from the jar again. Mumma kneels: "Haan beta, tumne kara. Par main tumhe pyar karti hoon." Text on screen: "COOKIE SNATCH! 🍪" "LOVE BOUNDARY ❤️" "ASK NEXT TIME 💛"
+
+On-Screen Text:
+- [0-3s]: "COOKIE SNATCH! 🍪"
+- [3-7s]: "CAUGHT RED-HANDED 😳"
+- [7-11s]: "BOUNDARY WITH LOVE ❤️"
+- [11-15s]: "ASK NEXT TIME 💛"
+- [16-20s]: "PROMISE MADE 🌱"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio sneaks another cookie from the jar. Mumma catches her: "Haan beta, tumne kara." Instead of shouting, Mumma kneels: "Par main tumhe pyar karti hoon." Text: "COOKIE SNATCH! 🍪" "CAUGHT RED-HANDED 😳" "BOUNDARY WITH LOVE ❤️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma: "Kal se pehle puchna — theek hai?" Rio: "Haan Mummy, promise!" Text: "ASK NEXT TIME 💛".
+
+Audio/Dialogue (Hinglish): Rio (mouth half-full): "Bas ek hi chhota sa..." Mumma gentle: "Haan beta, tumne kara. Par main tumhe pyar karti hoon." Rio: "Mujhe maaf karo!" Mumma: "Kal se pehle puchna — theek hai?" Rio: "Promise! Next time I'll ask pehle!" Both: "Phir se promise!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Cookie jar closed. "Phir se promise?" "Haan." Text: "PROMISE MADE 🌱". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Pyaar ke saath rule set karna — when boundaries are held with love instead of anger, children learn safety and respect. A simple promise becomes a moment of connection.
+''',
   ),
 
   HookIdea(
@@ -2512,11 +2745,26 @@ Moral: Children see tiredness before we admit it — and small hands can still h
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room, afternoon. Mumma slumped on the couch, bag beside her. Ria (sparkly pink star dress, pigtails) notices, picks up the bag from the floor and hands it. Mumma starts to take it back: "Maine kaha tha, main saambhaa lunga." Text on screen: "NOTICED TIREDNESS 👀" "SMALL HELP 💛" "GIVING SPACE TO LOVE ❤️"
+
+On-Screen Text:
+- [0-3s]: "MUMMA TIRED 😴"
+- [3-7s]: "NOTICED WITHOUT WORDS 👀"
+- [7-11s]: "SMALL HELP 💛"
+- [11-15s]: "ALLOWING LOVE ❤️"
+- [16-20s]: "QUIET TOGETHERNESS 🧘"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria sees Mumma tired, picks up bag from floor. "Tum itni thak gayi ho!" Mumma tries to take it back: "Maine kaha tha, main saambhaa lunga." Text: "MUMMA TIRED 😴" "NOTICED WITHOUT WORDS 👀".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria: "Mere saath chalo, main saambhal ke rakhti hoon." Mumma lets her help, ruffles her hair. Text: "SMALL HELP 💛" "ALLOWING LOVE ❤️".
+
+Audio/Dialogue (Hinglish): Ria: "Tum itni thak gayi ho!" Mumma: "Main saambhaa lunga." Ria: "Nahi Mummy, main khud karke doonga." Mumma: "Shukriya beta." Ria: "Tumhara saath hi toh maza aata hai." Both: "Shukriya."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria sits beside Mumma, hands her the bag. "Tumhara saath hi toh maza aata hai." Text: "QUIET TOGETHERNESS 🧘". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Children see tiredness before we admit it, and small hands can still hold a big bag — unasked help is the purest form of love in action.
+''',
   ),
 
-
-  // Milestone posts: complete concepts for the 100th Instagram post.
   HookIdea(
     id: 'p05',
     category: 'Page & milestone',
@@ -2549,7 +2797,24 @@ Moral: The best toy costs nothing and takes up no space.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room, one big cardboard box on the floor. Ria (sparkly pink star dress, pigtails), Rio (blue t-shirt, shorts), Cuty (white bunny, pink bow) all circle the box. Ria reaches for flaps, Rio for lid, Cuty for packing peanuts. Text on screen: "WELCOME TO 100 POSTS! ❤️" "TEAM RIA | TEAM RIO | TEAM CUTY" "THE BEST TOY IS FREE! 🎁"
+
+On-Screen Text:
+- [0-4s]: "100 POSTS! ❤️"
+- [4-8s]: "WELCOME TO OUR WORLD 👋"
+- [8-12s]: "TEAM RIA = TOFAANI 🌪️"
+- [12-16s]: "TEAM RIO = ZIDDI 💪"
+- [16-20s]: "TEAM CUTY = SLEEP LOVER 🛌"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Delivery box on floor. Three kids circle it. Ria: "Box car banegi!" Rio: "Lid mere paas!" Cuty: "Peanuts mere!" Packing peanuts flying. Text: "100 POSTS! ❤️" "WELCOME TO OUR WORLD 👋" "TEAM RIA = TOFAANI 🌪️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Box becomes a car, kids driving inside. Ria: "Vroom vroom!" Rio: "Faster!" Cuty pops head out window. Text: "TEAM RIO = ZIDDI 💪" "TEAM CUTY = SLEEP LOVER 🛌".
+
+Audio/Dialogue (Hinglish): Ria: "Box car banegi!" Rio: "Lid mere paas!" Cuty: "Peanuts mere!" Mumma: "Sabko ek minute!" Ria: "Car ke saath ghar bhi banegi!" Rio: "Aur superhero base!" Cuty: "Aur sleeping cave!" All: "Team Ria! Team Rio! Team Cuty!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Box transforms: car → house → cave. Three imaginations fill it together. "Thank you for being here!" Text: "TEAM CUTY = SLEEP LOVER 🛌". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: The best toy costs nothing and takes up no space — an empty box becomes a car, a house, a cave when three imaginations drive the play. Screen-free magic.
+''',
   ),
 
   // Milestone posts: complete concepts for the 50th Instagram post.
@@ -3289,7 +3554,7 @@ Moral: Sometimes the win is just that she walks in wearing something on her back
     category: 'Relatable',
     cover: 'She is "helping" — ASMR style!',
     opening: 'The atta was on the floor. She has now added water.',
-    problem: 'Cuty spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like to her.',
+    problem: 'Ria spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like to her.',
     lesson: 'Toddler help is often just mess with better intentions — and that\'s okay.',
     postFormat: 'Reel',
     strategy: 'ASMR-hook inversion (calm setup, chaos payoff)',
@@ -3300,18 +3565,18 @@ Moral: Sometimes the win is just that she walks in wearing something on her back
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Cuty spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like.
-Twist: The paste spreads. Cuty is now sitting in it. The floor becomes worse than it was, and Mumma starts laughing instead of scolding.
-Resolution: The paste-covered floor, with two small handprints in it.
-Moral: Toddler help is often just mess with better intentions.
+Story: Ria spills the atta, decides to clean it herself, and reaches for the water mug because that is what cleaning looks like.
+Twist: The dry atta turns into a sticky paste. Ria's hands are covered in flour, and Mumma starts laughing instead of scolding.
+Resolution: Mumma kneels down: "Let me show you the right way — dry wipe first, then damp cloth." Together they clean it properly.
+Moral: Toddler help is often just mess with better intentions — guide gently, don't shame.
 ''',
     setting: 'Kitchen floor, right after rolling rotis, steel plate still on the counter',
-    sceneDetail: 'The atta was dry, sweepable, and is now a paste that has to be scraped.',
+    sceneDetail: 'The atta was dry, sweepable, and is now a sticky paste that needs proper cleaning',
     dialogue: '"Dekho Mumma, saaf!"',
-    mess: 'The paste spreads. Cuty is now sitting in it. The floor becomes worse than it was, and Mumma starts laughing instead of scolding.',
+    mess: 'Ria tries to mop with a dry cloth, but the wet atta sticks to everything — her hands and the cloth',
     innerThought: 'My grandmother would have shouted. I am laughing because I have no other option left.',
-    endingBeat: 'The paste-covered floor, with two small handprints in it.',
-    defaultCast: ['Cuty', 'Mumma'],
+    endingBeat: 'Mumma shows Ria the proper technique: dry brush first, then damp cloth.',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: '',
     detail: '',
@@ -3458,7 +3723,24 @@ Moral: Sometimes the thing we want help finding is already in our hand.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room afternoon. Ria (sparkly pink star dress, pigtails, no glasses) sits on the floor playing. Robot charging dock glows nearby. Ria: "Robot, phone rakh do!" but her hand still grips the phone. Text on screen: "PHONE RAKH DO? 📱" "LEKIN HAATH MEIN HAI 🤖"
+
+On-Screen Text:
+- [0-3s]: "PHONE RAKH DO? 📱"
+- [3-7s]: "LEKIN HAATH MEIN HAI 🤖"
+- [7-12s]: "SCAN EVERYWHERE!"
+- [12-16s]: "EK PAL MILTAA HAI!"
+- [16-20s]: "SELF-CHECK SUCCESS 💡"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria sitting cross-legged on the rug: "Robot, phone rakh do!" Her hand still holds it. Robot's LED blinks erratically. The phone is right where it was. Text: "PHONE RAKH DO? 📱" "LEKIN HAATH MEIN HAI 🤖" Robot: "Acknowledged. Scanning for misplaced object."
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot extends its arm, scanning under the couch, behind pillows, checking Cuty's bed. "Object not detected. Expanding search radius." Cuty hides a toy phone, looks innocent. Ria watches, confused. Text: "SCAN EVERYWHERE!" "EK PAL MILTAA HAI!" Robot: "Searching: behind couch, under pillows, inside Cuty's bed."
+
+Audio/Dialogue (Hinglish): Ria: "Robot, phone rakh do!" Robot monotone: "Scanning for phone." Robot: "Not found behind couch." "Not found under pillows." "Not found in Cuty's bed." Ria: "Par yehi tho hai!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Robot's hand extends, points at Ria's own hand: "Object located." Ria looks, sees the phone in her grip, laughs: "Meri hi toh thi!" Text: "EK PAL MILTAA HAI!" "SELF-CHECK SUCCESS 💡". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Check your own hands first — sometimes the thing you want help finding is already in your possession.
+''',
   ),
 
   HookIdea(
@@ -3493,7 +3775,24 @@ Moral: Even rejections can be filed — and sometimes re-tried with a tiny twist
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Dining table, lunch time. Ria (sparkly pink star dress, pigtails) pushes away her plate: "Mujhe yeh sabzi bilkul nahi chahiye!" Robot (silver box-shaped body, blue LED eyes) whirs and extends a printer head. Text on screen: "REJECTION FORM 📝" "TOO GREEN ✅" "TRY CHEESE! 🧀"
+
+On-Screen Text:
+- [0-3s]: "SABZI REJECTION FORM 📝"
+- [3-7s]: "TOO GREEN ✅"
+- [7-12s]: "CHEESE TIME! 🧀"
+- [12-16s]: "ONE BITE = MAGIC ✨"
+- [16-20s]: "FILING SUCCESS 📁"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria pushes her plate away: "Mujhe yeh sabzi bilkul nahi chahiye!" Robot whirs, extends printer: "Sabzi Rejection Form — Item Code: Green." Prints checkboxes. Ria points: "Too green!" Robot nods. Text: "SABZI REJECTION FORM 📝" "TOO GREEN ✅". 
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot prints a new card: "Noted. Try cheese next time." Places a tiny cheese cube on her spoon. Ria eyes it. "Ek bite?" She tries: "Thik hai!" Text: "CHEESE TIME! 🧀" "ONE BITE = MAGIC ✨".
+
+Audio/Dialogue (Hinglish): Ria: "Mujhe yeh sabzi bilkul nahi chahiye!" Robot monotone: "Initiating Sabzi Rejection Form." Ria: "Too green!" Robot: "Form printed. Suggestion: cheese." Ria trying: "Thik hai!" Robot: "Data recorded. Taste preference updated."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria happily eats more of the cheese-topped sabzi. Robot's LED blinks green with approval. Text: "ONE BITE = MAGIC ✨" "FILING SUCCESS 📁". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Even rejections can be filed — and sometimes re-tried with a tiny twist. Offer agency through choice while gently encouraging one small bite.
+''',
   ),
 
   HookIdea(
@@ -3528,7 +3827,24 @@ Moral: A little humor and teamwork can mend both toys and feelings.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, toy pieces scattered. Rio (blue t-shirt, shorts) accidentally knocks over Ria's tower. Ria's eyes well up: "Mera heart toot gaya!" Robot (blue LED eyes softening) extends a large heart-shaped bandage. Text on screen: "BROKEN HEART 🫀" "HEART BANDAGE ❤️🩹" "TEAM REPAIR 🔧"
+
+On-Screen Text:
+- [0-3s]: "BROKEN HEART 🫀"
+- [3-7s]: "ROBOT RESPONSE 🤖"
+- [7-11s]: "HEART BANDAGE ❤️🩹"
+- [11-15s]: "APLOGY + TEAMWORK 🤝"
+- [15-19s]: "REPAIR COMPLETE! 🔧"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio accidentally bumps Ria's tower — pieces scatter. Ria: "Mera heart toot gaya!" Crying, clutching her broken toy. Robot's LED shifts from neutral to concern: "Emotional distress detected." Text: "BROKEN HEART 🫀" "ROBOT RESPONSE 🤖".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot extends a heart-shaped adhesive bandage, places it on Ria's chest: "Prescribing laughter therapy." Ria snorts, then giggles. Rio: "Sorry didi!" They both look at the bandage. Text: "HEART BANDAGE ❤️🩹" "APOLOGY + TEAMWORK 🤝".
+
+Audio/Dialogue (Hinglish): Ria: "Mera heart toot gaya!" Robot: "Heart bandage protocol: initiating." Ria: "Ye kya hai?" Robot: "Humor injection. Side effect: laughter." Rio: "Mujhe maaf kar dena!" Ria: "Theek hai... phir se khelo?"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria and Rio rebuild the tower together, Robot handing blocks. Text: "REPAIR COMPLETE! 🔧". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A little humor and teamwork can mend both toys and feelings. When siblings repair together, the bond grows stronger.
+''',
   ),
 
   HookIdea(
@@ -3563,7 +3879,24 @@ Moral: A single block can start a new tower — and a robot's deadpan can reset 
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, scattered blocks. Ria (sparkly pink star dress, pigtails) throws her arms up: "Mera sab kharab!" Robot (stiff posture, blue LED eyes) extends a single block on its tray. Text on screen: "SAB KHARAB! 💥" "EK BLOCK SE SHURU 🎯" "RESET! 🔄"
+
+On-Screen Text:
+- [0-3s]: "SAB KHARAB! 💥"
+- [3-7s]: "ROBOT DEADLANGS 😐"
+- [7-11s]: "EK BLOCK SE SHURU 🎯"
+- [11-15s]: "TOGETHER BUILD 🤝"
+- [15-19s]: "RESET! 🔄"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria declares "Mera sab kharab!" throwing arms up. Robot sits stiffly, extends one block: "Problem identified. Solution: one block." Text: "SAB KHARAB! 💥" "ROBOT DEADLANGS 😐".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria: "Ek hi block?" Robot: "Ek block se shuru hota hai." They place the block together. More blocks appear as they build. Text: "EK BLOCK SE SHURU 🎯" "TOGETHER BUILD 🤝".
+
+Audio/Dialogue (Hinglish): Ria: "Mera sab kharab!" Robot monotone: "Solution: one block." Ria: "Ek hi block?" Robot: "Ek block se shuru hota hai." Ria: "Theek hai!" Both placing: "Ek saath!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. A tiny tower stands, both kids beaming. Robot's LED blinks green. Text: "RESET! 🔄". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A single block can start a new tower — sometimes the smallest reset is all it takes.
+''',
   ),
 
   HookIdea(
@@ -3598,7 +3931,24 @@ Moral: A breath before the shout can save the whole tower.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Floor scattered with blocks, purple breathe cards fanned out. Tower lies in pieces. Rio (blue t-shirt, shorts) inhales to shout: "NOOOO!" — but Ria (sparkly pink star dress, pigtails) holds up a purple card: "Ek chhota sa saans." Text on screen: "TOWER FELL 💥" "BREATH BEFORE SHOUT 🌬️" "REBUILD TOGETHER 🧱"
+
+On-Screen Text:
+- [0-3s]: "TOWER FELL 💥"
+- [3-7s]: "NOOOO! 😤"
+- [7-11s]: "EK CHHOTA SA SAANS 🌬️"
+- [11-15s]: "BREATHE + REBUILD 🧱"
+- [15-19s]: "TOWER STANDS! 🎉"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Tower crashes, blocks fly. Rio inhales for a huge shout. Ria holds up purple card: "Ek chhota sa saans." Inhale for two counts, exhale for two. Text: "TOWER FELL 💥" "NOOOO! 😤" "EK CHHOTA SA SAANS 🌬️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot nods, projects counting: "Do... do..." Ria and Rio mirror the breath. The flying card lands softly in Rio's palm. Text: "BREATHE + REBUILD 🧱" "CARD CATCH ✨".
+
+Audio/Dialogue (Hinglish): Rio loud: "NOOOOO!" Ria gentle: "Ek chhota sa saans." Robot: "Inhale... two. Exhale... two." Rio: "Phir se?" Ria: "Phir se." Both: "Ek... do..."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Tower rebuilt, block by block, as they count breaths. Rio high-fives the camera. Text: "TOWER STANDS! 🎉". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A breath before the shout can save the whole tower — and give the mind a calm moment between feeling and acting.
+''',
   ),
 
   HookIdea(
@@ -3633,7 +3983,24 @@ Moral: Copying can flip into collaboration when you turn it into a game.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, afternoon. Rio (blue t-shirt, shorts) copying Ria (sparkly pink star dress, pigtails) — mirroring sip, walk, big-cat growl. Ria's face showing patience, then slight strain. Robot (blue LED eyes whirring) steps between them. Text on screen: "COPY COPY COPY! 🤖" "COPY COMPLETE! 🔄" "JOINT POSE! 🤝"
+
+On-Screen Text:
+- [0-3s]: "COPY COPY COPY! 🤖"
+- [3-7s]: "PATIENCE FRAWS 💪"
+- [7-11s]: "COPY COMPLETE! 🔄"
+- [11-15s]: "JOINT POSE! 🤝"
+- [15-19s]: "LAUGHTER WINS! 😂"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio mimics Ria: "Mmm sip sip!" copying her drink, her walk, her big-cat growl. Ria's smile starts to fade — patience fraying. Robot steps between: "Copy complete. Initiating joint silly pose protocol." Text: "COPY COPY COPY! 🤖" "PATIENCE FRAWS 💪".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot strikes a pose: "Left hand broccoli, right hand ice cream!" Both kids mirror — broccoli, ice cream, wobbling. Robot: "Hold position!" Text: "COPY COMPLETE! 🔄" "JOINT POSE! 🤝".
+
+Audio/Dialogue (Hinglish): Rio mimicking: "Mmm sip sip!" Ria: "(internal sigh)" Robot: "Copy complete. Initiating joint pose." Ria: "Broccoli?" Robot: "Ice cream!" Both: "Left hand broccoli, right hand ice cream!" Ria: "Haan!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Both kids hold the silly pose, laughing, Robot's LED blinking in rhythm. Text: "LAUGHTER WINS! 😂". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Copying can flip into collaboration when you turn it into a game — mimicry becomes shared creativity.
+''',
   ),
 
   HookIdea(
@@ -3668,7 +4035,24 @@ Moral: There's no "wrong" way to create art — your style is your superpower.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Drawing table, afternoon. Ria (sparkly pink star dress, pigtails) shows her lopsided drawing to Robot: "Robot, meri drawing kharab ho gayi!" Robot (blue LED eyes brightening) scans it and projects an animated version. Text on screen: "KHARAB? NAHIN! ✨" "YOUR STYLE = SUPERPOWER 🎨" "ART ALIVE! 🖼️"
+
+On-Screen Text:
+- [0-3s]: "KHARAB? NAHIN! ✨"
+- [3-7s]: "SCAN IN PROGRESS 🖌️"
+- [7-12s]: "YOUR STYLE! 🎨"
+- [12-16s]: "ART ALIVE! 🖼️"
+- [16-20s]: "DRAW 10 MORE! 📝"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria holds up her drawing: "Robot, meri drawing kharab ho gayi!" comparing it to an example. Robot scans: "Lopsided sun = radiant. Crooked tree = dancing. Wobbly house = full of life." Text: "KHARAB? NAHIN! ✨" "SCAN IN PROGRESS 🖌️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot projects Ria's drawing as animation — sun beams smile, tree sways, house winks. Ria's eyes widen: "Mere drawings alive hote hain!" Text: "YOUR STYLE! 🎨" "ART ALIVE! 🖼️".
+
+Audio/Dialogue (Hinglish): Ria: "Robot, meri drawing kharab ho gayi!" Robot: "Negative. Style detected: radiant sun, dancing tree, wiggly house." Ria: "Really?" Robot: "Really." Ria: "Mere drawings alive hote hain!" Robot: "Initiating next canvas."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria grabs a fresh sheet: "Do I get ten more?" Robot extends a new crayon: "Ten. Go." Text: "DRAW 10 MORE! 📝". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: There's no "wrong" way to create art — your style is your superpower. Let confidence follow curiosity, not comparison.
+''',
   ),
 
   HookIdea(
@@ -3703,7 +4087,24 @@ Moral: Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen corner, afternoon. Ria (sparkly pink star dress, pigtails) sneaking toward the cookie jar. Robot (blue LED eyes scanning) projects a floating clue chart — footsteps, crinkles, timer beep. Mumma (yellow kurti, top bun) watches with a knowing smile. Text on screen: "COOKIE HEIST? 🍪" "CLUE CHART! 🕵️‍♀️" "LOVE > MAGIC ❤️"
+
+On-Screen Text:
+- [0-3s]: "COOKIE HEIST? 🍪"
+- [3-7s]: "MUMMA EARS 👂"
+- [7-11s]: "CLUE CHART! 🕵️‍♀️"
+- [11-15s]: "Busted with love 😍"
+- [16-20s]: "NO MAGIC, JUST LOVE"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria tiptoes toward the cookie jar, wrapper crinkling under her foot. Robot: "Unauthorized access detected." Text: "COOKIE HEIST? 🍪" "MUMMA EARS 👂".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot projects clue chart: "Footsteps: detected. Crinkles: detected. Timer beep: no." Mumma: "Ruk jao, meri aankh bhi nahi todegi!" Ria stops, grinning. Text: "CLUE CHART! 🕵️‍♀️" "Busted with love 😍".
+
+Audio/Dialogue (Hinglish): Ria sneaky: "Thodaa sa cookie..." Robot: "Footsteps detected." Ria: (quiet) "Crinkle..." Robot: "Crinkles detected." Mumma: "Ruk jao beta, maine tumhe sun liya." Ria: "Mumma ne suna!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Mumma kneels, offers a tiny cookie on a proper plate: "Ek cookie, proper plate." Ria beaming: "Bas ek?" Text: "NO MAGIC, JUST LOVE". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Love needs no camera — a parent's awareness is enough. Pyaar se bina camera ki zaroorat nahi — sunna hi kaafi hota hai.
+''',
   ),
 
   HookIdea(
@@ -3773,7 +4174,24 @@ Moral: Butterflies mean you care — and caring is the first step to courage.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Classroom, afternoon. Ria (sparkly pink star dress, pigtails) clutching her drawing, stomach visibly fluttery. Robot (blue LED eyes gentle) scans her: "Excitement Detected: 97%." Projects: "Butterflies = Courage, Not Fear." Text on screen: "BUTTERFLIES 🦋" "COURAGE = EXCITEMENT 💪" "SHOW YOUR ART! 🎨"
+
+On-Screen Text:
+- [0-3s]: "BUTTERFLIES 🦋"
+- [3-7s]: "97% EXCITEMENT ⚡"
+- [7-11s]: "NOT FEAR!"
+- [11-15s]: "BUTTERFLY BREATH 🌬️"
+- [15-19s]: "SHOW YOUR ART! 🎨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria's stomach fluttery with jitters: "Mere pet mein titliyan udd rahi hain!" She clutches drawing. Classmates wait. Robot: "Butterflies = courage, not fear." Text: "BUTTERFLIES 🦋" "97% EXCITEMENT ⚡".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot teaches "butterfly breath": "Inhale... imagine wings. Exhale... they carry worry away." Ria breathes, shoulders relax. Text: "NOT FEAR!" "BUTTERFLY BREATH 🌬️".
+
+Audio/Dialogue (Hinglish): Ria nervous: "Mere pet mein titliyan udd rahi hain!" Robot: "Excitement detected: 97%." Ria: "Par darr lag raha hai..." Robot: "Butterflies = courage. Try butterfly breath." Ria: "Ek... do..." Robot: "Show them your garden!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria confidently: "This is my butterfly garden!" Classmates clap. Robot's LED glows proud blue. Text: "SHOW YOUR ART! 🎨". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Butterflies mean you care — and caring is the first step to courage. A simple breath can turn nervous energy into brave action.
+''',
   ),
 
   HookIdea(
@@ -3843,10 +4261,27 @@ Moral: Surprises are sweet to share; secrets that make you uncomfortable must be
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room, afternoon. Half-wrapped gift box, ribbons scattered. Rio (blue t-shirt, shorts) blurts out: "Ria ne Mumma ko surprise gift banaya hai!" Ria (sparkly pink star dress, pigtails) face falls. Robot (blue LED eyes flickering) projects a two-column chart. Text on screen: "SURPRISE? ✨" "SECRET = TELL GROWN-UP! 🚨" "RIGHT TIME = RIGHT! ⏰"
+
+On-Screen Text:
+- [0-3s]: "SURPRISE! ✨"
+- [3-7s]: "SPOILED! 😱"
+- [7-11s]: "ROBOT INTERVENTION 🤖"
+- [11-15s]: "CHART EXPLAINED 📊"
+- [15-19s]: "RIRO UNDERSTANDS! 💡"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Rio blurts out the surprise. Ria's face falls — "Mera plan kharab!" Mumma overhears. Robot's eyes whirl: "Privacy protocol activated." Text: "SURPRISE! ✨" "SPOILED! 😱".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot projects chart: left side "Surprise = fun to share later!" right side "Secret = if sad or scary, tell grown-up." Ria reads both sides. Text: "ROBOT INTERVENTION 🤖" "CHART EXPLAINED 📊".
+
+Audio/Dialogue (Hinglish): Rio blurting: "Ria ne Mumma ko surprise gift banaya hai!" Ria: "Rio! Kya kar diya tune!" Robot: "Drawing distinction." Charts: "Surprise = share later. Secret = tell grown-up." Rio: "Samajh gaya!" Ria: "Theek hai."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Rio: "Mujhe pata hai, main dhyaan rakhunga!" Ria hands him tape: "Pack up." Gift box wrapped. Text: "RIRO UNDERSTANDS! 💡". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Surprises are sweet to share at the right time; secrets that make you uncomfortable must always be told to a trusted grown-up immediately.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'robot-20',
     category: 'Series',
     cover: 'I Want to Eat the Whole World!',
@@ -3878,9 +4313,25 @@ Moral: The world is huge — best to explore it one bite at a time.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
-  ),
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Dining table, afternoon. Rainbow of international dishes arranged. Ria (sparkly pink star dress, pigtails) pointing at everything: "Mujhe poori duniya khana hai!" Robot (blue LED eyes whirring) produces a world map where each country lights up. Text on screen: "WORLD MENU 🌍" "ONE BITE AT A TIME! 🍽️" "ADVENTURE MAP! 🗺️"
 
+On-Screen Text:
+- [0-3s]: "WORLD MENU 🌍"
+- [3-7s]: "EVERYTHING! 🍜🍕🌮"
+- [7-12s]: "ONE COUNTRY PER DAY 📅"
+- [12-16s]: "TINY BITES ONLY 🍴"
+- [16-20s]: "FLAVOR ADVENTURE! ✨"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria overwhelmed by dishes: "Mujhe poori duniya khana hai!" Robot scans each dish: "Too much data for one meal cycle." Projects world map — countries blinking. Text: "WORLD MENU 🌍" "EVERYTHING! 🍜🍕🌮" "ONE COUNTRY PER DAY 📅".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Robot: "Protocol: one bite at a time." Places a single samosa: "Today: India." Ria takes a careful bite: "Mmm!" Text: "TINY BITES ONLY 🍴" "FLAVOR ADVENTURE! ✨".
+
+Audio/Dialogue (Hinglish): Ria: "Mujhe poori duniya khana hai!" Robot: "All dishes detected. Recommendation: one country per day." Ria: "Ek bite?" Robot: "Start with familiar. India first." Ria: "Mmm! Swadisht!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Ria marks "India" on her adventure map with a gold star. Robot hands her a new dish: "Tomorrow: Mexico." Text: "FLAVOR ADVENTURE! ✨". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: The world is huge — best to explore it one bite at a time. Tiny tastes build big curiosity.
+''',
+  ),
 
   // Real mess parenting stories.
 HookIdea(
@@ -3915,10 +4366,27 @@ Moral: Bachche apni tareeke se solution dhoondhte hain — unki creativity ko en
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Living room floor, scattered toys, crumpled paper plan in Ria's hands. Ria (sparkly pink star dress, pigtails) proudly unfolds blueprint: "Step 1: Papa ko gulaab do!" "Step 2: Mummy ko paani do." "Step 3: Rio ko TV chalu karo." Papa: "Beta, main gulaab se allergic hoon!" Text on screen: "PERFECT PLAN! 📋" "ALLERGY ALERT! 🌹" "REVISE & RESUBMIT! ✨"
+
+On-Screen Text:
+- [0-3s]: "PLAN PRESENTATION! 📋"
+- [3-7s]: "PERFECT PLAN! ✨"
+- [7-11s]: "ALLERGY ALERT! 🌹"
+- [11-15s]: "MISSED THE BRIEF 😅"
+- [16-20s]: "REVISED PLAN! ✅"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria presents plan: "Dekho plan!" Steps: roses for Papa, water for Mummy, TV for Rio — "PROBLEM SOLVED!" Text: "PLAN PRESENTATION! 📋" "PERFECT PLAN! ✨".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Papa: "Gulaab se allergic hoon!" Rio: "Main TV nahi dekhna chahta." Mumma: "Main paani nahi peeti, darrakchunni hai." Ria crumples plan. Text: "ALLERGY ALERT! 🌹" "MISSED THE BRIEF 😅".
+
+Audio/Dialogue (Hinglish): Ria: "Maine plan banaya hai!" Papa: "Beta, gulaab se allergic hoon." Rio: "Main TV nahi dekhna chahta, book maanga hai." Mumma: "Main paani nahi peeti." Ria: "Toh... naya plan?" New plan: "Step 1: Papa tofa mile." "Step 2: Mummy book mile." "Step 3: Rio dinosaur mile." All: "Sab khush hain!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Everyone gets what they actually wanted. Ria: "Mere plan ka final version — sab khush!" Text: "REVISED PLAN! ✅". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bachche apni tareeke se solution dhoondhte hain, unki creativity ko encourage karo, par unki zaroorat pucho.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'park-se-nikalna',
     category: 'Relatable',
     cover: 'Park Se Nikalna!',
@@ -3950,7 +4418,24 @@ Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Society park exit, morning. Ria (sparkly pink star dress, pigtails) and Rio (blue t-shirt, shorts) both sitting on the bench, arms crossed. Papa checking watch: "Time to go." Text on screen: "PARK EXIT DRAMA! 🏃" "GAME OVER DEMANDS! 🏁" "FIRST STEP WINS! 🏆"
+
+On-Screen Text:
+- [0-3s]: "PLAYTIME OVER! ⏰"
+- [3-7s]: "PARK EXIT DRAMA! 🏃"
+- [7-11s]: "GAME ON! 🎮"
+- [11-15s]: "FIRST STEP WINS! 🏆"
+- [16-20s]: "MISSION COMPLETE! ✅"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Papa: "Time to go." Ria plants feet: "Main yahan nahi jaungi park se!" Rio joins: "Mujhe bhi nahi jaana!" Both sit. Text: "PLAYTIME OVER! ⏰" "PARK EXIT DRAMA! 🏃".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Papa: "Game banao — jiska pehla step niklega, wohi countdown karega!" Ria takes first step. Text: "GAME ON! 🎮" "FIRST STEP WINS! 🏆".
+
+Audio/Dialogue (Hinglish): Papa: "Time to go — park se nikalna padega." Ria: "Main yahan nahi jaungi park se!" Rio: "Mujhe bhi nahi jaana!" Papa: "Game banao — pehla step, countdown karega." Ria: "Main jee lungi!" Rio: "Mere saath bhi!" Both: "Phir kal phir milenge!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Both walk out, hand in hand with Papa. "Mission complete!" Text: "MISSION COMPLETE! ✅". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Game toh game hota hai, lekin har game ek nayi baat sunane dega — turning transitions into games beats demanding compliance every time.
+''',
   ),
 
 HookIdea(
@@ -3985,10 +4470,27 @@ Moral: Bachche har baat yaad rakhte hain — bolo soch ke.
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen, breakfast table, morning light. Half-eaten dosa on Rio's plate. Mumma's dupatta caught on the door handle. Mumma: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio freezes mid-bite: "Arre... yehi toh tha jo tumne kaha tha!" Text on screen: "TAPE RECORDER! 🎙️" "BACKTRACK FAIL! ❌" "LISTEN FIRST 👂"
+
+On-Screen Text:
+- [0-3s]: "OVERHEARD! 👂"
+- [3-7s]: "TAPE RECORDER! 🎙️"
+- [7-11s]: "BACKTRACK FAIL! ❌"
+- [11-15s]: "ADMIT MISTAKE 🤦"
+- [16-20s]: "LAUGHTER WINS! ❤️"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mumma to Papa in hallway: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio eating breakfast: "Mummy ne kaha — aaj tak nahi dekhna." Papa: "Kya?" Mumma's face goes white. Text: "OVERHEARD! 👂" "TAPE RECORDER! 🎙️".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria: "Wohi toh tha jo tumne kaha!" Mumma pinches her arm: "Rio, tumhara breakfast khatam karo." Text: "BACKTRACK FAIL! ❌" "ADMIT MISTAKE 🤦".
+
+Audio/Dialogue (Hinglish): Mumma: "Aaj tak nahi dekhna, tumhe samajh aa jayega." Rio: "Mummy ne kaha — aaj tak nahi dekhna!" Papa: "Kya? Kisko bhi kaha?" Mumma: "Arre bachche, galt baat nahi kahi." Rio: "Wohi toh tha jo tumne kaha!" Mumma: "Maine toh kaha tha koi mat karo..." Rio: "Bas yehi toh tha."
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Mumma laughs: "Beta, tumne samajh gaya!" Rio grins, takes another bite. "Phir bhi yehi toh tha." Text: "LAUGHTER WINS! ❤️". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bachche har baat yaad rakhte hain — bolde soch ke, because walking tape recorders are always on.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'h24',
     category: 'Relatable',
     cover: 'Secret Agent Cuty!',
@@ -4013,17 +4515,34 @@ Moral: Bachche bade ki baatein apne tareeke se samajhte hain — unhe simple sha
     sceneDetail: 'Mumma\'s purse on the floor, single coin glinting',
     dialogue: 'Par main toh ghar ka part hoon!',
     mess: 'Ria keeps asking "kitna budget hai?" and "kiska share hai"',
-    innerThought: 'Agar main bahar hoon toh kya main free hoon, and then will they still love me',
+    innerThought: 'Agar main bahar hoon toh kya main free hoon... kya mujhe pyar ki jayegi?',
     endingBeat: 'Cuty drops the coin, everyone stares at it like it just solved everything',
     defaultCast: ['Ria', 'Rio', 'Mumma'],
     keepMoralOffScreen: true,
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Hallway outside bedroom, morning. Mumma's purse on the floor, single coin glinting. Mumma on phone: "Nahi, yeh month budget mein nahi aayega." Ria: "Par main toh ghar ka part hoon!" Cuty sniffs the purse. Text on screen: "BUDGET CONFUSION! 💰" "COIN LOGIC! 🪙" "SIMPLE WORDS MATTER! 💬"
+
+On-Screen Text:
+- [0-3s]: "BUDGET CONFUSION! 💰"
+- [3-7s]: "AM I IN OR OUT? 🤔"
+- [7-11s]: "TODDLER ECONOMICS 📊"
+- [11-15s]: "COIN LOGIC! 🪙"
+- [16-20s]: "SIMPLE WORDS MATTER! 💬"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Mumma: "Nahi, budget mein nahi aayega." Ria: "Budget? Kya budget?" Mumma: "Ghar ka budget." Ria: "Par main toh ghar ka part hoon!" Rio: "Main bhi budget se bahar hoon?" Text: "BUDGET CONFUSION! 💰" "AM I IN OR OUT? 🤔".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Cuty sniffs Mumma's purse, trots away. Emerges with single coin, drops it at Ria's feet. Text: "COIN LOGIC! 🪙".
+
+Audio/Dialogue (Hinglish): Mumma: "Nahi, yeh month budget mein nahi aayega." Ria: "Par main toh ghar ka part hoon!" Rio: "Main bhi budget se bahar hoon?" Mumma: "Sab koi budget ke andar hi hoon." Cuty: "Yip!" [drops coin] Ria: "Cuty ne solve kar diya!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Everyone stares at the coin. "Evidence hai — hair on the floor!" Text: "SIMPLE WORDS MATTER! 💬". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bachche bade ki baatein apne tareeke se samajhte hain, unhe simple shabdon mein samjhaana padta hai.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'h25',
     category: 'Relatable',
     cover: 'Cuty\'s Investigation!',
@@ -4055,11 +4574,27 @@ Moral: Bachche har cheez notice karte hain — unki curiosity ko sahi direction 
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen floor, morning light through window. Magnifying glass on counter. Ria (sparkly pink star dress, pigtails) stands on hind legs like detective, nose twitching. Cuty (white bunny, pink bow) sits innocent. "Cuty ne problem dhundh li!" Text on screen: "DETECTIVE TEAM! 🔍" "CLUES EVERYWHERE! 🕵️" "CURIOUSITY WINS! ✨"
+
+On-Screen Text:
+- [0-3s]: "CASE OPENED! 🔍"
+- [3-7s]: "EVIDENCE HUNT 🕵️"
+- [7-11s]: "CLUES EVERYWHERE! 🕵️"
+- [11-15s]: "WRONG MYSTERY! 🤔"
+- [16-20s]: "TEAM DETECTIVE! 👥"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria holds magnifying glass: "Kaunne ne Mumma ki favourite chappal girayi?" Cuty sits innocent. Ria: "Evidence — hair, scuff mark." Text: "CASE OPENED! 🔍" "EVIDENCE HUNT 🕵️" "CLUES EVERYWHERE!".
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Mumma: "Ria... maine khud hi girayi thi." Ria points at sink: "Dabbe nahi dhule — THAT is mystery!" Text: "WRONG MYSTERY! 🤔".
+
+Audio/Dialogue (Hinglish): Ria: "Cuty ne problem dhundh li!" Ria: "Kaunne ne chappal girayi?" Mumma: "Ria... maine khud hi toh girayi thi." Ria: "Phir bhi, koi aur problem hogi!" Mumma: "Dabbe nahi dhule? Theek hai!" Cuty: "Yip!" [drops spoon]
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Cuty drops spoon at Rio's feet. "Detective Cuty ne kaha — team banao." All three form tiny detective team. Text: "TEAM DETECTIVE! 👥". Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Bachche har cheez notice karte hain, unki curiosity ko sahi dikhao — channel their observations toward real solutions.
+''',
   ),
 
-  // ── New ideas (added by hand; blanks to be filled later) ─────────────────────
-
+  // New ideas (added by hand; blanks to be filled later)
   HookIdea(
     id: 'h27',
     category: 'Diwali',
@@ -4202,10 +4737,10 @@ Resolution: Ghar wale rangoli ke saath khush hokar photo le li, kyunki asli rang
 Moral: Jo bhi ban raha ho, agar pyaar ke saath ban raha ho, toh wahi perfect hai — colors wash off, memories stay.
 ''',
     setting: 'Front courtyard, rangoli powder scattered everywhere, washable colors',
-    sceneDetail: 'Ria sitting in a rainbow of colored powder, looking like a painting herself',
+    sceneDetail: 'Pink powder all over Ria\'s nose and ears, rainbow spillage on the floor',
     dialogue: '"Yeh abstract art hai na, Mumma?"',
-    mess: 'Pink powder all over Ria"s nose and ears — washes off easily',
-    innerThought: 'Maybe I should just let her go full color.',
+    mess: 'Ria\'s nose and ears covered in pink powder — washes off easily',
+    innerThought: 'Maybe messy is the best kind of messy.',
     endingBeat: 'Ria gives a thumbs up, covered in colors, holding her "masterpiece". Mumma cleans up together.',
     defaultCast: ['Ria', 'Mumma', 'Rio'],
     keepMoralOffScreen: false,
@@ -4503,16 +5038,16 @@ HookIdea(
     archived: false,
     storyDetail: '''
 Story: Ria, Rio, Cuty hamesha ek dusre se ladte rehte hain — par jab koi stranger unse baat karta hai, toh ve ek team ban jaate hain.
-Twist: Stranger ne unhe ek problem ke baare mein poocha — lost and needs help finding their dog.
-Resolution: Teenon milkar ek proper search team ban gaye — Ria tracks footsteps, Rio checks the street, Cuty uses her keen ears.
-Moral: Unity is strength, especially when it's family.
+Twist: Auntie at the park looks confused, pointing around: "Kya koi bachcha dekha? Main apna dog kho diya hai!" Ria sees her distress.
+Resolution: Teenon milkar ek proper search team ban gaye — Ria tracks footprints, Rio checks under benches, Cuty uses her keen ears. After a few minutes, they find the lost dog wagging its tail near the swings.
+Moral: Unity is strength — when siblings work together, even strangers feel safe.
 ''',
     setting: 'Neighborhood park, afternoon',
     sceneDetail: 'Three kids forming a line, then switching to a triangle formation',
     dialogue: 'Ria: "We don\'t fight outsiders - we fight FOR each other."',
-    mess: 'A ball rolls into traffic and the siblings must work together to retrieve it safely',
+    mess: 'Their own toy fight ends when a lost auntie needs help — the siblings unite.',
     innerThought: 'Why do we only unite when someone else is in trouble?',
-    endingBeat: 'The three siblings bow together after helping the stranger find their dog.',
+    endingBeat: 'The three siblings bow together with the auntie and her dog after a happy reunion.',
     defaultCast: ['Ria', 'Rio', 'Cuty'],
     keepMoralOffScreen: false,
     quote: 'When siblings unite, even giants look small.',
