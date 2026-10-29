@@ -84,7 +84,7 @@ class HookIdea {
   final String detail;         // one concrete sensory detail
   final String punchline;      // closing image/beat (alternative to endingBeat)
 
-  /// Ready-to-use 20-second viral Reel prompt (Part 1 + Part 2 + on-screen text).
+  /// Ready-to-use 30-second viral Reel prompt (Part 1 + Part 2 + Part 3 + on-screen text).
   /// Empty when the hook does not have a pre-built viral prompt.
   final String readyPrompt;
 
@@ -2637,7 +2637,7 @@ Moral: "Mat" nahi, "ungli pakdo".
     detail: '',
     punchline: '',
     readyPrompt: '''
-PROMPT: 3D Pixar animation style, vertical 9:16. Society parking lot, afternoon, red car stopped at crossing line. Rio (yellow sundress, pigtails, holding Mumma's hand) tugs toward the road. "Rio, meri ungli pakho!" Rio hesitates, looks back, grabs her hand. Text on screen: "PAHLI UNGli 🎵" "MAT BHAAGO vs UNGULI PAKHO"
+PROMPT: 3D Pixar animation style, vertical 9:16. Society parking lot, afternoon, red car stopped at crossing line. Rio (blue t-shirt, shorts, holding Mumma's hand) tugs toward the road. "Rio, meri ungli pakho!" Rio hesitates, looks back, grabs her hand. Text on screen: "PAHLI UNGli 🎵" "MAT BHAAGO vs UNGULI PAKHO"
 
 On-Screen Text:
 - [0-3s]: "ROAD SAFETY KI LINE 🎵"
@@ -2648,7 +2648,7 @@ On-Screen Text:
 
 Part 1 (0-10s): 3D Pixar style, 9:16. Rio at parking lot crossing, tugging toward road. Cars rushing past. Text: "ROAD SAFETY KI LINE 🎵" "MAT BHAGA ❌ → UNGULI PAKHO ✅". Rio: "Rio, meri ungli pakho!" Rio stops, looks back, takes her hand. Comedic tension with fast cars approaching.
 
-Part 2 (10-20s): 3D Pixar style, 9:19. Both walk slowly, hand in hand, red car waiting. Text: "HAND HOLD TECHNIQUE 💪" "SMALL HANDS, BIG SAFETY 🌟" "CROSS TOGETHER, ALWAYS 🤝". Rio: "Theek hai, main tumhari saath hoon." Mumma: "Haan, hum dono milke teerahon."
+Part 2 (10-20s): 3D Pixar style, 9:16. Both walk slowly, hand in hand, red car waiting. Text: "HAND HOLD TECHNIQUE 💪" "SMALL HANDS, BIG SAFETY 🌟" "CROSS TOGETHER, ALWAYS 🤝". Rio: "Theek hai, main tumhari saath hoon." Mumma: "Haan, hum dono milke teerahon."
 
 Audio/Dialogue (Hinglish): Rio urgent: "Rio, meri ungli pakho!" Mumma hesitant: "Par thoda maza aa raha tha..." Rio: "Ruk jao beta, ek second." Rio reassuring: "Main tumhe saaf pakad hoon gi." Mumma: "Haan, chalo... saath milkar." Both crossing: "Ek dusre ki ungli pakad ke chal rahe hain!"
 
@@ -2693,7 +2693,7 @@ Moral: Pyaar ke saath rule set karna, bachcha safe mehsoos karta hai.
     detail: '',
     punchline: '',
     readyPrompt: '''
-PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen counter, morning, cookie jar on the table. Rio (yellow sundress, pigtails, holding cookie) sneaks from the jar again. Mumma kneels: "Haan beta, tumne kara. Par main tumhe pyar karti hoon." Text on screen: "COOKIE SNATCH! 🍪" "LOVE BOUNDARY ❤️" "ASK NEXT TIME 💛"
+PROMPT: 3D Pixar animation style, vertical 9:16. Kitchen counter, morning, cookie jar on the table. Rio (blue t-shirt, shorts, holding cookie) sneaks from the jar again. Mumma kneels: "Haan beta, tumne kara. Par main tumhe pyar karti hoon." Text on screen: "COOKIE SNATCH! 🍪" "LOVE BOUNDARY ❤️" "ASK NEXT TIME 💛"
 
 On-Screen Text:
 - [0-3s]: "COOKIE SNATCH! 🍪"
@@ -4968,9 +4968,9 @@ Moral: Time boundaries without punishment = happy kids.
     id: 'h37',
     category: 'Warm lesson',
     cover: 'Calm Down Corner!',
-    opening: 'Jab bhi Cuty ka gussa chadhne lagta hai, Mumma calm down corner le aati hai.',
-    problem: 'A strategy to calm a child down when they are angry — a calm-down space instead of punishment.',
-    lesson: 'Connection before correction. A calm-down space with comfort items helps regulate emotions.',
+    opening: 'Jab Ria koi cheez ke liye bahut zaroorat mehsoos karti hai — like wanting a specific snack or needing a hug — Mumma calm corner le aati hai.',
+    problem: 'Ria communicates big needs through gentle persistence, and Mumma guides her to a calm-down space with comfort items instead of saying no.',
+    lesson: 'Big feelings are okay. A calm-down space with comfort items helps little ones reset with gentle guidance.',
     postFormat: 'Reel',
     strategy: 'The "calm-down corner": 3 deep breaths, 2 comfort items, 1 reconnect hug.',
     caption: 'Connection before correction 💛 #EmotionalRegulation #CalmDownCorner #FunLearningWithPalak #IndianParents #GentleParenting',
@@ -4980,18 +4980,23 @@ Moral: Time boundaries without punishment = happy kids.
     custom: false,
     archived: false,
     storyDetail: '''
-Story: Jab Cuty ka gussa chadhne lagta hai — toys, words, sab kuch udaane ki koshish. Mumma ne ek secret strategy try kari — calm down corner le aayi with soft cushion and favorite toy.
-Twist: Har deep breath ke baad gussa thoda sa kam ho jaata hai, lekin last step tak poora maza nahi aata — usse zaroori hai ki "hug" bhi mile.
-Resolution: Cuty ka gussa poori tarah se breathing-hug se nikal aa gaya, aur ab woh ek naye game ke liye taiyyar thi.
+Story: Jab Ria ko koi badi chahat hoati hai — jaise ek specific snack chahiye ya ek hug — Mumma dekhti hai. Ria nudge karti hai Mumma's hand gently, then sits by her calm-down corner with her soft cushion.
+
+Twist: Har deep breath ke baad Ria aur bhi soft ho jaati hai, aur last step tak usey pata chalta hai ki sab theek ho jayega — par pehle ek chhota sa hug bhi zaroori hai.
+
+Resolution: Ria kehta hai (softly, in her quiet way) — nudge, nudge — and Mumma hugs her tight. The storm has passed. Ria is ready for a new game.
+
+Moral: Connection before correction. A calm space with comfort beats any timeout chair.
+
 Moral: Connection before correction. A calm space with comfort beats any timeout chair.
 ''',
     setting: 'Corner of the room where tantrums happen, calm-down corner with cushion and favorite toy',
-    sceneDetail: 'Cuty with tears streaming, Mumma kneeling at her level with soft cushion',
+    sceneDetail: 'Ria nudging Mumma\'s hand, sitting by her calm-down corner with soft cushion',
     dialogue: '"Beta, chalo calm down corner mein chalte hain. Teen deep breaths lete hain."',
     mess: 'Toys scattered everywhere during the tantrum',
     innerThought: 'This looks simple, but it is working.',
-    endingBeat: 'Cuty snuggles into Mumma\'s shoulder after breathing, the storm now just a whisper.',
-    defaultCast: ['Cuty', 'Mumma'],
+    endingBeat: 'Ria rests her head on Mumma\'s shoulder after breathing, then sits up ready for a new game.',
+    defaultCast: ['Ria', 'Mumma'],
     keepMoralOffScreen: false,
     quote: 'Deep breaths and a hug can deflate anger faster than any timeout chair.',
     detail: 'Always kneel to eye level — no "above" positioning. Create a calm-down corner with soft items.',
