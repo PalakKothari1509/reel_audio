@@ -15,7 +15,6 @@
 // folding them into 'conversation' would have quietly changed what they were about.
 
 import 'brand_system.dart';
-import 'models/quick_idea.dart';
 
 // -- Buckets ---------------------------------------------------------------------
 //
@@ -340,10 +339,18 @@ const kHookCategories = [
   'Series',
 ];
 
-/// Kids Safety hooks for the shield collection.
+/// The starting list. Merged from several AI suggestions and cut down hard: the same
+/// three problems (screen time, shoes, toy fights) appeared four or five times each,
+/// and several were written as "I" — a parent speaking — when the reels are told by a
+/// storyteller about Ria and Rio.
+///
+/// Kids Safety hooks (shield collection) and the former 14-day post package all live
+/// directly in this one list now too, so every idea is one format in one place instead
+/// of three different lists and two different classes.
 /// Each carries a full storyDetail with the Story/Twist/Resolution/Moral
 /// labels the offline generator expects.
-final kSafetyHooks = <HookIdea>[
+List<HookIdea> buildDefaultHooks() {
+  final list = <HookIdea>[
 // NEEDS EXPERT REVIEW before posting
 HookIdea(
     id: 'idea_1',
@@ -683,15 +690,6 @@ Outro: "Accha laga toh FOLLOW zaroor karo! 🙌"
 ''',
   ),
 
-];
-
-/// The starting list. Merged from several AI suggestions and cut down hard: the same
-/// three problems (screen time, shoes, toy fights) appeared four or five times each,
-/// and several were written as "I" — a parent speaking — when the reels are told by a
-/// storyteller about Ria and Rio.
-/// Combined hooks list with safety hooks appended.
-List<HookIdea> buildDefaultHooks() {
-  final list = <HookIdea>[
     // Relatable: the child's own words, the thing every parent has heard this week.
 HookIdea(
     id: 'idea_7',
@@ -5461,10 +5459,1160 @@ Part 3 (20-30s): $kPartStyle. The next day, Ria proudly shows off her star patch
 Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo! ❤️"
 ''',
   ),
+
+  // Former "14-Day Post Package" entries, folded into this same list and the
+  // same HookIdea shape as everything else, so there is one format, not
+  // three lists and two classes.
+  HookIdea(
+    id: 'idea_93',
+    category: 'Funny',
+    cover: 'Which One Doesn\'t Belong? 🧩',
+    title: 'Which One Doesn\'t Belong?',
+    opening: 'Four illustrated figures: Ria, Rio, Cuty, and a banana. Which one is different?',
+    problem: 'Four illustrated figures side by side: Ria (child), Rio (child), Cuty (bunny), and a yellow banana.',
+    lesson: 'The banana — it\'s the only food! (Round 2: pattern game — who holds what?)',
+    postFormat: 'Static Image',
+    strategy: 'For parents of 3-6 year olds — a save-worthy observation-skill puzzle card.',
+    caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
+    pinnedComment: 'Comment your child\'s answer below 👇',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Four pictures sit side by side on a cream puzzle card — Ria, Rio, Cuty, and a single yellow banana.
+Twist: At first glance all four just look like "characters," so kids scan for a while before it clicks.
+Resolution: The banana is the only one that isn't a character — it's food! Round 2 swaps in a pattern game asking who holds what.
+Moral: Simple observation games sharpen thinking far more than they look like they would.
+''',
+    setting: 'A cream puzzle card, square format',
+    sceneDetail: 'Ria, Rio, Cuty and a yellow banana lined up as four equal-looking icons',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Round 2 keeps the game going with a who-holds-what pattern twist.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Create a bright, clean preschool puzzle card, square format, cream pastel background. Four large, simple, colorful illustrations in a row: Ria (pigtails, pink dress), Rio (blue shirt), Cuty (white bunny with pink bow), and a single yellow banana. Rounded card border, soft drop shadow under each figure, minimal clutter, no text inside the image, playful children's illustration style.
+
+On-Screen Text: "WHICH ONE DOESN'T BELONG? 🧩"
+
+Answer: The banana — it's the only food! Round 2: a pattern game asking who holds what.
+
+Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_94',
+    category: 'Funny',
+    cover: 'Mumma Says This 100x a Day 😂',
+    title: 'Mumma Says This 100x a Day',
+    opening: 'Fast-cut relatable moments of things parents repeat all day.',
+    problem: 'Put your shoes on / Where\'s your water bottle / Don\'t run / Stop fighting / Come here',
+    lesson: 'Tag a parent who needs to see this',
+    postFormat: 'Reel',
+    strategy: 'For parents of 2-5 year olds — relatable, share-worthy fast-cut humor.',
+    caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
+    pinnedComment: 'Be honest — how many times today? 👇',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Five everyday lines repeat on loop in every house — "put your shoes on," "where's your water bottle," "don't run," "stop fighting," "come here."
+Twist: Each line gets the exact same response: Ria stays barefoot five minutes later, Rio shrugs with the bottle sitting right beside him, and Cuty sleeps through all of it.
+Resolution: By the fifth "come here," the only answer is silence — followed by a louder "COME HERE!"
+Moral: If it feels like you're saying the same five things on repeat, you basically are — every parent is.
+''',
+    setting: 'A regular day at home, cream background, fast cuts',
+    sceneDetail: 'Ria barefoot holding her shoes, Rio\'s water bottle sitting right beside him untouched',
+    dialogue: '"Coming!" "I don\'t know." "COME HERE!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty sleeps through every single scene.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Cream background, fast-cut reel. Scene 1: Ria barefoot holding her shoes: "Coming!" — five minutes later, still barefoot. Scene 2: Rio shrugs, water bottle sitting right beside him. Scene 3: Ria and Rio sprint past, Cuty asleep. Scene 4: Both with angry faces mid-argument, Cuty still asleep. Scene 5: A parent calls, silence, then "COME HERE!" Text on screen: "MUMMA SAYS THIS 100x A DAY 😂"
+
+On-Screen Text:
+- [0-4s]: "PUT YOUR SHOES ON! 👟"
+- [4-8s]: "WHERE'S YOUR WATER BOTTLE? 🍼"
+- [8-12s]: "DON'T RUN! 🏃"
+- [12-16s]: "STOP FIGHTING! 😤"
+- [16-20s]: "COME HERE! 📣"
+
+Part 1 (0-10s): $kPartStyle. Ria: "Coming!" — stays barefoot five minutes later. Rio shrugs at "where's your water bottle," bottle sitting right beside him. Text: "PUT YOUR SHOES ON! 👟" "WHERE'S YOUR WATER BOTTLE? 🍼"
+
+Part 2 (10-20s): $kPartStyle. Ria and Rio sprint past mid-argument, Cuty asleep through all of it. Text: "DON'T RUN! 🏃" "STOP FIGHTING! 😤"
+
+Audio/Dialogue (Hinglish): Mumma: "Shoes pehno!" Ria: "Coming!" Mumma: "Bottle kahan hai?" Rio: shrug. Mumma: "Mat bhaago! Ladna band karo!" Mumma: "Idhar aao." Silence. Mumma: "IDHAR AAO!"
+
+Part 3 (20-30s): $kPartStyle. Silence after the fifth call, then a louder "COME HERE!" lands. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Every parent says the same five things on repeat — you are not alone.
+
+Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_95',
+    category: 'Learning Lesson',
+    cover: '5-Minute Kitchen Challenge 🥄',
+    title: '5-Minute Kitchen Challenge',
+    opening: 'Safe kitchen items kids can explore with adult supervision — cold items only, no stove.',
+    problem: 'Safe items: plastic bowls, wooden spoons, cold pasta, large spoon — all adult-supervised.',
+    lesson: '1. Adult sets out 5 safe items. 2. Child explores textures, makes sounds. 3. "What feels bumpy? What sounds splashy?"',
+    postFormat: 'Carousel',
+    strategy: 'For parents of 2-4 year olds — a save-worthy practical activity using things already in the kitchen drawer.',
+    caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
+    pinnedComment: 'Save this for your next kitchen moment ❤️',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Five safe, cold kitchen items — a wooden spoon, a plastic bowl, cold pasta, a large spoon, a measuring cup — get laid out on the counter for exploring.
+Twist: No stove, no sharp edges — just textures and sounds, with an adult staying close the whole time.
+Resolution: "What feels bumpy? What sounds splashy?" turns five minutes of waiting for dinner into sorting-and-counting practice.
+Moral: You don't need fancy toys — your own kitchen drawer already has five minutes of learning in it.
+''',
+    setting: 'Cream kitchen countertop, five safe items arranged playfully',
+    sceneDetail: 'Wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup laid out together',
+    dialogue: '"What feels bumpy? What sounds splashy?"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Counting all five items together — "1, 2, 3, 4, 5!"',
+    defaultCast: ['Ria', 'Rio'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream kitchen countertop background, five safe kitchen items (wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup) arranged playfully, a small illustrated child's hands exploring them with an adult hand nearby, warm cozy lighting, minimal text, square format.
+
+On-Screen Text:
+- Slide 1: "5-MINUTE KITCHEN CHALLENGE"
+- Slide 2: "Safe items only: bowls, spoons, cold pasta — adult stays close!"
+- Slide 3: "Step 1: Explore textures — bumpy, smooth, cool."
+- Slide 4: "Step 2: Make sounds — splash, clang, tap!"
+- Slide 5: "Step 3: Count them together — 1, 2, 3, 4, 5!"
+- Slide 6: "Stove = grown-up zone. Save this for safe play!"
+
+Outro: "Aur masti chahiye? FOLLOW karna mat bhoolna! 🌟"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_96',
+    category: 'Learning Lesson',
+    cover: 'Ask Your Child This Tonight 🗣️',
+    title: 'Ask Your Child This Tonight',
+    opening: 'A conversation-starter question for bedtime or dinner.',
+    problem: 'Prompts:\n1. "If your teddy could talk, what would it say?"\n2. "What makes you feel safe?"\n3. "What would you invent today?"\n4. "If you could be any animal at dinner, which one?"',
+    lesson: 'Encourages imagination and gives you a window into how your child thinks.',
+    postFormat: 'Static Image',
+    strategy: 'For parents of 2-6 year olds — a conversation-starter with real window-into-their-head value.',
+    caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
+    pinnedComment: 'What did they say? Comment below 👇',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Ria sits on her bed hugging Cuty, Rio peeks in from the doorway — tonight's question is waiting: "If your teddy could talk, what would it say?"
+Twist: It's a small swap from the usual "how was school" — just one imaginative question instead.
+Resolution: The answer says more about how a child thinks than a dozen ordinary questions would.
+Moral: One good question opens a bigger conversation than ten routine ones.
+''',
+    setting: 'Cream bedroom, warm evening lighting',
+    sceneDetail: 'Ria hugging Cuty on her bed, a thought bubble with a question mark above Cuty\'s head',
+    dialogue: '"If your teddy could talk, what would it say?"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Rio peeks in curiously from the doorway, waiting for his turn to answer too.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream bedroom background, warm evening lighting. Ria (pigtails with pink bows, pink star dress) sitting on her bed hugging Cuty the white bunny, a small thought bubble above Cuty's head with a question mark. Rio (blue-grey t-shirt) peeking in from the doorway curiously. Square format, gentle cozy mood.
+
+On-Screen Text: "ASK YOUR CHILD THIS TONIGHT" - "If your teddy could talk, what would it say?" / "What makes you feel safe?" / "What would you invent today?" / "If you could be any animal at dinner, which one?"
+
+Outro: "COMMENT mein batao — aapka favorite kaun, Ria, Rio ya Cuty? 💬"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_97',
+    category: 'Learning Lesson',
+    cover: 'Can Your 3-Year-Old Do These? ✅',
+    title: 'Can Your 3-Year-Old Do These?',
+    opening: 'A quick skill-check reference for parents of 3-year-olds.',
+    problem: 'Age group: 3 Years',
+    lesson: '1. Identify basic colours\n2. Name 5 fruits\n3. Recognise their own name\n4. Count 1–10\n5. Identify body parts',
+    postFormat: 'Carousel',
+    strategy: 'For parents of 3-year-olds — a gentle milestone reference, not a pressure checklist.',
+    caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
+    pinnedComment: 'Bookmark this for your 3-year-old\'s next milestone check 📌',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Five simple checks for age three — colours, fruits, their own name, counting to 10, body parts.
+Twist: It reads like a test, but it's framed as a gentle guide, not a race against other kids.
+Resolution: Parents check off what their child can already do, and quietly note what's still growing.
+Moral: Every child grows at their own pace — this is a mirror, not a measuring stick.
+''',
+    setting: 'Clean checklist card, soft pastel icons',
+    sceneDetail: 'Ria and Rio pointing at a floating checklist icon, Cuty sitting nearby',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Save this to check off with your little one this week.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background. Ria and Rio standing together pointing at a floating checklist icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, square format.
+
+On-Screen Text: "CAN YOUR 3-YEAR-OLD DO THESE?" - Identify basic colours / Name 5 fruits / Recognise their own name / Count 1-10 / Identify body parts / "Save this to check off with your little one this week!"
+
+Outro: "Aisi hi chhoti kahaniyan, badi lessons — FOLLOW karo! 🌱"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_98',
+    category: 'Funny',
+    cover: 'Toddler Mathematics 😂',
+    title: 'Toddler Mathematics',
+    opening: 'A funny, exaggerated "math lesson" about biscuit logic.',
+    problem: '1 biscuit = hungry / 2 biscuits = still hungry / 3 biscuits = MUMMA, MORE!',
+    lesson: 'Tag a parent who has lived this exact equation',
+    postFormat: 'Reel',
+    strategy: 'For parents of 1-4 year olds — bold meme-style humor built for sharing.',
+    caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
+    pinnedComment: 'Tag a parent who gets this 😅',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Rio holds one biscuit — "1 biscuit = hungry," neutral face.
+Twist: Two biscuits later, same neutral face — "2 biscuits = still hungry." It's only at three that the real equation shows up.
+Resolution: "3 biscuits = MUMMA, MORE!" — arms out, face lit up, while Cuty stays calm nibbling one single carrot the whole time.
+Moral: Toddler math doesn't follow normal rules, and every parent has lived this exact equation.
+''',
+    setting: 'Cream background, bold meme-style reel',
+    sceneDetail: 'Rio holding biscuits one at a time, Cuty nibbling one carrot unbothered throughout',
+    dialogue: '"MUMMA, MORE!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty stays completely unimpressed through the entire equation.',
+    defaultCast: ['Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Bold bright meme-style reel, cream background. Scene 1: "1 biscuit = hungry" — Rio holding one biscuit, neutral face. Scene 2: "2 biscuits = still hungry" — same neutral face. Scene 3: "3 biscuits = 'MUMMA, MORE!'" — dramatic happy face, arms outstretched. Scene 4: Cuty unimpressed, nibbling one carrot. Text on screen: "TODDLER MATHEMATICS"
+
+On-Screen Text:
+- [0-5s]: "1 BISCUIT = HUNGRY"
+- [5-10s]: "2 BISCUITS = STILL HUNGRY"
+- [10-20s]: "3 BISCUITS = MUMMA, MORE!"
+- [20-30s]: "CUTY: UNBOTHERED"
+
+Part 1 (0-10s): $kPartStyle. Rio holds one biscuit, neutral face: "1 biscuit = hungry." Second biscuit, same neutral face: "2 biscuits = still hungry." Text: "1 BISCUIT = HUNGRY" "2 BISCUITS = STILL HUNGRY"
+
+Part 2 (10-20s): $kPartStyle. Third biscuit lands and Rio's face lights up dramatically, arms out: "MUMMA, MORE!" Text: "3 BISCUITS = MUMMA, MORE!"
+
+Audio/Dialogue (Hinglish): Rio neutral: "Bas ek biscuit?" Still neutral: "Do bhi ho gaye, phir bhi hungry." Then loud: "MUMMA, MORE!"
+
+Part 3 (20-30s): $kPartStyle. Cuty sits nearby, calm, still nibbling one single carrot through the whole thing. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Toddler math doesn't follow normal rules — every parent has lived this exact equation.
+
+Outro: "LIKE karo agar aapko bhi yaad aaya apna bachpan! 👍❤️"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_99',
+    category: 'Funny',
+    cover: 'Find the Hidden Cuty! 👀',
+    title: 'Find the Hidden Cuty!',
+    opening: 'A "spot the character" observation game.',
+    problem: 'A busy, colorful garden scene with Cuty the bunny camouflaged somewhere.',
+    lesson: 'Cuty was hidden behind a flower pot — look for the pink bow!',
+    postFormat: 'Static Image',
+    strategy: 'For parents of 2-5 year olds — a playful observation game that holds attention.',
+    caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
+    pinnedComment: 'How fast did you find him? ⏱️ Comment below!',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: A busy garden scene hides Cuty somewhere among the flowers and bushes — only the ears and pink bow give it away.
+Twist: Ria and Rio look all around the scene, scanning every bush before anyone spots the tell-tale bow.
+Resolution: Cuty was tucked behind the flower pot the whole time — the pink bow was the clue.
+Moral: Slowing down to really look is its own kind of fun, not just a chore.
+''',
+    setting: 'Illustrated garden scene, cream and green tones, flowers and bushes',
+    sceneDetail: 'Cuty tucked behind a flower pot, only ears and pink bow peeking out',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Found behind the flower pot — the pink bow gave it away.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, illustrated garden scene, cream and green tones, flowers, bushes, small toys scattered around. Cuty the small white bunny cleverly tucked partially behind a bush or flower pot with only ears and pink bow peeking out. Ria and Rio standing to the side looking around playfully. Square format.
+
+On-Screen Text: "FIND THE HIDDEN CUTY!" - Answer: behind the flower pot, look for the pink bow!
+
+Outro: "Agli kahani miss na ho — abhi FOLLOW karo! 🔔"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_100',
+    category: 'Learning Lesson',
+    cover: 'The Sock Hunt 🧦',
+    title: 'The Sock Hunt',
+    opening: 'Before: laundry basket dumped, socks everywhere. After: all pairs matched and folded.',
+    problem: 'Before: socks scattered everywhere, no pairs in sight. After: sorted pairs stacked neatly, Cuty napping on the finished pile.',
+    lesson: '1. Dump the basket. 2. Find matches by color/size. 3. Stack pairs together and celebrate!',
+    postFormat: 'Reel',
+    strategy: 'For parents of 1-4 year olds — turns a chore into a sorting game and buys five quiet minutes.',
+    caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
+    pinnedComment: 'Try this before your next laundry day 😂',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: The laundry basket gets dumped out and Ria and Rio dive straight into the pile of mismatched socks.
+Twist: Rio holds up two different-colored socks and shakes his head — "no match" — while Ria finds a true pair and holds it up like a trophy.
+Resolution: Pairs stack up one by one until the whole pile is sorted, with Cuty curling up for a nap on top of the finished stack.
+Moral: A chore becomes a game the moment you hand it over as a hunt instead of a task.
+''',
+    setting: 'Cream laundry room, pile of mismatched socks on the floor',
+    sceneDetail: 'Rio comparing two different-colored socks, Ria holding up a matching pair triumphantly',
+    dialogue: '"No match!" "Found it!"',
+    mess: 'Socks scattered everywhere before the sort begins',
+    innerThought: '',
+    endingBeat: 'Cuty naps on top of the neatly finished pile.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Cream laundry room background. Scene 1: Pile of mismatched colorful socks on floor, Ria and Rio diving in curiously. Scene 2: Rio holds two socks of different colors, shakes head "no match." Scene 3: Ria finds matching pair, holds triumphantly. Scene 4: Montage of pairs stacking, Cuty sitting on finished pile. Text on screen: "THE SOCK HUNT"
+
+On-Screen Text:
+- [0-5s]: "LAUNDRY DUMPED!"
+- [5-15s]: "NO MATCH... FOUND IT!"
+- [15-25s]: "PAIRS STACKING UP!"
+- [25-30s]: "CUTY NAPS ON TOP!"
+
+Part 1 (0-10s): $kPartStyle. Pile of mismatched socks dumped on the floor, Ria and Rio dive in. Rio holds two different-colored socks, shakes his head: "No match." Text: "LAUNDRY DUMPED!"
+
+Part 2 (10-20s): $kPartStyle. Ria finds a true pair and holds it up triumphantly: "Found it!" Pairs start stacking up one by one. Text: "NO MATCH... FOUND IT!" "PAIRS STACKING UP!"
+
+Audio/Dialogue (Hinglish): Rio: "Yeh match nahi hai!" Ria: "Mila! Yeh pair hai!" Both: "Ek, do, teen..." counting pairs together.
+
+Part 3 (20-30s): $kPartStyle. The last pair stacks on top, and Cuty curls up for a nap on the finished pile. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A chore becomes a game the moment you hand it over as a hunt instead of a task.
+
+Outro: "Dosto ke saath SHARE karo, unhe bhi pasand aayega! 🔁"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_101',
+    category: 'Learning Lesson',
+    cover: '3 Questions to Ask Your Child This Week',
+    title: '3 Questions Every Parent Should Ask This Week',
+    opening: 'A small set of conversation-starter questions for the week ahead.',
+    problem: 'Questions:\n1. "What made you happy today?"\n2. "What would you build with 100 blocks?"\n3. "Which animal would you want as a friend?"',
+    lesson: 'Small questions can open up the biggest conversations.',
+    postFormat: 'Carousel',
+    strategy: 'For parents of 2-6 year olds — a gentle weekly conversation-starter series.',
+    caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
+    pinnedComment: 'Save this — ask one each night this week.',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Ria and Rio sit together in conversation on the floor, Cuty curled up nearby — tonight is question night.
+Twist: Instead of the usual "how was your day," three specific questions wait to be asked, one a night.
+Resolution: "What would you build with 100 blocks?" gets a bigger answer than any routine question ever would.
+Moral: Small, specific questions open up the biggest conversations.
+''',
+    setting: 'Cream background, warm evening lighting',
+    sceneDetail: 'Ria and Rio sitting together in conversation, Cuty curled up nearby',
+    dialogue: '"What made you happy today?"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'One question a night, all week.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background, warm evening lighting. Ria and Rio sitting together on the floor in conversation, Cuty curled nearby. Square format, gentle cozy family mood.
+
+On-Screen Text: "3 QUESTIONS TO ASK YOUR CHILD THIS WEEK" - "What made you happy today?" / "What would you build with 100 blocks?" / "Which animal would you want as a friend?" / "Save this — ask one each night this week!"
+
+Outro: "Aisi hi pyaari stories ke liye FOLLOW karna mat bhoolna! 🌸"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_102',
+    category: 'Learning Lesson',
+    cover: 'Can Your 4-Year-Old Do These? ✅',
+    title: 'Can Your 4-Year-Old Do These?',
+    opening: 'A skill-check reference for parents of 4-year-olds.',
+    problem: 'Age group: 4 Years',
+    lesson: '1. Count 1–20\n2. Recognise A–Z\n3. Name the days of the week\n4. Sort objects by category\n5. Follow 2–3 step instructions',
+    postFormat: 'Carousel',
+    strategy: 'For parents of 4-year-olds — same gentle checklist format as the 3-year-old series, for consistency.',
+    caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
+    pinnedComment: 'Bookmark this for your 4-year-old\'s next milestone check 📌',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Five checks for age four — counting to 20, the alphabet, days of the week, sorting, and following multi-step instructions.
+Twist: It looks harder than the 3-year-old version, but it's framed the same way — a guide, not a race.
+Resolution: Parents check off what's already there and quietly note what's still growing.
+Moral: Growth has a pace of its own — this is a gentle guide, not pressure.
+''',
+    setting: 'Clean checklist card, same visual series as the 3-year-old version',
+    sceneDetail: 'Rio and Ria pointing at a floating icon, Cuty sitting nearby',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Bookmark this for the next milestone check.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background. Rio and Ria standing together pointing at a floating icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, square format.
+
+On-Screen Text: "CAN YOUR 4-YEAR-OLD DO THESE?" - Count 1-20 / Recognise A-Z / Name the days of the week / Sort objects by category / Follow 2-3 step instructions / "Bookmark this for your 4-year-old's next milestone check!"
+
+Outro: "FOLLOW, LIKE, COMMENT, SHARE — Little Stories, Big Lessons! 🌱💛"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_103',
+    category: 'Funny',
+    cover: 'Three Types of Kids at Dinner 🍽️',
+    title: 'Three Types of Kids at Dinner',
+    opening: 'A character-based relatable meme using the established Ria/Rio/Cuty personalities.',
+    problem: '🌸 Ria = "What\'s this?" (curious, poking at food) / 💙 Rio = "I don\'t want it." (arms crossed, ziddi) / 🐰 Cuty = peacefully eating, unbothered',
+    lesson: 'Every family has all three at the dinner table',
+    postFormat: 'Static Image',
+    strategy: 'For parents of 1-5 year olds — character-driven relatable humor for sharing.',
+    caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
+    pinnedComment: 'Which one is your child? 👇',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Three panels, one dinner table — Ria pokes curiously at her plate: "What's this?" Rio sits with arms crossed, refusing his entirely.
+Twist: While both of them negotiate and resist in their own way, Cuty just eats a carrot, completely unbothered.
+Resolution: Every family has all three reactions at the same table, sometimes in the same child on different nights.
+Moral: Dinner drama is universal — you're not doing anything wrong.
+''',
+    setting: 'Dinner table, three-panel layout, cream background',
+    sceneDetail: 'Ria poking at her plate, Rio with arms crossed, Cuty calmly eating a carrot',
+    dialogue: '"What\'s this?" "I don\'t want it."',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty finishes her carrot before the other two finish arguing.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, three-panel layout on cream background, dinner table setting. Panel 1: Ria poking curiously at a plate of food, questioning expression. Panel 2: Rio with arms crossed, refusing his plate, stubborn expression. Panel 3: Cuty the white bunny calmly and happily eating a carrot from a small bowl. Square format.
+
+On-Screen Text: "THREE TYPES OF KIDS AT DINNER" - Ria: "What's this?" / Rio: "I don't want it." / Cuty: peacefully eating
+
+Outro: "Pyaar aaya toh LIKE zaroor karo! ❤️👍"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_104',
+    category: 'Funny',
+    cover: 'What Comes Next? Round 1 + Round 2!',
+    title: 'What Comes Next? Two Rounds!',
+    opening: 'Two pattern rounds — color patterns and shape patterns — for growing minds.',
+    problem: 'Round 1: yellow, blue, yellow, blue — then a pause on question mark.\nRound 2: circle, square, circle, square — then a pause.',
+    lesson: 'Round 1: Yellow. Round 2: Circle. Build a pattern, then break it — and rebuild!',
+    postFormat: 'Reel',
+    strategy: 'For parents of 2-5 year olds — a satisfying early-math pattern game.',
+    caption: 'Can your child guess what comes next? A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
+    pinnedComment: 'Did your child guess it before the reveal? 😄',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Yellow, blue, yellow, blue circles appear one at a time — then a big question mark where the next one should go.
+Twist: Ria taps her chin, thinking it through, while the pattern waits.
+Resolution: Yellow slides into place and Ria claps — then round two swaps in shapes, and Rio shouts "Circle!" before the reveal even lands.
+Moral: Spotting a pattern feels like a tiny win every single time — for kids and for the parent watching.
+''',
+    setting: 'Cream background, bold simple shapes, clean animation-style reveal',
+    sceneDetail: 'A large question mark hovering where the next shape should go',
+    dialogue: '"Circle!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Rio calls out the answer before the reveal lands.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Bold simple animation-style reel, cream background. Yellow and blue circles appear in sequence. Then a large question mark where the next circle should go. Ria taps her chin, thinking. Yellow circle slides into place, Ria claps, Cuty hops happily. Text on screen: "WHAT COMES NEXT? ROUND 1 + ROUND 2!"
+
+On-Screen Text:
+- [0-8s]: "ROUND 1: YELLOW, BLUE, YELLOW, BLUE?"
+- [8-15s]: "RIA THINKS..."
+- [15-20s]: "YELLOW! CORRECT!"
+- [20-30s]: "ROUND 2: CIRCLE, SQUARE...?"
+
+Part 1 (0-10s): $kPartStyle. Pattern builds on screen one shape at a time — yellow, blue, yellow, blue — then holds on a large question mark. Ria taps her chin, thinking. Text: "ROUND 1: YELLOW, BLUE, YELLOW, BLUE?" "RIA THINKS..."
+
+Part 2 (10-20s): $kPartStyle. Yellow slides into place, Ria claps, Cuty hops happily. Round 2 begins with shapes instead of colors — circle, square, circle, square — then another question mark. Text: "YELLOW! CORRECT!" "ROUND 2: CIRCLE, SQUARE...?"
+
+Audio/Dialogue (Hinglish): Ria thinking: "Yeh toh... yellow hoga!" Correct! Round 2 begins. Rio shouts: "Circle!" before the reveal.
+
+Part 3 (20-30s): $kPartStyle. Rio shouts "Circle!" before the reveal even lands, and he's right. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Spotting a pattern feels like a tiny win every time — for kids and for the parent watching.
+
+Outro: "COMMENT mein likho — aapke ghar mein bhi aisa hota hai? 😂"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_105',
+    category: 'Series',
+    cover: 'Which New Format Was Your Favorite?',
+    title: 'Which New Format Was Your Favorite?',
+    opening: 'A visual recap of the 5 buckets tested this week, inviting audience feedback.',
+    problem: 'Five content types tested this week:\nPuzzles & Challenges\nTalk With Your Child\nTry This at Home\nParent-Relatable Humor\nAge-Based Skill Checks',
+    lesson: 'Use this post\'s engagement + Insights data to decide bucket weighting for the next series.',
+    postFormat: 'Carousel',
+    strategy: 'Community feedback post kicking off the Missions series — existing followers.',
+    caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
+    pinnedComment: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Five very different formats went out this week — puzzles, conversation-starters, a kitchen activity, parent humor, and age-based checklists.
+Twist: Instead of just moving on to the next idea, the page pauses to ask which one actually landed.
+Resolution: Votes and comments decide what gets made more of — starting with the Missions series that follows.
+Moral: Asking the audience what they want is itself part of making good content.
+''',
+    setting: 'Clean 5-tile grid or carousel, cream background',
+    sceneDetail: 'Five small icons — puzzle piece, speech bubble, house, laughing face, checklist',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'The winning format sets up the next series.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background, small icon representing the bucket theme (puzzle piece / speech bubble / house / laughing face / checklist), Ria, Rio, or Cuty featured lightly in the corner depending on tile. Square format.
+
+On-Screen Text: "WHICH NEW FORMAT WAS YOUR FAVORITE?" - Puzzles & Challenges / Talk With Your Child / Try This at Home / Parent-Relatable Humor / Age-Based Skill Checks
+
+Outro: "Vote karo aur batao — agla kaunsa format dekhna hai?"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_106',
+    category: 'Series',
+    cover: 'No Special Toys Needed — Here\'s What to Use!',
+    title: 'How to Play Each Mission With Household Items',
+    opening: 'A practical substitution guide showing exactly what household item replaces each mission\'s prop.',
+    problem: 'Parents may think missions need special equipment (hurdles, treasure boxes, detective kits).',
+    lesson: 'Race Track to broomstick + 2 chairs as hurdle, dupatta as line | Concert to wooden spoon mic, steel plate drums | Art Studio to any paper + slate/notebook, kitchen chalk on floor | Detective to sunglasses/toy binoculars or cupped hands | Rescue Team to laundry basket, dupatta/old rope | Treasure Box to any box/tiffin with lid, small toys inside | Daily Care to owned tiffin, water bottle, toothbrush',
+    postFormat: 'Carousel',
+    strategy: 'Sets up the 7 Missions series with zero shopping required.',
+    caption: 'Promised, delivered! Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Save this — now you have zero excuses to skip a mission! 📌',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Seven missions are coming, and every single one worried parents might need special gear — hurdles, a detective kit, a treasure box.
+Twist: Each "official" prop gets swapped for something already sitting at home — a broomstick, a dupatta, a steel plate, a tiffin box.
+Resolution: Zero shopping list, zero special toys — just a week of play using things already in the house.
+Moral: The best play equipment is usually already in your kitchen drawer.
+''',
+    setting: 'Cream background, split-view slides: official prop vs. at-home swap',
+    sceneDetail: 'A broomstick between two chairs standing in for a hurdle',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Seven swaps, zero shopping — the week is ready to start.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background, vertical carousel format. Consistent Ria and Rio appear across all slides with Cuty the white bunny. Each slide shows a split view: left side "official" mission prop, right side "at-home swap" using household items — broomstick + dupatta line, wooden spoon mic + steel plates, paper/slate + kitchen chalk, sunglasses/binoculars + cupped hands, laundry basket + dupatta rope, tiffin box with toys, tiffin + water bottle + toothbrush.
+
+On-Screen Text: "NO SPECIAL TOYS NEEDED — HERE'S WHAT TO USE!" with one swap per slide for all 7 missions, ending on "Save this — zero excuses to skip a mission!"
+
+Outro: "Aisi hi pyaari kahaniyan ke liye FOLLOW karo!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_107',
+    category: 'Series',
+    cover: 'The Votes Are In!',
+    title: 'You Voted! Here\'s Which Mission Won',
+    opening: 'A results reveal based on which mission number got the most comments, turning passive voters into repeat engagers.',
+    problem: 'N/A (results format, no puzzle needed)',
+    lesson: 'Reveal the winning mission with a small "why this one might be the most popular" note (e.g., "Detective Mission is your favorite — mystery never gets old!")',
+    postFormat: 'Static Image',
+    strategy: 'Closes the loop on the Missions poll and keeps the series moving.',
+    caption: 'You voted, and Mission 5 won! Detective Mission is your favorite — mystery never gets old! Try it today and show us how it goes! #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
+    pinnedComment: 'Try today\'s winning mission and tag us in your Story! 🏆',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: The comments are counted and the votes are in — one mission clearly won the room.
+Twist: Mission 5, the Detective Mission, takes it — mystery never gets old, apparently.
+Resolution: Ria and Rio hold up a trophy while Cuty cheers, and the winning mission gets a replay invite.
+Moral: Letting the audience pick what comes next turns watching into playing along.
+''',
+    setting: 'Cream background, celebratory mood with confetti',
+    sceneDetail: 'Ria and Rio holding a trophy, Cuty cheering beside them',
+    dialogue: '"Mission 5 won!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'The winning mission gets tagged and replayed by followers.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background, celebratory mood with confetti. Ria and Rio holding a trophy, Cuty the white bunny cheering. Winning mission number displayed prominently ("Mission 5 Won!"). Colorful, joyful, square format.
+
+On-Screen Text: "THE VOTES ARE IN!" - "Mission 5 Won! Detective Mission is your favorite — mystery never gets old!"
+
+Outro: "Agli kahani miss na ho — abhi FOLLOW karo!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_108',
+    category: 'Series',
+    cover: 'Mission 1: On Your Mark!',
+    title: 'Mission 1: On Your Mark!',
+    opening: 'Ria and Rio running, jumping a pillow hurdle, walking a line - Mission 1 of the 7 Mission Week.',
+    problem: 'Parents need a simple, structured movement activity for toddlers.',
+    lesson: 'Race Track builds coordination, listening skills, and gross motor confidence.',
+    postFormat: 'Reel',
+    strategy: 'Mission 1 of 7 — a home race track using pillows and tape.',
+    caption: 'Mission 1: Race Track! Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Tag us trying this mission! 🏁',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Ria and Rio line up at the start of a home-made race track — a pillow hurdle, a taped line on the floor.
+Twist: Rio jumps the pillow hurdle, Ria carefully walks the taped line, and Cuty cheers from the side.
+Resolution: Both run to the finish, and Cuty hands over a spoon as the "medal."
+Moral: Coordination and listening skills build through play, not drills.
+''',
+    setting: 'Home hallway/living room, pillow hurdle and taped line',
+    sceneDetail: 'A cushion hurdle and a strip of tape marking the walking line',
+    dialogue: '"Jump!" "Walk the line." "Run!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty hands over a spoon as the finish-line "medal."',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home hallway/living room. Ria and Rio at a start line. Rio jumping over a pillow "hurdle" made from cushions, Ria walking a taped line on the floor, Cuty the white bunny cheering from the side. Bright morning light, energetic movement. Text on screen: "MISSION 1: ON YOUR MARK!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 1: ON YOUR MARK!"
+- [5-15s]: "JUMP! WALK THE LINE!"
+- [15-25s]: "RUN TO THE FINISH!"
+- [25-30s]: "MEDAL TIME!"
+
+Part 1 (0-10s): $kPartStyle. Ria and Rio at the start line. Rio jumps the pillow hurdle: "Jump!" Ria carefully walks the taped line: "Walk the line." Text: "MISSION 1: ON YOUR MARK!" "JUMP! WALK THE LINE!"
+
+Part 2 (10-20s): $kPartStyle. Both run to the finish line together: "Run!" Cuty cheers from the side the whole way. Text: "RUN TO THE FINISH!"
+
+Audio/Dialogue (Hinglish): Rio: "Jump!" Ria: "Walk the line!" Both: "Run!" Cuty: "Medal time!"
+
+Part 3 (20-30s): $kPartStyle. Cuty hands them a spoon as their "medal." Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Coordination and listening skills build through play, not drills.
+
+Outro: "Try Mission 2 today! Tag us!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_109',
+    category: 'Series',
+    cover: 'Mission 2: Living Room Concert!',
+    title: 'Mission 2: Living Room Concert!',
+    opening: 'Singing into a spoon mic, dancing, clapping to rhythm - Mission 2 of the 7 Mission Week.',
+    problem: 'Parents need a simple music and movement activity.',
+    lesson: 'Concert builds rhythm awareness, self-expression, and language through song.',
+    postFormat: 'Reel',
+    strategy: 'Mission 2 of 7 — a kitchen-utensil concert.',
+    caption: 'Mission 2: Concert! Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Show us your concert! 🎤',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: A wooden spoon becomes a microphone, and the living room turns into a stage.
+Twist: Ria sings, Rio dances and claps to the rhythm, and Cuty taps a steel plate like a drum.
+Resolution: The whole family takes a bow together at the end of the show.
+Moral: Kitchen utensils are instruments if you just decide they are.
+''',
+    setting: 'Home living room, wooden spoon mic and steel plate drums',
+    sceneDetail: 'A wooden spoon held up to the mouth like a microphone',
+    dialogue: '"La la la!" "Drum solo!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'The whole family bows together to end the show.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home living room. Ria singing into a wooden spoon microphone, Rio clapping and dancing, Cuty the white bunny tapping a steel plate like a drum. Kitchen utensils as instruments visible. Joyful musical chaos, warm family energy. Text on screen: "MISSION 2: LIVING ROOM CONCERT!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 2: LIVING ROOM CONCERT!"
+- [5-15s]: "LA LA LA!"
+- [15-25s]: "DRUM SOLO!"
+- [25-30s]: "TAKE A BOW!"
+
+Part 1 (0-10s): $kPartStyle. Ria sings into the wooden spoon mic: "La la la!" Rio dances and claps along to the rhythm. Text: "MISSION 2: LIVING ROOM CONCERT!" "LA LA LA!"
+
+Part 2 (10-20s): $kPartStyle. Cuty taps the steel plate like a drum: "Drum solo!" The music gets louder and sillier. Text: "DRUM SOLO!"
+
+Audio/Dialogue (Hinglish): Ria: "La la la!" Rio: clapping along. Cuty: tapping the plate. All together: "Bow!"
+
+Part 3 (20-30s): $kPartStyle. The whole family bows together to end the show. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Kitchen utensils are instruments if you just decide they are.
+
+Outro: "Your turn! Show us your concert!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_110',
+    category: 'Series',
+    cover: 'Mission 3: Art Corner Time!',
+    title: 'Mission 3: Art Corner Time!',
+    opening: 'Drawing round shapes only (circles, wheels, suns) — Mission 3 of the 7 Mission Week, with circle constraint.',
+    problem: 'Parents need a fine motor creative activity with a simple constraint.',
+    lesson: 'Art Studio builds fine motor skills, shape recognition, and creative confidence — circle shapes only!',
+    postFormat: 'Reel',
+    strategy: 'Mission 3 of 7 — a circles-only art constraint.',
+    caption: 'Mission 3: Art Studio! Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Share your child\'s masterpiece! 🎨',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: The art corner opens with one simple rule — circles only.
+Twist: Ria draws a big yellow sun on paper, Rio writes his name on a slate with chalk, and kitchen chalk turns the floor into a giant canvas.
+Resolution: Cuty hops through the drawings, admiring every piece, no matter how wobbly the circles are.
+Moral: A simple constraint doesn't limit creativity — it focuses it.
+''',
+    setting: 'Home art corner — paper, slate, chalk',
+    sceneDetail: 'A big yellow sun drawn in wobbly circles on paper',
+    dialogue: '"Look, a sun!" "R-I-O"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty hops through all the finished drawings.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home art corner. Ria drawing a big yellow sun on paper, Rio writing his name on a slate with chalk, Cuty the white bunny watching curiously. Kitchen chalk drawing on floor visible. Cozy creative atmosphere, warm light. Text on screen: "MISSION 3: ART CORNER TIME!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 3: ART CORNER TIME!"
+- [5-15s]: "LOOK, A SUN!"
+- [15-25s]: "R-I-O"
+- [25-30s]: "BIG CANVAS!"
+
+Part 1 (0-10s): $kPartStyle. Ria draws a big yellow sun on paper: "Look, a sun!" Rio writes his name on a slate with chalk: "R-I-O." Text: "MISSION 3: ART CORNER TIME!" "LOOK, A SUN!"
+
+Part 2 (10-20s): $kPartStyle. Kitchen chalk turns the floor into a giant canvas. Text: "BIG CANVAS!"
+
+Audio/Dialogue (Hinglish): Ria: "Look, a sun!" Rio: "R-I-O," writing carefully. Both: drawing circles everywhere.
+
+Part 3 (20-30s): $kPartStyle. Cuty hops through all the finished drawings, delighted by every one. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A simple constraint doesn't limit creativity — it focuses it.
+
+Outro: "Show us your masterpiece!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_111',
+    category: 'Series',
+    cover: 'Mission 4: Case Open!',
+    title: 'Mission 4: Case Open!',
+    opening: 'Two fair clues: a footprint in flour, a dropped magnifying glass — solve where Cuty hid the snack.',
+    problem: 'Parents need an observation activity with visual clues, not magic.',
+    lesson: 'Detective builds observation, logical thinking, and evidence collection — fair clues only!',
+    postFormat: 'Reel',
+    strategy: 'Mission 4 of 7 — a fair-clue detective game.',
+    caption: 'Mission 4: Detective! Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Did your detective solve it? 🕵️',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: A mystery is on — Cuty hid something, and two fair clues are waiting to be found.
+Twist: Ria looks through cardboard tube binoculars, Rio cups his hands around his eyes, then stops to listen closely instead.
+Resolution: The clue turns up fast, and the case is solved with real observation, not a trick.
+Moral: Looking and listening closely is its own kind of superpower.
+''',
+    setting: 'Home setting, cardboard tube binoculars or cupped hands',
+    sceneDetail: 'A toy footprint clue left on the floor',
+    dialogue: '"I see something!" "Shhh, I hear it!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'The clue is found and the case is officially closed.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home setting. Ria looking through cardboard tube binoculars, Rio with cupped hands around his eyes, Cuty the white bunny with a magnifying glass. A "clue" (toy footprint) on the floor. Playful mystery mood. Text on screen: "MISSION 4: CASE OPEN!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 4: CASE OPEN!"
+- [5-15s]: "I SEE SOMETHING!"
+- [15-25s]: "SHHH, I HEAR IT!"
+- [25-30s]: "CASE SOLVED!"
+
+Part 1 (0-10s): $kPartStyle. Ria looks through cardboard binoculars: "I see something!" Rio cups his hands around his eyes, looking closely. Text: "MISSION 4: CASE OPEN!" "I SEE SOMETHING!"
+
+Part 2 (10-20s): $kPartStyle. Rio closes his eyes to listen instead: "Shhh, I hear it!" The clue turns up fast. Text: "SHHH, I HEAR IT!"
+
+Audio/Dialogue (Hinglish): Ria: "Main kuch dekh rahi hoon!" Rio: "Shhh, main sun raha hoon!" Both: "Mil gaya!"
+
+Part 3 (20-30s): $kPartStyle. The clue is found and the whole case is solved together. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Looking and listening closely is its own kind of superpower.
+
+Outro: "Did your detective solve it?"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_112',
+    category: 'Series',
+    cover: 'Mission 5: Rescue Time!',
+    title: 'Mission 5: Rescue Time!',
+    opening: 'Pushing a laundry basket, pulling a rope, helping tidy up - Mission 5 of the 7 Mission Week.',
+    problem: 'Parents need a heavy work / proprioception activity.',
+    lesson: 'Rescue Team builds gross motor strength, teamwork, and helpfulness.',
+    postFormat: 'Reel',
+    strategy: 'Mission 5 of 7 — heavy work play using a laundry basket and rope.',
+    caption: 'Mission 5: Rescue Team! Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Teamwork tip from your house? 🧸',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: A laundry basket becomes a rescue vehicle, with a dupatta tied on as a tow rope.
+Twist: Ria pushes the basket, Rio pulls the rope, and Cuty rides along inside like precious cargo.
+Resolution: A high-five teamwork moment finishes the rescue mission.
+Moral: Pushing and pulling together builds strength and teamwork at the same time.
+''',
+    setting: 'Home setting, laundry basket and dupatta rope',
+    sceneDetail: 'Cuty riding inside the laundry basket like a passenger',
+    dialogue: '"Coming through!" "Pulling hard!" "Rescue complete!"',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'A high-five seals the completed rescue mission.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home setting. Ria pushing a laundry basket with toys inside, Rio pulling a dupatta rope attached to the basket, Cuty the white bunny riding in the basket. Heavy work play, teamwork energy, warm home setting. Text on screen: "MISSION 5: RESCUE TIME!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 5: RESCUE TIME!"
+- [5-15s]: "COMING THROUGH!"
+- [15-25s]: "PULLING HARD!"
+- [25-30s]: "RESCUE COMPLETE!"
+
+Part 1 (0-10s): $kPartStyle. Ria pushes the laundry basket: "Coming through!" Rio pulls the dupatta rope attached to it: "Pulling hard!" Text: "MISSION 5: RESCUE TIME!" "COMING THROUGH!"
+
+Part 2 (10-20s): $kPartStyle. Cuty rides inside the basket the whole way: "Rescue complete!" Text: "PULLING HARD!" "RESCUE COMPLETE!"
+
+Audio/Dialogue (Hinglish): Ria: "Coming through!" Rio: "Pulling hard!" Cuty: "Rescue complete!" Both: high-five.
+
+Part 3 (20-30s): $kPartStyle. A high-five teamwork moment finishes the mission. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Pushing and pulling together builds strength and teamwork at the same time.
+
+Outro: "Your teamwork tip?"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_113',
+    category: 'Series',
+    cover: 'Mission 6: Treasure Hunt!',
+    title: 'Mission 6: Treasure Hunt!',
+    opening: 'Two clues found: a trail of crumbs, then a torn paper. Follow both to find the hidden treasure.',
+    problem: 'Parents need an object permanence activity with two clear clues.',
+    lesson: 'Treasure Hunt builds fine motor skills, logical sequencing, and nurturing play — two clues!',
+    postFormat: 'Reel',
+    strategy: 'Mission 6 of 7 — a tiffin-box treasure hunt that ends in a bedtime wind-down.',
+    caption: 'Mission 6: Treasure Box! Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'What treasure did you hide? 🎁',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: A tiffin box holds a hidden treasure, waiting to be opened.
+Twist: Ria opens it to find a small toy inside, and Rio closes the box carefully afterward, keeping it "safe."
+Resolution: The mission winds down gently into bedtime, with Cuty getting tucked into a blanket nearby.
+Moral: Opening, finding, and closing something carefully is its own small, satisfying skill.
+''',
+    setting: 'Home setting, tiffin box or any box with a lid',
+    sceneDetail: 'A small toy discovered inside the tiffin box',
+    dialogue: '"What\'s inside?" "Treasure!" "Night night bunny."',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'Cuty gets tucked into a blanket, closing the mission out gently.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home setting. Ria opening a tiffin box to find a small toy, Rio closing the box carefully, Cuty the white bunny being tucked into a blanket nearby. Cozy bedtime transition energy. Text on screen: "MISSION 6: TREASURE HUNT!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 6: TREASURE HUNT!"
+- [5-15s]: "WHAT'S INSIDE? TREASURE!"
+- [15-25s]: "SAFE NOW"
+- [25-30s]: "NIGHT NIGHT BUNNY"
+
+Part 1 (0-10s): $kPartStyle. Ria opens the tiffin box: "What's inside?" and finds a small toy: "Treasure!" Text: "MISSION 6: TREASURE HUNT!" "WHAT'S INSIDE? TREASURE!"
+
+Part 2 (10-20s): $kPartStyle. Rio closes the box carefully: "Safe now." Text: "SAFE NOW"
+
+Audio/Dialogue (Hinglish): Ria: "Kya hai andar?" Finds the toy: "Treasure!" Rio: "Safe now." Tucking Cuty in: "Night night bunny."
+
+Part 3 (20-30s): $kPartStyle. Cuty gets tucked into a blanket nearby, winding the mission down gently into bedtime. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Opening, finding, and closing something carefully is its own small, satisfying skill.
+
+Outro: "What treasure did you hide?"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_114',
+    category: 'Series',
+    cover: 'Mission 7: Self-Care Squad!',
+    title: 'Mission 7: Self-Care Squad!',
+    opening: 'Eating fruit, drinking water, brushing teeth, bedtime routine - Mission 7 of the 7 Mission Week.',
+    problem: 'Parents need to build independent self-care routines.',
+    lesson: 'Daily Care builds independence, body awareness, and healthy habits. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.',
+    postFormat: 'Reel',
+    strategy: 'Mission 7 of 7 — the final mission, built around the 5-second wait technique.',
+    caption: 'Mission 7: Daily Care! Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
+    pinnedComment: 'Which routine is hardest at your house? 🍎',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: The final mission is the quietest one — eating, drinking, brushing, winding down for bed.
+Twist: Ria struggles to brush on her own; instead of jumping in immediately, Mumma waits about five seconds first.
+Resolution: Ria tries again on her own and gets it — Mumma only helps when it's actually needed.
+Moral: A five-second pause before helping lets independence actually grow.
+''',
+    setting: 'Home bathroom/kitchen setting',
+    sceneDetail: 'Ria pausing mid-brush while Mumma waits instead of stepping in right away',
+    dialogue: '"Crunch!" "Glug glug" "Scrub scrub"',
+    mess: '',
+    innerThought: 'Five seconds feels long when you want to just do it for them.',
+    endingBeat: 'Cuty watches the whole self-care routine from the counter.',
+    defaultCast: ['Ria', 'Rio', 'Mumma', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: $kPromptStyle. Home bathroom/kitchen setting. Ria eating apple slices from her tiffin, Rio drinking from his water bottle, both brushing teeth side by side, Cuty the white bunny watching from the counter. Cozy bathroom/kitchen routine atmosphere. Text on screen: "MISSION 7: SELF-CARE SQUAD!"
+
+On-Screen Text:
+- [0-5s]: "MISSION 7: SELF-CARE SQUAD!"
+- [5-12s]: "CRUNCH! GLUG GLUG!"
+- [12-22s]: "THE 5-SECOND WAIT..."
+- [22-30s]: "SCRUB SCRUB! SHE DID IT!"
+
+Part 1 (0-10s): $kPartStyle. Ria eats apple slices from her tiffin: "Crunch!" Rio drinks from his water bottle: "Glug glug." Text: "MISSION 7: SELF-CARE SQUAD!" "CRUNCH! GLUG GLUG!"
+
+Part 2 (10-20s): $kPartStyle. Ria struggles to brush on her own. Mumma waits about five seconds instead of stepping in immediately. Text: "THE 5-SECOND WAIT..."
+
+Audio/Dialogue (Hinglish): Ria: "Crunch!" Rio: "Glug glug." Ria struggling to brush, Mumma waiting quietly. Ria tries again: "Scrub scrub!" Mumma: "Tumne khud kar liya!"
+
+Part 3 (20-30s): $kPartStyle. Ria completes brushing on her own, Mumma only helping right at the end. Cuty watches the whole routine from the counter. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: A five-second pause before helping lets independence actually grow.
+
+Outro: "Which routine is hardest at your house?"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_115',
+    category: 'Series',
+    cover: '7 Screen-Free Missions in 60 Seconds',
+    title: '7 Missions in 60 Seconds',
+    opening: 'A fast-cut compilation reel showing one shot from each of the 7 missions back to back, building toward the "We Did It!" celebration.',
+    problem: 'Parents scrolling don\'t know screen-free play can look this structured and fun.',
+    lesson: 'Recap card at the end listing all 7 mission names quickly.',
+    postFormat: 'Reel',
+    strategy: 'Non-follower reach post recapping the full Missions week in one fast cut.',
+    caption: '7 screen-free missions, 60 seconds, zero shopping required. Follow along as we play through all of them with Ria and Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
+    pinnedComment: 'Follow for a new mission every day this week! 🏠',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: One shot from each of the seven missions flashes by, back to back, in just sixty seconds.
+Twist: Race Track, Concert, Art Studio, Detective, Rescue, Treasure, Self-Care — all seven in quick succession.
+Resolution: The final frame lands on a "We Did It!" celebration grid with Ria, Rio, and Cuty.
+Moral: A full week of screen-free play fits into sixty seconds when you actually commit to it.
+''',
+    setting: 'Cream background, fast-cut vertical reel montage',
+    sceneDetail: 'All seven mission icons lined up in a final celebration grid',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: '"We Did It!" celebration with all three characters together.',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Fast-cut vertical 9:16 reel montage, soft 3D Pixar/Disney-style render, cream background. Quick 1-2 second shots: 1) jumping pillow hurdle (Race Track) 2) singing into spoon, plate drums (Concert) 3) drawing sun, slate (Art Studio) 4) binoculars, cupped hands (Detective) 5) pushing laundry basket, pulling rope (Rescue) 6) opening tiffin box (Treasure) 7) eating fruit, drinking water, brushing (Daily Care). Final frame: all 7 mission icons in a grid, "We Did It!" celebration with Ria, Rio, Cuty.
+
+On-Screen Text: 0-3s Race Track / 3-6s Concert / 6-9s Art Studio / 9-12s Detective / 12-15s Rescue / 15-18s Treasure / 18-21s Daily Care / 21-60s Recap grid + "We Did It!"
+
+Outro: "Follow for a new mission every day this week!"
+''',
+  ),
+
+  HookIdea(
+    id: 'idea_116',
+    category: 'Series',
+    cover: 'We Did It — All 7 Missions Complete!',
+    title: 'We Completed All 7 Missions! Here\'s What Happened',
+    opening: 'A recap carousel celebrating the full week, featuring any parent responses/tags from the week if available.',
+    problem: 'N/A',
+    lesson: 'One slide per mission with a one-line "what we learned" note, then a final "what\'s next" teaser.',
+    postFormat: 'Carousel',
+    strategy: 'Closes out the Missions series and teases what comes next.',
+    caption: 'A full week of screen-free missions, complete! From racing to detective work to bedtime routines, Ria and Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
+    pinnedComment: 'Which mission will you repeat this week? Comment below! 🎉',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '''
+Story: Seven missions, one full week, and a trophy to show for it.
+Twist: Each mission gets a one-line lesson of its own — movement builds confidence, music is self-expression, creativity needs no fancy tools.
+Resolution: The recap closes with one open question — what should come next?
+Moral: A full week of small missions adds up to one very big celebration.
+''',
+    setting: 'Cream background, celebratory confetti/trophy theme',
+    sceneDetail: 'Ria, Rio and Cuty together with a trophy, confetti falling',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: 'The carousel ends on "What\'s next? Tell us below!"',
+    defaultCast: ['Ria', 'Rio', 'Cuty'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '''
+PROMPT: Soft 3D Pixar/Disney-style render, cream background, square carousel format. Consistent Ria, Rio, Cuty across all slides. Celebratory confetti/trophy theme.
+
+On-Screen Text: "WE DID IT — ALL 7 MISSIONS COMPLETE!" with one lesson per mission (Race Track to confidence, Concert to self-expression, Art Studio to creativity needs no fancy tools, Detective to observation is a superpower, Rescue Team to teamwork, Treasure Box to small things bring big joy, Daily Care to routines build independence), ending on "What's next? Tell us below!"
+
+Outro: "Which mission will you repeat this week? Comment below!"
+''',
+  ),
 ];
 
-  // Safety hooks are appended at the end.
-  list.addAll(kSafetyHooks);
   return list;
 }
 
@@ -5475,706 +6623,6 @@ final kDefaultHooks = buildDefaultHooks();
 /// Since [kRewrittenStories] and [kMomentUpgrades] have been merged
 /// directly into [kDefaultHooks], this is now a simple alias.
 final kDefaultHooksWithRewrite = kDefaultHooks;
-
-// ── The 14-Day Post Packages ───────────────────────────────────────────────────
-
-final kDay14Posts = <QuickIdea>[
-  // ── DAY 2 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_93',
-    title: 'Which One Doesn\'t Belong?',
-    postType: 'Static Image',
-    audience: 'Parents of 3-6 year olds',
-    contentGoal: 'Observation skill practice — save-worthy',
-    mood: 'Curious / Playful',
-    hook: 'Which One Doesn\'t Belong? 🧩',
-    mainIdea: 'Four illustrated figures: Ria, Rio, Cuty, and a banana. Which one is different?',
-    problem: 'Four illustrated figures side by side: Ria (child), Rio (child), Cuty (bunny), and a yellow banana.',
-    lesson: 'The banana — it\'s the only food! (Round 2: pattern game — who holds what?)',
-    visualStyle: 'Bright, clean, minimal — 4 large icon-style illustrations on a cream card',
-    imagePrompt: 'Create a bright, clean preschool puzzle card, square format, cream pastel background. Four large, simple, colorful illustrations in a row: Ria (pigtails, pink dress), Rio (blue shirt), Cuty (white bunny with pink bow), and a single yellow banana. Rounded card border, soft drop shadow under each figure, minimal clutter, no text inside the image, playful children\'s illustration style.',
-    caption: 'Which one doesn\'t belong? 🧩 A simple thinking game for your little explorer — no right or wrong way to try, just fun observation! Save this for your next 5-minute activity with your child. 💛\n\n#FunLearningWithPalak #preschoolactivities #toddlerlearning #earlylearningindia #momsofinstagram',
-    cta: 'Comment your child\'s answer below 👇',
-    hashtags: '#preschoolactivities #toddlerlearning #kidsbrainbooster #earlylearningindia #funlearningwithpalak',
-    comments: [
-      'Try this with your little one and tell us — did they spot it right away? 👀',
-      'So clever! Kids love these simple observations.',
-      'This is such a simple but smart activity, saving it!',
-      '😂 The banana logic made me laugh!',
-      'Love how easy this is to do with things we already have at home.',
-    ],
-    script: '',
-    bucket: 'challenge',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 3 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_94',
-    title: 'Mumma Says This 100x a Day',
-    postType: 'Reel',
-    audience: 'Parents of 2-5 year olds',
-    contentGoal: 'Relatable connection + share-worthy',
-    mood: 'Funny / Chaotic-cute',
-    hook: 'MUMMA SAYS THIS 100× A DAY 😂',
-    mainIdea: 'Fast-cut relatable moments of things parents repeat all day.',
-    problem: 'Put your shoes on / Where\'s your water bottle / Don\'t run / Stop fighting / Come here',
-    lesson: 'Tag a parent who needs to see this',
-    visualStyle: 'Bright cartoon reel style, soft 3D Pixar aesthetic, cream background, vertical 9:16',
-    imagePrompt: 'Soft 3D Disney/Pixar-style render, cream background, vertical 9:16. Scene 1: Ria barefoot holding shoes, "Coming!" speech bubble, 5 min later still barefoot. Scene 2: Rio shrugging, water bottle beside him. Scene 3: Ria and Rio sprinting past, Cuty asleep. Scene 4: Both with angry faces, Cuty still asleep. Scene 5: Parent searching, "COME HERE!" text. No glasses on Ria and Rio.',
-    caption: 'Mummas, be honest — how many times did you say this TODAY? 😂 Tag a parent who needs to see this.\n\n#FunLearningWithPalak #parentingmemes #toddlerlife #momsofindia #parentinghumor',
-    cta: 'Be honest — how many times today? 👇',
-    hashtags: '#parentingmemes #toddlerlife #momsofindia #relatablemom #funlearningwithpalak',
-    comments: [
-      'Drop a number 👇 be honest, we won\'t judge 😂',
-      'Literally on repeat in my house every single morning 😭',
-      'This is SO accurate it hurts 😂',
-      'I said "come here" 4 times before dinner today alone.',
-      'Even non-moms understand this energy 😂',
-    ],
-    script: 'Scene 1: "Put your shoes on." — Ria: "Coming!" — 5 minutes later, still barefoot 😂\nScene 2: "Where\'s your water bottle?" — Rio: "I don\'t know." (bottle right beside him)\nScene 3: "Don\'t run!" — Ria and Rio sprint past, Cuty asleep 😴\nScene 4: "Stop fighting!" — Ria 😤 Rio 😤 Cuty: still asleep\nScene 5: "Come here." — silence — "COME HERE!" 😂',
-    bucket: 'humor',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 4 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_95',
-    title: '5-Minute Kitchen Challenge',
-    postType: 'Carousel',
-    audience: 'Parents of 2-4 year olds',
-    contentGoal: 'Save-worthy practical activity',
-    mood: 'Warm / Practical',
-    hook: '5-MINUTE KITCHEN CHALLENGE 🥄',
-    mainIdea: 'Safe kitchen items kids can explore with adult supervision — cold items only, no stove.',
-    problem: 'Safe items: plastic bowls, wooden spoons, cold pasta, large spoon — all adult-supervised.',
-    lesson: '1. Adult sets out 5 safe items. 2. Child explores textures, makes sounds. 3. "What feels bumpy? What sounds splashy?"',
-    visualStyle: 'Soft 3D Pixar/Disney style, warm cozy cream kitchen setting',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream kitchen countertop background, five safe kitchen items (wooden spoon, plastic bowl, cold pasta, large spoon, measuring cup) arranged playfully, a small illustrated child hands exploring them with an adult hand nearby, warm cozy lighting, minimal text, square format.',
-    caption: 'No fancy toys needed — just 5 spoons from your drawer! This 5-minute activity builds sorting + counting skills while you finish making dinner. 💛 Save this for later!\n\n#FunLearningWithPalak #preschoolactivities #kitchenlearning #earlylearning #momhacks',
-    cta: 'Save this for your next kitchen moment ❤️',
-    hashtags: '#preschoolactivities #kitchenlearning #toddleractivities #earlylearning #sortingskills',
-    comments: [
-      'Tried this yet? Tell us how your little chef did! 🥄',
-      'Love that this uses stuff I already have at home!',
-      'My 3-year-old turned it into a spoon xylophone instead 😂 still counts as learning right?',
-      'Doing this tonight while I cook, thank you!',
-      'So simple but so smart.',
-    ],
-    script: 'Slide 1: "5-MINUTE KITCHEN CHALLENGE 🥄"\nSlide 2: "Safe items only: bowls, spoons, cold pasta — adult stays close!"\nSlide 3: "Step 1: Explore textures — bumpy, smooth, cool."\nSlide 4: "Step 2: Make sounds — splash, clang, tap!"\nSlide 5: "Step 3: Count them together — 1, 2, 3, 4, 5!"\nSlide 6: "Stove = grown-up zone. Save this for safe play! ❤️"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 5 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_96',
-    title: 'Ask Your Child This Tonight',
-    postType: 'Static Image',
-    audience: 'Parents of 2-6 year olds',
-    contentGoal: 'Conversation starter value',
-    mood: 'Warm / Curious',
-    hook: 'ASK YOUR CHILD THIS TONIGHT 🗣️',
-    mainIdea: 'A conversation-starter question for bedtime or dinner.',
-    problem: 'Prompts:\n1. "If your teddy could talk, what would it say?"\n2. "What makes you feel safe?"\n3. "What would you invent today?"\n4. "If you could be any animal at dinner, which one?"',
-    lesson: 'Encourages imagination and gives you a window into how your child thinks.',
-    visualStyle: 'Cozy, soft evening lighting, warm Pixar aesthetic',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream bedroom background, warm evening lighting. Ria (pigtails with pink bows, pink star dress) sitting on her bed hugging Cuty the white bunny, a small thought bubble above Cuty\'s head with a question mark. Rio (blue-grey t-shirt) peeking in from the doorway curiously. No glasses, no text inside image, gentle cozy mood, square format.',
-    caption: 'Tonight, instead of the usual bedtime questions, try this one: "If your teddy could talk, what would it say?" You might be surprised by the answer. 💛\n\n#FunLearningWithPalak #talkwithyourkids #bedtimeroutine #earlychildhood #momlife',
-    cta: 'What did they say? Comment below 👇',
-    hashtags: '#talkwithyourkids #parentingtips #bedtimeroutine #toddlerconversations #funlearningwithpalak',
-    comments: [
-      'We\'d love to hear what your little one said — share it below! ❤️',
-      'My son said his teddy would say "let\'s go on an adventure!" 😍',
-      'This made for such a sweet bedtime chat tonight.',
-      'She said her teddy would just say "I love you" — I nearly cried 🥹',
-      'Trying this tonight, such a lovely idea.',
-    ],
-    script: 'Slide 1: "ASK YOUR CHILD THIS TONIGHT 🗣️"\nSlide 2: "If your teddy could talk, what would it say?"\nSlide 3: "What makes you feel safe?"\nSlide 4: "What would you invent today?"\nSlide 5: "If you could be any animal at dinner, which one?"\nSlide 6: "Try one question — see what happens 💛"',
-    bucket: 'conversation',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 6 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_97',
-    title: 'Can Your 3-Year-Old Do These?',
-    postType: 'Carousel',
-    audience: 'Parents of 3-year-olds',
-    contentGoal: 'Informative milestone reference',
-    mood: 'Informative / Reassuring',
-    hook: 'CAN YOUR 3-YEAR-OLD DO THESE? ✅',
-    mainIdea: 'A quick skill-check reference for parents of 3-year-olds.',
-    problem: 'Age group: 3 Years',
-    lesson: '1. Identify basic colours\n2. Name 5 fruits\n3. Recognise their own name\n4. Count 1–10\n5. Identify body parts',
-    visualStyle: 'Clean checklist card, soft pastel icons per item',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Ria and Rio standing together pointing at a floating checklist icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, minimal text inside image, square format.',
-    caption: 'Every child grows at their own pace — this is simply a gentle guide, not a race! ❤️ Save this to casually check in with your 3-year-old\'s development.\n\n#FunLearningWithPalak #preschoolmilestones #3yearoldactivities #toddlerdevelopment #parentingindia',
-    cta: 'Bookmark this for your 3-year-old\'s next milestone check 📌',
-    hashtags: '#preschoolmilestones #3yearoldactivities #toddlerdevelopment #earlylearning #parentingindia',
-    comments: [
-      'How many can your 3-year-old already do? Tell us below! 💛',
-      'My daughter can do 4 out of 5, so proud!',
-      'This is a great reminder, not a pressure checklist. Thank you for that note.',
-      'Saving this to track over the next few months.',
-      'She\'s still working on counting to 10 but getting there!',
-    ],
-    script: 'Slide 1: "CAN YOUR 3-YEAR-OLD DO THESE? ✅"\nSlide 2: "🎨 Identify basic colours"\nSlide 3: "🍎 Name 5 fruits"\nSlide 4: "📛 Recognise their own name"\nSlide 5: "🔢 Count 1–10"\nSlide 6: "👀 Identify body parts"\nSlide 7: "Save this to check off with your little one this week! 📌"',
-    bucket: 'age_practice',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 7 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_98',
-    title: 'Toddler Mathematics',
-    postType: 'Reel',
-    audience: 'Parents of 1-4 year olds',
-    contentGoal: 'Relatable humor + share',
-    mood: 'Funny / Punchy',
-    hook: 'TODDLER MATHEMATICS 😂',
-    mainIdea: 'A funny, exaggerated "math lesson" about biscuit logic.',
-    problem: '1 biscuit = hungry / 2 biscuits = still hungry / 3 biscuits = MUMMA, MORE!',
-    lesson: 'Tag a parent who has lived this exact equation',
-    visualStyle: 'Bold, bright, meme-style text overlays, vertical 9:16',
-    imagePrompt: 'Bold bright meme-style reel, soft 3D Pixar animation, cream background, vertical 9:16. Scene 1: "1 biscuit = hungry" — Rio holding one biscuit, neutral face. Scene 2: "2 biscuits = still hungry" — same neutral face. Scene 3: "3 biscuits = \'MUMMA, MORE!\'" — dramatic happy face, arms outstretched. Scene 4: Cuty unimpressed, nibbling one carrot. No glasses.',
-    caption: 'Toddler mathematics — it\'s a whole different subject 😂 Tag a parent who\'s lived this exact equation.\n\n#FunLearningWithPalak #toddlerlife #parentingmemes #momsofindia #parentinghumor',
-    cta: 'Tag a parent who gets this 😅',
-    hashtags: '#toddlerlife #parentingmemes #momsofindia #relatablehumor #funlearningwithpalak',
-    comments: [
-      'Be honest — how many biscuits does it take in your house? 😂',
-      'This is exact science in my house 😭',
-      'Replace biscuit with chocolate and this is EVERY household.',
-      '😂😂😂 too accurate.',
-      'Cuty staying calm through all of this is such a mood.',
-    ],
-    script: 'Scene 1: "1 biscuit = hungry" — Rio holds one biscuit, neutral face.\nScene 2: "2 biscuits = still hungry" — same neutral face.\nScene 3: "3 biscuits = \'MUMMA, MORE!\'" — Rio\'s face lights up dramatically, arms out.\nScene 4: Cuty sitting nearby, unimpressed, still nibbling one carrot.',
-    bucket: 'humor',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 8 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_99',
-    title: 'Find the Hidden Cuty!',
-    postType: 'Static Image',
-    audience: 'Parents of 2-5 year olds',
-    contentGoal: 'Observation game',
-    mood: 'Playful / Fun',
-    hook: 'FIND THE HIDDEN CUTY! 👀',
-    mainIdea: 'A "spot the character" observation game.',
-    problem: 'A busy, colorful garden scene with Cuty the bunny camouflaged somewhere.',
-    lesson: 'Cuty was hidden behind a flower pot — look for the pink bow!',
-    visualStyle: 'Busy but not overwhelming, bright colors, lots of details to scan',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render illustrated garden scene, cream and green tones, flowers, bushes, small toys scattered around. Cuty the small white bunny cleverly tucked partially behind a bush or flower pot with only ears and pink bow peeking out. Ria and Rio standing to the side looking around playfully, no glasses, square format, minimal text inside image.',
-    caption: 'Cuty is hiding somewhere in this picture! 🐰 Can your little one spot him before you do? Comment when you find him!\n\n#FunLearningWithPalak #hiddenobject #spotthedifference #preschoolgames #kidsgames',
-    cta: 'How fast did you find him? ⏱️ Comment below!',
-    hashtags: '#hiddenobject #spotthedifference #preschoolgames #observationskills #toddleractivities',
-    comments: [
-      'Found him? Drop a 🐰 in the comments!',
-      'Found him behind the flower pot! 🐰',
-      'Love these hidden object activities for focus!',
-      'So good for observation skills at this age.',
-      'My toddler spotted it right away, great game!',
-    ],
-    script: '',
-    bucket: 'challenge',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 9 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_100',
-    title: 'The Sock Hunt',
-    postType: 'Reel',
-    audience: 'Parents of 1-4 year olds',
-    contentGoal: 'Practical activity that saves time',
-    mood: 'Playful / Everyday-relatable',
-    hook: 'THE SOCK HUNT 🧦',
-    mainIdea: 'Before: laundry basket dumped, socks everywhere. After: all pairs matched and folded.',
-    problem: 'Before: socks scattered everywhere, no pairs in sight. After: sorted pairs stacked neatly, Cuty napping on the finished pile.',
-    lesson: '1. Dump the basket. 2. Find matches by color/size. 3. Stack pairs together and celebrate!',
-    visualStyle: 'Cozy home laundry scene, bright sock colors, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream laundry room background, vertical 9:16. Scene 1: Pile of mismatched colorful socks on floor, Ria and Rio diving in curiously. Scene 2: Rio holds two socks of different colors, shakes head "no match." Scene 3: Ria finds matching pair, holds triumphantly. Scene 4: Montage of pairs stacking, Cuty sitting on finished pile. No glasses on Ria and Rio.',
-    caption: 'Turn laundry day into a game! 🧦 This simple sock-matching hunt builds sorting skills and buys you 5 quiet minutes to actually finish the laundry. Win-win. 😂\n\n#FunLearningWithPalak #laundryhacks #preschoollearning #momhacks #parentingtips',
-    cta: 'Try this before your next laundry day 😂',
-    hashtags: '#laundryhacks #toddleractivities #preschoollearning #momhacks #sortingskills',
-    comments: [
-      'Does this actually work in your house too? 😂 Tell us!',
-      'Genius, why didn\'t I think of this before 😂',
-      'My toddler actually helped me fold today because of this!',
-      'Turning chores into games is the real parenting hack.',
-      'Trying this literally today, laundry pile is huge 😅',
-    ],
-    script: 'Before: Laundry basket dumped — pile of mismatched colorful socks on the floor. Ria and Rio both dive in curiously.\nDuring: Rio holds two socks — different colors — shakes head "no match." Ria finds a matching pair, holds them up triumphantly.\nAfter: Small montage — pairs stacking up. Cuty "helps" by sitting on the finished pile.',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 10 ───────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_101',
-    title: '3 Questions Every Parent Should Ask This Week',
-    postType: 'Carousel',
-    audience: 'Parents of 2-6 year olds',
-    contentGoal: 'Conversation starter / community engagement',
-    mood: 'Warm / Reflective',
-    hook: '3 QUESTIONS TO ASK YOUR CHILD THIS WEEK ❤️',
-    mainIdea: 'A small set of conversation-starter questions for the week ahead.',
-    problem: 'Questions:\n1. "What made you happy today?"\n2. "What would you build with 100 blocks?"\n3. "Which animal would you want as a friend?"',
-    lesson: 'Small questions can open up the biggest conversations.',
-    visualStyle: 'Soft, cozy, one question per slide with gentle illustration',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, warm evening lighting. Ria and Rio sitting together on the floor in conversation, Cuty curled nearby, gentle cozy family mood, no glasses, minimal text inside image, square format.',
-    caption: 'Small questions can open up the biggest conversations. Save this and try asking just one each night this week. 💛\n\n#FunLearningWithPalak #talkwithyourkids #mindfulparenting #familytime #momlife',
-    cta: 'Save this — ask one each night this week.',
-    hashtags: '#talkwithyourkids #parentingtips #mindfulparenting #toddlerconversations #funlearningwithpalak',
-    comments: [
-      'Starting with the 100 blocks question tonight!',
-      'These are so simple but so meaningful, saving this.',
-      'My son\'s animal answer was a dinosaur, obviously 😂',
-      'Love having actual questions instead of just "how was your day."',
-      'This is going into our nightly routine now.',
-    ],
-    script: 'Slide 1: "3 QUESTIONS TO ASK YOUR CHILD THIS WEEK ❤️"\nSlide 2: "\'What made you happy today?\'"\nSlide 3: "\'What would you build with 100 blocks?\'"\nSlide 4: "\'Which animal would you want as a friend?\'"\nSlide 5: "Save this — ask one each night this week 💛"',
-    bucket: 'conversation',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 11 ───────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_102',
-    title: 'Can Your 4-Year-Old Do These?',
-    postType: 'Carousel',
-    audience: 'Parents of 4-year-olds',
-    contentGoal: 'Informative milestone reference (series with Day 6)',
-    mood: 'Informative / Reassuring',
-    hook: 'CAN YOUR 4-YEAR-OLD DO THESE? ✅',
-    mainIdea: 'A skill-check reference for parents of 4-year-olds.',
-    problem: 'Age group: 4 Years',
-    lesson: '1. Count 1–20\n2. Recognise A–Z\n3. Name the days of the week\n4. Sort objects by category\n5. Follow 2–3 step instructions',
-    visualStyle: 'Same clean checklist card style as Day 6, for visual series consistency',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background. Rio and Ria standing together pointing at a floating icon relevant to each slide, Cuty sitting nearby. Clean, warm, reassuring tone, no glasses, square format.',
-    caption: 'Every child moves at their own pace — this is just a gentle guide! Save this to casually check in with your 4-year-old\'s growth. ❤️\n\n#FunLearningWithPalak #preschoolmilestones #4yearoldactivities #toddlerdevelopment #parentingindia',
-    cta: 'Bookmark this for your 4-year-old\'s next milestone check 📌',
-    hashtags: '#preschoolmilestones #4yearoldactivities #toddlerdevelopment #earlylearning #parentingindia',
-    comments: [
-      'How many can your 4-year-old already do? Tell us below! 💛',
-      'He\'s got the alphabet down but still working on days of the week!',
-      'This is such a helpful, non-stressful way to check progress.',
-      'Saving this series, loved the 3-year-old one too.',
-      'Would love a 5-year-old version too!',
-    ],
-    script: 'Slide 1: "CAN YOUR 4-YEAR-OLD DO THESE? ✅"\nSlide 2: "🔢 Count 1–20"\nSlide 3: "🔤 Recognise A–Z"\nSlide 4: "📅 Name the days of the week"\nSlide 5: "🗂️ Sort objects by category"\nSlide 6: "👂 Follow 2–3 step instructions"\nSlide 7: "Bookmark this for your 4-year-old\'s next milestone check 📌"',
-    bucket: 'age_practice',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 12 ───────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_103',
-    title: 'Three Types of Kids at Dinner',
-    postType: 'Static Image',
-    audience: 'Parents of 1-5 year olds',
-    contentGoal: 'Relatable humor + share',
-    mood: 'Funny / Character-driven',
-    hook: 'THREE TYPES OF KIDS AT DINNER 🍽️',
-    mainIdea: 'A character-based relatable meme using the established Ria/Rio/Cuty personalities.',
-    problem: '🌸 Ria = "What\'s this?" (curious, poking at food) / 💙 Rio = "I don\'t want it." (arms crossed, ziddi) / 🐰 Cuty = peacefully eating, unbothered',
-    lesson: 'Every family has all three at the dinner table',
-    visualStyle: 'Three-panel meme layout, bright and simple, soft 3D Pixar render',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, three-panel layout on cream background, dinner table setting. Panel 1: Ria poking curiously at a plate of food, questioning expression. Panel 2: Rio with arms crossed, refusing his plate, stubborn expression. Panel 3: Cuty the white bunny calmly and happily eating a carrot from a small bowl. No glasses, clean simple outlines, minimal text inside image, square format.',
-    caption: 'Every family has all three at the dinner table 😂 Which one is your child tonight?\n\n#FunLearningWithPalak #parentingmemes #toddlerdinner #momsofindia #pickyeater',
-    cta: 'Which one is your child? 👇',
-    hashtags: '#parentingmemes #toddlerdinner #relatablehumor #momsofindia #pickyeater',
-    comments: [
-      'Tag the parent whose child is ALL THREE some nights 😂',
-      'My son is 100% Rio energy at every meal 😩',
-      'We have a Ria who questions every single ingredient 😂',
-      'Cuty\'s energy is the dream honestly.',
-      'All three, every night, in the same child 😭',
-    ],
-    script: '',
-    bucket: 'humor',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 13 ───────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_104',
-    title: 'What Comes Next? Two Rounds!',
-    postType: 'Reel',
-    audience: 'Parents of 2-5 year olds',
-    contentGoal: 'Early math thinking game',
-    mood: 'Curious / Satisfying',
-    hook: 'WHAT COMES NEXT? 🟡🔵 Round 1 + Round 2! ❓',
-    mainIdea: 'Two pattern rounds — color patterns and shape patterns — for growing minds.',
-    problem: 'Round 1: yellow, blue, yellow, blue — then a pause on question mark.\nRound 2: circle, square, circle, square — then a pause.',
-    lesson: 'Round 1: Yellow. Round 2: Circle. Build a pattern, then break it — and rebuild!',
-    visualStyle: 'Bold, simple shapes, clean animation-style reveal, vertical 9:16',
-    imagePrompt: 'Bold simple animation-style reel, soft 3D Pixar style, cream background, vertical 9:16. Yellow and blue circles appear in sequence: 🟡🔵🟡🔵. Then a large question mark where the next circle should go. Ria taps her chin, thinking. Yellow circle slides into place, Ria claps, Cuty hops happily. No glasses.',
-    caption: 'Can your child guess what comes next? 🟡🔵🟡🔵❓ A simple pattern game that builds early math thinking!\n\n#FunLearningWithPalak #patternrecognition #preschoolmath #toddlerbrain #kidsactivities',
-    cta: 'Did your child guess it before the reveal? 😄',
-    hashtags: '#patternrecognition #preschoolmath #earlylearning #toddlerbrain #funlearningwithpalak',
-    comments: [
-      'Guess before you scroll — what comes next? 👇',
-      'Got it right away, yellow obviously! 🟡',
-      'Love how this builds slowly — keeps kids engaged!',
-      'Simple but so satisfying to watch.',
-      'This is a great one to do out loud with kids.',
-    ],
-    script: 'Scene 1: Pattern 1 builds on screen one shape at a time — 🟡🔵🟡🔵\nScene 2: Hold on a large "❓" where the next shape should go.\nScene 3: Ria taps her chin, thinking.\nScene 4: Reveal — 🟡 slides into place, Ria claps, Cuty hops happily.\nScene 5: Pattern 2 begins — ⭕□⭕□ — then another "❓"\nScene 6: Rio shouts "Circle!" before the reveal.',
-    bucket: 'challenge',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 14 ───────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_105',
-    title: 'Which New Format Was Your Favorite?',
-    postType: 'Carousel',
-    audience: 'Existing followers',
-    contentGoal: 'Community feedback + engagement',
-    mood: 'Reflective / Community-driven',
-    hook: 'WHICH NEW FORMAT WAS YOUR FAVORITE? 🗳️',
-    mainIdea: 'A visual recap of the 5 buckets tested this week, inviting audience feedback.',
-    problem: 'Five content types tested this week:\n🔎 Puzzles & Challenges\n🗣️ Talk With Your Child\n🏠 Try This at Home\n😂 Parent-Relatable Humor\n📚 Age-Based Skill Checks',
-    lesson: 'Use this post\'s engagement + Insights data to decide bucket weighting for Days 15-30.',
-    visualStyle: 'Clean 5-tile grid or carousel, cream background, one word label per tile',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, small icon representing the bucket theme (puzzle piece / speech bubble / house / laughing face / checklist), Ria, Rio, or Cuty featured lightly in the corner depending on tile, clean minimal design, square format.',
-    caption: 'This past week, we tried something new — 5 completely different formats instead of just stories! Which one did you enjoy the most? Vote in our Story or tell us below. 💛\n\n#FunLearningWithPalak #newcontent #parentingcommunity #preschoollearning #momsofinstagram',
-    cta: 'Vote in the poll sticker on our Story, or comment your favorite below 👇',
-    hashtags: '#newcontent #parentingcommunity #preschoollearning #funlearningwithpalak #momsofinstagram',
-    comments: [
-      'Tell us honestly — which one should we make more of? 👇',
-      'Loved the puzzles the most, more of those please!',
-      'The humor reels made me laugh out loud, keep those coming.',
-      'The 3/4-year-old checklists were genuinely useful for me.',
-      'Honestly loved all of them, such a fun week of content!',
-    ],
-    script: 'Slide 1: "WHICH NEW FORMAT WAS YOUR FAVORITE? 🗳️"\nSlide 2: "🔎 Puzzles & Challenges"\nSlide 3: "🗣️ Talk With Your Child"\nSlide 4: "🏠 Try This at Home"\nSlide 5: "😂 Parent-Relatable Humor"\nSlide 6: "📚 Age-Based Skill Checks"\nSlide 7: "Vote in our Story poll or comment your favorite below! 💛"',
-    bucket: 'community',
-    createdAt: DateTime(2026, 9, 24),
-  ),
-
-  // ── DAY 15 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_106',
-    title: 'How to Play Each Mission With Household Items',
-    postType: 'Carousel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Fulfill promise + drive saves',
-    mood: 'Practical / Warm',
-    hook: 'NO SPECIAL TOYS NEEDED — HERE\'S WHAT TO USE! 🏠',
-    mainIdea: 'A practical substitution guide showing exactly what household item replaces each mission\'s prop.',
-    problem: 'Parents may think missions need special equipment (hurdles, treasure boxes, detective kits).',
-    lesson: 'Race Track → broomstick + 2 chairs as hurdle, dupatta as line | Concert → wooden spoon mic, steel plate drums | Art Studio → any paper + slate/notebook, kitchen chalk on floor | Detective → sunglasses/toy binoculars or cupped hands | Rescue Team → laundry basket, dupatta/old rope | Treasure Box → any box/tiffin with lid, small toys inside | Daily Care → owned tiffin, water bottle, toothbrush',
-    visualStyle: 'Same consistent characters, showing the "official" prop next to the "at-home swap"',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) appear across all slides with Cuty the white bunny (pink bow). Each slide shows split view: left side "official" mission prop, right side "at-home swap" using household items. Slide 1: broomstick between chairs + dupatta line. Slide 2: wooden spoon mic + steel plates. Slide 3: paper/slate + kitchen chalk. Slide 4: sunglasses/binoculars + cupped hands. Slide 5: laundry basket + dupatta rope. Slide 6: tiffin box with toys. Slide 7: tiffin, water bottle, toothbrush. Warm, practical, encouraging mood.',
-    caption: 'Promised, delivered! 🏠 Here\'s exactly what to swap in for each mission using things already in your house. No special toys, no shopping list — just play. Which swap are you trying first? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Save this — now you have zero excuses to skip a mission! 📌',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Using my dupatta for the rescue mission right now 😂',
-      'This removes literally every excuse, thank you!',
-      'Wooden spoon microphone was a huge hit here!',
-      'Love that I didn\'t need to buy anything at all.',
-      'Saving this permanently, so practical.',
-    ],
-    script: 'Slide 1: "NO SPECIAL TOYS NEEDED — HERE\'S WHAT TO USE! 🏠"\nSlide 2: "Race Track → Broomstick + 2 chairs = hurdle, dupatta = line"\nSlide 3: "Concert → Wooden spoon = mic, steel plates = drums"\nSlide 4: "Art Studio → Any paper + slate, kitchen chalk on floor"\nSlide 5: "Detective → Sunglasses/binoculars or just cupped hands"\nSlide 6: "Rescue Team → Laundry basket + dupatta rope"\nSlide 7: "Treasure Box → Any box/tiffin with lid, small toys inside"\nSlide 8: "Daily Care → Your tiffin, water bottle, toothbrush — done!"\nSlide 9: "Save this — zero excuses to skip a mission! 📌"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 25),
-  ),
-
-  // ── DAY 16 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_107',
-    title: 'You Voted! Here\'s Which Mission Won',
-    postType: 'Static Image',
-    audience: 'Existing followers who commented',
-    contentGoal: 'Close the loop + build community + drive comments again',
-    mood: 'Fun / Celebratory',
-    hook: 'THE VOTES ARE IN! 🏆',
-    mainIdea: 'A results reveal based on which mission number got the most comments, turning passive voters into repeat engagers.',
-    problem: 'N/A (results format, no puzzle needed)',
-    lesson: 'Reveal the winning mission with a small "why this one might be the most popular" note (e.g., "Detective Mission is your favorite — mystery never gets old!")',
-    visualStyle: 'Celebratory, confetti, winning mission\'s characters front and center',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, celebratory mood with confetti. Ria and Rio (brown eyes, warm skin tone, no glasses) holding a trophy, Cuty the white bunny (pink bow) cheering. Winning mission number displayed prominently (e.g., "Mission 5 Won!"). Colorful, joyful, vertical 4:5 or square format.',
-    caption: 'You voted, and Mission 5 won! 🏆 Detective Mission is your favorite — mystery never gets old! Try it today and show us how it goes! #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
-    cta: 'Try today\'s winning mission and tag us in your Story! 🏆',
-    hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome',
-    comments: [
-      'Yes! This was my top pick too!',
-      'My son will be so excited to see this won.',
-      'Didn\'t expect this one to win, but I get it!',
-      'Trying this with my daughter this evening.',
-      'More voting posts like this please, so fun!',
-    ],
-    script: '',
-    bucket: 'community',
-    createdAt: DateTime(2026, 9, 26),
-  ),
-
-  // ── DAY 17 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_108',
-    title: 'Mission 1: On Your Mark! 🏁',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Energetic / Fun',
-    hook: 'MISSION 1: ON YOUR MARK! 🏁',
-    mainIdea: 'Ria & Rio running, jumping a pillow hurdle, walking a line - Mission 1 of the 7 Mission Week.',
-    problem: 'Parents need a simple, structured movement activity for toddlers.',
-    lesson: 'Race Track builds coordination, listening skills, and gross motor confidence.',
-    visualStyle: 'Consistent characters, home setting with pillow hurdle and taped line, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) and Rio (brown eyes, warm skin tone, no glasses) in a home hallway/living room. Scene: Rio jumping over a pillow "hurdle" made from cushions, Ria walking a taped line on floor, Cuty the white bunny (pink bow) cheering from the side. Bright morning light, energetic movement captured in soft 3D Pixar render style.',
-    caption: 'Mission 1: Race Track! 🏁 Run, jump, walk — simple gross motor play that builds coordination and confidence. No equipment needed, just pillows and tape! Tag us trying this mission! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Tag us trying this mission! 🏁',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'My toddler LOVED the pillow hurdle! 😂',
-      'We used couch cushions and it was perfect!',
-      'Walking the line was harder than it looked for my 2yo!',
-      'Great energy burner before nap time!',
-      'Cuty cheering is the best part 🐰💕',
-    ],
-    script: 'Scene 1: "Mission 1: On Your Mark! 🏁" — Ria and Rio at start line\nScene 2: Rio jumps pillow hurdle — "Jump!"\nScene 3: Ria walks taped line carefully — "Walk the line"\nScene 4: Both run to finish — "Run!"\nScene 5: Cuty hands them a "medal" (spoon) 🏅\nScene 6: "Try Mission 2 today! Tag us 🏁"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 27),
-  ),
-
-  // ── DAY 18 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_109',
-    title: 'Mission 2: Living Room Concert! 🎤',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Energetic / Fun',
-    hook: 'MISSION 2: LIVING ROOM CONCERT! 🎤',
-    mainIdea: 'Singing into a spoon mic, dancing, clapping to rhythm - Mission 2 of the 7 Mission Week.',
-    problem: 'Parents need a simple music and movement activity.',
-    lesson: 'Concert builds rhythm awareness, self-expression, and language through song.',
-    visualStyle: 'Consistent characters, home setting with wooden spoon mic and steel plate drums, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) singing into a wooden spoon microphone, Rio (brown eyes, warm skin tone, no glasses) clapping and dancing, Cuty the white bunny (pink bow) tapping a steel plate like a drum. Kitchen utensils as instruments visible. Joyful musical chaos, warm family energy.',
-    caption: 'Mission 2: Concert! 🎤 Spoon mic, plate drums, living room stage — music time with zero prep. Show us your concert! 🎤 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Show us your concert! 🎤',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Wooden spoon mic is iconic now! 😂🎤',
-      'My daughter performed a 20-minute concert for us!',
-      'Steel plate drums = best drums ever 😂',
-      'Love how this uses kitchen items as instruments.',
-      'Cuty on drums is everything 🐰🥁',
-    ],
-    script: 'Scene 1: "Mission 2: Living Room Concert! 🎤"\nScene 2: Ria sings into wooden spoon — "La la la!"\nScene 3: Rio dances, claps to rhythm\nScene 4: Cuty taps steel plate — "Drum solo!"\nScene 5: Family bow together 🎭\nScene 6: "Your turn! Show us your concert 🎤"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 28),
-  ),
-
-  // ── DAY 19 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_110',
-    title: 'Mission 3: Art Corner Time! 🎨',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Creative / Calm',
-    hook: 'MISSION 3: ART CORNER TIME! 🎨',
-    mainIdea: 'Drawing round shapes only (circles, wheels, suns) — Mission 3 of the 7 Mission Week, with circle constraint.',
-    problem: 'Parents need a fine motor creative activity with a simple constraint.',
-    lesson: 'Art Studio builds fine motor skills, shape recognition, and creative confidence — circle shapes only!',
-    visualStyle: 'Consistent characters, home art corner with paper, slate, chalk, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) drawing a big yellow sun on paper, Rio (brown eyes, warm skin tone, no glasses) writing his name on a slate with chalk, Cuty the white bunny (pink bow) watching curiously. Kitchen chalk drawing on floor visible. Cozy creative atmosphere, warm light.',
-    caption: 'Mission 3: Art Studio! 🎨 Paper, slate, chalk — three ways to create with what you have. Share your child\'s masterpiece! 🎨 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Share your child\'s masterpiece! 🎨',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Kitchen chalk on the floor = genius and washable!',
-      'Slate writing practice is such a classic for a reason.',
-      'My son drew a sun that looked like a blob but he was SO proud 😍',
-      'Love the paper + slate + chalk variety.',
-      'Art corner doesn\'t need fancy supplies!',
-    ],
-    script: 'Scene 1: "Mission 3: Art Corner Time! 🎨"\nScene 2: Ria draws sun on paper — "Look, a sun!"\nScene 3: Rio writes name on slate — "R-I-O"\nScene 4: Kitchen chalk on floor — "Big canvas!"\nScene 5: Cuty hops through drawings 🐰\nScene 6: "Show us your masterpiece! 🎨"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 9, 29),
-  ),
-
-  // ── DAY 20 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_111',
-    title: 'Mission 4: Case Open! 🕵️',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Mysterious / Playful',
-    hook: 'MISSION 4: CASE OPEN! 🕵️',
-    mainIdea: 'Two fair clues: a footprint in flour, a dropped magnifying glass — solve where Cuty hid the snack.',
-    problem: 'Parents need an observation activity with visual clues, not magic.',
-    lesson: 'Detective builds observation, logical thinking, and evidence collection — fair clues only!',
-    visualStyle: 'Consistent characters, home setting with cardboard tube binoculars or cupped hands, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) looking through cardboard tube binoculars, Rio (brown eyes, warm skin tone, no glasses) with cupped hands around eyes, Cuty the white bunny (pink bow) with a magnifying glass. A "clue" (toy footprint) on floor. Playful mystery mood.',
-    caption: 'Mission 4: Detective! 🕵️ Binoculars, listening ears, mystery clues — observation play that builds thinking skills. Did your detective solve it? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Did your detective solve it? 🕵️',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Cardboard tube binoculars = best DIY ever!',
-      'My son found the "clue" in 3 seconds flat 😂',
-      'Cupped hands as binoculars is so cute and free!',
-      'Love how this builds real observation skills.',
-      'Cuty with magnifying glass 🐰🔍',
-    ],
-    script: 'Scene 1: "Mission 4: Case Open! 🕵️"\nScene 2: Ria with cardboard binoculars — "I see something!"\nScene 3: Rio cupped hands around eyes — "Looking closely"\nScene 4: Rio closes eyes to listen — "Shhh, I hear it!"\nScene 5: Found the clue! 🎉\nScene 6: "Did your detective solve it? 🕵️"',
-    bucket: 'challenge',
-    createdAt: DateTime(2026, 9, 30),
-  ),
-
-  // ── DAY 21 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_112',
-    title: 'Mission 5: Rescue Time! 🧸',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Heroic / Teamwork',
-    hook: 'MISSION 5: RESCUE TIME! 🧸',
-    mainIdea: 'Pushing a laundry basket, pulling a rope, helping tidy up - Mission 5 of the 7 Mission Week.',
-    problem: 'Parents need a heavy work / proprioception activity.',
-    lesson: 'Rescue Team builds gross motor strength, teamwork, and helpfulness.',
-    visualStyle: 'Consistent characters, home setting with laundry basket and dupatta rope, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) pushing a laundry basket with toys inside, Rio (brown eyes, warm skin tone, no glasses) pulling a dupatta rope attached to the basket, Cuty the white bunny (pink bow) riding in the basket. Heavy work play, teamwork energy, warm home setting.',
-    caption: 'Mission 5: Rescue Team! 🧸 Push, pull, help — heavy work play that builds strength AND teamwork. Teamwork tip from your house? 🧸 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Teamwork tip from your house? 🧸',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Laundry basket rescue is our go-to now!',
-      'My kids fight over who gets to pull the rope 😂',
-      'Heavy work before bed = better sleep, proven!',
-      'Cuty riding in the basket is the cutest 🐰',
-      'This turns cleanup into a mission!',
-    ],
-    script: 'Scene 1: "Mission 5: Rescue Time! 🧸"\nScene 2: Ria pushes laundry basket — "Coming through!"\nScene 3: Rio pulls dupatta rope — "Pulling hard!"\nScene 4: Cuty rides inside — "Rescue complete!"\nScene 5: High five teamwork moment ✋\nScene 6: "Your teamwork tip? 🧸"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 10, 1),
-  ),
-
-  // ── DAY 22 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_113',
-    title: 'Mission 6: Treasure Hunt! 🎁',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Exciting / Cozy',
-    hook: 'MISSION 6: TREASURE HUNT! 🎁',
-    mainIdea: 'Two clues found: a trail of crumbs, then a torn paper. Follow both to find the hidden treasure.',
-    problem: 'Parents need an object permanence activity with two clear clues.',
-    lesson: 'Treasure Hunt builds fine motor skills, logical sequencing, and nurturing play — two clues!',
-    visualStyle: 'Consistent characters, home setting with tiffin box or any box with lid, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) opening a tiffin box to find a small toy, Rio (brown eyes, warm skin tone, no glasses) closing the box carefully, Cuty the white bunny (pink bow) being tucked into a blanket nearby. Cozy bedtime transition energy.',
-    caption: 'Mission 6: Treasure Box! 🎁 Open, find, close, tuck in — fine motor + nurturing play with any box. What treasure did you hide? 🎁 #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'What treasure did you hide? 🎁',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Tiffin box treasure hunt is brilliant!',
-      'My daughter tucks Cuty in every night now 😍',
-      'Opening/closing boxes is the best fine motor practice.',
-      'We used an old shoebox and it worked perfectly.',
-      'The bedtime transition at the end is so smooth!',
-    ],
-    script: 'Scene 1: "Mission 6: Treasure Hunt! 🎁"\nScene 2: Ria opens tiffin — "What\'s inside?"\nScene 3: Finds toy — "Treasure!"\nScene 4: Rio closes box carefully — "Safe now"\nScene 5: Tucking Cuty in — "Night night bunny" 🐰\nScene 6: "What treasure did you hide? 🎁"',
-    bucket: 'age_practice',
-    createdAt: DateTime(2026, 10, 2),
-  ),
-
-  // ── DAY 23 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_114',
-    title: 'Mission 7: Self-Care Squad! 🍎',
-    postType: 'Reel',
-    audience: 'Parents of 1.5-4 year olds',
-    contentGoal: 'Drive daily engagement + saves',
-    mood: 'Warm / Routine',
-    hook: 'MISSION 7: SELF-CARE SQUAD! 🍎',
-    mainIdea: 'Eating fruit, drinking water, brushing teeth, bedtime routine - Mission 7 of the 7 Mission Week.',
-    problem: 'Parents need to build independent self-care routines.',
-    lesson: 'Daily Care builds independence, body awareness, and healthy habits. The 5-second wait: child struggles, parent waits about 5 seconds, child tries, parent helps only when needed, child completes the task.',
-    visualStyle: 'Consistent characters, home bathroom/kitchen setting, vertical 9:16',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, vertical 9:16 reel format. Ria (brown eyes, warm skin tone, no glasses) eating apple slices from her tiffin, Rio (brown eyes, warm skin tone, no glasses) drinking from his water bottle, both brushing teeth side by side, Cuty the white bunny (pink bow) watching from the counter. Cozy bathroom/kitchen routine atmosphere.',
-    caption: 'Mission 7: Daily Care! 🍎 Eat, drink, brush, sleep — the self-care squad routine with your own tiffin, bottle, brush. Which routine is hardest at your house? #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #indianmoms',
-    cta: 'Which routine is hardest at your house? 🍎',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'Tiffin for snacks = independence unlocked!',
-      'Brushing together makes it way easier.',
-      'Water bottle independence = fewer spills 😂',
-      'Bedtime routine is still our biggest battle 😭',
-      'Cuty watching them brush is too cute 🐰',
-    ],
-    script: 'Scene 1: "Mission 7: Self-Care Squad! 🍎"\nScene 2: Ria eats apple from tiffin — "Crunch!"\nScene 3: Rio drinks water — "Glug glug"\nScene 4: Ria struggles to brush — Mumma waits 5 seconds — Ria tries — Mumma helps only when needed — "Scrub scrub"\nScene 5: Cuty watches from counter 🐰\nScene 6: "Hardest routine at your house? 🍎"',
-    bucket: 'age_practice',
-    createdAt: DateTime(2026, 10, 3),
-  ),
-
-  // ── DAY 24 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_115',
-    title: '7 Missions in 60 Seconds',
-    postType: 'Reel',
-    audience: 'Non-followers, parents of 1.5-4 year olds',
-    contentGoal: 'Maximize non-follower reach + follows',
-    mood: 'Energetic / Fun',
-    hook: '7 SCREEN-FREE MISSIONS IN 60 SECONDS 🏠✨',
-    mainIdea: 'A fast-cut compilation reel showing one shot from each of the 7 missions back to back, building toward the "We Did It!" celebration.',
-    problem: 'Parents scrolling don\'t know screen-free play can look this structured and fun.',
-    lesson: 'Recap card at the end listing all 7 mission names quickly.',
-    visualStyle: 'Fast cuts (1-2 sec per mission), consistent characters, upbeat music, vertical 9:16',
-    imagePrompt: 'Fast-cut vertical 9:16 reel montage, Soft 3D Pixar/Disney-style render, cream background. Quick 1-2 second shots: 1) Ria/Rio jumping pillow hurdle (Race Track) 2) Ria singing into spoon, Rio on plate drums (Concert) 3) Ria drawing sun, Rio on slate (Art Studio) 4) Ria with binoculars, Rio cupped hands (Detective) 5) Pushing laundry basket, pulling rope (Rescue) 6) Opening tiffin box, finding toy (Treasure) 7) Eating fruit, drinking water, brushing (Daily Care). Final frame: All 7 mission icons in a grid, "We Did It!" celebration with Ria, Rio, Cuty. Upbeat, energetic, no glasses on children.',
-    caption: '7 screen-free missions, 60 seconds, zero shopping required 🏠✨ Follow along as we play through all of them with Ria & Rio! #FunLearningWithPalak #noscreenactivities #playbasedlearning #montessoriathome #earlylearning',
-    cta: 'Follow for a new mission every day this week! 🏠',
-    hashtags: '#noscreenactivities #playbasedlearning #montessoriathome #toddleractivities #funlearningwithpalak',
-    comments: [
-      'This makes screen-free time actually look doable!',
-      'Following now, need this mission list saved!',
-      'My kids would love the treasure box one especially.',
-      'So well organized, love the mission theme!',
-      'This is exactly the structure I needed for our afternoons.',
-    ],
-    script: '0-3s: Race Track — jump, walk, run 🏁\n3-6s: Concert — spoon mic, plate drums 🎤\n6-9s: Art Studio — draw, write, chalk 🎨\n9-12s: Detective — look, listen, think 🕵️\n12-15s: Rescue — push, pull, help 🧸\n15-18s: Treasure — open, find, close 🎁\n18-21s: Daily Care — eat, drink, brush 🍎\n21-60s: Recap grid of all 7 + "We Did It!" celebration 🎉\nCTA: "Follow for daily missions! 🏠"',
-    bucket: 'activity',
-    createdAt: DateTime(2026, 10, 4),
-  ),
-
-  // ── DAY 25 ────────────────────────────────────────────────────────────────────
-  QuickIdea(
-    id: 'idea_116',
-    title: 'We Completed All 7 Missions! Here\'s What Happened',
-    postType: 'Carousel',
-    audience: 'Existing followers + parents who joined the week',
-    contentGoal: 'Build community + set up next series',
-    mood: 'Celebratory / Reflective',
-    hook: 'WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉',
-    mainIdea: 'A recap carousel celebrating the full week, featuring any parent responses/tags from the week if available.',
-    problem: 'N/A',
-    lesson: 'One slide per mission with a one-line "what we learned" note, then a final "what\'s next" teaser.',
-    visualStyle: 'Celebratory, consistent characters, confetti/trophy theme matching the original "We Did It!" page',
-    imagePrompt: 'Soft 3D Pixar/Disney-style render, cream background, square carousel format. Consistent Ria (brown eyes, warm skin tone, no glasses), Rio (brown eyes, warm skin tone, no glasses), Cuty (white bunny, pink bow) across all slides. Celebratory confetti/trophy theme. Slide 1: "WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉" with trophy. Slides 2-8: Each mission with one-line learning note. Slide 9: "What\'s next? Tell us below!" with Ria, Rio, Cuty excited for new adventures.',
-    caption: 'A full week of screen-free missions, complete! 🎉 From racing to detective work to bedtime routines, Ria & Rio (and hopefully your little ones too) played through all 7. What should our next mission set be about? #FunLearningWithPalak #playbasedlearning #toddleractivities #noscreenactivities #montessoriathome',
-    cta: 'Which mission will you repeat this week? Comment below! 🎉',
-    hashtags: '#playbasedlearning #toddleractivities #funlearningwithpalak #noscreenactivities #montessoriathome',
-    comments: [
-      'This was such a fun week to follow along with!',
-      'Please do a kitchen-themed mission series next!',
-      'My daughter asks for "mission time" every day now 😍',
-      'Loved seeing this build up all week.',
-      'Can\'t wait to see what\'s next!',
-    ],
-    script: 'Slide 1: "WE DID IT — ALL 7 MISSIONS COMPLETE! 🎉"\nSlide 2: "Race Track → Movement builds confidence 🏁"\nSlide 3: "Concert → Music is self-expression 🎤"\nSlide 4: "Art Studio → Creativity needs no fancy tools 🎨"\nSlide 5: "Detective → Observation is a superpower 🕵️"\nSlide 6: "Rescue Team → Teamwork makes the dream work 🧸"\nSlide 7: "Treasure Box → Small things bring big joy 🎁"\nSlide 8: "Daily Care → Routines build independence 🍎"\nSlide 9: "What\'s next? Tell us below! 🚀"',
-    bucket: 'community',
-    createdAt: DateTime(2026, 10, 5),
-  ),
-];
 
 // ── Bulk Parser ───────────────────────────────────────────────────────────────
 
@@ -6247,38 +6695,33 @@ class ParsedPostPackage {
       dialogue.isNotEmpty ||
       endingBeat.isNotEmpty;
 
-  QuickIdea toQuickIdea(String id) {
-    final comments = <String>[];
-    if (pinnedComment.isNotEmpty) comments.add(pinnedComment);
-    comments.addAll(replyComments.where((c) => c.isNotEmpty));
-
-    // Pad to 5 comments minimum if reply comments are available
-    if (replyComments.isNotEmpty) {
-      while (comments.length < 5) {
-        comments.add(replyComments[comments.length % replyComments.length]);
-      }
-    }
-
-    return QuickIdea(
+  /// Builds a [HookIdea] from the parsed fields, in the one shared format
+  /// every idea in [kDefaultHooks] now uses. [category] overrides the guess
+  /// made from [bucket] when the caller already knows which one fits.
+  HookIdea toHookIdea(String id, {String? category}) {
+    return HookIdea(
       id: id,
+      category: category ?? _categoryFromBucket(bucket),
+      cover: hook.isNotEmpty ? hook : title,
       title: title,
-      postType: postType,
-      audience: audience,
-      contentGoal: contentGoal,
-      mood: mood,
-      hook: hook,
-      mainIdea: mainIdea,
+      opening: opening.isNotEmpty ? opening : mainIdea,
       problem: problem,
       lesson: lesson,
-      visualStyle: visualStyle,
-      imagePrompt: imagePrompt,
+      postFormat: _normalizePostType(postType),
+      strategy: [audience, contentGoal].where((s) => s.isNotEmpty).join(' — '),
       caption: caption,
-      cta: cta,
-      hashtags: hashtags,
-      comments: comments,
-      script: script,
-      bucket: bucket,
-      createdAt: DateTime.now(),
+      pinnedComment: cta.isNotEmpty ? cta : pinnedComment,
+      forApp: true,
+      storyDetail: script,
+      setting: visualStyle,
+      sceneDetail: sceneDetail,
+      dialogue: dialogue,
+      mess: mess,
+      innerThought: innerThought,
+      endingBeat: endingBeat,
+      defaultCast: const ['Ria', 'Rio', 'Cuty'],
+      keepMoralOffScreen: keepMoralOffScreen,
+      readyPrompt: imagePrompt,
     );
   }
 }
@@ -6451,4 +6894,22 @@ String _resolveBucket(String name) {
     return 'community';
   }
   return '';
+}
+
+/// Best-guess [kHookCategories] value for a pasted idea, from its bucket.
+/// Lets [ParsedPostPackage.toHookIdea] produce something sane without the
+/// caller having to pick a category by hand every time.
+String _categoryFromBucket(String bucket) {
+  switch (bucket) {
+    case 'challenge':
+    case 'humor':
+      return 'Funny';
+    case 'community':
+      return 'Series';
+    case 'activity':
+    case 'conversation':
+    case 'age_practice':
+    default:
+      return 'Learning Lesson';
+  }
 }
