@@ -174,7 +174,7 @@ Each full_prompt must include:
 - CAMERA (opening framing, movement, ending framing)
 - ACTION TIMELINE (0-4s, 4-8s, 8-10s)
 - DIALOGUE AND AUDIO in {{LANGUAGE}}
-- ON-SCREEN TEXT OVERLAYS (max 2 short lines, for sound-off viewing)
+- ON-SCREEN TEXT OVERLAYS are editor metadata only (on_screen_text field) — NOT rendered in video
 - CONTINUITY FROM PREVIOUS PART
 - CONTINUITY INTO NEXT PART
 - VISUAL STYLE

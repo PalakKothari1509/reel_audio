@@ -131,5 +131,39 @@ void main() {
       expect(rendered, contains(characterDescription('Mumma')));
       expect(rendered, contains('Use the supplied character descriptions as the authoritative references'));
     });
+
+    test('prohibits rendered text overlays in video frames', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Ria'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+      ));
+
+      // The prompt must tell Gemini that text overlays are editor metadata
+      // and must NOT be rendered in the video
+      expect(rendered, contains('must NOT'));
+      expect(rendered, contains('render text'));
+      expect(rendered, contains('on_screen_text field only'));
+      expect(rendered, contains('editor\'s'));
+      expect(rendered, contains('editor metadata'));
+    });
+
+    test('does not contain Instagram handle', () {
+      final rendered = renderVideoMasterPrompt(VideoPromptVariables(
+        storyTitle: 'Test',
+        storyIdea: 'Test',
+        realLifeProblem: 'Test',
+        learningOutcome: 'Test',
+        selectedCharacters: ['Ria'],
+        visualStyle: '3D',
+        overallTone: 'Playful',
+      ));
+
+      expect(rendered, isNot(contains('@funlearningwithpalak')));
+    });
   });
 }

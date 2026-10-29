@@ -102,6 +102,18 @@ void main() {
       expect(prompt, isNot(contains('On-Screen Text:\n  - 0s')));
       expect(prompt, contains('Editor Metadata'));
     });
+
+    test('prohibits rendered text overlays on video frames', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Test story',
+        characters: ['Ria'],
+        language: 'Hinglish',
+      );
+
+      // No text rendered in video frames — editor adds text post-generation
+      expect(prompt, contains('NO on-screen text of any kind'));
+      expect(prompt, contains('Text is added later in the editor'));
+    });
   });
 
   group('buildMasterReelPrompt with reference images', () {
@@ -394,6 +406,18 @@ void main() {
       expect(prompt, contains('choking hazards'));
     });
 
+    test('excludes brand handle from video prompt', () {
+      final prompt = buildGeminiVideoPrompt(
+        idea: 'Ria plays with toys',
+        totalSeconds: 30,
+        characters: ['Ria'],
+      );
+
+      // Instagram handle must NOT appear in video prompts
+      expect(prompt, isNot(contains('(@funlearningwithpalak)')));
+      expect(prompt, isNot(contains('@funlearningwithpalak')));
+    });
+
     test('includes SHAREABILITY section', () {
       final prompt = buildGeminiVideoPrompt(
         idea: 'Ria shares toys',
@@ -425,6 +449,38 @@ void main() {
 
       expect(prompt, contains('CHARACTER VOICE PATTERNS'));
       expect(prompt, contains('Ria:'));
+    });
+  });
+
+  group('buildMasterReelPrompt brand handle exclusion', () {
+    test('excludes brand handle from master reel video prompt', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria refuses to wear shoes',
+        characters: ['Ria', 'Mumma'],
+        language: 'Hinglish',
+      );
+
+      // Instagram handle must NOT appear in video prompts
+      expect(prompt, isNot(contains('(@funlearningwithpalak)')));
+      expect(prompt, isNot(contains('@funlearningwithpalak')));
+
+      // Brand name should still be present without handle
+      expect(prompt, contains('Fun Learning With Palak'));
+    });
+  });
+
+  group('buildMasterReelPrompt no-text overlay directive', () {
+    test('prohibits rendered text overlays', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns to share',
+        characters: ['Ria', 'Cuty'],
+        language: 'Hinglish',
+      );
+
+      expect(prompt, contains('NO on-screen text of any kind'));
+      expect(prompt, contains('Text is added later in the editor'));
+      expect(prompt, contains('editor metadata'));
+      expect(prompt, contains('do NOT render in video'));
     });
   });
 }

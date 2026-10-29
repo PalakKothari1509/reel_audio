@@ -89,14 +89,71 @@ void main() {
         final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
         expect(p3.promptText, contains('Moral:'),
             reason: '${h.id}: Part 3 missing Moral');
-        expect(p3.promptText, contains('Final text overlay'),
-            reason: '${h.id}: Part 3 missing Final text overlay');
+        expect(p3.textOverlay, isNotEmpty,
+            reason: '${h.id}: Part 3 textOverlay field is empty');
+        expect(p3.promptText, isNot(contains('Final text overlay')),
+            reason: '${h.id}: Part 3 promptText still contains Final text overlay');
         expect(p3.promptText, isNot(contains('\\')),
             reason: '${h.id}: Part 3 contains backslash artifact');
 
         expect(p3.purpose, contains('Resolut'),
             reason: '${h.id}: Part 3 purpose not "Resolution & Moral"');
       }
+    });
+
+    test('parseReadyPrompt: overlay text is extracted to textOverlay and stripped from promptText', () {
+      const readyPrompt = '''PROMPT: Foundation
+
+Part 3 (20-30s): Ria puts on shoes correctly. Mumma hugs. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Give children opportunities to practise independence.
+''';
+      final result = GeminiVideoResult.parseReadyPrompt(readyPrompt, 'Test');
+      final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+
+      // Overlay value is extracted into textOverlay
+      expect(p3.textOverlay, contains('LEARNING IS A HABIT'));
+      expect(p3.textOverlay, contains('SMALL WINS BIG HEARTS'));
+
+      // Overlay instruction is NOT in promptText
+      expect(p3.promptText, isNot(contains('Final text overlay')));
+      expect(p3.promptText, isNot(contains('LEARNING IS A HABIT')));
+
+      // Moral and scene description remain intact
+      expect(p3.promptText, contains('Moral:'));
+      expect(p3.promptText, contains('independence'));
+      expect(p3.promptText, contains('Ria puts on shoes'));
+    });
+
+    test('parseReadyPrompt: handles missing overlay gracefully', () {
+      const readyPrompt = '''PROMPT: Foundation
+
+Part 1 (0-10s): Hook introduction
+Part 2 (10-20s): Twist escalation
+Part 3 (20-30s): Resolution and Moral: Be kind to others.
+''';
+      final result = GeminiVideoResult.parseReadyPrompt(readyPrompt, 'Test');
+      final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+
+      // No overlay in source, textOverlay is empty
+      expect(p3.textOverlay, isEmpty);
+
+      // promptText still contains the moral
+      expect(p3.promptText, contains('Moral:'));
+    });
+
+    test('parseReadyPrompt: handles overlay at end of prompt without Moral', () {
+      const readyPrompt = '''PROMPT: Foundation
+
+Part 1 (0-10s): Hook introduction
+Part 2 (10-20s): Twist escalation
+Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
+''';
+      final result = GeminiVideoResult.parseReadyPrompt(readyPrompt, 'Test');
+      final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+
+      expect(p3.textOverlay, contains('BE KIND'));
+      expect(p3.promptText, isNot(contains('Final text overlay')));
+      expect(p3.promptText, isNot(contains('BE KIND')));
+      expect(p3.promptText, contains('Resolution.'));
     });
 
     test('parseReadyPrompt: repaired hooks retain apostrophes and quotes in Part 3', () {
@@ -114,6 +171,40 @@ void main() {
         for (final expected in entry.value) {
           expect(p3.promptText, contains(expected),
               reason: '${entry.key}: Part 3 missing "$expected"');
+        }
+      }
+    });
+
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 26 hooks', () {
+      final hooks = [
+        for (final h in [...kSafetyHooks, ...kDefaultHooks])
+          if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
+      ];
+      for (final h in hooks) {
+        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        final p3 = result.parts.firstWhere((p) => p.partNumber == 3);
+        expect(p3.textOverlay, isNotEmpty,
+            reason: '${h.id}: textOverlay should be populated');
+        expect(p3.textOverlay, isNot(contains('Final text overlay')),
+            reason: '${h.id}: textOverlay should not contain the label');
+        expect(p3.promptText, isNot(contains('Final text overlay')),
+            reason: '${h.id}: promptText should not contain overlay label');
+        expect(p3.promptText, isNot(contains('LEARNING IS A HABIT')),
+            reason: '${h.id}: promptText should not contain overlay value');
+      }
+    });
+
+    test('parseReadyPrompt: dialogue and scene content survives overlay extraction', () {
+      final hooks = [
+        for (final h in [...kSafetyHooks, ...kDefaultHooks])
+          if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
+      ];
+      for (final h in hooks) {
+        final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
+        for (final p in result.parts) {
+          // Dialogue and scene descriptions should remain
+          expect(p.promptText.trim(), isNotEmpty,
+              reason: '${h.id}: Part ${p.partNumber} promptText is empty after extraction');
         }
       }
     });

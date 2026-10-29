@@ -164,6 +164,11 @@ String _brandStyleBlock() =>
     'Audience: ${BrandDefaults.audience}\n'
     'Brand: ${BrandDefaults.name} (${BrandDefaults.handle})';
 
+String _videoBrandStyleBlock() =>
+    '$kMasterPrompt\n\nNEGATIVE INSTRUCTIONS: $kNegativeInstructions\n'
+    'Audience: ${BrandDefaults.audience}\n'
+    'Brand: ${BrandDefaults.name}';
+
 // ── Feature 2: Single image prompt ───────────────────────────────────────────
 
 class ImagePromptResult {
@@ -466,7 +471,23 @@ class GeminiVideoResult {
             : readyPrompt.trim().isNotEmpty
                 ? readyPrompt.trim()
                 : title,
-      ));
+         ));
+    }
+
+    // Extract "Final text overlay:" value into textOverlay field and strip
+    // the overlay instruction from promptText/fullPrompt so it is never
+    // accidentally passed as a rendering instruction to the video model.
+    for (var i = 0; i < parts.length; i++) {
+      final p = parts[i];
+      final (cleanPrompt, overlay) = _extractTextOverlay(p.promptText);
+      parts[i] = VideoPartPrompt(
+        partNumber: p.partNumber,
+        totalParts: p.totalParts,
+        promptText: cleanPrompt,
+        textOverlay: overlay,
+        purpose: p.purpose,
+        fullPrompt: cleanPrompt,
+      );
     }
 
     return GeminiVideoResult(
@@ -474,6 +495,34 @@ class GeminiVideoResult {
       storyFoundation: foundation.isNotEmpty ? foundation : title,
       parts: parts,
     );
+  }
+
+  static (String, String) _extractTextOverlay(String promptText) {
+    final lower = promptText.toLowerCase();
+    final marker = 'final text overlay:';
+    final idx = lower.indexOf(marker);
+    if (idx == -1) return (promptText.trim(), '');
+
+    final before = promptText.substring(0, idx).trim();
+    final after = promptText.substring(idx + marker.length).trim();
+
+    final moralIdx = after.toLowerCase().indexOf('moral:');
+    String overlay;
+    String suffix = '';
+
+    if (moralIdx != -1) {
+      overlay = after.substring(0, moralIdx).trim();
+      suffix = after.substring(moralIdx).trim();
+    } else {
+      overlay = after.trim();
+    }
+
+    if (overlay.endsWith('.')) {
+      overlay = overlay.substring(0, overlay.length - 1).trim();
+    }
+
+    final cleaned = suffix.isNotEmpty ? '$before $suffix' : before;
+    return (cleaned, overlay);
   }
 
   static bool _isPartHeader(String line, int part) {
@@ -523,7 +572,7 @@ TOTAL DURATION: ${totalSeconds}s ($parts parts × 10 seconds each)
 LANGUAGE: $language
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
 
-${_brandStyleBlock()}
+${_videoBrandStyleBlock()}
 
 CHARACTERS:
 $charBlock$voiceBlock
@@ -668,7 +717,7 @@ PART TO REGENERATE: Part $partNumber of $totalParts
 LANGUAGE: $language
 ${previousEndingState.trim().isEmpty ? '' : 'PREVIOUS PART ENDED WITH: $previousEndingState'}
 
-${_brandStyleBlock()}
+${_videoBrandStyleBlock()}
 
 CHARACTERS:
 $charBlock
@@ -1333,7 +1382,7 @@ TOTAL DURATION: ${totalSeconds}s ($parts parts × 10 seconds each)
 LANGUAGE: $language
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
 
-${_brandStyleBlock()}
+${_videoBrandStyleBlock()}
 
 CHARACTERS:
 $charBlock$voiceBlock
@@ -1448,7 +1497,7 @@ STORY IDEA: $idea
 LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
 
-${_brandStyleBlock()}
+${_videoBrandStyleBlock()}
 
 CHARACTER LOCK (do not deviate):
 $charBlock$voiceBlock
@@ -1492,7 +1541,7 @@ CONTINUITY:
   readable signs, logos or watermarks. Text is added later in the editor.
 - No closing card, moral, quote or summary at the end.
 - Audience: Indian moms and parents of children aged 1-4
-- Brand: Fun Learning With Palak (@funlearningwithpalak)
+- Brand: Fun Learning With Palak
 
 CLIP STRUCTURE (MANDATORY - FOLLOW EXACTLY):
 
