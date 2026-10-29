@@ -344,7 +344,7 @@ void main() {
   group('QualityGate.evaluateIdea', () {
     test('a fully approved idea with a specific share trigger passes', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApproved(),
         shareTrigger: ShareTrigger.filled(
@@ -690,7 +690,7 @@ void main() {
 
     test('the report round-trips through JSON', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApproved(),
         shareTrigger: ShareTrigger.filled(

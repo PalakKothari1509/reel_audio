@@ -615,31 +615,31 @@ void main() {
     });
   });
 
-  group('buildMasterReelPrompt h27 HookIdea data integrity', () {
-    late HookIdea h27;
+  group('buildMasterReelPrompt idea_76 HookIdea data integrity', () {
+    late HookIdea idea76;
 
     setUp(() {
-      h27 = buildDefaultHooks().firstWhere((h) => h.id == 'h27');
+      idea76 = buildDefaultHooks().firstWhere((h) => h.id == 'idea_76');
     });
 
-    test('h27 sceneDetail does not show child holding sparklers', () {
-      expect(h27.sceneDetail, isNot(contains('holding sparkler with Ria')));
-      expect(h27.sceneDetail, contains('safe distance'));
+    test('idea_76 sceneDetail does not show child holding sparklers', () {
+      expect(idea76.sceneDetail, isNot(contains('holding sparkler with Ria')));
+      expect(idea76.sceneDetail, contains('safe distance'));
     });
 
-    test('h27 mess does not involve sparks on curtains', () {
-      expect(h27.mess, isNot(contains('spark lands on a curtain')));
-      expect(h27.mess, isNot(contains('smolder')));
+    test('idea_76 mess does not involve sparks on curtains', () {
+      expect(idea76.mess, isNot(contains('spark lands on a curtain')));
+      expect(idea76.mess, isNot(contains('smolder')));
     });
 
-    test('h27 endingBeat does not show child holding sparkler', () {
-      expect(h27.endingBeat, isNot(contains('holding sparkler with Mumma')));
-      expect(h27.endingBeat, contains('lights sparklers at a safe distance'));
+    test('idea_76 endingBeat does not show child holding sparkler', () {
+      expect(idea76.endingBeat, isNot(contains('holding sparkler with Mumma')));
+      expect(idea76.endingBeat, contains('lights sparklers at a safe distance'));
     });
 
-    test('h27 detail states adult lights, child watches', () {
-      expect(h27.detail, contains('Adult lights'));
-      expect(h27.detail, contains('child watches from safe distance'));
+    test('idea_76 detail states adult lights, child watches', () {
+      expect(idea76.detail, contains('Adult lights'));
+      expect(idea76.detail, contains('child watches from safe distance'));
     });
   });
 }

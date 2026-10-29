@@ -6,7 +6,7 @@ void main() {
   group('ContentAuditItem', () {
     test('round-trips through JSON with all fields', () {
       final item = ContentAuditItem(
-        id: 'navratri-garba-ghar',
+        id: 'idea_41',
         title: 'Garba se Ghar Kaise Laayein?',
         pillar: ContentPillar.play,
         format: 'story_reel',
@@ -28,7 +28,7 @@ void main() {
       );
 
       final roundTrip = ContentAuditItem.fromJson(item.toJson());
-      expect(roundTrip.id, 'navratri-garba-ghar');
+      expect(roundTrip.id, 'idea_41');
       expect(roundTrip.title, 'Garba se Ghar Kaise Laayein?');
       expect(roundTrip.pillar, ContentPillar.play);
       expect(roundTrip.characters, ['Ria', 'Mumma', 'Papa']);

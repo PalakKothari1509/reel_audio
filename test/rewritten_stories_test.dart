@@ -5,9 +5,10 @@ import 'package:reel_audio/content_ideas.dart';
 /// IDs that originally had entries in kRewrittenStories.
 /// These stories should now be embedded directly in storyDetail.
 const kRewrittenStoryIds = {
-  'h01', 'h02', 'h03', 'h04', 'h05', 'h07', 'h08',
-  'h12', 'h13', 'h14', 'h15', 'h16', 'h17', 'h19',
-  'pal03', 'pal19',
+  'idea_1', 'idea_2', 'idea_3', 'idea_4', 'idea_5', 'idea_6',
+  'idea_7', 'idea_8', 'idea_9', 'idea_10', 'idea_11', 'idea_12',
+  'idea_13', 'idea_23', 'idea_32', 'idea_33', 'idea_34', 'idea_35',
+  'idea_36', 'idea_38',
 };
 
 void main() {

@@ -152,7 +152,9 @@ List<HealthCheckResult> checkHookHealth(HookIdea idea) {
 
   // 6. Safety hooks need review flag (checked via code comment in source)
   // This is a static check — safety hooks should have expert review before posting.
-  final isSafetyHook = idea.id.startsWith('safety-');
+  final isSafetyHook = idea.id == 'idea_1' || idea.id == 'idea_2' ||
+      idea.id == 'idea_3' || idea.id == 'idea_4' ||
+      idea.id == 'idea_5' || idea.id == 'idea_6';
   results.add(HealthCheckResult(
     name: 'Safety Review',
     passed: !isSafetyHook || idea.archived,

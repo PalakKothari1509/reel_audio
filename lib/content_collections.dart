@@ -35,59 +35,63 @@ final Map<String, IdeaCollection> kCollectionById = {
   for (final c in kCollections) c.id: c,
 };
 
-/// Members of each collection, excluding items handled by rules
-/// (robot prefix, navratri prefix, day15-day25 regex).
+/// Members of each collection.
+///
+/// Every built-in idea id (idea_1 through idea_116) is listed here so the
+/// collection is always resolvable without fragile prefix rules.
 const Map<String, List<String>> _members = {
-  'routines': [
-    'h01', 'h04', 'h05', 'h06', 'h07', 'h09', 'h12',
-    'pal06', 'pal07', 'pal09', 'pal12',
-    'missing-shoe-mystery',
+  'safety': [
+    'idea_1', 'idea_2', 'idea_3', 'idea_4', 'idea_5', 'idea_6',
   ],
-  'food': [
-    'h08', 'plate-patana',
-    'broken-biscuit-meltdown', 'the-snack-reach',
-    'day12-dinner-types',
-  ],
-  'tantrums': [
-    'h02', 'h03', 'h10', 'h11', 'h13', 'h15', 'h17',
-    'pal03', 'pal04', 'pal13', 'pal14', 'park-se-nikalna',
-  ],
-  'siblings': [
-    'h06', 'h14', 'pal18',
-    'toy-sharing', 'the-toy-car-share', 'the-block-tower',
+  'robot': [
+    'idea_59', 'idea_60', 'idea_61', 'idea_62', 'idea_63', 'idea_64',
+    'idea_65', 'idea_66', 'idea_67', 'idea_68', 'idea_69', 'idea_70',
+    'idea_71',
   ],
   'festivals': [
-    'h27', 'h28', 'h29', 'h30',
-    'navratri-garba-ghar', 'navratri-bachcha-roye',
+    'idea_41', 'idea_42', 'idea_43', 'idea_44', 'idea_45', 'idea_46',
+    'idea_47', 'idea_48', 'idea_49',
+    'idea_54',
+    'idea_76', 'idea_77', 'idea_78',
+  ],
+  'routines': [
+    'idea_7', 'idea_10', 'idea_11', 'idea_12', 'idea_18', 'idea_19',
+    'idea_23', 'idea_32', 'idea_57',
+  ],
+  'food': [
+    'idea_13', 'idea_50', 'idea_53', 'idea_58', 'idea_103',
+  ],
+  'tantrums': [
+    'idea_8', 'idea_9', 'idea_16', 'idea_24', 'idea_25', 'idea_30',
+    'idea_31', 'idea_34', 'idea_73',
+  ],
+  'siblings': [
+    'idea_29', 'idea_33', 'idea_51', 'idea_52',
   ],
   'parent': [
-    'h16', 'h19', 'h19b', 'h23', 'h24', 'h25', 'h26',
-    'h31', 'h32', 'h34', 'h35', 'h36', 'h38',
-    'pal01', 'pal02', 'pal05', 'pal08', 'pal11', 'pal15',
-    'pal16', 'pal19',
-    'dangerous-silence', 'asmr-cleaning-reel',
-    'day3-mumma-says', 'day7-toddler-math',
+    'idea_14', 'idea_15', 'idea_17', 'idea_20', 'idea_22', 'idea_26',
+    'idea_27', 'idea_35', 'idea_36', 'idea_38', 'idea_55', 'idea_56',
+    'idea_72', 'idea_74', 'idea_75', 'idea_79', 'idea_80', 'idea_82',
+    'idea_83', 'idea_84', 'idea_86', 'idea_89', 'idea_90', 'idea_91',
+    'idea_92', 'idea_94', 'idea_98',
   ],
   'warm': [
-    'h18', 'h20', 'h21',
-    'pal10', 'pal17', 'pal20',
-    'h33', 'h37', 'h39', 'h40',
+    'idea_21', 'idea_28', 'idea_37', 'idea_39', 'idea_40', 'idea_81',
+    'idea_85', 'idea_87', 'idea_88',
   ],
   'play': [
-    'day2-which-doesnt-belong', 'day4-kitchen-challenge',
-    'day8-find-cuty', 'day9-sock-hunt', 'day13-pattern-game',
+    'idea_93', 'idea_95', 'idea_99', 'idea_100', 'idea_104',
   ],
   'guides': [
-    'day5-ask-tonight', 'day6-3year-skills',
-    'day10-3-questions', 'day11-4year-skills',
+    'idea_96', 'idea_97', 'idea_101', 'idea_102',
+  ],
+  'missions': [
+    'idea_106', 'idea_107', 'idea_108', 'idea_109', 'idea_110',
+    'idea_111', 'idea_112', 'idea_113', 'idea_114', 'idea_115',
+    'idea_116',
   ],
   'milestones': [
-    'p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'p07', 'p08',
-    'day14-favorite-format',
-  ],
-  'safety': [
-    'safety-good-touch', 'safety-stranger', 'safety-road',
-    'safety-emergency-number', 'safety-lost-crowd', 'safety-kitchen-line',
+    'idea_105',
   ],
 };
 
@@ -101,18 +105,10 @@ final Map<String, String> _collectionById = {
 ///
 /// Rules:
 /// 1. Custom ideas (added by user) → 'mine'
-/// 2. Robot series → 'robot'
-/// 3. Navratri posts + Annual Day night → 'festivals'
-/// 4. Day 15–25 posts → 'missions'
-/// 5. Anything in [_members] → its mapped collection
-/// 6. Everything else → 'mine' (so it is never lost)
+/// 2. Anything in [_members] → its mapped collection
+/// 3. Everything else → 'mine' (so it is never lost)
 String collectionOf(String id, {bool custom = false}) {
   if (custom) return 'mine';
-  if (id.startsWith('robot-')) return 'robot';
-  if (id.startsWith('navratri-') || id == 'night-before-annual-day') {
-    return 'festivals';
-  }
-  if (RegExp(r'^day(1[5-9]|2[0-5])-').hasMatch(id)) return 'missions';
   return _collectionById[id] ?? 'mine';
 }
 

@@ -77,7 +77,7 @@ void main() {
       );
 
       gateReport = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApproved,
         voiceMode: VoiceMode.required,
@@ -116,7 +116,7 @@ void main() {
       final svc = AiContentServiceImpl(mockProvider);
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: gateReport,
       ));
@@ -215,7 +215,7 @@ void main() {
       final svc = AiContentServiceImpl(mockProvider);
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: gateReport,
         audience: 'Parents of 1-4 year olds',
@@ -229,7 +229,7 @@ void main() {
 
       // Gate report is attached
       expect(pkg.gateReport, isNotNull);
-      expect(pkg.gateReport!.ideaId, 'day9-sock-hunt');
+      expect(pkg.gateReport!.ideaId, 'idea_100');
 
       // Voice mode is inherited
       expect(pkg.voiceMode, VoiceMode.required);
@@ -260,7 +260,7 @@ void main() {
       final svc = AiContentServiceImpl(mockProvider);
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: gateReport,
       ));
@@ -273,7 +273,7 @@ void main() {
       );
 
       expect(input.package.id, pkg.id);
-      expect(input.package.ideaId, 'day9-sock-hunt');
+      expect(input.package.ideaId, 'idea_100');
       expect(input.package.narration, isNotEmpty);
       expect(input.package.hook, 'Where did the socks go?');
     });

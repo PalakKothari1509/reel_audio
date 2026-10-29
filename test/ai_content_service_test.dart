@@ -61,7 +61,7 @@ void main() {
 
     GateReport passingReport() {
       return QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApproved(),
         voiceMode: VoiceMode.required,
@@ -109,12 +109,12 @@ void main() {
       final report = passingReport();
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: report,
       ));
 
-      expect(pkg.ideaId, 'day9-sock-hunt');
+      expect(pkg.ideaId, 'idea_100');
       expect(pkg.isReadyToGenerate, isTrue);
       expect(pkg.canGenerate, isTrue);
       expect(pkg.narration, 'Where are your socks?');
@@ -211,7 +211,7 @@ void main() {
 
       expect(
         () => svc.generate(GenerationRequest(
-          ideaId: 'day9-sock-hunt',
+          ideaId: 'idea_100',
           title: 'The Sock Hunt',
           gateReport: report,
         )),
@@ -224,7 +224,7 @@ void main() {
       final report = passingReport();
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: report,
       ));
@@ -253,7 +253,7 @@ void main() {
       final report = passingReport();
 
       final pkg = await svc.generate(GenerationRequest(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         gateReport: report,
         audience: 'Parents of 1-4',
@@ -263,7 +263,7 @@ void main() {
       final json = pkg.toJson();
       final restored = ContentPackageV2.fromJson(json);
 
-      expect(restored.ideaId, 'day9-sock-hunt');
+      expect(restored.ideaId, 'idea_100');
       expect(restored.narration, 'Where are your socks?');
       expect(restored.dialogue, 'Cuty: I hid them!');
       expect(restored.gateReport, isNotNull);

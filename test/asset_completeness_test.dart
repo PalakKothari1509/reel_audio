@@ -29,8 +29,8 @@ void main() {
     });
 
     test('checkContentId returns all false when no assets exist', () async {
-      final result = await AssetCompletenessService.checkContentId('h01');
-      expect(result.contentId, 'h01');
+      final result = await AssetCompletenessService.checkContentId('idea_1');
+      expect(result.contentId, 'idea_1');
       expect(result.hasScript, isFalse);
       expect(result.hasVideoPrompt, isFalse);
       expect(result.hasVideoAsset, isFalse);

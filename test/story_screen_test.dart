@@ -61,7 +61,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: StoryScreen(ideaId: 'h01'),
+          home: StoryScreen(ideaId: 'idea_7'),
         ),
       );
 
@@ -84,7 +84,7 @@ void main() {
     testWidgets('shows status message after loading idea', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: StoryScreen(ideaId: 'h01'),
+          home: StoryScreen(ideaId: 'idea_7'),
         ),
       );
 
@@ -102,7 +102,7 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: StoryScreen(ideaId: 'h99'),
+          home: StoryScreen(ideaId: 'idea_999'),
         ),
       );
 
@@ -110,7 +110,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(seconds: 1));
 
-      // h99 is not a real idea — the screen should not crash and should
+      // idea_999 is not a real idea — the screen should not crash and should
       // show an empty text field.
       expect(tester.takeException(), isNull);
     });

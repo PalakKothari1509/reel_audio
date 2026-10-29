@@ -130,7 +130,7 @@ void main() {
 
     test('fromGateReport creates a package with the gate report attached', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApprovedSnapshot(),
         shareTrigger: ShareTrigger.filled(
@@ -145,13 +145,13 @@ void main() {
 
       final pkg = ContentPackageV2Factory.fromGateReport(
         id: 'pkg-1',
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         report: report,
         hook: 'The Sock Hunt',
       );
 
       expect(pkg.gateReport, isNotNull);
-      expect(pkg.gateReport!.ideaId, 'day9-sock-hunt');
+      expect(pkg.gateReport!.ideaId, 'idea_100');
       expect(pkg.canGenerate, isTrue);
       expect(pkg.isReadyToGenerate, isTrue);
       expect(pkg.isBlockedByGate, isFalse);
@@ -160,7 +160,7 @@ void main() {
 
     test('a PASS package is ready and not blocked', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApprovedSnapshot(),
         shareTrigger: ShareTrigger.filled(
@@ -175,7 +175,7 @@ void main() {
 
       final pkg = ContentPackageV2Factory.fromGateReport(
         id: 'pkg-1',
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         report: report,
       );
 
@@ -307,7 +307,7 @@ void main() {
 
     test('full package round-trips through JSON with gate report', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApprovedSnapshot(),
         shareTrigger: ShareTrigger.filled(
@@ -322,7 +322,7 @@ void main() {
 
       final pkg = ContentPackageV2Factory.fromGateReport(
         id: 'pkg-6',
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         report: report,
       );
 
@@ -330,16 +330,16 @@ void main() {
       final restored = ContentPackageV2.fromJson(json);
 
       expect(restored.id, 'pkg-6');
-      expect(restored.ideaId, 'day9-sock-hunt');
+      expect(restored.ideaId, 'idea_100');
       expect(restored.gateReport, isNotNull);
-      expect(restored.gateReport!.ideaId, 'day9-sock-hunt');
+      expect(restored.gateReport!.ideaId, 'idea_100');
       expect(restored.canGenerate, isTrue);
       expect(restored.isReadyToGenerate, isTrue);
     });
 
     test('multiple packages share ideaId but have unique ids and snapshots', () {
       final report = QualityGate.evaluateIdea(
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         title: 'The Sock Hunt',
         classification: fullyApprovedSnapshot(),
         shareTrigger: ShareTrigger.filled(
@@ -354,7 +354,7 @@ void main() {
 
       final pkgA = ContentPackageV2Factory.fromGateReport(
         id: 'pkg-A',
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         report: report,
         hook: 'Sock refusal',
         narration: 'Where are your socks?',
@@ -363,7 +363,7 @@ void main() {
 
       final pkgB = ContentPackageV2Factory.fromGateReport(
         id: 'pkg-B',
-        ideaId: 'day9-sock-hunt',
+        ideaId: 'idea_100',
         report: report,
         hook: 'Sock victory',
         narration: 'Found them!',
@@ -379,7 +379,7 @@ void main() {
       final json = pkgB.toJson();
       final restored = ContentPackageV2.fromJson(json);
       expect(restored.id, 'pkg-B');
-      expect(restored.ideaId, 'day9-sock-hunt');
+      expect(restored.ideaId, 'idea_100');
       expect(restored.narration, 'Found them!');
       expect(restored.dialogue, 'Cuty: Here they are!');
     });

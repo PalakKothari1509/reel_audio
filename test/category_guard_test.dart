@@ -66,13 +66,13 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 60 prompts produce 3 valid parts with intact Part 3', () {
+    test('parseReadyPrompt: all 97 prompts produce 3 valid parts with intact Part 3', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 60,
-          reason: 'Expected exactly 60 populated readyPrompt entries');
+      expect(hooks.length, 97,
+          reason: 'Expected exactly 97 populated readyPrompt entries');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
@@ -158,10 +158,10 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
 
     test('parseReadyPrompt: repaired hooks retain apostrophes and quotes in Part 3', () {
       final checks = <String, List<String>>{
-        'pal01': ["Cuty yawns in Mumma's arms. \"Ria, Rio ya Cuty"],
-        'pal05': ["around Ria's shoulders, both half-asleep by page three"],
-        'pal14': ["Ria's tears turn to giggles as they draw"],
-        'pal18': ["Bow back in Ria's hair", "Sock on Ria's foot"],
+        'idea_12': ['"Shining smile!"', 'Cuty sits proudly on the counter'],
+        'idea_17': ["around Ria's shoulders", "both half-asleep by page three"],
+        'idea_25': ["Ria's tears turn to giggles as they draw"],
+        'idea_29': ["Bow back in Ria's hair", "Sock on Ria's foot"],
       };
 
       for (final entry in checks.entries) {
@@ -175,7 +175,7 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
       }
     });
 
-    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 60 hooks', () {
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 97 hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
@@ -305,10 +305,10 @@ Part 3 (20-30s): Content 3
       // Verify that hooks which originally had moment upgrades have
       // their setting/sceneDetail/dialogue/mess/innerThought/endingBeat populated.
       for (final h in kDefaultHooksWithRewrite) {
-        // Hooks that had moment upgrades should have non-empty moment fields.
-        // Safety hooks and main hooks all received moment upgrades, so they
-        // should have these fields populated.
-        if (h.category == 'Safety' || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+      // Hooks that had moment upgrades should have non-empty moment fields.
+      // Safety hooks and main hooks all received moment upgrades, so they
+      // should have these fields populated.
+      if (h.category == 'Safety' || h.id.startsWith('idea_')) {
           expect(h.setting, isNotEmpty, reason: '${h.id} has empty setting');
           expect(h.sceneDetail, isNotEmpty, reason: '${h.id} has empty sceneDetail');
           expect(h.dialogue, isNotEmpty, reason: '${h.id} has empty dialogue');
@@ -349,7 +349,7 @@ Part 3 (20-30s): Content 3
       // Verify that hooks which originally had moment upgrades don't have
       // more than 3 cast members
       for (final h in kDefaultHooksWithRewrite) {
-        if (h.id.startsWith('safety-') || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+        if (h.category == 'Safety' || h.id.startsWith('idea_')) {
           expect(h.defaultCast.length, lessThanOrEqualTo(3),
               reason: '${h.id} has more than 3 cast members: ${h.defaultCast}');
         }
@@ -358,7 +358,7 @@ Part 3 (20-30s): Content 3
 
     test('kDefaultHooksWithRewrite: endingBeat is non-empty for hooks with moments', () {
       for (final h in kDefaultHooksWithRewrite) {
-        if (h.id.startsWith('safety-') || h.id.startsWith('h') || h.id.startsWith('pal') || h.id.startsWith('robot')) {
+        if (h.category == 'Safety' || h.id.startsWith('idea_')) {
           expect(h.endingBeat, isNotEmpty,
               reason: '${h.id} has empty endingBeat');
         }
@@ -367,9 +367,9 @@ Part 3 (20-30s): Content 3
 
     test('New readyPrompt entries: each has 3 parts with Moral and Final text overlay', () {
       final newIds = [
-        'h06', 'pal10', 'pal12', 'h10', 'h11', 'h12', 'h13', 'h14', 'h15',
-        'h16', 'h17', 'h18', 'h20', 'h21', 'p05', 'h23', 'h24', 'h25', 'h26',
-        'park-se-nikalna',
+        'idea_11', 'idea_21', 'idea_23', 'idea_30', 'idea_31', 'idea_32',
+        'idea_33', 'idea_34', 'idea_35', 'idea_36', 'idea_37', 'idea_39',
+        'idea_40', 'idea_72', 'idea_73', 'idea_74', 'idea_75',
       ];
       for (final id in newIds) {
         final h = kDefaultHooks.firstWhere((e) => e.id == id, orElse: () =>
@@ -403,21 +403,19 @@ Part 3 (20-30s): Content 3
 
     test('New readyPrompt entries: correct characters mentioned', () {
       final characterChecks = {
-        'h06': ['Ria', 'Rio', 'Mumma'],
-        'pal12': ['Cuty', 'Mumma'],
-        'h10': ['Rio', 'Mumma'],
-        'h11': ['Ria', 'Mumma'],
-        'h12': ['Ria', 'Mumma'],
-        'h13': ['Ria', 'Cuty'],
-        'h14': ['Ria', 'Rio', 'Mumma'],
-        'h15': ['Rio', 'Mumma'],
-        'h16': ['Robot', 'Papa'],
-        'h17': ['Ria', 'Mumma'],
-        'h18': ['Rio', 'Mumma', 'Papa'],
-        'h20': ['Rio', 'Mumma'],
-        'h21': ['Ria', 'Mumma'],
-        'h23': ['Rio', 'Mumma', 'Papa'],
-        'p05': ['Ria', 'Rio', 'Cuty'],
+        'idea_11': ['Ria', 'Rio', 'Mumma'],
+        'idea_23': ['Cuty', 'Mumma'],
+        'idea_30': ['Rio', 'Mumma'],
+        'idea_31': ['Ria', 'Mumma'],
+        'idea_32': ['Ria', 'Mumma'],
+        'idea_33': ['Ria', 'Rio', 'Mumma'],
+        'idea_34': ['Rio', 'Mumma'],
+        'idea_35': ['Robot', 'Papa'],
+        'idea_36': ['Ria', 'Mumma'],
+        'idea_37': ['Rio', 'Mumma', 'Papa'],
+        'idea_39': ['Rio', 'Mumma'],
+        'idea_40': ['Ria', 'Mumma'],
+        'idea_74': ['Rio', 'Mumma', 'Papa'],
       };
       for (final entry in characterChecks.entries) {
         final h = kDefaultHooks.firstWhere((e) => e.id == entry.key);
@@ -429,7 +427,7 @@ Part 3 (20-30s): Content 3
     });
 
     test('asmr-cleaning-reel: safety regression - no child sitting in paste', () {
-      final h = kDefaultHooks.firstWhere((e) => e.id == 'asmr-cleaning-reel');
+      final h = kDefaultHooks.firstWhere((e) => e.id == 'idea_55');;
       final combined = '${h.storyDetail} ${h.sceneDetail} ${h.mess} ${h.endingBeat}';
       expect(combined, isNot(contains('sitting in')),
           reason: 'Child should not be described as sitting in paste');
@@ -448,7 +446,8 @@ Part 3 (20-30s): Content 3
 }
 
 const kRewrittenStoryIds = {
-  'h01', 'h02', 'h03', 'h04', 'h05', 'h07', 'h08',
-  'h12', 'h13', 'h14', 'h15', 'h16', 'h17', 'h19', 'h19b',
-  'pal03', 'pal19',
+  'idea_1', 'idea_2', 'idea_3', 'idea_4', 'idea_5', 'idea_6',
+  'idea_7', 'idea_8', 'idea_9', 'idea_10', 'idea_11', 'idea_12',
+  'idea_13', 'idea_23', 'idea_32', 'idea_33', 'idea_34', 'idea_35',
+  'idea_36', 'idea_38',
 };

@@ -1043,7 +1043,7 @@ class ReadyCheck {
 /// ── Usage ────────────────────────────────────────────────────────────────
 ///
 ///   final report = QualityGate.evaluateIdea(
-///     ideaId: 'day9-sock-hunt',
+///     ideaId: 'idea_100',
 ///     title: 'The Sock Hunt',
 ///     classification: snapshot,
 ///   );
