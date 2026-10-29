@@ -3581,10 +3581,21 @@ Moral: Toddler help is often just mess with better intentions — guide gently, 
     quote: '',
     detail: '',
     punchline: '',
-    readyPrompt: '',
+    readyPrompt: '''PROMPT: A warm, soft 3D Pixar-style kitchen (cream walls, wooden countertops, natural window light) at toddler scale. Vertical 9:16, 30 seconds total. Characters: Ria (3-year-old girl, pink star dress, pigtails with two pink bows, curious eyes), Mumma (yellow kurta, gentle smile). ASMR-style sound design: atta rustling, water pouring, soft cloth swishing.
+
+On-Screen Text: [0-3s] "MUMMA, MAIN MADAD KAR SAKTI HOON!" [4-7s] "AAG LAGI THI!" [8-11s] "PAANI DAAL DIYA!" [12-15s] "DRY BRUSH PEHLE" [16-19s] "PHIR DAMP CLOTH" [20-23s] "SAATH MILKE SAAF" [24-27s] "MUMMA KA GUIDANCE ❤️" [28-30s] "LEARNING IS A HABIT"
+
+Part 1 (0-10s): 3D Pixar style, 9:16. Ria reaches for the rolling pin. Atta spills across the counter and floor. Ria's eyes light up — she wants to help. She grabs a dry dish brush and starts sweeping. Text: "MUMMA, MAIN MADAD KAR SAKTI HOON!" "AAG LAGI THI!"
+
+Part 2 (10-20s): 3D Pixar style, 9:16. Ria reaches for the water mug to make sweeping easier. *plop* — water hits the dry atta. It turns into a sticky paste. Flour splatters onto her hands and dress. The squelch at 0:16 is the payoff. Text: "PAANI DAAL DIYA!" "DRY BRUSH PEHLE" "PHIR DAMP CLOTH".
+
+Audio/Dialogue (Hinglish): Ria: "Atta ghir gaya! Main saaf karoongi!" *splat* "Yay! Paani daal diya!" Mumma: *soft laugh* "Beta, thoda mushkil ho gaya!"
+
+Part 3 (20-30s): 3D Pixar style, 9:16. Mumma kneels, not scolding — laughing. She takes Ria's flour-covered hands: "Pehle dry brush, phir damp cloth." Together they clean: brush sweeps dry bits, then damp cloth glides over the sticky spots. The counter shines. Ria beams, matching her star dress. Text: "SAATH MILKE SAAF" "MUMMA KA GUIDANCE ❤️". Final text overlay: Toddler help is just mess with better intentions, guide gently don't shame, LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Toddler help is often just mess with better intentions — guide gently, don't shame.
+''',
   ),
 
-HookIdea(
+  HookIdea(
     id: 'dangerous-silence',
     category: 'Relatable',
     cover: 'Ghar Mein 2 Minute Ki Shanti... DANGER!',

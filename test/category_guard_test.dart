@@ -66,13 +66,13 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 59 prompts produce 3 valid parts with intact Part 3', () {
+    test('parseReadyPrompt: all 60 prompts produce 3 valid parts with intact Part 3', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 59,
-          reason: 'Expected exactly 59 populated readyPrompt entries');
+      expect(hooks.length, 60,
+          reason: 'Expected exactly 60 populated readyPrompt entries');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
@@ -175,7 +175,7 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
       }
     });
 
-    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 59 hooks', () {
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 60 hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,
@@ -395,8 +395,11 @@ Part 3 (20-30s): Content 3
             reason: '$id: Part 3 textOverlay empty after parse');
         expect(p3.textOverlay, contains('LEARNING IS A HABIT'),
             reason: '$id: textOverlay should contain standard footer');
+        expect(p3.textOverlay, isNot(contains('Moral:')),
+            reason: '$id: textOverlay should not contain Moral');
       }
     });
+
 
     test('New readyPrompt entries: correct characters mentioned', () {
       final characterChecks = {
