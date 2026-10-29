@@ -28,12 +28,13 @@ Key APIs:
 
 ### 2. Ideas (source: `lib/content_ideas.dart`)
 - `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`, `setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`, `quote`, `detail`, `punchline`, `readyPrompt`
-- `kDefaultHooks` — 94 built-in ideas including 6 safety hooks (spread in via `...kSafetyHooks`)
-- `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline)
-- `kSafetyHooks` — 6 Kids Safety ideas (safety-good-touch, safety-stranger, safety-road, safety-emergency-number, safety-lost-crowd, safety-kitchen-line)
+- `kDefaultHooks` — 116 built-in ideas using the `idea_N` scheme (`idea_1` through `idea_116`)
+- 6 safety hooks (`idea_1`–`idea_6`) are spread in via `...kSafetyHooks`
+- `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline in `storyDetail`)
+- `kSafetyHooks` — 6 Kids Safety ideas (idea_1 through idea_6)
 - Categories in `kHookCategories`: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`
-- `readyPrompt` field contains pre-built viral prompts for select hooks (h01, h02, h05, pal03, pal05, pal16, and h27-h40)
-- `kRewrittenStories` and `kMomentUpgrades` were merged into inline `storyDetail` field (no longer separate maps)
+- `readyPrompt` field contains pre-built viral prompts for all 97 hooks that have them (all 94 in `kDefaultHooks` + safety hooks combined)
+- `kRewrittenStories` and `kMomentUpgrades` were merged into inline `storyDetail` fields (no longer separate maps)
 
 ### 3. Content Collections (source: `lib/content_collections.dart`)
 - 14 thematic collections for browsing: Ria & Robot, Festivals & Events, Morning & Bedtime Routines, Food & Mealtime, Tantrums & Big Feelings, Siblings & Sharing, Parent Moments, Warm Lessons, Play & Learning, Parent Guides, 7 Missions Week, Milestones & Community, Kids Safety, My Ideas
@@ -177,11 +178,12 @@ The app is organized into six connected modules for managing content from idea t
 - **Service**: `AssetCompletenessService` — `checkContentId()`, `checkAll()`, `getMissing()`
 - **Features**: Identifies which content items are missing assets; drives the Ready-to-Post checklist on the Dashboard
 
-### Module 8: Dashboard & UI Screens
-- **File**: `lib/dashboard_screen.dart` — Added Ready-to-Post checklist showing ready items and items needing attention
+### 8. Dashboard & UI Screens
+- **File**: `lib/dashboard_screen.dart` — Ready-to-Post checklist showing ready items and items needing attention
+- **File**: `lib/home_screen.dart` — `ContentStudioHome`, the live app home with nav cards for Create Content, Add New Idea, Content Library, Image Prompt, Carousel Prompts, Gemini Video, Offline Story, Promotion Comments, Review All Ideas, and Settings
 - **File**: `lib/prompt_vault_screen.dart` — UI for browsing, searching, filtering, copying, and deleting saved prompts
 - **File**: `lib/video_library_screen.dart` — UI for listing, uploading, previewing videos; status management (quality check, approve, mark posted)
-   - **File**: `lib/home_screen.dart` — Added nav cards for Content Library, Add New Idea, Prompt Vault, Video Library, and Settings
+- **File**: `lib/quick_content.dart` — `PromoCommentVaultScreen` for promotion comment management
 
 ## Key design decisions
 
@@ -198,7 +200,7 @@ The app is organized into six connected modules for managing content from idea t
 11. **Version history** — Prompts and videos retain version history; new versions don't overwrite old ones
 12. **Quality checks with severity** — Critical/Major/Minor/Suggestion severity levels; reports tied to asset version
 13. **Content-level tracking** — `QualityReport2` has both `contentId` and `assetId` for flexible querying; `AssetCompletenessService` aggregates across all stores
-14. **Navigation hub** — Home screen has nav cards for Content Library, Add New Idea, Prompt Vault, Video Library, and Settings
+14. **Navigation hub** — `ContentStudioHome` (in `lib/home_screen.dart`) is the live app home with nav cards for Create Content, Content Library, Add New Idea, Image Prompt, Carousel Prompts, Gemini Video, Offline Story Generator, Promotion Comments, Review All Ideas, and Settings
 
 ## Key files to modify
 - `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kHookCategories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite — alias to kDefaultHooks)

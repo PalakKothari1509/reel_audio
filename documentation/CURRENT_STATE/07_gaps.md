@@ -24,12 +24,12 @@ Both are documented with reachability = unreachable.
 
 ## Reachability of the Quick Content Studio cluster
 `QuickContentScreen`, `CarouselMakerScreen`, `SingleImageScreen`, `TrialReelScreen`,
-`MultiFormatScreen`, `IdeaInboxScreen`, `QualityCheckScreen`, `PromoCommentVaultScreen`,
-`PostingPackScreen`, and `ShotPlannerScreen` live in `quick_content.dart` / standalone files
-and are **not wired to ContentStudioHome** (none appear in main.dart or home_screen.dart).
-They form a parallel "quick content" surface; `PostingPackScreen` and `ShotPlannerScreen`
-are referenced only by comments / same-cluster code. Document each as reachable only within
-its own cluster (effectively unreachable from the live app shell today).
+`MultiFormatScreen`, `IdeaInboxScreen`, `QualityCheckScreen`, `PostingPackScreen`, and
+`ShotPlannerScreen` live in `quick_content.dart` / standalone files and are **not wired to ContentStudioHome**
+(none appear in main.dart or home_screen.dart). They form a parallel "quick content" surface;
+`PostingPackScreen` and `ShotPlannerScreen` are referenced only by comments / same-cluster code.
+Document each as reachable only within its own cluster (effectively unreachable from the live app shell today).
+`PromoCommentVaultScreen` IS now wired via `onPromoComments` in ContentStudioHome.
 
 ## ContentStudioScreens cluster — reachable
 `ImagePromptScreen`, `CarouselPromptsScreen`, `GeminiVideoScreen` ARE wired (main.dart

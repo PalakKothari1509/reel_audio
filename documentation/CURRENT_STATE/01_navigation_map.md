@@ -29,6 +29,7 @@ AppBar `Settings` → SettingsScreen
 - (conditional) "Carousel Generation" → CarouselPromptsScreen
 - (conditional) "Gemini Story Video" → GeminiVideoScreen
 - (conditional) "Offline Story Generator" → OfflineStoryMakerScreen
+- (conditional) "Promotion Comments" → PromoCommentVaultScreen
 
 ### StoryScreen (lib/main.dart) — main reel writer, app entry point for creating
 AppBar: `New story` (reset), `Plan` → PlanScreen, `Saved stories` → SavedStoriesScreen, `Add voice to a video I already have` → HomeScreen

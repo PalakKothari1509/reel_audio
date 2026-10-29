@@ -26,7 +26,7 @@ flutter run
 ## Tests
 ```bash
 flutter test
-# Currently 426 tests passing
+# Currently 665 tests passing
 ```
 
 ## Project structure

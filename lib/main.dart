@@ -48,6 +48,7 @@ import 'content_ideas.dart';
 import 'add_idea_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
+import 'quick_content.dart';
 
 /// Android side of saving a finished reel.
 /// because saving a video has nothing to do with speech.
@@ -545,6 +546,12 @@ Future<void> main() async {
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(
             builder: (_) => OfflineStoryMakerScreen(),
+          ),
+        ),
+        onPromoComments: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => const PromoCommentVaultScreen(),
           ),
         ),
       ),

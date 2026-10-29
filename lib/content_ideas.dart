@@ -15,6 +15,7 @@
 // folding them into 'conversation' would have quietly changed what they were about.
 
 import 'brand_system.dart';
+import 'models/quick_idea.dart';
 
 // -- Buckets ---------------------------------------------------------------------
 //
@@ -6618,6 +6619,11 @@ Outro: "Which mission will you repeat this week? Comment below!"
 
 /// Combined hooks list with safety hooks appended.
 final kDefaultHooks = buildDefaultHooks();
+
+/// The 6 built-in Kids Safety hooks (idea_1 through idea_6).
+/// Spread into [kDefaultHooks] via the build function; also exposed separately
+/// so tests and the safety-specific logic can reference them directly.
+final kSafetyHooks = kDefaultHooks.where((h) => h.category == 'Safety').toList();
 
 /// Built-in hooks with all rewrites and moments applied.
 /// Since [kRewrittenStories] and [kMomentUpgrades] have been merged

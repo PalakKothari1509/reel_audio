@@ -27,6 +27,7 @@ class ContentStudioHome extends StatefulWidget {
 
   /// Optional offline story generator.
   final NavCallback? onOfflineStory;
+  final NavCallback? onPromoComments;
 
   const ContentStudioHome({
     super.key,
@@ -40,6 +41,7 @@ class ContentStudioHome extends StatefulWidget {
     this.onCarouselPrompts,
     this.onGeminiVideo,
     this.onOfflineStory,
+    this.onPromoComments,
   });
 
   @override
@@ -126,6 +128,19 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         onTap: widget.onContentLibrary,
       ),
     ];
+
+    if (widget.onPromoComments != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.forum_outlined,
+          iconColor: AppColors.primary,
+          title: 'Promotion Comments',
+          subtitle: 'Copy and organize reusable profile replies',
+          onTap: widget.onPromoComments!,
+        ),
+      ]);
+    }
 
     if (widget.onReviewAllIdeas != null) {
       goToActions.addAll([

@@ -210,6 +210,7 @@ From `home_screen.dart:13`:
 | `onCarouselPrompts` | Optional, wired → CarouselPromptsScreen | ✓ |
 | `onGeminiVideo` | Optional, wired → GeminiVideoScreen | ✓ |
 | `onOfflineStory` | Optional, wired → OfflineStoryMakerScreen | ✓ |
+| `onPromoComments` | Optional, wired → PromoCommentVaultScreen | ✓ |
 
 ### Dead/unreachable navigation targets
 | Screen | File | Status |
@@ -218,7 +219,7 @@ From `home_screen.dart:13`:
 | `DashboardScreen` | `dashboard_screen.dart` | Not pushed from main.dart or home_screen.dart |
 | `CaptionGeneratorScreen` | `caption_generator.dart` | No Navigator.push calls from any screen |
 | `StoryGeneratorScreen` | `story_generator_offline.dart` | Not imported from main.dart or home_screen.dart |
-| `QuickContentScreen` + 8 siblings | `quick_content.dart` | Not wired from ContentStudioHome |
+| `QuickContentScreen` + 8 siblings | `quick_content.dart` | Not wired from ContentStudioHome (except PromoCommentVaultScreen now wired) |
 | `VideoLibraryScreen` | (deleted) | Dead per prior audit |
 | `InsightsScreen` | (deleted) | Dead per prior audit |
 
@@ -229,7 +230,7 @@ From `home_screen.dart:13`:
 | File | Lines | Status |
 |------|-------|--------|
 | `bucket_group.dart` | 43 | Unused widget group |
-| `creator_home.dart` | 190 | Test-only |
+| `creator_home.dart` | 189 | Test-only (dead in prod) |
 | `caption_generator.dart` | 545 | Has `CaptionGeneratorScreen` (dead) + caption generation logic (may be used) |
 
 ---

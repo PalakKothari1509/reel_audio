@@ -72,7 +72,7 @@ void main() {
     testWidgets('optionally shows Add New Idea and legacy create cards', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: ContentStudioHome(
+          home:       ContentStudioHome(
             onCreateReel: (_) => {},
             onSettings: () {},
             onContentLibrary: () {},
@@ -80,6 +80,7 @@ void main() {
             onImagePrompt: () {},
             onCarouselPrompts: () {},
             onGeminiVideo: () {},
+            onPromoComments: () {},
           ),
         ),
       );
@@ -89,6 +90,7 @@ void main() {
       expect(find.text('Image Generation Prompt'), findsOneWidget);
       expect(find.text('Carousel Generation'), findsOneWidget);
       expect(find.text('Gemini Story Video'), findsOneWidget);
+      expect(find.text('Promotion Comments'), findsOneWidget);
     });
 
     testWidgets('conditionally hides optional cards when callbacks are null', (tester) async {
@@ -109,6 +111,7 @@ void main() {
       expect(find.text('Carousel Generation'), findsNothing);
       expect(find.text('Gemini Story Video'), findsNothing);
       expect(find.text('Review All Ideas'), findsNothing);
+      expect(find.text('Promotion Comments'), findsNothing);
     });
   });
 }

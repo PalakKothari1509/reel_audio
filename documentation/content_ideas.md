@@ -6,7 +6,7 @@ Add to `lib/content_ideas.dart` in the `kDefaultHooks` list:
 
 ```dart
 HookIdea(
-  id: 'unique-id',
+  id: 'idea_N',  // e.g. 'idea_1', 'idea_2', etc. — use the idea_N scheme
   category: 'Category',
   cover: 'Short cover text',
   opening: 'First line spoken',
@@ -29,7 +29,7 @@ Every property of `HookIdea` can be safely copied and mutated:
 final updated = hook.copyWith(usedOn: '2026-10-16');
 ```
 
-Supported fields: `id`, `category`, `cover`, `opening`, `problem`, `lesson`,
+## Supported fields: `id`, `category`, `cover`, `opening`, `problem`, `lesson`,
 `postFormat`, `strategy`, `caption`, `pinnedComment`, `forApp`, `usedOn`.
 
 ## The flow from idea to output
@@ -68,6 +68,11 @@ Offline generation uses deterministic templates from `StoryGenerator._templates`
   Snack Reach, Night Before Annual Day, ASMR Cleaning Reel)
 
 Each `StoryTemplate` has: title, problem, twist, worse, solution, endingLine, moral, where.
+
+## Idea ID scheme
+
+All ideas use the `idea_N` scheme (e.g. `idea_1` through `idea_116`). The first six
+(`idea_1`–`idea_6`) are Kids Safety concepts and are also exposed as `kSafetyHooks`.
 
 ## Characters in idea selection
 

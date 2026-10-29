@@ -1,6 +1,6 @@
 # 06 — Tests
 
-Inventory of the 40 test files in `test/` (505 unit `test()` + 44 widget `testWidgets()` = ~549 total).
+Inventory of the 40 test files in `test/` (~665 total widget and unit tests).
 
 ## Coverage map
 
@@ -17,8 +17,9 @@ Inventory of the 40 test files in `test/` (505 unit `test()` + 44 widget `testWi
 No widget tests exist for: StoryScreen, StoryInputScreen, HomeScreen (main.dart), TimedScriptScreen,
 PreviewMergedScreen, SavedStoriesScreen, PromptScreen/VideoPromptScreen, PlanScreen,
 ContentLibraryScreen, AddIdeaScreen, ImagePromptScreen, CarouselPromptsScreen, GeminiVideoScreen,
-QuickContentScreen/CarouselMaker/TrialReel/SingleImage/IdeaInbox/MultiFormat/QualityCheck,
-PromoCommentVaultScreen.
+QuickContentScreen/CarouselMaker/TrialReel/SingleImage/IdeaInbox/MultiFormat/QualityCheck.
+
+`PromoCommentVaultScreen` has unit coverage via `PromoCommentStore.decode` in `widget_test.dart`.
 
 ### Pipeline / production (unit + integration)
 | File | Focus |
@@ -73,4 +74,4 @@ PromoCommentVaultScreen.
   and the library UI depend on, but not the screens themselves.
 
 ## Running
-`flutter test` from the repo root. Current count: **499 tests** (verified by running `flutter test`).
+`flutter test` from the repo root. Current count: **665 tests** (verified by running `flutter test`).
