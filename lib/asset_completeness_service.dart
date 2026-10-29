@@ -1,5 +1,4 @@
 import 'plan_data.dart';
-import 'content_ideas.dart';
 import 'prompt_vault.dart';
 import 'quality_check_center.dart';
 import 'video_library.dart';
@@ -100,16 +99,6 @@ class AssetCompletenessService {
       results.add(_checkFromPreloaded(
         contentId: idea.id,
         title: idea.cover,
-        prompts: promptByContent[idea.id],
-        videos: videosByContent[idea.id],
-        reports: reportsByContent[idea.id],
-      ));
-    }
-
-    for (final idea in kDay14Posts) {
-      results.add(_checkFromPreloaded(
-        contentId: idea.id,
-        title: idea.title,
         prompts: promptByContent[idea.id],
         videos: videosByContent[idea.id],
         reports: reportsByContent[idea.id],

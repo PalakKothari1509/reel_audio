@@ -66,13 +66,13 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 97 prompts produce 3 valid parts with intact Part 3', () {
+    test('parseReadyPrompt: all 121 prompts produce 3 valid parts with intact Part 3', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
-      expect(hooks.length, 97,
-          reason: 'Expected exactly 97 populated readyPrompt entries');
+      expect(hooks.length, 121,
+          reason: 'Expected exactly 121 populated readyPrompt entries');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(h.readyPrompt, h.cover);
@@ -175,7 +175,7 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
       }
     });
 
-    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 97 hooks', () {
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 121 hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty && h.readyPrompt.contains('Final text overlay')) h,

@@ -401,13 +401,7 @@ class ContentLibraryService {
       result.add(_hookToIdea(h, isCustom: h.custom));
     }
 
-    // 3. QuickIdea posts from kDay14Posts
-    for (final q in kDay14Posts) {
-      if (!seen.add(q.id)) continue;
-      result.add(_quickIdeaToContentIdea(q));
-    }
-
-    // 5. User-added QuickIdeas from the store
+    // 4. User-added QuickIdeas from the store
     final savedQuickIdeas = await QuickIdeaStore.load();
     for (final q in savedQuickIdeas) {
       if (!seen.add(q.id)) continue;
