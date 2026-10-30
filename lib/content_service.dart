@@ -12,7 +12,7 @@ import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_library.dart';
-import 'quick_content.dart';
+import 'idea_inbox_store.dart';
 
 /// A unified service that coordinates IdeaVault, ContentLibraryStore,
 /// and content-package creation in one place.
@@ -28,7 +28,9 @@ class ContentService {
   }
 
   /// Returns all items filtered by status.
-  static Future<List<ContentLibraryItem>> getItemsByStatus(IdeaStatus status) async {
+  static Future<List<ContentLibraryItem>> getItemsByStatus(
+    IdeaStatus status,
+  ) async {
     return ContentLibraryStore.getByStatus(status);
   }
 
@@ -62,11 +64,7 @@ class ContentService {
       contentPackage: null,
       formatOutputs: {},
       qualityReport: null,
-      tags: [
-        ...tags,
-        bucket.id,
-        if (notes != null && notes.isNotEmpty) notes,
-      ],
+      tags: [...tags, bucket.id, if (notes != null && notes.isNotEmpty) notes],
       createdAt: now,
       updatedAt: now,
       postedAt: null,
@@ -89,7 +87,9 @@ class ContentService {
   /// Idempotent: if an item with the same [IdeaInboxItem.id] as
   /// sourceIdeaId already exists in the library, the existing item is
   /// returned without creating a duplicate.
-  static Future<ContentLibraryItem> syncInboxItem(IdeaInboxItem inboxItem) async {
+  static Future<ContentLibraryItem> syncInboxItem(
+    IdeaInboxItem inboxItem,
+  ) async {
     final all = await ContentLibraryStore.getAll();
     for (final item in all) {
       if (item.sourceIdeaId == inboxItem.id) {
@@ -97,7 +97,8 @@ class ContentService {
       }
     }
 
-    final bucket = BucketLibrary.byId(inboxItem.bucketId) ?? BucketLibrary.challenge;
+    final bucket =
+        BucketLibrary.byId(inboxItem.bucketId) ?? BucketLibrary.challenge;
     return saveIdea(
       title: inboxItem.title,
       topic: inboxItem.rawIdea,
@@ -141,18 +142,27 @@ class ContentService {
   ///
   /// When an idea transitions from "Idea" → "Generated" → "Posted", this
   /// is the method that records it in the canonical library.
-  static Future<void> updateStatus(String id, IdeaStatus status, {
+  static Future<void> updateStatus(
+    String id,
+    IdeaStatus status, {
     DateTime? postedAt,
     String? instagramUrl,
   }) async {
-    await ContentLibraryStore.updateStatus(id, status,
-        postedAt: postedAt, instagramUrl: instagramUrl);
+    await ContentLibraryStore.updateStatus(
+      id,
+      status,
+      postedAt: postedAt,
+      instagramUrl: instagramUrl,
+    );
   }
 
   /// Records performance metrics for a published item.
   ///
   /// Called after manually recording Instagram Insights data.
-  static Future<void> recordMetrics(String id, Map<String, dynamic> metrics) async {
+  static Future<void> recordMetrics(
+    String id,
+    Map<String, dynamic> metrics,
+  ) async {
     final item = await ContentLibraryStore.getById(id);
     if (item == null) return;
     await ContentLibraryStore.update(

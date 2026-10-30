@@ -6,13 +6,21 @@ The app uses three external services for media generation:
 2. **ElevenLabs** — premium TTS voice synthesis
 3. **FFmpeg** — video composition and processing
 
-**All HTTP requests go through a single path**: `geminiPost()` in `lib/gemini_call.dart`.
+Gemini text generation currently has two transports:
+
+- The raw HTTP path through `geminiPost()` is used by live generation flows.
+- The `google_generative_ai` SDK path remains available through a lazily created
+  `GeminiClient`, but `getAiContentService()` currently has no call sites.
+
+Both paths remain in the codebase. Their model selection and some fallback
+behavior differ; this document records the current behavior rather than implying
+that they are interchangeable.
 
 ---
 
-## 1. Gemini (Text Generation)
+## 1. Gemini Text Generation
 
-### Primary: `geminiPost()` in `lib/gemini_call.dart` (210 lines)
+### Live path: raw HTTP via `geminiPost()` in `lib/gemini_call.dart`
 
 ```dart
 Future<http.Response> geminiPost({
@@ -54,16 +62,44 @@ Between retries, the app:
 | 503 | — | Retries with backoff |
 | Timeout | — | Not retried — returned as-is (caller handles) |
 
-### Model Selection (from content files)
+### Model Selection (per call site)
 
 | File | Model Constant | Usage |
 |------|---------------|-------|
-| `caption_generator.dart:29` | `gemini-3.5-flash` | Small jobs (caption generation) — lighter model to preserve budget |
-| `caption_generator.dart:30` | `gemini-3.8-flash` | Full jobs — higher quality outputs |
+| `main.dart` | `gemini-3.5-flash` | Story script generation |
+| `caption_generator.dart` | `gemini-3.5-flash` / `gemini-3.8-flash` | Small / full caption jobs |
+| `content_studio_service.dart` | `gemini-3.8-flash` / `gemini-3.5-flash` | Main / light jobs; its caller adds a model fallback chain |
+| `story_ideas.dart` | `gemini-3.5-flash` / `gemini-3.8-flash` | Light / full jobs |
+| `prompt_builder.dart` | `gemini-3.5-flash` | Prompt construction |
 | `voice.dart:48` | `gemini-2.5-flash-preview-tts` | Gemini TTS audio synthesis |
 | `gemini_call.dart:155` | Dynamic via `geminiPost(model: ..., fallbackModel: ...)` | Any text generation |
 
-> **Note**: `google_generative_ai: ^0.4.0` is listed in pubspec.yaml but is **not used** — `gemini_call.dart` uses the `http` package directly. The SDK import is unused.
+There is not yet a shared model-selection configuration. Most call sites choose
+their own primary model. `geminiPost()` can switch to a supplied fallback after a
+404; `content_studio_service.dart` additionally tries other models after selected
+model errors (including per-minute 429, 400, 404, and 503).
+
+### SDK path: `GeminiClient` in `lib/gemini_client.dart`
+
+`GeminiClient` implements `AIProvider` using `google_generative_ai`. It is only
+constructed by `getAiContentService()` in `main.dart`; repository search found
+no caller of that getter, so this is currently an available but dormant path.
+`AiContentServiceImpl` adapts its legacy `ContentPackage` output to the newer
+generation model.
+
+- Primary model: `gemini-3.5-flash-lite`; one 404 fallback: `gemini-3.5-flash`.
+- Retryable status codes share `retryableStatusCodes`, `backoffDurations`,
+  `googlesRetryDelay()`, and `isDailyLimit()` with the HTTP helper.
+- Retries 429/500/503 with the shared backoff and stops immediately for a
+  detected daily limit. A timeout is surfaced without retrying.
+- Unlike `geminiPost()`, the SDK wrapper does not persist/cache 404'd model names.
+- Other recognized errors are surfaced; there is no SDK-side template fallback.
+  `AIProviderWithFallback` can provide a local template fallback, but it has no
+  construction sites in the current `lib/` tree.
+
+The SDK primary (`gemini-3.5-flash-lite`) differs from the main HTTP flow's
+`gemini-3.5-flash`; `GeminiClient.providerName` also currently reports
+“Gemini 3.6 Flash.” Do not treat these labels as a single source of truth.
 
 ### `geminiBusyMessage()` — UX Strings
 
@@ -76,12 +112,15 @@ Returns user-friendly messages:
 - **Daily limit**: "Today's free Gemini requests are used up. They reset tomorrow. Your story is saved, so nothing is lost."
 - **Generic 429**: "Gemini has run out of free requests for the moment. Your story is saved, so nothing is lost — wait a minute and tap it again."
 
-### Call Sites for `geminiPost()`
+### Live call sites for `geminiPost()`
 
 | File | Function | Model Used |
 |------|----------|------------|
 | `caption_generator.dart` | `generateCaption()` | `gemini-3.5-flash` (small) / `gemini-3.8-flash` (full) |
-| `gemini_video_master_prompt.dart` | `generateVideoPlan()` | Dynamic (passed as parameter) |
+| `content_studio_service.dart` | generation methods | `gemini-3.8-flash`, then call-site model chain |
+| `main.dart` | story script generation | `gemini-3.5-flash` |
+| `prompt_builder.dart` | prompt generation | `gemini-3.5-flash` |
+| `story_ideas.dart` | idea/check generation | `gemini-3.5-flash` / `gemini-3.8-flash` |
 
 ### Model Caching (`_missingModels`)
 
@@ -174,36 +213,30 @@ From `video_builder.dart` comments: Instagram overlays its own UI (header, profi
 3. **429 has two meanings**: Per-minute (retry) vs per-day (stop) — the app distinguishes them
 4. **Timeout is not retried**: A request that timed out will usually time out again
 5. **Missing models cached**: 404'd model names are remembered for 7 days
-6. **400 = switch models** (Path A only): "Model rejected request — switching to next model..."
-7. **Path B has no fallback**: 400/429/503 → immediate hard failure (no retry, no switch)
+6. **400 is call-site-specific**: `geminiPost()` returns it without retry; the
+   Content Studio caller may then try another model. The SDK path surfaces it.
+7. **Fallback layers differ**: HTTP call sites may provide a model chain; the SDK
+   wrapper has one 404 fallback and does not fall back to local templates.
 
 ---
 
-## 5. Two Parallel Gemini Code Paths (CORRECTION)
+## 5. Transport and Error Policy Summary
 
-### Path A: Raw HTTP via `geminiPost()` — `lib/gemini_call.dart` (210 lines)
+| Concern | Raw HTTP (`geminiPost`) | SDK (`GeminiClient`) |
+|---------|-------------------------|----------------------|
+| Current use | Live call sites listed above | Dormant; getter has no caller |
+| Model source | Selected by each caller | SDK primary and fallback constants |
+| Retry | 429/500/503, shared four-delay backoff; daily 429 stops | Same retryable codes and backoff helpers; daily 429 stops |
+| 404 | Optional caller-supplied fallback; failed primary is cached for 7 days | One fallback model; no persistent missing-model cache |
+| Other 4xx | Returned to caller without retry | Converted from SDK exception and surfaced |
+| Timeout | Not retried; caller handles timeout | Not retried; converted to a user-facing busy message |
+| Local content fallback | Not in the transport; some callers have their own fallback behavior | No local template fallback in `GeminiClient`; `AIProviderWithFallback` is currently uninstantiated |
 
-All text generation calls from `content_studio_service.dart` go through `geminiPost()` with:
-- Primary model: `gemini-3.8-flash` (content_studio_service.dart:18)
-- Fallback chain: `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-3.5-flash` → `gemini-2.5-flash` (content_studio_service.dart:27-32)
-- Full retry, backoff, 429 detection, model fallback (404 cache, 400 model switch)
-- **Call sites using this path**: `content_studio_service.dart` (6 calls), `caption_generator.dart` (409:), `story_ideas.dart` (4 calls), `prompt_builder.dart` (2 calls), `main.dart` (1 call)
-
-### Path B: SDK via `google_generative_ai` — `lib/gemini_client.dart` (381 lines)
-
-**This is NOT an empty stub.** It's 381 lines that implements `AIProvider` using the `google_generative_ai` package directly:
-- Model: `gemini-3.5-flash-lite` (gemini_client.dart:17) — **NOT** the same as Path A
-- **No retry, no fallback, no backoff** — the comment at line 12-14 explicitly says it "gets none of that helper's model fallback and 404 handling"
-- Used by `AiContentServiceImpl` (created at main.dart:96)
-- `AiContentServiceImpl` is created but only appears in main.dart — **verify if actually used in any screen flow**
-
-**400 Error Risk**: Path B (`gemini_client.dart`) uses `gemini-3.5-flash-lite` with no fallback. If this model returns 400, the call fails immediately with no retry. This is likely the source of the user's intermittent failures ("works 2 out of 10 times").
-
-### Path B Call Sites
-- `main.dart:96` — creates `AiContentServiceImpl(GeminiClient(...))`
-- `AiContentServiceImpl` implements `AiContentService` (ai_content_service_impl.dart)
-
-> **Finding**: Two Gemini code paths exist with different models, different error handling, and different callers. Path B has zero retry/fallback — any 400/429/503 is a hard failure.
+Model choice, request configuration, and fallback chains are not yet centralized.
+The two transports share retry/quota helpers, but they are not behaviorally
+identical. Keep both until their callers and compatibility requirements are
+reviewed; this stabilization task does not remove either transport or make API
+requests.
 
 ---
 

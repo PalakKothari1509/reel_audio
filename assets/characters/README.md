@@ -8,7 +8,7 @@ one, so any of them can be changed without a new build.
 ## Adding one
 
 1. Save the picture here named exactly as the character is named in kDefaultCast: `Ria.jpg`, `Rio.jpg`,
-   `Cuty.jpg`, `Mumma.jpg`, `Papa.jpg`, `Daadi.jpg`, `Teacher.jpg`
+   `Cuty.jpg`, `Robot.jpg`, `Mumma.jpg`, `Papa.jpg`, `Daadi.jpg`, `Teacher.jpg`
 2. List it in `pubspec.yaml` under `flutter: assets:`
 3. Set `assetPath` on that character in `kDefaultCast` in `lib/characters.dart`:
 

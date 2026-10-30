@@ -30,7 +30,7 @@ import 'content_collections.dart';
 import 'content_ideas.dart';
 import 'models/quick_idea.dart';
 import 'plan_data.dart';
-import 'quick_content.dart';
+import 'idea_inbox_store.dart';
 
 /// A single normalized idea that unifies HookIdea and QuickIdea.
 ///
@@ -402,15 +402,20 @@ class ContentLibraryService {
     final seen = <String>{};
     final result = <ContentIdea>[];
 
-    // 1. Built-in hooks with rewrites applied
+    // HookStore.load returns the built-ins with persisted edits applied, as well
+    // as user-created hooks. Prefer that view when an ID overlaps a built-in.
+    final savedHooks = await HookStore.load();
+    final savedHooksById = {for (final h in savedHooks) h.id: h};
+
+    // 1. Built-in hooks with rewrites applied, overridden by persisted edits
     for (final h in kDefaultHooksWithRewrite) {
-      if (!seen.add(h.id)) continue;
-      result.add(_hookToIdea(h, isCustom: h.custom));
+      final effectiveHook = savedHooksById.remove(h.id) ?? h;
+      if (!seen.add(effectiveHook.id)) continue;
+      result.add(_hookToIdea(effectiveHook, isCustom: effectiveHook.custom));
     }
 
-    // 2. Saved user-edited hooks from HookStore (these override built-ins)
-    final savedHooks = await HookStore.load();
-    for (final h in savedHooks) {
+    // 2. User-created hooks from HookStore that do not overlap a built-in.
+    for (final h in savedHooksById.values) {
       if (!seen.add(h.id)) continue;
       result.add(_hookToIdea(h, isCustom: h.custom));
     }

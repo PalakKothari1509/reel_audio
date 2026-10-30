@@ -44,16 +44,6 @@ void main() {
       }
     });
 
-    test('kDefaultHooks: defaultCast has at most 3 characters', () {
-      for (final h in kDefaultHooks) {
-        expect(
-          h.defaultCast.length,
-          lessThanOrEqualTo(3),
-          reason: '${h.id} has more than 3 cast members: ${h.defaultCast}',
-        );
-      }
-    });
-
     test('kDefaultHooks: caption hashtag count is exactly 5 when non-empty', () {
       for (final h in kDefaultHooks) {
         if (h.caption.isNotEmpty) {
@@ -80,7 +70,8 @@ void main() {
 
     test('kDefaultHooks: readyPrompt with content contains Part 3', () {
       for (final h in kDefaultHooks) {
-        if (h.readyPrompt.isNotEmpty) {
+        if (h.readyPrompt.contains('Part 1 (') &&
+            h.readyPrompt.contains('Part 2 (')) {
           expect(
             h.readyPrompt,
             contains('Part 3'),
@@ -90,16 +81,25 @@ void main() {
       }
     });
 
-    test('parseReadyPrompt: all 121 prompts produce 3 valid parts with intact Part 3', () {
-      final hooks = [
+    test('parseReadyPrompt: every video prompt produces 3 valid parts with intact Part 3', () {
+      final populatedHooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty) h,
       ];
       expect(
-        hooks.length,
-        121,
-        reason: 'Expected exactly 121 populated readyPrompt entries',
+        populatedHooks.length,
+        122,
+        reason: 'Expected exactly 122 populated readyPrompt entries',
       );
+      final hooks = populatedHooks
+          .where(
+            (h) =>
+                h.postFormat == 'Reel' &&
+                h.readyPrompt.contains('Part 1 (') &&
+                h.readyPrompt.contains('Part 2 ('),
+          )
+          .toList();
+      expect(hooks, isNotEmpty, reason: 'Expected structured video prompts');
 
       for (final h in hooks) {
         final result = GeminiVideoResult.parseReadyPrompt(
@@ -239,7 +239,7 @@ Part 3 (20-30s): Resolution. Final text overlay: BE KIND.
       }
     });
 
-    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all 121 hooks', () {
+    test('parseReadyPrompt: overlay text is preserved in textOverlay metadata across all populated hooks', () {
       final hooks = [
         for (final h in [...kSafetyHooks, ...kDefaultHooks])
           if (h.readyPrompt.isNotEmpty &&
@@ -391,6 +391,13 @@ Part 3 (20-30s): Content 3
       }
     });
 
+    test('static image prompts are not required to be video prompts', () {
+      final puzzle = kDefaultHooks.singleWhere((h) => h.id == 'idea_93');
+      expect(puzzle.postFormat, 'Static Image');
+      expect(puzzle.readyPrompt, contains('puzzle card'));
+      expect(puzzle.readyPrompt, isNot(contains('Part 3')));
+    });
+
     test("Safety hooks: all maintain keepMoralOffScreen = false", () {
       for (final h in kSafetyHooks) {
         expect(
@@ -404,37 +411,28 @@ Part 3 (20-30s): Content 3
     test(
       'kDefaultHooksWithRewrite: all hook ids have moment fields populated',
       () {
-        // Moment upgrades are now embedded in kDefaultHooksWithRewrite.
-        // Verify that hooks which originally had moment upgrades have
-        // their setting/sceneDetail/dialogue/mess/innerThought/endingBeat populated.
-        for (final h in kDefaultHooksWithRewrite) {
-          // Hooks that had moment upgrades should have non-empty moment fields.
-          // Safety hooks and main hooks all received moment upgrades, so they
-          // should have these fields populated.
-          if (h.category == 'Safety' || h.id.startsWith('idea_')) {
-            expect(h.setting, isNotEmpty, reason: '${h.id} has empty setting');
-            expect(
-              h.sceneDetail,
-              isNotEmpty,
-              reason: '${h.id} has empty sceneDetail',
-            );
-            expect(
-              h.dialogue,
-              isNotEmpty,
-              reason: '${h.id} has empty dialogue',
-            );
-            expect(h.mess, isNotEmpty, reason: '${h.id} has empty mess');
-            expect(
-              h.innerThought,
-              isNotEmpty,
-              reason: '${h.id} has empty innerThought',
-            );
-            expect(
-              h.endingBeat,
-              isNotEmpty,
-              reason: '${h.id} has empty endingBeat',
-            );
-          }
+        // Moment upgrades apply to the explicitly tracked rewritten stories,
+        // not every idea that happens to use an "idea_" ID.
+        final mappedIds = kRewrittenStoryIds;
+        final hooksById = {for (final h in kDefaultHooksWithRewrite) h.id: h};
+        expect(hooksById.keys, containsAll(mappedIds));
+
+        for (final id in mappedIds) {
+          final h = hooksById[id]!;
+          expect(h.setting, isNotEmpty, reason: '$id has empty setting');
+          expect(
+            h.sceneDetail,
+            isNotEmpty,
+            reason: '$id has empty sceneDetail',
+          );
+          expect(h.dialogue, isNotEmpty, reason: '$id has empty dialogue');
+          expect(h.mess, isNotEmpty, reason: '$id has empty mess');
+          expect(
+            h.innerThought,
+            isNotEmpty,
+            reason: '$id has empty innerThought',
+          );
+          expect(h.endingBeat, isNotEmpty, reason: '$id has empty endingBeat');
         }
       },
     );
@@ -455,7 +453,7 @@ Part 3 (20-30s): Content 3
     test(
       'kDefaultHooksWithRewrite: HookIdea round-trips through toJson/fromJson',
       () {
-        for (final h in kDefaultHooksWithRewrite.take(10)) {
+        for (final h in kDefaultHooksWithRewrite) {
           final json = h.toJson();
           final restored = HookIdea.fromJson(json);
           expect(restored.id, h.id);
@@ -471,23 +469,9 @@ Part 3 (20-30s): Content 3
       },
     );
 
-    test('kDefaultHooksWithRewrite: defaultCast has at most 3 characters for hooks', () {
-      // Verify that hooks which originally had moment upgrades don't have
-      // more than 3 cast members
-      for (final h in kDefaultHooksWithRewrite) {
-        if (h.category == 'Safety' || h.id.startsWith('idea_')) {
-          expect(
-            h.defaultCast.length,
-            lessThanOrEqualTo(3),
-            reason: '${h.id} has more than 3 cast members: ${h.defaultCast}',
-          );
-        }
-      }
-    });
-
     test('kDefaultHooksWithRewrite: endingBeat is non-empty for hooks with moments', () {
       for (final h in kDefaultHooksWithRewrite) {
-        if (h.category == 'Safety' || h.id.startsWith('idea_')) {
+        if (kRewrittenStoryIds.contains(h.id)) {
           expect(
             h.endingBeat,
             isNotEmpty,

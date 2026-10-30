@@ -1,11 +1,11 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 
 import 'secrets.dart';
-  import 'api_key_store.dart';
+import 'api_key_store.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -44,6 +44,7 @@ import 'project_bridge.dart';
 import 'production_adapter.dart';
 import 'production_adapter_impl.dart';
 import 'settings_screen.dart';
+import 'character_definitions.dart';
 import 'content_ideas.dart';
 import 'add_idea_screen.dart';
 import 'content_studio_screens.dart';
@@ -96,7 +97,9 @@ AiContentService? _aiContentService;
 
 Future<AiContentService> getAiContentService() async {
   if (_aiContentService != null) return _aiContentService!;
-  _aiContentService = AiContentServiceImpl(GeminiClient(apiKey: _keyStore!.getGeminiApiKey()));
+  _aiContentService = AiContentServiceImpl(
+    GeminiClient(apiKey: _keyStore!.getGeminiApiKey()),
+  );
   return _aiContentService!;
 }
 
@@ -138,7 +141,10 @@ Future<List<ScriptLine>> generateScriptWithGemini({
 
   var selectedChars = (characterIds == null || characterIds.isEmpty)
       ? kCharacters.map((c) => c.name).toList()
-      : kCharacters.where((c) => characterIds.contains(c.characterId)).map((c) => c.name).toList();
+      : kCharacters
+            .where((c) => characterIds.contains(c.characterId))
+            .map((c) => c.name)
+            .toList();
   if (selectedChars.isEmpty) selectedChars = kCharacters.map((c) => c.name).toList();
 
   final storyNote = videoDescription.isNotEmpty
@@ -439,15 +445,22 @@ class Character {
   final String emoji;
   final String characterId;
   bool selected;
-  Character({required this.name, required this.emoji, required this.characterId, this.selected = false});
+  Character({
+    required this.name,
+    required this.emoji,
+    required this.characterId,
+    this.selected = false,
+  });
 }
 
 final List<Character> kCharacters = [
-  Character(name: 'Ria', emoji: '👧', characterId: 'ria', selected: true),
-  Character(name: 'Rio', emoji: '👦', characterId: 'rio'),
-  Character(name: 'Cuty', emoji: '🐰', characterId: 'cuty'),
-  Character(name: 'Mum', emoji: '👩', characterId: 'mumma'),
-  Character(name: 'Dad', emoji: '👨', characterId: 'papa'),
+  for (final definition in kMainAppCharacterDefinitions)
+    Character(
+      name: definition.appDisplayName ?? definition.name,
+      emoji: definition.appEmoji ?? definition.emoji,
+      characterId: definition.id,
+      selected: definition.id == 'ria',
+    ),
 ];
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -473,16 +486,15 @@ Future<void> main() async {
       theme: buildAppTheme(),
       routes: {
         '/review-idea': (context) {
-          final ideaId = ModalRoute.of(context)!.settings.arguments as String? ?? '';
+          final ideaId =
+              ModalRoute.of(context)!.settings.arguments as String? ?? '';
           return ReviewIdeaScreen(ideaId: ideaId);
         },
       },
       home: ContentStudioHome(
         onCreateReel: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => StoryScreen(ideaId: ideaId),
-          ),
+          MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
         ),
         onContentLibrary: () => Navigator.push(
           _appNavigatorKey.currentContext!,
@@ -508,21 +520,15 @@ Future<void> main() async {
         ),
         onAddNewIdea: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => const AddIdeaScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
         ),
         onCreateContent: (ideaId) => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => StoryScreen(ideaId: ideaId),
-          ),
+          MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
         ),
         onSettings: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => const SettingsScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const SettingsScreen()),
         ),
         onImagePrompt: () => Navigator.push(
           _appNavigatorKey.currentContext!,
@@ -544,15 +550,11 @@ Future<void> main() async {
         ),
         onOfflineStory: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => OfflineStoryMakerScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => OfflineStoryMakerScreen()),
         ),
         onPromoComments: () => Navigator.push(
           _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => const PromoCommentVaultScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const PromoCommentVaultScreen()),
         ),
       ),
     ),
@@ -747,7 +749,8 @@ class _StoryScreenState extends State<StoryScreen> {
       _descCtrl.text = idea.storyDetail.isNotEmpty
           ? idea.storyDetail
           : '${idea.problem}\n${idea.lesson}';
-      _status = '💡 ${idea.title} — fill in anything you like, then write the script.';
+      _status =
+          '💡 ${idea.title} — fill in anything you like, then write the script.';
     });
   }
 
@@ -1122,9 +1125,8 @@ class _StoryScreenState extends State<StoryScreen> {
   Future<void> _showStoryCheckPromptOnly() async {
     final story = _descCtrl.text.trim();
     if (story.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a story first.')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Enter a story first.')));
       return;
     }
     final prompt = buildCheckStoryPrompt(story);
@@ -1554,16 +1556,16 @@ class _StoryScreenState extends State<StoryScreen> {
                 ),
                 Gap.m,
 
-TextField(
+                TextField(
                   controller: _descCtrl,
                   maxLines: null,
                   minLines: 10,
                   style: AppText.body,
                   decoration: const InputDecoration(
-                      hintText:
-                          'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
-                          'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
-                          'neeche mil jaata hai. Sab hass padte hain.',
+                    hintText:
+                        'e.g. Cuty ka gajar gum ho gaya. Ria aur Rio dono ek dusre '
+                        'ko blame karte hain. Phir milkar dhoondte hain aur sofa ke '
+                        'neeche mil jaata hai. Sab hass padte hain.',
                   ),
                 ),
                 Gap.s,
@@ -1594,7 +1596,9 @@ TextField(
                       child: SecondaryButton(
                         label: 'Show Prompt',
                         icon: Icons.description,
-                        onPressed: _isGenerating ? null : _showStoryCheckPromptOnly,
+                        onPressed: _isGenerating
+                            ? null
+                            : _showStoryCheckPromptOnly,
                       ),
                     ),
                     Gap.wS,
@@ -1654,37 +1658,37 @@ TextField(
                 ),
                 Gap.l,
 
-                 const SectionTitle('Language'),
-                 _chips(
-                   _languages.map(
-                     (l) => _Choice(
-                       l,
-                       _language == l,
-                       () => setState(() => _language = l),
-                     ),
-                   ),
-                 ),
-                 Gap.l,
+                const SectionTitle('Language'),
+                _chips(
+                  _languages.map(
+                    (l) => _Choice(
+                      l,
+                      _language == l,
+                      () => setState(() => _language = l),
+                    ),
+                  ),
+                ),
+                Gap.l,
 
-                 const SectionTitle('Characters'),
-                 _chips(
-                   kCharacters.map(
-                     (c) => _Choice(
-                       c.name,
-                       _selectedCharacterIds.contains(c.characterId),
-                       () {
-                         setState(() {
-                           if (_selectedCharacterIds.contains(c.characterId)) {
-                             _selectedCharacterIds.remove(c.characterId);
-                           } else {
-                             _selectedCharacterIds.add(c.characterId);
-                           }
-                         });
-                       },
-                       emoji: c.emoji,
-                     ),
-                   ),
-                 ),
+                const SectionTitle('Characters'),
+                _chips(
+                  kCharacters.map(
+                    (c) => _Choice(
+                      c.name,
+                      _selectedCharacterIds.contains(c.characterId),
+                      () {
+                        setState(() {
+                          if (_selectedCharacterIds.contains(c.characterId)) {
+                            _selectedCharacterIds.remove(c.characterId);
+                          } else {
+                            _selectedCharacterIds.add(c.characterId);
+                          }
+                        });
+                      },
+                      emoji: c.emoji,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -1777,12 +1781,17 @@ TextField(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (c.emoji.isNotEmpty) ...[Text(c.emoji), const SizedBox(width: 4)],
+                  if (c.emoji.isNotEmpty) ...[
+                    Text(c.emoji),
+                    const SizedBox(width: 4),
+                  ],
                   Text(
                     c.label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: c.selected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: c.selected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                       color: c.selected ? Colors.white : AppColors.text,
                     ),
                   ),
@@ -1984,55 +1993,57 @@ class _StoryInputScreenState extends State<StoryInputScreen> {
                     onChanged: (v) => setState(() => _language = v!),
                   ),
                   const SizedBox(height: 16),
-                   const Text(
-                     'Video Description (for AI)',
-                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                   ),
-                   const SizedBox(height: 8),
-                   TextField(
-                     controller: _descCtrl,
-                     maxLines: 3,
-                     style: const TextStyle(fontSize: 13),
-                     decoration: InputDecoration(
-                       hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai aur sab khush ho jaate hain',
-                       hintStyle: const TextStyle(
-                         color: AppColors.textFaint,
-                         fontSize: 12,
-                       ),
-                       filled: true,
-                       fillColor: AppColors.surface,
-                       border: OutlineInputBorder(
-                         borderRadius: BorderRadius.circular(8),
-                       ),
-                       contentPadding: const EdgeInsets.all(10),
-                     ),
-                   ),
-                   const SizedBox(height: 16),
-                   const Text(
-                     'Characters',
-                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                   ),
-                   const SizedBox(height: 8),
-                   Wrap(
-                     spacing: 8,
-                     children: kCharacters.map((c) {
-                       final selected = _selectedCharacterIds.contains(c.characterId);
-                       return FilterChip(
-                         avatar: Text(c.emoji),
-                         label: Text(c.name),
-                         selected: selected,
-                         onSelected: (_) {
-                           setState(() {
-                             if (selected) {
-                               _selectedCharacterIds.remove(c.characterId);
-                             } else {
-                               _selectedCharacterIds.add(c.characterId);
-                             }
-                           });
-                         },
-                       );
-                     }).toList(),
-                   ),
+                  const Text(
+                    'Video Description (for AI)',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _descCtrl,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 13),
+                    decoration: InputDecoration(
+                      hintText: 'e.g. Ria aur Rio ek teddy ke liye ladte hain, phir Rio share karta hai aur sab khush ho jaate hain',
+                      hintStyle: const TextStyle(
+                        color: AppColors.textFaint,
+                        fontSize: 12,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.all(10),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Characters',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: kCharacters.map((c) {
+                      final selected = _selectedCharacterIds.contains(
+                        c.characterId,
+                      );
+                      return FilterChip(
+                        avatar: Text(c.emoji),
+                        label: Text(c.name),
+                        selected: selected,
+                        onSelected: (_) {
+                          setState(() {
+                            if (selected) {
+                              _selectedCharacterIds.remove(c.characterId);
+                            } else {
+                              _selectedCharacterIds.add(c.characterId);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
                   if (_genStatus.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     Container(
@@ -2951,7 +2962,7 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
           if (mounted) setState(() => _status = message);
         },
       );
-       // Out of the cache folder and into the app's own storage, with a note of what it
+      // Out of the cache folder and into the app's own storage, with a note of what it
       // was made from. This is what lets you leave, come back, and find it waiting.
       var reelPath = outPath;
       if (widget.projectId.isNotEmpty) {
@@ -2973,7 +2984,9 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
         // ALSO save to PackageStore as a ContentPackageV2 for the new pipeline.
         // This is non-blocking — if it fails, the reel is still saved via ProjectStore.
         _savePackageV2(widget.projectId, kept).catchError((e) {
-          debugPrint('PackageStore: failed to save package for ${widget.projectId} — $e');
+          debugPrint(
+            'PackageStore: failed to save package for ${widget.projectId} — $e',
+          );
         });
       }
 
@@ -3901,10 +3914,15 @@ class _TimedScriptScreenState extends State<TimedScriptScreen> {
               colour: AppColors.accent,
               onPressed: busy
                   ? null
-                  : () => showPostingKit(context, widget.projectId, apiKey: _keyStore?.getGeminiApiKey()).then((_) {
-                      _loadHookChoices();
-                      _checkSavedReel();
-                    }),
+                  : () =>
+                        showPostingKit(
+                          context,
+                          widget.projectId,
+                          apiKey: _keyStore?.getGeminiApiKey(),
+                        ).then((_) {
+                          _loadHookChoices();
+                          _checkSavedReel();
+                        }),
             ),
           ),
         ],
@@ -4625,7 +4643,11 @@ class _PreviewMergedScreenState extends State<PreviewMergedScreen> {
                   PrimaryButton(
                     label: 'Caption & comments',
                     icon: Icons.content_copy,
-                    onPressed: () => showPostingKit(context, widget.projectId, apiKey: _keyStore?.getGeminiApiKey()),
+                    onPressed: () => showPostingKit(
+                      context,
+                      widget.projectId,
+                      apiKey: _keyStore?.getGeminiApiKey(),
+                    ),
                   ),
                   Gap.s,
                 ],
@@ -4794,7 +4816,11 @@ class _SavedStoriesScreenState extends State<SavedStoriesScreen> {
                 subtitle: const Text('Copy for posting'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  showPostingKit(context, p.id, apiKey: _keyStore?.getGeminiApiKey());
+                  showPostingKit(
+                    context,
+                    p.id,
+                    apiKey: _keyStore?.getGeminiApiKey(),
+                  );
                 },
               ),
             if (lines.isNotEmpty)

@@ -6,6 +6,10 @@
 
 import 'package:flutter/material.dart';
 
+import 'character_definitions.dart';
+
+export 'character_definitions.dart' show Character;
+
 // ============================================================================
 // BRAND DEFAULTS
 // ============================================================================
@@ -59,126 +63,33 @@ class BrandDefaults {
 // CHARACTER PROFILES - Immutable, always injected
 // ============================================================================
 
-class Character {
-  final String id;
-  final String name;
-  final String emoji;
-  final String description;
-  final String appearance;
-  final String personality;
-  final String role;
-
-  /// How this character sounds, in words. Separate from [personality] on purpose:
-  /// personality decides what Mumma does, this decides what comes out of her mouth.
-  /// A prompt that only knows she is "patient" writes a scolding-adjacent line,
-  /// whereas knowing she says "arre mera bachha" gets the tone right.
-  final String speechPattern;
-
-  const Character({
-    required this.id,
-    required this.name,
-    required this.emoji,
-    required this.description,
-    required this.appearance,
-    required this.personality,
-    required this.role,
-    this.speechPattern = '',
-  });
-
-  String get fullProfile => '''
-$name ($emoji)
-Role: $role
-Appearance: $appearance
-Personality: $personality
-Description: $description${speechPattern.isEmpty ? '' : '\nSpeech: $speechPattern'}''';
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'emoji': emoji,
-        'description': description,
-        'appearance': appearance,
-        'personality': personality,
-        'role': role,
-        'speechPattern': speechPattern,
-      };
-}
-
 class CharacterLibrary {
-  static const Character ria = Character(
-    id: 'ria',
-    name: 'Ria',
-    emoji: '🌸',
-    description: 'Indian preschool girl, curious and playful',
-    appearance: 'Dark brown hair in two ponytails with pink bows, brown eyes, pink dress, no glasses, preschool age (3-4). Toofani: round chubby cheeks and a soft plump build, not thin',
-    personality: 'Curious and expressive, energetic and playful, asks questions and leads activities, sometimes stubborn, a little harmless chaos',
-    role: 'Protagonist / explorer',
-  );
+  static const Character ria = kRiaDefinition;
+  static const Character rio = kRioDefinition;
+  static const Character cuty = kCutyDefinition;
+  static const Character robot = kRobotDefinition;
+  static const Character mumma = kMummaDefinition;
+  static const Character papa = kPapaDefinition;
+  static const Character daadi = kDaadiDefinition;
+  static const Character teacher = kTeacherDefinition;
 
-  static const Character rio = Character(
-    id: 'rio',
-    name: 'Rio',
-    emoji: '💙',
-    description: 'Indian preschool boy, playful and determined',
-    appearance: 'Dark brown hair, blue outfit, brown eyes, no glasses, preschool age (3-4)',
-    personality: 'Energetic and playful, naturally stubborn and determined, says "no" before thinking, follows then leads, deep focus when interested',
-    role: 'Co-protagonist / problem solver',
-  );
-
-  static const Character cuty = Character(
-    id: 'cuty',
-    name: 'Cuty',
-    emoji: '🐰',
-    description: 'Small white bunny, the peace-bringer',
-    appearance: 'Small white bunny, pink bow, soft friendly expression, unchanged always',
-    personality: 'Gentle, quiet observer, calm and sleepy, unbothered, subtle comic relief and warmth, the emotional anchor, never the one who lectures',
-    role: 'Mascot / observer',
-  );
-
-  /// The fourth character, and the one who carries the whole Jugaadu Mummy direction.
-  ///
-  /// She was missing from the library while every flagship example ("Phone chahiye →
-  /// simple home activity") is a Mumma story, so those prompts were reaching the
-  /// model with no description of her at all.
-  static const Character mumma = Character(
-    id: 'mumma',
-    name: 'Mumma',
-    emoji: '👩',
-    description: 'Young Indian mother in her early 30s, warm and patient',
-    appearance: 'Young Indian mother, early 30s, warm brown eyes, gentle radiant smile, '
-        'hair neatly styled in a soft high bun with loose face-framing strands, small red bindi '
-        'on the forehead. Wearing a mustard yellow kurti with white chikankari embroidery, '
-        'classic blue slim-fit jeans, casual brown flat slide sandals. Stylized 3D '
-        'Pixar/Disney character design, soft rim lighting, clean white backdrop.',
-    personality: 'Warm, patient and observant. Playfully redirects tantrums rather than '
-        'scolding, never lectures. A master of low-cost screen-free household hacks. '
-        'Her solutions come from noticing what is already in the kitchen, not from buying '
-        'anything.',
-    role: 'Warm problem-solver, the parent the viewer identifies with',
-    speechPattern: 'Calm Hinglish, encouraging, warm. Soft terms of endearment such as '
-        '"arre mera bachha" and "dekho toh". Never scolding, never impatient.',
-  );
-
-  static const Character papa = Character(
-    id: 'papa',
-    name: 'Papa',
-    emoji: '👨',
-    description: 'Young Indian father in his early 30s, warm and playful',
-    appearance: 'Young Indian father, early 30s, warm brown eyes, soft smile, '
-        'dark hair neatly styled with a light stubble. Wearing a half-sleeve '
-        'linen shirt in earthy tones, slim-fit jeans, casual brown shoes. '
-        'Stylized 3D Pixar/Disney character design, soft rim lighting.',
-    personality: 'Warm, patient and playful. Joins in the children\'s games rather '
-        'than directing, adds silly voices and sound effects, defuses tension '
-        'with a joke. The calm in the chaos, always ready with a low-cost '
-        'household hack.',
-    role: 'The calm problem-solver, the parent who joins the fun',
-  );
-
+  /// The unchanged default cast used by existing generation prompts.
   static const List<Character> all = [ria, rio, cuty, mumma, papa];
 
+  /// All registered characters, including supporting characters not in the default cast.
+  static const List<Character> registered = [
+    ria,
+    rio,
+    cuty,
+    robot,
+    mumma,
+    papa,
+    daadi,
+    teacher,
+  ];
+
   static Character? byId(String id) {
-    for (final c in all) {
+    for (final c in registered) {
       if (c.id == id) return c;
     }
     return null;
@@ -252,14 +163,14 @@ class ContentBucket {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'emoji': emoji,
-        'shortLabel': shortLabel,
-        'description': description,
-        'color': color.value,
-        'softColor': softColor.value,
-      };
+    'id': id,
+    'name': name,
+    'emoji': emoji,
+    'shortLabel': shortLabel,
+    'description': description,
+    'color': color.value,
+    'softColor': softColor.value,
+  };
 }
 
 class BucketLibrary {
@@ -268,7 +179,8 @@ class BucketLibrary {
     name: 'Challenge',
     emoji: '🔎',
     shortLabel: 'Challenge',
-    description: 'Observation games, pattern challenges, spot-the-hidden, puzzles',
+    description:
+        'Observation games, pattern challenges, spot-the-hidden, puzzles',
     generationPrompt: '''
 This is a CHALLENGE post. The goal is to make the child (and parent) think, observe, and solve.
 Structure: Hook → Challenge Setup → Options/Clues → Thinking Moment → Reveal → Why it works → CTA.
@@ -481,18 +393,54 @@ Visual: Characters holding or pointing at choices, friendly and open.''',
 // ============================================================================
 
 enum ContentFormat {
-  carousel('Carousel', '📚', 'Swipeable multi-slide post', 7,
-    canvasWidth: 1080, canvasHeight: 1440,
-    topMargin: 180, bottomMargin: 180, leftMargin: 50, rightMargin: 50),
-  reel('Reel', '🎬', '15-20 sec vertical video', 5,
-    canvasWidth: 1080, canvasHeight: 1920,
-    topMargin: 250, bottomMargin: 450, leftMargin: 35, rightMargin: 35),
-  trialReel('Trial Reel', '🧪', '60-sec fast-cut for reach', 8,
-    canvasWidth: 1080, canvasHeight: 1920,
-    topMargin: 250, bottomMargin: 450, leftMargin: 35, rightMargin: 35),
-  singleImage('Single Image', '🖼️', 'One image + full caption pack', 1,
-    canvasWidth: 1080, canvasHeight: 1080,
-    topMargin: 100, bottomMargin: 100, leftMargin: 50, rightMargin: 50);
+  carousel(
+    'Carousel',
+    '📚',
+    'Swipeable multi-slide post',
+    7,
+    canvasWidth: 1080,
+    canvasHeight: 1440,
+    topMargin: 180,
+    bottomMargin: 180,
+    leftMargin: 50,
+    rightMargin: 50,
+  ),
+  reel(
+    'Reel',
+    '🎬',
+    '15-20 sec vertical video',
+    5,
+    canvasWidth: 1080,
+    canvasHeight: 1920,
+    topMargin: 250,
+    bottomMargin: 450,
+    leftMargin: 35,
+    rightMargin: 35,
+  ),
+  trialReel(
+    'Trial Reel',
+    '🧪',
+    '60-sec fast-cut for reach',
+    8,
+    canvasWidth: 1080,
+    canvasHeight: 1920,
+    topMargin: 250,
+    bottomMargin: 450,
+    leftMargin: 35,
+    rightMargin: 35,
+  ),
+  singleImage(
+    'Single Image',
+    '🖼️',
+    'One image + full caption pack',
+    1,
+    canvasWidth: 1080,
+    canvasHeight: 1080,
+    topMargin: 100,
+    bottomMargin: 100,
+    leftMargin: 50,
+    rightMargin: 50,
+  );
 
   final String label;
   final String emoji;
@@ -505,10 +453,18 @@ enum ContentFormat {
   final int leftMargin;
   final int rightMargin;
 
-  const ContentFormat(this.label, this.emoji, this.description, this.defaultSlideCount,
-    {required this.canvasWidth, required this.canvasHeight,
-     required this.topMargin, required this.bottomMargin,
-     required this.leftMargin, required this.rightMargin});
+  const ContentFormat(
+    this.label,
+    this.emoji,
+    this.description,
+    this.defaultSlideCount, {
+    required this.canvasWidth,
+    required this.canvasHeight,
+    required this.topMargin,
+    required this.bottomMargin,
+    required this.leftMargin,
+    required this.rightMargin,
+  });
 }
 
 extension FormatExt on ContentFormat {
@@ -526,7 +482,8 @@ extension FormatExt on ContentFormat {
     ContentFormat.singleImage => 1,
   };
 
-  String get safeZoneSpec => '''
+  String get safeZoneSpec =>
+      '''
 Safe Zone (content must stay within these margins):
   Canvas: ${canvasWidth}x${canvasHeight}px
   Top Margin: ${topMargin}px
@@ -536,7 +493,8 @@ Safe Zone (content must stay within these margins):
   Safe Area: ${canvasWidth - leftMargin - rightMargin}x${canvasHeight - topMargin - bottomMargin}px
   (All key text, characters, and visual elements MUST remain inside this safe area)''';
 
-  String get visualPromptSpec => '''
+  String get visualPromptSpec =>
+      '''
 Visual Prompt Spec (for AI image/video generation):
   Format: $label ($description)
   Canvas: ${canvasWidth}x${canvasHeight}px (${aspectRatio})

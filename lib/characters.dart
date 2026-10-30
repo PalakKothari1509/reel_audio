@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'character_definitions.dart';
 import 'json_file_store.dart';
 
 // ── The cast ──────────────────────────────────────────────────────────────────
@@ -17,10 +18,13 @@ import 'json_file_store.dart';
 
 class CharacterRef {
   final String name;
+
   /// Pasted into every prompt exactly as written. Rewording it breaks the likeness.
   final String description;
+
   /// Absolute path to a face picked from the gallery, or null when none was picked.
   final String? imagePath;
+
   /// A face shipped inside the app, used when nothing has been picked.
   ///
   /// Means the cast has faces from the moment the app is installed — nothing to set
@@ -40,25 +44,32 @@ class CharacterRef {
 
   bool get hasImage => imagePath != null && imagePath!.isNotEmpty;
 
-  CharacterRef copyWith({String? name, String? description, String? imagePath, bool clearImage = false}) =>
-      CharacterRef(
-        name: name ?? this.name,
-        description: description ?? this.description,
-        imagePath: clearImage ? null : (imagePath ?? this.imagePath),
-        assetPath: assetPath,
-      );
+  CharacterRef copyWith({
+    String? name,
+    String? description,
+    String? imagePath,
+    bool clearImage = false,
+  }) => CharacterRef(
+    name: name ?? this.name,
+    description: description ?? this.description,
+    imagePath: clearImage ? null : (imagePath ?? this.imagePath),
+    assetPath: assetPath,
+  );
 
   // assetPath is deliberately not saved: it comes from the build, not the phone, so
   // reading it back from an old file would pin the app to a picture that has since
   // been renamed or removed.
-  Map<String, dynamic> toJson() =>
-      {'name': name, 'description': description, 'image': imagePath};
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'description': description,
+    'image': imagePath,
+  };
 
   factory CharacterRef.fromJson(Map<String, dynamic> json) => CharacterRef(
-        name: json['name'] as String? ?? '',
-        description: json['description'] as String? ?? '',
-        imagePath: json['image'] as String?,
-      );
+    name: json['name'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    imagePath: json['image'] as String?,
+  );
 }
 
 /// The starting cast, ready to use before anyone sets anything up.
@@ -66,43 +77,14 @@ class CharacterRef {
 /// Ria, Rio and Cuty are worded exactly as the reels already use them. Mum and Dad
 /// are here because the stories mention them and a character with no description
 /// comes out looking different in every picture.
-const kDefaultCast = <CharacterRef>[
-  CharacterRef(
-    name: "Ria",
-    assetPath: "assets/characters/Ria.jpg",
-    description: "toddler girl, light brown hair in two short pigtails tied with pink bows, soft fringe across the forehead, large round dark brown eyes with long lashes, fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, chubby toddler body proportions",
-  ),
-  CharacterRef(
-    name: "Rio",
-    assetPath: "assets/characters/Rio.jpg",
-    description: "toddler boy, tousled medium brown hair, large round amber-brown eyes with long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black lace-up sneakers with white soles, chubby toddler body proportions, slightly taller than Ria",
-  ),
-  CharacterRef(
-    name: "Cuty",
-    assetPath: "assets/characters/Cuty.jpg",
-    description: "fluffy white bunny, long upright ears with soft pink inner colouring, coral-pink fabric bow tied at the neck, very large round dark brown eyes with lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing upright like a toddler",
-  ),
-  CharacterRef(
-    name: "Mumma",
-    assetPath: "assets/characters/Mumma.jpg",
-    description: "young Indian mother, medium brown hair in a high rounded bun with a few loose strands, fair-medium skin, large dark brown eyes, small red bindi, gold jhumka earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari floral embroidery, blue jeans, brown flip-flop sandals, gentle warm smile",
-  ),
-  CharacterRef(
-    name: "Papa",
-    assetPath: "assets/characters/Papa.jpg",
-    description: "young Indian father, short spiky black hair, thick dark eyebrows, light stubble beard, warm tan skin, dark brown eyes, light blue full-sleeve kurta with blue and gold embroidery at the mandarin collar and cuffs, matching light blue pyjama trousers, brown embroidered juttis, friendly closed-mouth smile",
-  ),
-  CharacterRef(
-    name: "Daadi",
-    assetPath: "assets/characters/Daadi.jpg",
-    description: "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with soft wrinkles and laugh lines, dark brown eyes, round gold-rimmed glasses, small red bindi, gold jhumka earrings, cream saree with a gold woven border and small gold floral motifs, cream embroidered juttis, warm affectionate smile",
-  ),
-  CharacterRef(
-    name: "Teacher",
-    assetPath: "assets/characters/Teacher.jpg",
-    description: "Indian school teacher, dark hair in a low bun with small white gajra flowers, warm tan skin, dark brown eyes, round gold-rimmed glasses, small red bindi, small gold earrings, blue three-quarter-sleeve kurta with white block-printed floral motifs, white leggings, blue juttis, holding a blue hardback book, encouraging smile",
-  ),
-];
+final List<CharacterRef> kDefaultCast = List.unmodifiable([
+  for (final definition in kCharacterDefinitions)
+    CharacterRef(
+      name: definition.name,
+      assetPath: definition.assetPath,
+      description: definition.referenceDescription,
+    ),
+]);
 
 class _CharacterFileStore extends JsonFileStore<CharacterRef> {
   _CharacterFileStore() : super('characters.json');
@@ -111,7 +93,8 @@ class _CharacterFileStore extends JsonFileStore<CharacterRef> {
   String idOf(CharacterRef item) => item.name;
 
   @override
-  CharacterRef fromJson(Map<String, dynamic> json) => CharacterRef.fromJson(json);
+  CharacterRef fromJson(Map<String, dynamic> json) =>
+      CharacterRef.fromJson(json);
 
   @override
   Map<String, dynamic> toJson(CharacterRef item) => item.toJson();
@@ -126,9 +109,7 @@ class CharacterStore {
   /// Loads the saved cast, seeding the defaults the first time the app runs.
   static Future<List<CharacterRef>> load() async {
     try {
-      final saved = await _store.loadAll(
-        shouldKeep: (c) => c.name.isNotEmpty,
-      );
+      final saved = await _store.loadAll(shouldKeep: (c) => c.name.isNotEmpty);
       if (saved.isEmpty) {
         await save(kDefaultCast);
         return List.of(kDefaultCast);
@@ -142,16 +123,27 @@ class CharacterStore {
       final checked = <CharacterRef>[];
       for (final c in saved) {
         final stillThere = c.hasImage && await File(c.imagePath!).exists();
-        final matches = kDefaultCast
-            .where((d) => d.name.toLowerCase() == c.name.toLowerCase());
+        final matches = kDefaultCast.where(
+          (d) => d.name.toLowerCase() == c.name.toLowerCase(),
+        );
         final bundled = matches.isEmpty ? null : matches.first.assetPath;
 
-        checked.add(CharacterRef(
-          name: c.name,
-          description: c.description,
-          imagePath: stillThere ? c.imagePath : null,
-          assetPath: bundled,
-        ));
+        checked.add(
+          CharacterRef(
+            name: c.name,
+            description: c.description,
+            imagePath: stillThere ? c.imagePath : null,
+            assetPath: bundled,
+          ),
+        );
+      }
+      final savedNames = checked
+          .map((character) => character.name.toLowerCase())
+          .toSet();
+      for (final character in kDefaultCast) {
+        if (savedNames.add(character.name.toLowerCase())) {
+          checked.add(character);
+        }
       }
       return checked;
     } catch (_) {
@@ -170,12 +162,22 @@ class CharacterStore {
   /// reference kept there is gone by next week. Named after the character rather than
   /// given a unique name, so choosing a new face replaces the old one instead of
   /// leaving the phone collecting every picture ever picked.
-  static Future<String> saveFace(String characterName, String pickedPath) async {
-    final dir = Directory('${(await getApplicationDocumentsDirectory()).path}/$_folder');
+  static Future<String> saveFace(
+    String characterName,
+    String pickedPath,
+  ) async {
+    final dir = Directory(
+      '${(await getApplicationDocumentsDirectory()).path}/$_folder',
+    );
     if (!await dir.exists()) await dir.create(recursive: true);
 
-    final safeName = characterName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_');
-    final extension = pickedPath.contains('.') ? pickedPath.split('.').last : 'jpg';
+    final safeName = characterName.toLowerCase().replaceAll(
+      RegExp(r'[^a-z0-9]'),
+      '_',
+    );
+    final extension = pickedPath.contains('.')
+        ? pickedPath.split('.').last
+        : 'jpg';
     final target = '${dir.path}/$safeName.$extension';
 
     // Delete first: writing over a file the image cache is holding shows the old one.
@@ -195,79 +197,31 @@ class CharacterStore {
 
 typedef CharOption = ({String id, String name, String emoji});
 
-const List<CharOption> kCharacterOptions = [
-  (id: 'ria', name: 'Ria', emoji: '🌸'),
-  (id: 'rio', name: 'Rio', emoji: '💙'),
-  (id: 'cuty', name: 'Cuty', emoji: '🐰'),
-  (id: 'robot', name: 'Robot', emoji: '🤖'),
-  (id: 'mumma', name: 'Mumma', emoji: '👩'),
-  (id: 'papa', name: 'Papa', emoji: '👨'),
-  (id: 'daadi', name: 'Daadi', emoji: '👵'),
-  (id: 'teacher', name: 'Teacher', emoji: '👩‍🏫'),
-];
+final List<CharOption> kCharacterOptions = List.unmodifiable(
+  kCharacterDefinitions.map(
+    (definition) =>
+        (id: definition.id, name: definition.name, emoji: definition.emoji),
+  ),
+);
 
-const List<String> kCharacterNames =
-    ['Ria', 'Rio', 'Cuty', 'Robot', 'Mumma', 'Papa', 'Daadi', 'Teacher'];
+final List<String> kCharacterNames = List.unmodifiable(
+  kCharacterDefinitions.map((definition) => definition.name),
+);
 
-const Map<String, String> kCharacterDescriptions = {
-  'Ria': "toddler girl, light brown hair in two short pigtails tied with pink bows, "
-      "soft fringe across the forehead, large round dark brown eyes with long lashes, "
-      "fair skin with rosy cheeks and light freckles, pink short-sleeved tiered dress "
-      "covered in small gold stars with pink lace trim on each tier, pink mary-jane shoes, "
-      "chubby toddler body proportions",
-  'Rio': "toddler boy, tousled medium brown hair, large round amber-brown eyes with "
-      "long lashes, fair skin with rosy cheeks, thick dark eyebrows, plain blue-grey "
-      "short-sleeved t-shirt, matching blue-grey shorts with a side pocket, black "
-      "lace-up sneakers with white soles, chubby toddler body proportions, slightly "
-      "taller than Ria",
-  'Cuty': "fluffy white bunny, long upright ears with soft pink inner colouring, "
-      "coral-pink fabric bow tied at the neck, very large round dark brown eyes with "
-      "lashes, small pink nose, pink blush on both cheeks, chubby rounded body standing "
-      "upright like a toddler",
-  'Robot': "friendly AI robot, white and silver sleek body with soft edges, teal blue "
-      "accent lights along the chest and arms, expressive LED screen face that shows "
-      "gentle eyes and curious expressions, small retractable arms with precision grippers, "
-      "compact and child-height so it can interact at eye level with Ria and Rio",
-  'Mumma': "young Indian mother, medium brown hair in a high bun with a few loose "
-      "strands, fair-medium skin, large dark brown eyes, small red bindi, gold jhumka "
-      "earrings, mustard-yellow three-quarter-sleeve kurta with white chikankari "
-      "floral embroidery, blue jeans, comfortable smile",
-  'Papa': "young Indian father, short neat black hair, warm brown eyes, light stubble, "
-      "fair skin, light blue full-sleeve kurta with subtle embroidery, "
-      "matching pyjama trousers, brown juttis, friendly expression",
-  'Daadi': "Indian grandmother, silver-grey hair in a neat bun, warm tan skin with "
-      "soft wrinkles and laugh lines, dark brown eyes behind round gold-rimmed glasses, "
-      "small red bindi, gold jhumka earrings, cream saree with gold border, warm "
-      "affectionate smile",
-  'Teacher': "Indian school teacher, dark hair in a low bun with small white gajra "
-      "flowers, warm tan skin, dark brown eyes, round gold-rimmed glasses, small red "
-      "bindi, small gold earrings, blue three-quarter-sleeve kurta, holding a book, "
-      "encouraging smile",
-};
+final Map<String, String> kCharacterDescriptions = Map.unmodifiable({
+  for (final definition in kCharacterDefinitions)
+    definition.name: definition.imagePromptDescription,
+});
 
 String characterDescription(String name) =>
     kCharacterDescriptions[name] ?? 'standard character appearance';
 
 /// Speech quirks per character — used by the generator so each person
 /// actually sounds like themselves, not like one narrator.
-const Map<String, String> kCharacterVoices = {
-  'Mumma': 'Short Hinglish commands, counts instead of shouting. '
-      'Example: "Ek. Do. Teesra bolungi toh rone lagega."',
-  'Papa': 'Over-promises, fixes nothing today. '
-      'Example: "Kal subah main theek kar dunga."',
-  'Daadi': 'Narrates in third person, compares to Papa\'s childhood. '
-      'Example: "Papa bhi aise hi the. Poore ghar mein atta tha."',
-  'Teacher': 'Uses "Friends", "in our class", full sentences. '
-      'Example: "Friends, kya hum ek ek karke try karein?"',
-  'Ria': 'Full sentences, negotiates, keeps score. '
-      'Example: "Main pehle thi. Toh main aakhir mein bhi thi."',
-  'Rio': 'Two-word demands, loud, refuses once then gives in. '
-      'Example: "Mera car. Abhi."',
-  'Cuty': 'Repeats adult words wrongly. '
-      'Example: "Gaana khallaam? Phir tumhaari baari."',
-  'Robot': 'Literal, helpful, slightly robotic phrasing. '
-      'Example: "I have calculated the optimal solution: share."',
-};
+final Map<String, String> kCharacterVoices = Map.unmodifiable({
+  for (final definition in kCharacterDefinitions)
+    if (definition.voice.isNotEmpty) definition.name: definition.voice,
+});
 
 /// Returns a voice hint for the given character name, or empty string.
 String characterVoice(String name) => kCharacterVoices[name] ?? '';
@@ -275,16 +229,11 @@ String characterVoice(String name) => kCharacterVoices[name] ?? '';
 /// Short, one-line speech pattern used for prompt injection.
 /// This is distinct from [characterVoice]: it gives a 2-3 word
 /// speech style tag, while [characterVoice] gives a longer example.
-const Map<String, String> kSpeechPatterns = {
-  'Ria': 'Negotiates with questions.',
-  'Rio': 'Two-word demands, loud.',
-  'Cuty': 'Repeats adult words wrongly.',
-  'Robot': 'Literal, slightly robotic.',
-  'Mumma': 'Short Hinglish commands, counts.',
-  'Papa': 'Over-promises, fixes later.',
-  'Daadi': 'Third person, childhood comparisons.',
-  'Teacher': 'Classroom phrases, full sentences.',
-};
+final Map<String, String> kSpeechPatterns = Map.unmodifiable({
+  for (final definition in kCharacterDefinitions)
+    if (definition.promptSpeechPattern.isNotEmpty)
+      definition.name: definition.promptSpeechPattern,
+});
 
 /// Returns a short speech pattern tag for the given character name,
 /// or empty string when unknown.

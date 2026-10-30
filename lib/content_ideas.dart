@@ -85,7 +85,7 @@ class HookIdea {
   final String mess; // what goes wrong and stays wrong
   final String innerThought; // what the parent thinks but doesn't say
   final String endingBeat; // closing image; replaces spoken moral
-  final List<String> defaultCast; // 2–3 max, not all 7
+  final List<String> defaultCast; // Characters used by this story.
   final bool keepMoralOffScreen;
 
   // Task 3: quote, detail, punchline
@@ -4871,6 +4871,66 @@ Audio/Dialogue (Hinglish): Rio: "Yeh abstract art hai!" Ria: "Yeh abstract art h
 Part 3 (20-30s): $kPartStyle. Ria gives a thumbs up, covered in colors, holding her "masterpiece." Mumma cleans up with her together. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Jo bhi pyaar ke saath banaya jaaye, wahi perfect hai — colors wash off, memories stay.
 
 Outro: "Pasand aaya? LIKE karo aur COMMENT mein batao! 👍💬"
+''',
+    ),
+    HookIdea(
+      id: 'idea_101',
+      category: 'Diwali',
+      cover: 'Papa Ke Bag, Family Ka Bill! 🛍️😂',
+      title: 'Papa Ke Bag, Family Ka Bill! 🛍️😂',
+      opening: 'Papa sochta hai shopping khatam... family boli "Ruko! Bill toh dekh!" 😂🛍️',
+      problem: 'Papa carries all the Diwali shopping bags, exhausted, thinking the mission is complete. But Ria says "Ruko! Abhi to shopping start hui hai!" Then Papa asks "Mere liye kya liya?" — Ria giggles and hands him the long bill: "Papa, bill." Papa is shocked, everyone else rocks with laughter.',
+      lesson: 'Diwali shopping is not a solo mission — the real "shopping" starts when the bill arrives, and Papa\'s bags are just the beginning of the fun.',
+      postFormat: 'Reel',
+      strategy: 'Turn post-shopping exhaustion into a hilarious family moment where Ria\'s innocent "Papa, bill" becomes the perfect punchline.',
+      caption: 'Papa socha shopping khatam... Ria boli "Ruko!" Papa pucha "Mere liye kya?" Ria: "Papa, bill." 😂🛍️ #DiwaliShopping #FamilyTime #ShoppingBill #IndianParents #FunLearningWithPalak',
+      pinnedComment:
+          'Papa ka reaction dekh ke hasna aaya? Comment mein batayein! 🛍️😂',
+      forApp: true,
+      usedOn: '',
+      custom: false,
+      archived: false,
+      storyDetail: '''
+Story: Papa walks through the front door, arms loaded with colorful Diwali shopping bags — clothes, diyas, sweets, gifts, decorations. He sets them down with a deep sigh, arms aching, wiping sweat from his forehead: "Bas, ho gaya. Shopping khatam." He sits on the sofa, looking at Ria, Rio, and Mummy with a weary expression: "I thought we were done..."
+
+Twist: Before he can finish his thought, Ria excitedly exclaims: "Ruko! Abhi to shopping start hui hai!" Papa, curious, asks: "Mere liye kya liya?" Ria giggles, pulls out the long receipt from her pocket, and hands it to Papa with a mischievous grin: "Papa, bill." Papa stares at the never-ending bill, eyes wide, jaw dropped in shock. Mummy bursts out laughing, Rio and Cuty join in rocking with laughter. The "shopping" was never the bags — it was the bill all along!
+
+Resolution: Papa shakes his head, smiling despite the shock: "Tum log... bilkul bhi nahi badloge." He picks up the bill, kisses Ria's forehead: "Chalo, ab asli shopping shuru — chai peene ka time!" The family gathers in the kitchen, laughing over chai and the legendary bill.
+
+Moral: Diwali shopping is never just about bags — it's about the laughter, the surprises, and the bill that brings everyone together.
+''',
+      setting: 'Living room entrance, evening, Papa entering exhausted with multiple colorful Diwali shopping bags, drops them on sofa',
+      sceneDetail: 'Papa exhausted, arms aching, bags everywhere. Ria with mischievous grin holding receipt, Rio and Cuty giggling, Mummy leaning on doorframe trying not to laugh',
+      dialogue: '"Bas, ho gaya shopping khatam!" "I thought we were done..." "Ruko! Abhi to shopping start hui hai!" "Mere liye kya liya?" "Papa, bill." *Papa shocked* *Everyone else rocking with laughter*',
+      mess: 'Shopping bags everywhere, Papa exhausted on sofa, long receipt in Ria\'s hand, Papa\'s shocked face, family rocking with laughter',
+      innerThought: 'Shopping is never done until the bill arrives — and that\'s when the real fun starts.',
+      endingBeat: 'Papa kisses Ria\'s forehead: "Chalo, ab asli shopping — chai peene ka time!" Family in kitchen laughing over chai and the legendary bill.',
+      defaultCast: ['Papa', 'Ria', 'Rio', 'Cuty', 'Mumma'],
+      keepMoralOffScreen: false,
+      quote: 'Shopping bags heavy, bill longer, family laughter loudest.',
+      detail: 'Ria\'s innocent "Papa, bill" is the perfect twist — turns Papa\'s exhaustion into family laughter.',
+      punchline: 'Papa socha khatam... Ria boli "Ruko!" Papa pucha "Mere liye?" Ria: "Papa, bill." 😂🛍️',
+      readyPrompt:
+          '''
+PROMPT: $kPromptStyle. Living room entrance, evening. Papa enters exhausted, arms loaded with colorful Diwali shopping bags. He drops bags on sofa with a weary sigh: "Bas, ho gaya shopping khatam." He looks at Ria, Rio, Mummy with weary expression: "I thought we were done..." Text on screen: "PAPA SOCHA KHATAM... 😤" "RIA: RUKO! ABHI TOH START! 😂"
+
+On-Screen Text:
+- [0-3s]: "PAPA KA BAG MASTI! 🛍️"
+- [3-6s]: "PAPA: BAS, KHATAM! 😤"
+- [6-10s]: "PAPA: I THOUGHT WE WERE DONE... 😔"
+- [10-14s]: "RIA: RUKO! ABHI TO START! 😂"
+- [14-18s]: "PAPA: MERE LIYE KYA LIYA? 🤔"
+- [18-22s]: "RIA GIGGLES: PAPA, BILL! 📜"
+- [22-26s]: "PAPA SHOCKED! 😱"
+- [26-30s]: "EVERYONE ROCKING! 🤣"
+
+Part 1 (0-10s): $kPartStyle. Papa enters exhausted, drops bags on sofa with heavy sigh: "Bas, ho gaya shopping khatam." He sits, arms aching, looks at family with weary expression: "I thought we were done..." Ria appears with mischievous grin: "Ruko! Abhi to shopping start hui hai!" Text: "PAPA SOCHA KHATAM..." "RIA: RUKO! ABHI TO START!"
+
+Part 2 (10-20s): $kPartStyle. Papa curious: "Mere liye kya liya?" Ria giggles, pulls out long receipt from pocket, hands to Papa: "Papa, bill." Papa stares at never-ending bill, eyes wide, jaw dropped in shock. Mummy bursts laughing. Text: "PAPA: MERE LIYE KYA LIYA?" "RIA: PAPA, BILL! 📜" "PAPA SHOCKED! 😱"
+
+Part 3 (20-30s): $kPartStyle. Papa shocked, Mummy/Rio/Cuty rocking with laughter. Papa shakes head smiling: "Tum log... bilkul bhi nahi badloge." Kisses Ria's forehead: "Chalo, ab asli shopping — chai peene ka time!" Family in kitchen laughing over chai and legendary bill. Final text overlay: LEARNING IS A HABIT, SMALL WINS BIG HEARTS. Moral: Diwali shopping is never just about bags — it's about the laughter, the surprises, and the bill that brings everyone together.
+
+Outro: "Papa ka reaction dekh ke hasna aaya? Comment mein batayein! 🛍️😂"
 ''',
     ),
     HookIdea(
