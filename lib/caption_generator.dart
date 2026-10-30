@@ -108,6 +108,7 @@ String buildCaptionPrompt({
   required CaptionLanguage language,
   String bucket = '',
   String extraNotes = '',
+  String sourceCaption = '',
 }) {
   final buffer = StringBuffer()
     ..writeln(
@@ -117,7 +118,9 @@ String buildCaptionPrompt({
     ..writeln('TOPIC: $topic')
     ..writeln()
     ..writeln('AUDIENCE: ${BrandDefaults.audience}')
-    ..writeln('BRAND FEEL: Little stories, big lessons. Real preschool moments.')
+    ..writeln(
+      'BRAND FEEL: Little stories, big lessons. Real preschool moments.',
+    )
     ..writeln('LANGUAGE: ${language.guidance}.')
     ..writeln();
 
@@ -129,13 +132,29 @@ String buildCaptionPrompt({
     buffer.writeln('EXTRA NOTES FROM PALAK: ${extraNotes.trim()}');
     buffer.writeln();
   }
+  if (sourceCaption.trim().isNotEmpty) {
+    buffer
+      ..writeln('EXISTING CAPTION TO REWRITE:')
+      ..writeln(sourceCaption.trim())
+      ..writeln()
+      ..writeln(
+        'Preserve the original meaning and specific details. Rewrite the '
+        'wording in the house voice; do not add facts that are not in the '
+        'topic or existing caption.',
+      )
+      ..writeln();
+  }
 
   buffer
     ..writeln(kCaptionSpec)
     ..writeln()
     ..writeln('The Fun Learning With Palak world has Ria, a toddler girl who')
-    ..writeln('gets into everyday preschool situations, and Cuty, her small white')
-    ..writeln('bunny with a pink bow. Bring them in only when the topic suits it.')
+    ..writeln(
+      'gets into everyday preschool situations, and Cuty, her small white',
+    )
+    ..writeln(
+      'bunny with a pink bow. Bring them in only when the topic suits it.',
+    )
     ..writeln()
     ..writeln('Return ONLY valid JSON in exactly this shape:')
     ..writeln()
@@ -147,7 +166,9 @@ String buildCaptionPrompt({
   "hashtags": ["#tagone", "#tagtwo", "#tagthree", "#tagfour", "#tagfive"]
 }''')
     ..writeln()
-    ..writeln('"hashtags" must hold exactly 5 tags, specific to this post rather')
+    ..writeln(
+      '"hashtags" must hold exactly 5 tags, specific to this post rather',
+    )
     ..writeln('than five big generic tags. Do not repeat a tag.');
 
   return buffer.toString();
@@ -160,13 +181,18 @@ Future<GeneratedCaption> generateCaption({
   required CaptionLanguage language,
   String bucket = '',
   String extraNotes = '',
+  String sourceCaption = '',
   String? apiKey,
   void Function(String message)? onWait,
 }) async {
   final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;
 
   if (key.trim().isEmpty) {
-    return captionFromTemplate(topic: topic, language: language, bucket: bucket);
+    return captionFromTemplate(
+      topic: topic,
+      language: language,
+      bucket: bucket,
+    );
   }
 
   final response = await geminiPost(
@@ -185,6 +211,7 @@ Future<GeneratedCaption> generateCaption({
                 language: language,
                 bucket: bucket,
                 extraNotes: extraNotes,
+                sourceCaption: sourceCaption,
               ),
             },
           ],
@@ -208,13 +235,17 @@ Future<GeneratedCaption> generateCaption({
   );
 
   if (response.statusCode != 200) {
-    throw Exception(response.statusCode == 503 || response.statusCode == 429
-        ? geminiBusyMessage(response.statusCode, response.body)
-        : 'Gemini error ${response.statusCode}: ${response.body}');
+    throw Exception(
+      response.statusCode == 503 || response.statusCode == 429
+          ? geminiBusyMessage(response.statusCode, response.body)
+          : 'Gemini error ${response.statusCode}: ${response.body}',
+    );
   }
 
   final reply = jsonDecode(response.body);
-  final text = reply['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+  final text =
+      reply['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ??
+      '';
   if (text.trim().isEmpty) throw Exception('Gemini returned no caption.');
 
   final Map<String, dynamic> json;
@@ -238,13 +269,31 @@ Future<GeneratedCaption> generateCaption({
     throw Exception('Gemini returned an incomplete caption.');
   }
 
+  final hashtagCandidates = [
+    ...hashtags,
+    ...captionFromTemplate(
+      topic: topic,
+      language: language,
+      bucket: bucket,
+    ).hashtags,
+  ];
+  final uniqueHashtags = <String>[];
+  for (final tag in hashtagCandidates) {
+    final normalized = tag.startsWith('#')
+        ? tag.toLowerCase()
+        : '#${tag.toLowerCase()}';
+    if (normalized.length > 1 && !uniqueHashtags.contains(normalized)) {
+      uniqueHashtags.add(normalized);
+    }
+    if (uniqueHashtags.length == BrandDefaults.hashtagCount) break;
+  }
+
   return GeneratedCaption(
     hook: '${json['hook'] ?? ''}'.trim(),
     body: body,
     takeaway: '${json['takeaway'] ?? ''}'.trim(),
     cta: '${json['cta'] ?? ''}'.trim(),
-    // Five is the rule. Take what came back and top up, never ship seven.
-    hashtags: hashtags.take(5).toList(),
+    hashtags: uniqueHashtags,
   );
 }
 
@@ -326,16 +375,17 @@ Future<GeneratedCaption> generateCaptionWithStore({
   required ApiKeyStore store,
   String bucket = '',
   String extraNotes = '',
+  String sourceCaption = '',
   void Function(String message)? onWait,
-}) =>
-    generateCaption(
-      topic: topic,
-      language: language,
-      bucket: bucket,
-      extraNotes: extraNotes,
-      apiKey: store.getGeminiApiKey(),
-      onWait: onWait,
-    );
+}) => generateCaption(
+  topic: topic,
+  language: language,
+  bucket: bucket,
+  extraNotes: extraNotes,
+  sourceCaption: sourceCaption,
+  apiKey: store.getGeminiApiKey(),
+  onWait: onWait,
+);
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -364,7 +414,10 @@ class _CaptionGeneratorScreenState extends State<CaptionGeneratorScreen> {
   Future<void> _generate() async {
     final topic = _topicCtrl.text.trim();
     if (topic.isEmpty) {
-      setState(() => _error = 'Type the topic first, for example: shoe rack time chaos');
+      setState(
+        () =>
+            _error = 'Type the topic first, for example: shoe rack time chaos',
+      );
       return;
     }
 
@@ -450,7 +503,9 @@ class _CaptionGeneratorScreenState extends State<CaptionGeneratorScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.auto_awesome),
-            label: Text(caption == null ? 'Generate Caption' : 'Generate Another'),
+            label: Text(
+              caption == null ? 'Generate Caption' : 'Generate Another',
+            ),
           ),
           Gap.l,
           if (_error != null) ...[
@@ -523,7 +578,12 @@ class _CaptionGeneratorScreenState extends State<CaptionGeneratorScreen> {
     );
   }
 
-  Widget _field(String label, TextEditingController ctrl, {String? hint, int lines = 1}) {
+  Widget _field(
+    String label,
+    TextEditingController ctrl, {
+    String? hint,
+    int lines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

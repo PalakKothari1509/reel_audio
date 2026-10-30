@@ -355,3 +355,26 @@ speechPattern(name)         // Speech pattern string
 These match the 8 character image assets in `pubspec.yaml`:
 `assets/characters/Ria.jpg` through `assets/characters/Robot.jpg`
 
+---
+
+## 10. Instagram Workflows
+
+The home screen's **Instagram Workflows** entry opens six optional drafts in
+`instagram_workflow_screen.dart`: account/per-approved-idea growth planning,
+Reels scripts, carousel drafts, caption rewrites, hashtag/keyword maps, and
+Stories sequences.
+
+- Approved ideas come from `ContentLibraryService`; category and canonical
+  characters are selected in the workflow form.
+- Reels call the existing `generateScriptWithGemini` path. Carousel prompts use
+  `generateCarouselPrompts`; captions reuse `caption_generator.dart`; growth
+  planning and Stories use `instagram_workflow_service.dart`.
+- Offline generation is explicit. Stories are text/frame plans only; no
+  publishing, rendering, trend lookup, or Instagram analytics API is provided.
+- Growth planning uses saved or manually entered metrics as user-recorded
+  evidence. Without metrics, the plan identifies recommendations as estimates
+  or hypotheses.
+- Generated post drafts use the existing quality checker and require exactly
+  five unique hashtags before saving. Drafts are editable and stored as
+  `ContentLibraryItem` entries with optional `workflowType` and `workflowData`.
+  Missing workflow keys in older library JSON remain valid.

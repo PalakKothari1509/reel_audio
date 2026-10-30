@@ -50,6 +50,7 @@ import 'add_idea_screen.dart';
 import 'content_studio_screens.dart';
 import 'offline_story_maker_screen.dart';
 import 'quick_content.dart';
+import 'instagram_workflow_screen.dart';
 
 /// Android side of saving a finished reel.
 /// because saving a video has nothing to do with speech.
@@ -504,6 +505,24 @@ Future<void> main() async {
                 _appNavigatorKey.currentContext!,
                 MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
               ),
+            ),
+          ),
+        ),
+        onInstagramWorkflows: () => Navigator.push(
+          _appNavigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (_) => InstagramWorkflowsScreen(
+              keyStore: _keyStore!,
+              generateReelScript: (idea, characterIds) async {
+                final lines = await generateScriptWithGemini(
+                  videoDescription: idea,
+                  language: 'Hinglish',
+                  style: 'Funny',
+                  videoDuration: 30,
+                  characterIds: characterIds,
+                );
+                return lines.map((line) => line.text).join('\n');
+              },
             ),
           ),
         ),

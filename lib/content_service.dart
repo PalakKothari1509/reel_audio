@@ -13,6 +13,7 @@ import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_library.dart';
 import 'idea_inbox_store.dart';
+import 'quality_check.dart';
 
 /// A unified service that coordinates IdeaVault, ContentLibraryStore,
 /// and content-package creation in one place.
@@ -128,11 +129,21 @@ class ContentService {
   /// visible in All Content and My Content.
   static Future<ContentLibraryItem> saveGeneratedPackage(
     ContentPackage pkg,
-    String sourceIdeaId,
-  ) async {
+    String? sourceIdeaId, {
+    String? workflowType,
+    Map<String, dynamic> workflowData = const {},
+    IdeaStatus status = IdeaStatus.scripted,
+    QualityReport? qualityReport,
+    List<String>? tags,
+  }) async {
     final item = ContentLibraryItem.createFromPackage(
       pkg,
       sourceIdeaId: sourceIdeaId,
+      workflowType: workflowType,
+      workflowData: workflowData,
+      status: status,
+      qualityReport: qualityReport,
+      tags: tags,
     );
     await ContentLibraryStore.add(item);
     return item;

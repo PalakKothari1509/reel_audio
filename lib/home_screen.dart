@@ -16,6 +16,7 @@ class ContentStudioHome extends StatefulWidget {
 
   /// New simplified callbacks.
   final NavCallback onContentLibrary;
+  final NavCallback? onInstagramWorkflows;
   final NavCallback? onReviewAllIdeas;
   final NavCallback? onAddNewIdea;
   final CreateCallback? onCreateContent;
@@ -34,6 +35,7 @@ class ContentStudioHome extends StatefulWidget {
     required this.onCreateReel,
     required this.onSettings,
     required this.onContentLibrary,
+    this.onInstagramWorkflows,
     this.onReviewAllIdeas,
     this.onAddNewIdea,
     this.onCreateContent,
@@ -80,7 +82,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         _PrimaryAction(
           icon: Icons.image_outlined,
           title: 'Image Generation Prompt',
-          subtitle: 'One detailed prompt ready to paste into an image generator',
+          subtitle:
+              'One detailed prompt ready to paste into an image generator',
           onTap: widget.onImagePrompt!,
         ),
       ]);
@@ -129,6 +132,20 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
       ),
     ];
 
+    if (widget.onInstagramWorkflows != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.insights_outlined,
+          iconColor: AppColors.primary,
+          title: 'Instagram Workflows',
+          subtitle:
+              'Growth planning, Reels, carousels, captions, hashtags, Stories',
+          onTap: widget.onInstagramWorkflows!,
+        ),
+      ]);
+    }
+
     if (widget.onPromoComments != null) {
       goToActions.addAll([
         const SizedBox(height: 10),
@@ -165,10 +182,7 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         ),
       ),
       const SizedBox(height: 4),
-      const Text(
-        'What would you like to create today?',
-        style: AppText.hint,
-      ),
+      const Text('What would you like to create today?', style: AppText.hint),
       const SizedBox(height: 24),
       const Text('Create', style: AppText.section),
       const SizedBox(height: 12),
@@ -228,10 +242,7 @@ class _PrimaryAction extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.accent),
             gradient: LinearGradient(
-              colors: [
-                AppColors.accent,
-                AppColors.surface,
-              ],
+              colors: [AppColors.accent, AppColors.surface],
             ),
           ),
           child: Row(

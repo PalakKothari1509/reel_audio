@@ -94,6 +94,33 @@ void main() {
     expect(reloaded.title, pkg.hook);
   });
 
+  test('Instagram workflow metadata survives a library round trip', () async {
+    final item = ContentLibraryItem.createFromPackage(
+      samplePackage(),
+      sourceIdeaId: 'approved-idea-7',
+      workflowType: 'storiesSequence',
+      workflowData: const {
+        'editableText': 'FRAME 1\nTEXT: Try this',
+        'scope': 'Account',
+        'keywords': ['screen-free play', 'preschool'],
+      },
+      tags: const ['activity', 'instagram-workflow'],
+      status: IdeaStatus.scripted,
+    );
+    await ContentLibraryStore.add(item);
+
+    final reloaded = (await ContentLibraryStore.getAll()).single;
+    expect(reloaded.id, item.id);
+    expect(reloaded.sourceIdeaId, 'approved-idea-7');
+    expect(reloaded.workflowType, 'storiesSequence');
+    expect(reloaded.workflowData['editableText'], 'FRAME 1\nTEXT: Try this');
+    expect(
+      reloaded.workflowData['keywords'],
+      ['screen-free play', 'preschool'],
+    );
+    expect(reloaded.tags, ['activity', 'instagram-workflow']);
+  });
+
   // 4. A failed save is surfaced rather than reported as success.
   test('a failed write reports failure, not success', () async {
     ContentLibraryStore.resetDirectory();
@@ -199,6 +226,8 @@ void main() {
 
     final item = ContentLibraryItem.fromJson(json);
     expect(item.status, IdeaStatus.tested);
+    expect(item.workflowType, isNull);
+    expect(item.workflowData, isEmpty);
   });
 
   test('QualitySeverity enum index is bounds-checked', () {

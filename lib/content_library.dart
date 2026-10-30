@@ -27,6 +27,8 @@ class ContentLibraryItem {
   final Map<String, dynamic> performanceMetrics;
   final int reuseCount;
   final String? sourceIdeaId;
+  final String? workflowType;
+  final Map<String, dynamic> workflowData;
 
   ContentLibraryItem({
     required this.id,
@@ -46,6 +48,8 @@ class ContentLibraryItem {
     required this.performanceMetrics,
     required this.reuseCount,
     this.sourceIdeaId,
+    this.workflowType,
+    this.workflowData = const {},
   });
 
   ContentLibraryItem copyWith({
@@ -63,6 +67,8 @@ class ContentLibraryItem {
     String? instagramPostUrl,
     Map<String, dynamic>? performanceMetrics,
     int? reuseCount,
+    String? workflowType,
+    Map<String, dynamic>? workflowData,
   }) {
     return ContentLibraryItem(
       id: id,
@@ -82,6 +88,8 @@ class ContentLibraryItem {
       performanceMetrics: performanceMetrics ?? this.performanceMetrics,
       reuseCount: reuseCount ?? this.reuseCount,
       sourceIdeaId: sourceIdeaId,
+      workflowType: workflowType ?? this.workflowType,
+      workflowData: workflowData ?? this.workflowData,
     );
   }
 
@@ -118,6 +126,8 @@ class ContentLibraryItem {
         'performanceMetrics': performanceMetrics,
         'reuseCount': reuseCount,
         'sourceIdeaId': sourceIdeaId,
+        if (workflowType != null) 'workflowType': workflowType,
+        if (workflowData.isNotEmpty) 'workflowData': workflowData,
       };
 
   factory ContentLibraryItem.fromJson(Map<String, dynamic> json) {
@@ -154,6 +164,9 @@ class ContentLibraryItem {
       performanceMetrics: (json['performanceMetrics'] as Map?)?.cast<String, dynamic>() ?? {},
       reuseCount: json['reuseCount'] as int? ?? 0,
       sourceIdeaId: json['sourceIdeaId'] as String?,
+      workflowType: json['workflowType'] as String?,
+      workflowData:
+          (json['workflowData'] as Map?)?.cast<String, dynamic>() ?? const {},
     );
   }
 
@@ -197,7 +210,15 @@ class ContentLibraryItem {
     );
   }
 
-  static ContentLibraryItem createFromPackage(ContentPackage pkg, {String? sourceIdeaId}) {
+  static ContentLibraryItem createFromPackage(
+    ContentPackage pkg, {
+    String? sourceIdeaId,
+    String? workflowType,
+    Map<String, dynamic> workflowData = const {},
+    IdeaStatus status = IdeaStatus.scripted,
+    QualityReport? qualityReport,
+    List<String>? tags,
+  }) {
     final formats = FormatAdapter.adaptAll(pkg);
     return ContentLibraryItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -205,15 +226,18 @@ class ContentLibraryItem {
       topic: pkg.idea,
       bucket: pkg.bucket,
       format: pkg.format,
-      status: IdeaStatus.scripted,
+      status: status,
       contentPackage: pkg,
       formatOutputs: formats,
-      tags: [pkg.bucket.id],
+      tags: tags ?? [pkg.bucket.id],
+      qualityReport: qualityReport,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       performanceMetrics: {},
       reuseCount: 0,
       sourceIdeaId: sourceIdeaId,
+      workflowType: workflowType,
+      workflowData: workflowData,
     );
   }
 }
