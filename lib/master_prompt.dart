@@ -73,17 +73,40 @@ VISUAL STORYTELLING:
 LANGUAGE:
   Adults speak natural Hindi or Hinglish — never stilted or translated-sounding.
   Children speak short, age-appropriate Hinglish — simple words, limited grammar.
-  Dialogue serves the action; it does not replace visual storytelling.
+  Dialogue serves the action; it does not replace visual storytelling. Dialogue
+  must be idea-specific — the actual words this character would say, not a
+  generic placeholder. Do not force every character to speak; a silent
+  character who acts is fine.
 
-STORY PROGRESSION:
-  Part 1 (10s): Establish the real-life problem and the character's first action.
-  Part 2 (10s): Escalate tension through consequence, then resolve with a small, believable improvement.
-  Each part ends on a clear beat that makes the viewer want to see what happens next.
+STORY ACCURACY (the story idea is the source of truth):
+  Preserve the central problem, twist, resolution, and lesson of the selected
+  story idea exactly. Do not invent contradictory events, unrelated characters,
+  or a different moral. Every action, dialogue line, and prop must come from
+  the idea — do not swap it out for a generic stand-in.
 
-ON-SCREEN TEXT:
-  During image/video generation: render NONE. No on-screen text, no captions, no signs, no logos.
-  Text overlays are added later in the editor using the ON-SCREEN TEXT OVERLAYS section of the plan.
-  The overlay section specifies timing and content for post-generation addition only.''';
+REALISTIC PRESCHOOL OUTCOMES:
+  Show a small, believable improvement — a child trying, a parent nudging, one
+  manageable step better. Never claim an entire house is cleaned in minutes, a
+  tantrum is cured instantly, or a child masters an adult skill in one take.
+  Outcomes must respect the child's age (1-4): imperfect but caring parenting,
+  not magic.
+
+CONTINUITY:
+  Define the exact starting state and exact ending state for every clip:
+  character positions, expressions, props, and background. Each next clip must
+  continue from the previous clip's ending state — no teleporting, no
+  unexplained outfit or prop changes.
+
+ON-SCREEN TEXT (THREE DISTINCT LAYERS — DO NOT MIX THEM):
+  1. GENERATED VIDEO FRAMES: the model renders NONE. No on-screen text, no
+     captions, no signs, no logos. The frame is a clean picture with no text.
+  2. SPOKEN DIALOGUE: what the characters say out loud, in Hinglish. Audio
+     only — never drawn as text in the frame.
+  3. EDITOR OVERLAYS: actual story-specific text for sound-off viewing, written
+     to the ON-SCREEN TEXT OVERLAYS section and added later by the editor. The
+     overlay section specifies timing and content for post-generation addition
+     only, and must carry story-specific text — never an empty or generic
+     placeholder.''';
 
 /// Header fields every video prompt part must include.
 const List<String> kRequiredPromptSections = [
