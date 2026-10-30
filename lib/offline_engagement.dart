@@ -55,6 +55,8 @@ String buildOfflineImagePrompt({
   }
   buffer.writeln();
   buffer.writeln(kStoryStructureRules);
+  buffer.writeln();
+  buffer.writeln('NEGATIVE INSTRUCTIONS: $kNegativeInstructions');
   return buffer.toString();
 }
 

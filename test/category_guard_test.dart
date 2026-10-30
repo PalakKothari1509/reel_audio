@@ -68,6 +68,17 @@ void main() {
       }
     });
 
+    test('kDefaultHooks: defaultCast has at most 3 characters', () {
+      for (final h in kDefaultHooks) {
+        expect(
+          h.defaultCast.length,
+          lessThanOrEqualTo(3),
+          reason:
+              '${h.id} has ${h.defaultCast.length} defaultCast characters (max 3 allowed)',
+        );
+      }
+    });
+
     test('kDefaultHooks: readyPrompt with content contains Part 3', () {
       for (final h in kDefaultHooks) {
         if (h.readyPrompt.contains('Part 1 (') &&
@@ -599,7 +610,6 @@ Part 3 (20-30s): Content 3
       'asmr-cleaning-reel: safety regression - no child sitting in paste',
       () {
         final h = kDefaultHooks.firstWhere((e) => e.id == 'idea_55');
-        ;
         final combined =
             '${h.storyDetail} ${h.sceneDetail} ${h.mess} ${h.endingBeat}';
         expect(

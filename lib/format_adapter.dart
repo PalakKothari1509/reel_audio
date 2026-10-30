@@ -1,6 +1,7 @@
 import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_generator.dart';
+import 'master_prompt.dart';
 
 class FormatOutput {
   final ContentFormat format;
@@ -220,7 +221,8 @@ Characters: ${CharacterLibrary.all.map((c) => c.name).join(', ')}.
 Character Lock: ${CharacterLibrary.characterLockBlock}
 Bucket context: ${bucket.generationPrompt}
 High quality, 4K, Soft 3D Pixar/Disney-style render.
-'''.trim();
+$kVisualStyle
+NEGATIVE INSTRUCTIONS: $kNegativeInstructions'''.trim();
   }
 
   static String _carouselScript(ContentPackage pkg) {
@@ -325,7 +327,8 @@ Characters: ${CharacterLibrary.all.map((c) => c.name).join(', ')}.
 Character Lock: ${CharacterLibrary.characterLockBlock}
 Bucket context: ${bucket.generationPrompt}
 CINEMATIC VIDEO: Smooth camera movement (gentle pan/zoom/push), 2-3 second shot, 30fps, high quality.
-'''.trim();
+$kVisualStyle
+NEGATIVE INSTRUCTIONS: $kNegativeInstructions'''.trim();
   }
 
   static String _reelScript(ContentPackage pkg) {
@@ -614,7 +617,8 @@ Character Lock: ${CharacterLibrary.characterLockBlock}
 Bucket context: ${bucket.generationPrompt}
 HIGH DETAIL: 4K, professional photography quality, Soft 3D Pixar/Disney-style render.
 Perfect for Instagram single image post.
-'''.trim();
+$kVisualStyle
+NEGATIVE INSTRUCTIONS: $kNegativeInstructions'''.trim();
   }
 
   static String _generateAltText(SlideContent slide, ContentBucket bucket) {
