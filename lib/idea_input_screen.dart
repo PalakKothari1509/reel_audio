@@ -27,11 +27,15 @@ class IdeaInputScreen extends StatefulWidget {
   /// Called when the user taps Generate. Receives the idea text, selected
   /// character names, and additional instructions. If a hook with a
   /// pre-built viral prompt was selected, [readyPrompt] contains it.
+  /// If the hook has engagement data, [caption] and [pinnedComment]
+  /// will be populated.
   final void Function({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
+    String? caption,
+    String? pinnedComment,
   }) onGenerate;
 
   /// Optional: called when user taps "Show Prompt Only" — builds and displays
@@ -116,11 +120,15 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
         ? ['ria', 'rio', 'cuty']
         : List<String>.from(_selectedChars);
     final readyPrompt = _selectedHook?.readyPrompt.trim() ?? '';
+    final caption = _selectedHook?.caption;
+    final pinnedComment = _selectedHook?.pinnedComment;
     widget.onGenerate(
       idea: idea,
       characters: chars,
       additionalInstructions: _instrCtrl.text.trim(),
       readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
+      caption: caption?.isNotEmpty == true ? caption : null,
+      pinnedComment: pinnedComment?.isNotEmpty == true ? pinnedComment : null,
     );
   }
 

@@ -77,6 +77,9 @@ class _ImagePromptScreenState extends State<ImagePromptScreen> {
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
+    String? caption,
+    List<String>? hashtags,
+    String? pinnedComment,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
@@ -231,7 +234,7 @@ return IdeaInputScreen(
       feature: ContentFeature.imagePrompt,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
+          ? ({required String idea, required List<String> characters, required String additionalInstructions, String? readyPrompt, String? caption, List<String>? hashtags, String? pinnedComment}) {}
           : _evaluate,
       onGeneratePromptOnly: _showEvaluationPromptOnly,
       extraControls: _loading
@@ -273,6 +276,9 @@ class _CarouselPromptsScreenState extends State<CarouselPromptsScreen> {
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
+    String? caption,
+    List<String>? hashtags,
+    String? pinnedComment,
   }) async {
     _ideaText = idea;
     _ideaChars = List.from(characters);
@@ -427,7 +433,7 @@ return IdeaInputScreen(
       feature: ContentFeature.carouselPrompts,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
+          ? ({required String idea, required List<String> characters, required String additionalInstructions, String? readyPrompt, String? caption, List<String>? hashtags, String? pinnedComment}) {}
           : _evaluate,
       onGeneratePromptOnly: _showEvaluationPromptOnly,
       extraControls: Column(
@@ -644,6 +650,7 @@ class _GeminiVideoScreenState extends State<GeminiVideoScreen> {
   String _ideaInstructions = '';
   String? _readyPrompt;
   String? _caption;
+  List<String>? _hashtags;
   String? _pinnedComment;
   int _totalSeconds = 30;
   String _lastIdea = '';
@@ -662,6 +669,7 @@ Future<void> _evaluate({
     required String additionalInstructions,
     String? readyPrompt,
     String? caption,
+    List<String>? hashtags,
     String? pinnedComment,
   }) async {
     _ideaText = idea;
@@ -669,6 +677,7 @@ Future<void> _evaluate({
     _ideaInstructions = additionalInstructions;
     _readyPrompt = readyPrompt;
     _caption = caption;
+    _hashtags = hashtags;
     _pinnedComment = pinnedComment;
 
     setState(() {
@@ -695,7 +704,7 @@ Future<void> _evaluate({
     }
   }
 
-  Future<void> _handleApproval(HookChoice? hook) async {
+Future<void> _handleApproval(HookChoice? hook) async {
     setState(() {
       _isGenerating = true;
       _status = 'Generating video prompts...';
@@ -704,15 +713,52 @@ Future<void> _evaluate({
       final idea = hook != null
           ? 'Cover hook: ${hook.text}\n\n$_ideaText'
           : _ideaText;
-      GeminiVideoResult result;
+      late GeminiVideoResult result;
       EngagementPackage? engagement;
+      bool usedReadyPrompt = false;
+
       if (_readyPrompt != null && _readyPrompt!.isNotEmpty) {
-        setState(() => _status = 'Using ready viral prompt...');
+        // CASE A: Ready prompt exists - parse and validate
+        setState(() => _status = 'Loading ready viral prompt...');
         result = GeminiVideoResult.parseReadyPrompt(
           _readyPrompt!,
           hook?.text ?? 'Viral Reel',
         );
-} else {
+        usedReadyPrompt = true;
+
+        // If ready prompt has validation errors, show them and DON'T auto-fallback
+        if (result.validationErrors.isNotEmpty) {
+          if (!mounted) return;
+          final shouldFallback = await _showValidationErrorsDialog(
+            context,
+            result.validationErrors,
+          );
+          if (!shouldFallback) {
+            setState(() {
+              _isGenerating = false;
+              _status = '';
+            });
+            return;
+          }
+          // User chose to fallback - clear readyPrompt and regenerate
+          _readyPrompt = null;
+          usedReadyPrompt = false;
+        }
+
+        // Extract engagement data from stored HookIdea data (not from readyPrompt which is legacy)
+        if (result.isValid && result.fromReadyPrompt) {
+          engagement = EngagementPackage(
+            caption: _caption ?? '',
+            hashtags: _hashtags ?? [],
+            pinnedComment: _pinnedComment ?? '',
+            suggestedReplies: [],
+            followReason: '',
+          );
+        }
+      }
+
+      // CASE B: No readyPrompt or user chose fallback - generate via Gemini
+      if (!usedReadyPrompt) {
         try {
           // Use Master Reel prompt for 30-second videos (3 clips)
           if (_totalSeconds == 30) {
@@ -757,14 +803,16 @@ Future<void> _evaluate({
           rethrow;
         }
       }
+
       if (!mounted) return;
       setState(() {
         _result = result;
-       _engagement = engagement;
+        _engagement = engagement;
         _lastIdea = idea;
         _lastCharacters = List.from(_ideaChars);
         _evaluation = null;
         _status = '';
+        _usedReadyPrompt = usedReadyPrompt;
       });
       _saveVideoPromptsToVault(result, idea, _ideaChars);
     } catch (e) {
@@ -772,6 +820,51 @@ Future<void> _evaluate({
     } finally {
       if (mounted) setState(() => _isGenerating = false);
     }
+  }
+
+  bool _usedReadyPrompt = false;
+
+  Future<bool> _showValidationErrorsDialog(
+    BuildContext context,
+    List<String> errors,
+  ) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Ready Prompt Validation Issues'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'The ready prompt has validation issues:',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            ...errors.map((e) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text('• $e', style: const TextStyle(fontSize: 13)),
+            )),
+            const SizedBox(height: 16),
+            const Text(
+              'Do you want to discard this ready prompt and generate a new one via Gemini (API call)?',
+              style: TextStyle(fontSize: 13, color: Colors.orange),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Generate New (API)'),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
 
   Future<void> _handleRegenerate() async {
@@ -844,6 +937,7 @@ Future<void> _evaluate({
         engagement: _engagement,
         caption: _caption,
         pinnedComment: _pinnedComment,
+        usedReadyPrompt: _usedReadyPrompt,
         onBack: () => setState(() {
           _result = null;
           _engagement = null;
@@ -923,7 +1017,7 @@ return IdeaInputScreen(
       feature: ContentFeature.geminiVideo,
       initialText: _ideaText.isNotEmpty ? _ideaText : null,
       onGenerate: _loading
-          ? ({required idea, required characters, required additionalInstructions, String? readyPrompt}) {}
+          ? ({required String idea, required List<String> characters, required String additionalInstructions, String? readyPrompt, String? caption, List<String>? hashtags, String? pinnedComment}) {}
           : _evaluate,
       onGeneratePromptOnly: _totalSeconds == 30
           ? _showMasterReelPromptOnly
@@ -976,13 +1070,14 @@ return IdeaInputScreen(
   }
 }
 
-class _VideoResultScreen extends StatelessWidget {
+class _VideoResultScreen extends StatefulWidget {
   final GeminiVideoResult result;
   final EngagementPackage? engagement;
   final VoidCallback onBack;
   final void Function(int partIndex) onRegeneratePart;
   final String? caption;
   final String? pinnedComment;
+  final bool usedReadyPrompt;
 
   const _VideoResultScreen({
     required this.result,
@@ -991,18 +1086,115 @@ class _VideoResultScreen extends StatelessWidget {
     this.engagement,
     this.caption,
     this.pinnedComment,
+    this.usedReadyPrompt = false,
   });
 
   @override
+  State<_VideoResultScreen> createState() => _VideoResultScreenState();
+}
+
+class _VideoResultScreenState extends State<_VideoResultScreen> {
+  bool _enhancing = false;
+
+  Future<void> _handleEnhance() async {
+    final shouldEnhance = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('AI Enhancement'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This will use Gemini to enhance the prompt.',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              '• Uses API quota\n'
+              '• Original approved prompt will be preserved\n'
+              '• You can accept or reject the enhanced version',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Continue with AI enhancement?',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Enhance (API)'),
+          ),
+        ],
+      ),
+    ) ?? false;
+
+    if (!shouldEnhance || !mounted) return;
+
+    setState(() => _enhancing = true);
+
+    // TODO: Implement actual enhancement via Gemini
+    // For now, show a placeholder
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Enhancement feature coming soon')),
+    );
+    setState(() => _enhancing = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final result = widget.result;
     return Scaffold(
       appBar: AppBar(
         title: Text(result.storyTitle, overflow: TextOverflow.ellipsis),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: onBack,
+          onPressed: widget.onBack,
         ),
         actions: [
+          // Source indicator
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: widget.usedReadyPrompt
+                      ? Colors.green.withOpacity(0.2)
+                      : AppColors.primary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      widget.usedReadyPrompt
+                          ? Icons.check_circle
+                          : Icons.auto_awesome,
+                      size: 14,
+                      color: widget.usedReadyPrompt ? Colors.green : AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.usedReadyPrompt ? 'Ready Prompt' : 'Gemini Generated',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: widget.usedReadyPrompt ? Colors.green : AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           IconButton(
             tooltip: 'Copy all parts',
             icon: const Icon(Icons.copy_all),
@@ -1017,11 +1209,58 @@ class _VideoResultScreen extends StatelessWidget {
               );
             },
           ),
+          // Enhancement button
+          IconButton(
+            tooltip: 'Enhance with AI (uses API)',
+            icon: const Icon(Icons.auto_awesome),
+            onPressed: _enhancing ? null : _handleEnhance,
+          ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Source badge
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.usedReadyPrompt
+                  ? Colors.green.withOpacity(0.1)
+                  : AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: widget.usedReadyPrompt
+                    ? Colors.green.withOpacity(0.3)
+                    : AppColors.primary.withOpacity(0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  widget.usedReadyPrompt
+                      ? Icons.library_books
+                      : Icons.auto_awesome,
+                  color: widget.usedReadyPrompt ? Colors.green : AppColors.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.usedReadyPrompt
+                        ? 'Loaded from approved Ready Prompt — No API call made'
+                        : 'Generated via Gemini API',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: widget.usedReadyPrompt ? Colors.green[700] : AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // Story foundation card
           Card(
             color: AppColors.accentSoft,
@@ -1055,30 +1294,30 @@ class _VideoResultScreen extends StatelessWidget {
             final part = entry.value;
             return _VideoPartCard(
               part: part,
-              onRegenerate: () => onRegeneratePart(i),
+              onRegenerate: () => widget.onRegeneratePart(i),
             );
           }),
-          if (engagement != null) ...[
+          if (widget.engagement != null) ...[
             const SizedBox(height: 16),
-            _EngagementCard(engagement: engagement!),
+            _EngagementCard(engagement: widget.engagement!),
           ],
 
           // Caption card
-          if (caption != null && caption!.isNotEmpty) ...[
+          if (widget.caption != null && widget.caption!.isNotEmpty) ...[
             const SizedBox(height: 16),
             _CopyableFieldCard(
               label: 'Caption',
-              value: caption!,
+              value: widget.caption!,
               icon: Icons.text_fields,
             ),
           ],
 
           // Pinned Comment card
-          if (pinnedComment != null && pinnedComment!.isNotEmpty) ...[
+          if (widget.pinnedComment != null && widget.pinnedComment!.isNotEmpty) ...[
             const SizedBox(height: 16),
             _CopyableFieldCard(
               label: 'Pinned Comment',
-              value: pinnedComment!,
+              value: widget.pinnedComment!,
               icon: Icons.push_pin_outlined,
             ),
           ],

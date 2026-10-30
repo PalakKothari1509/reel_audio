@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -360,6 +361,16 @@ class VideoPartPrompt {
   final String textOverlay;
   final String purpose;
   final String fullPrompt;
+  final String startingState;
+  final String endingState;
+  final String setting;
+  final String dialogue;
+  final String continuityFrom;
+  final String continuityInto;
+  final String negativeInstructions;
+  final String visualPrompt;
+  final Map<String, dynamic>? onScreenText;
+
   const VideoPartPrompt({
     required this.partNumber,
     required this.totalParts,
@@ -367,7 +378,17 @@ class VideoPartPrompt {
     this.textOverlay = '',
     this.purpose = '',
     this.fullPrompt = '',
+    this.startingState = '',
+    this.endingState = '',
+    this.setting = '',
+    this.dialogue = '',
+    this.continuityFrom = '',
+    this.continuityInto = '',
+    this.negativeInstructions = '',
+    this.visualPrompt = '',
+    this.onScreenText,
   });
+
   String get title => 'Part $partNumber of $totalParts';
 }
 
@@ -375,103 +396,273 @@ class GeminiVideoResult {
   final String storyTitle;
   final String storyFoundation;
   final List<VideoPartPrompt> parts;
+  final String? caption;
+  final List<String>? hashtags;
+  final String? pinComment;
+  final bool fromReadyPrompt;
+  final List<String> validationErrors;
+
   const GeminiVideoResult({
     required this.storyTitle,
     required this.storyFoundation,
     required this.parts,
+    this.caption,
+    this.hashtags,
+    this.pinComment,
+    this.fromReadyPrompt = false,
+    this.validationErrors = const [],
   });
 
+  bool get isValid => validationErrors.isEmpty;
+
+  bool get hasEngagementData =>
+      (caption != null && caption!.isNotEmpty) ||
+      (hashtags != null && hashtags!.isNotEmpty) ||
+      (pinComment != null && pinComment!.isNotEmpty);
+
   /// Parses a [HookIdea.readyPrompt] string into a [GeminiVideoResult].
-  /// Supports both 2-part (legacy 20s) and 3-part (30s) readyPrompt formats.
+  /// Supports both legacy text format and new JSON format.
+  /// Returns a result with validationErrors populated if parsing issues found.
   static GeminiVideoResult parseReadyPrompt(String readyPrompt, String title) {
-    final lines = readyPrompt.split('\n');
+    if (readyPrompt.trim().isEmpty) {
+      // Backward compatibility: empty input falls back to single part
+      return GeminiVideoResult(
+        storyTitle: title,
+        storyFoundation: title,
+        parts: [
+          VideoPartPrompt(
+            partNumber: 1,
+            totalParts: 1,
+            promptText: title,
+            purpose: 'Full Prompt',
+            fullPrompt: title,
+          ),
+        ],
+        fromReadyPrompt: true,
+        validationErrors: ['Ready prompt is empty'],
+      );
+    }
+
+    final trimmed = readyPrompt.trim();
+
+    // Try JSON format first (newer structured format)
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      return _parseJsonReadyPrompt(trimmed, title);
+    }
+
+    // Legacy text format (PROMPT:, Part 1:, Part 2:, Part 3:, etc.)
+    return _parseLegacyReadyPrompt(trimmed, title);
+  }
+
+  /// Parse JSON-structured ready prompt (newer generation workflow)
+  static GeminiVideoResult _parseJsonReadyPrompt(String jsonText, String title) {
+    final errors = <String>[];
+    Map<String, dynamic> json;
+
+    try {
+      json = jsonDecode(jsonText) as Map<String, dynamic>;
+    } catch (e) {
+      return GeminiVideoResult(
+        storyTitle: title,
+        storyFoundation: title,
+        parts: [],
+        fromReadyPrompt: true,
+        validationErrors: ['Invalid JSON in readyPrompt: $e'],
+      );
+    }
+
+    // Extract top-level fields
+    final storyTitle = (json['story_title'] as String?)?.trim() ?? title;
+    final storyFoundation =
+        (json['story_foundation'] as String?)?.trim() ?? '';
+    final caption = (json['caption'] as String?)?.trim();
+    final hashtags = (json['hashtags'] as List?)?.cast<String>() ?? [];
+    final pinComment = (json['pin_comment'] as String?)?.trim();
+
+    // Parse parts
+    final rawParts = (json['parts'] as List?) ?? [];
+    final parts = <VideoPartPrompt>[];
+
+    for (int i = 0; i < rawParts.length; i++) {
+      final p = rawParts[i];
+      if (p is! Map<String, dynamic>) {
+        errors.add('Part ${i + 1}: not a valid object');
+        continue;
+      }
+
+      final partNumber = (p['part_number'] as num?)?.toInt() ?? i + 1;
+      final totalParts = rawParts.length;
+      final purpose = (p['purpose'] as String?)?.trim() ?? '';
+      final setting = (p['setting'] as String?)?.trim() ?? '';
+      final startingState = (p['starting_state'] as String?)?.trim() ?? '';
+      final action04s = (p['action_0_4s'] as String?)?.trim() ?? '';
+      final action48s = (p['action_4_8s'] as String?)?.trim() ?? '';
+      final action810s = (p['action_8_10s'] as String?)?.trim() ?? '';
+      final dialogue = (p['dialogue'] as String?)?.trim() ?? '';
+      final textOverlay = (p['text_overlay'] as String?)?.trim() ?? '';
+      final endingState = (p['ending_state'] as String?)?.trim() ?? '';
+      final continuityFrom = (p['continuity_from'] as String?)?.trim() ?? '';
+      final continuityInto = (p['continuity_into'] as String?)?.trim() ?? '';
+      final negativeInstructions =
+          (p['negative_instructions'] as String?)?.trim() ?? '';
+      final visualPrompt = (p['visual_prompt'] as String?)?.trim() ?? '';
+      final fullPrompt = (p['full_prompt'] as String?)?.trim() ?? visualPrompt;
+      final onScreenText = p['on_screen_text'];
+
+      // Validate required fields
+      if (visualPrompt.isEmpty && fullPrompt.isEmpty) {
+        errors.add('Part $partNumber: missing visual_prompt/full_prompt');
+      }
+      if (textOverlay.isEmpty) {
+        errors.add('Part $partNumber: missing text_overlay');
+      }
+      if (setting.isEmpty) {
+        errors.add('Part $partNumber: missing setting');
+      }
+      if (startingState.isEmpty) {
+        errors.add('Part $partNumber: missing starting_state');
+      }
+      if (endingState.isEmpty) {
+        errors.add('Part $partNumber: missing ending_state');
+      }
+
+      // Build comprehensive prompt text for the part
+      final promptText = _buildPartPromptText(
+        partNumber: partNumber,
+        totalParts: totalParts,
+        purpose: purpose,
+        setting: setting,
+        startingState: startingState,
+        action04s: action04s,
+        action48s: action48s,
+        action810s: action810s,
+        dialogue: dialogue,
+        textOverlay: textOverlay,
+        endingState: endingState,
+        continuityFrom: continuityFrom,
+        continuityInto: continuityInto,
+        negativeInstructions: negativeInstructions,
+        visualPrompt: visualPrompt,
+        fullPrompt: fullPrompt,
+        onScreenText: onScreenText,
+      );
+
+      parts.add(VideoPartPrompt(
+        partNumber: partNumber,
+        totalParts: totalParts,
+        promptText: promptText,
+        textOverlay: textOverlay,
+        purpose: purpose,
+        fullPrompt: fullPrompt,
+      ));
+    }
+
+    // Validate part count
+    if (parts.length != 2 && parts.length != 3) {
+      errors.add('Expected 2 or 3 parts, got ${parts.length}');
+    }
+
+    // Validate engagement data
+    if (caption == null || caption.isEmpty) {
+      errors.add('Missing caption');
+    }
+    if (hashtags.length != 5) {
+      errors.add('Expected exactly 5 hashtags, got ${hashtags.length}');
+    }
+    if (pinComment == null || pinComment.isEmpty) {
+      errors.add('Missing pinned comment');
+    }
+
+    return GeminiVideoResult(
+      storyTitle: storyTitle,
+      storyFoundation: storyFoundation.isNotEmpty ? storyFoundation : title,
+      parts: parts,
+      caption: caption,
+      hashtags: hashtags.isNotEmpty ? hashtags : null,
+      pinComment: pinComment,
+      fromReadyPrompt: true,
+      validationErrors: errors,
+    );
+  }
+
+  /// Parse legacy text format ready prompt (PROMPT:, Part 1:, Part 2:, Part 3:, etc.)
+  static GeminiVideoResult _parseLegacyReadyPrompt(String text, String title) {
+    final errors = <String>[];
+    final lines = text.split('\n');
     String foundation = '';
     final parts = <VideoPartPrompt>[];
-    String currentPart = '';
-    int partNumber = 0;
-    String currentPurpose = '';
+    final Map<int, String> partContent = {};
+    final Map<int, String> partPurpose = {};
+    int maxPartNumber = 0;
 
     for (final line in lines) {
       final trimmed = line.trim();
       if (trimmed.startsWith('PROMPT:')) {
         foundation = trimmed.substring(7).trim();
       } else if (_isPartHeader(trimmed, 1)) {
-        if (partNumber > 0 && currentPart.trim().isNotEmpty) {
-          parts.add(VideoPartPrompt(
-            partNumber: partNumber,
-            totalParts: 3,
-            promptText: currentPart.trim(),
-            purpose: currentPurpose,
-            fullPrompt: currentPart.trim(),
-          ));
-        }
-        partNumber = 1;
-        currentPart = _partHeaderContent(trimmed, 1);
-        currentPurpose = 'Hook & Problem';
+        partContent[1] = _partHeaderContent(trimmed, 1);
+        partPurpose[1] = 'Hook & Problem';
+        maxPartNumber = max(maxPartNumber, 1);
       } else if (_isPartHeader(trimmed, 2)) {
-        if (partNumber > 0 && currentPart.trim().isNotEmpty) {
-          parts.add(VideoPartPrompt(
-            partNumber: partNumber,
-            totalParts: 3,
-            promptText: currentPart.trim(),
-            purpose: currentPurpose,
-            fullPrompt: currentPart.trim(),
-          ));
-        }
-        partNumber = 2;
-        currentPart = _partHeaderContent(trimmed, 2);
-        currentPurpose = 'Twist & Escalation';
+        partContent[2] = _partHeaderContent(trimmed, 2);
+        partPurpose[2] = 'Twist & Escalation';
+        maxPartNumber = max(maxPartNumber, 2);
       } else if (_isPartHeader(trimmed, 3)) {
-        if (partNumber > 0 && currentPart.trim().isNotEmpty) {
-          parts.add(VideoPartPrompt(
-            partNumber: partNumber,
-            totalParts: 3,
-            promptText: currentPart.trim(),
-            purpose: currentPurpose,
-            fullPrompt: currentPart.trim(),
-          ));
-        }
-        partNumber = 3;
-        currentPart = _partHeaderContent(trimmed, 3);
-        currentPurpose = 'Resolution & Moral';
+        partContent[3] = _partHeaderContent(trimmed, 3);
+        partPurpose[3] = 'Resolution & Moral';
+        maxPartNumber = max(maxPartNumber, 3);
       } else if (trimmed.startsWith('On-Screen Text:') ||
-          trimmed.startsWith('Audio/Dialogue')) {
-        // Skip these sections
+          trimmed.startsWith('Audio/Dialogue') ||
+          trimmed.startsWith('Outro:')) {
+        // Skip these sections - they're metadata
       } else {
-        if (partNumber > 0 && trimmed.isNotEmpty) {
-          currentPart += '$trimmed\n';
+        // Append to the most recent part if any
+        if (maxPartNumber > 0 && trimmed.isNotEmpty) {
+          // Find the highest part number we've seen so far
+          for (int p = maxPartNumber; p >= 1; p--) {
+            if (partContent.containsKey(p)) {
+              partContent[p] = '${partContent[p]}$trimmed\n';
+              break;
+            }
+          }
         }
       }
     }
 
-    // Add the last part
-    if (partNumber > 0 && currentPart.trim().isNotEmpty) {
-      parts.add(VideoPartPrompt(
-        partNumber: partNumber,
-        totalParts: 3,
-        promptText: currentPart.trim(),
-        purpose: currentPurpose,
-        fullPrompt: currentPart.trim(),
-      ));
+    // Build parts from collected content
+    for (int i = 1; i <= maxPartNumber; i++) {
+      if (partContent.containsKey(i)) {
+        parts.add(VideoPartPrompt(
+          partNumber: i,
+          totalParts: maxPartNumber,
+          promptText: partContent[i]!.trim(),
+          purpose: partPurpose[i] ?? '',
+          fullPrompt: partContent[i]!.trim(),
+        ));
+      }
     }
 
     // If we didn't find structured parts, wrap the whole prompt
     if (parts.isEmpty) {
-      parts.add(VideoPartPrompt(
-        partNumber: 1,
-        totalParts: 1,
-        promptText: foundation.isNotEmpty
-            ? foundation
-            : readyPrompt.trim().isNotEmpty
-                ? readyPrompt.trim()
-                : title,
-        purpose: 'Full Prompt',
-        fullPrompt: foundation.isNotEmpty
-            ? foundation
-            : readyPrompt.trim().isNotEmpty
-                ? readyPrompt.trim()
-                : title,
-         ));
+      if (foundation.isNotEmpty) {
+        parts.add(VideoPartPrompt(
+          partNumber: 1,
+          totalParts: 1,
+          promptText: foundation,
+          purpose: 'Full Prompt',
+          fullPrompt: foundation,
+        ));
+      } else if (text.trim().isNotEmpty) {
+        parts.add(VideoPartPrompt(
+          partNumber: 1,
+          totalParts: 1,
+          promptText: text.trim(),
+          purpose: 'Full Prompt',
+          fullPrompt: text.trim(),
+        ));
+      } else {
+        errors.add('No parsable content found in readyPrompt');
+      }
     }
 
     // Extract "Final text overlay:" value into textOverlay field and strip
@@ -490,11 +681,125 @@ class GeminiVideoResult {
       );
     }
 
-    return GeminiVideoResult(
+    // Validate legacy format
+    if (parts.isEmpty) {
+      errors.add('No parts could be parsed from legacy format');
+    }
+    if (parts.length != 1 && parts.length != 2 && parts.length != 3) {
+      errors.add('Legacy format should have 1, 2, or 3 parts, got ${parts.length}');
+    }
+
+return GeminiVideoResult(
       storyTitle: title,
       storyFoundation: foundation.isNotEmpty ? foundation : title,
       parts: parts,
+      fromReadyPrompt: true,
+      validationErrors: errors,
     );
+  }
+
+  /// Build comprehensive prompt text for a part from JSON fields
+  static String _buildPartPromptText({
+    required int partNumber,
+    required int totalParts,
+    required String purpose,
+    required String setting,
+    required String startingState,
+    required String action04s,
+    required String action48s,
+    required String action810s,
+    required String dialogue,
+    required String textOverlay,
+    required String endingState,
+    required String continuityFrom,
+    required String continuityInto,
+    required String negativeInstructions,
+    required String visualPrompt,
+    required String fullPrompt,
+    dynamic onScreenText,
+  }) {
+    final buffer = StringBuffer();
+
+    buffer.writeln('PART $partNumber of $totalParts — $purpose');
+    buffer.writeln('');
+
+    if (setting.isNotEmpty) {
+      buffer.writeln('SETTING: $setting');
+      buffer.writeln('');
+    }
+
+    if (startingState.isNotEmpty) {
+      buffer.writeln('STARTING STATE: $startingState');
+      buffer.writeln('');
+    }
+
+    if (action04s.isNotEmpty) {
+      buffer.writeln('ACTION 0-4s: $action04s');
+    }
+    if (action48s.isNotEmpty) {
+      buffer.writeln('ACTION 4-8s: $action48s');
+    }
+    if (action810s.isNotEmpty) {
+      buffer.writeln('ACTION 8-10s: $action810s');
+    }
+    buffer.writeln('');
+
+    if (dialogue.isNotEmpty) {
+      buffer.writeln('DIALOGUE: $dialogue');
+      buffer.writeln('');
+    }
+
+    // On-screen text overlay (editor metadata)
+    if (textOverlay.isNotEmpty) {
+      buffer.writeln('ON-SCREEN TEXT OVERLAY (editor metadata): $textOverlay');
+      buffer.writeln('');
+    } else if (onScreenText != null) {
+      // Handle structured on_screen_text object
+      if (onScreenText is Map) {
+        final lines = onScreenText.values
+            .where((v) => v is String && (v as String).isNotEmpty)
+            .cast<String>()
+            .toList();
+        if (lines.isNotEmpty) {
+          buffer.writeln('ON-SCREEN TEXT OVERLAY (editor metadata): ${lines.join(' | ')}');
+          buffer.writeln('');
+        }
+      }
+    }
+
+    if (endingState.isNotEmpty) {
+      buffer.writeln('ENDING STATE: $endingState');
+      buffer.writeln('');
+    }
+
+    if (continuityFrom.isNotEmpty) {
+      buffer.writeln('CONTINUITY FROM: $continuityFrom');
+      buffer.writeln('');
+    }
+
+    if (continuityInto.isNotEmpty) {
+      buffer.writeln('CONTINUITY INTO: $continuityInto');
+      buffer.writeln('');
+    }
+
+    if (negativeInstructions.isNotEmpty) {
+      buffer.writeln('NEGATIVE INSTRUCTIONS: $negativeInstructions');
+      buffer.writeln('');
+    }
+
+    // Visual prompt (the actual video generation prompt)
+    if (visualPrompt.isNotEmpty) {
+      buffer.writeln('VISUAL PROMPT: $visualPrompt');
+      buffer.writeln('');
+    } else if (fullPrompt.isNotEmpty) {
+      buffer.writeln('VISUAL PROMPT: $fullPrompt');
+      buffer.writeln('');
+    }
+
+    // Explicitly note: NO on-screen text in video frames
+    buffer.writeln('NOTE: No on-screen text rendered in video frames. All overlay text is editor metadata only.');
+
+    return buffer.toString().trim();
   }
 
   static (String, String) _extractTextOverlay(String promptText) {
