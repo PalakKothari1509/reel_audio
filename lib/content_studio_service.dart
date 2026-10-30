@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'brand_system.dart';
 import 'characters.dart';
 import 'gemini_call.dart';
+import 'gemini_video_master_prompt.dart';
 import 'master_prompt.dart';
+import 'prompt_vault.dart';
 import 'secrets.dart';
 import 'prompts.dart';
 import 'story_ideas.dart';
@@ -18,6 +20,33 @@ import 'prompt_preview.dart';
 // Gemini Video) share the same brand identity, character library and visual style.
 // This service is the single place that knows all of that and produces the correct
 // output for each requested deliverable.
+
+/// Checks if an approved ready prompt exists in the PromptVault for the given
+/// content ID and prompt type. Returns the latest approved prompt if found,
+/// or null if no approved prompt exists.
+///
+/// This prevents unnecessary AI generation when a usable prompt already exists.
+Future<SavedPrompt?> _checkExistingReadyPrompt(
+  String contentId,
+  PromptType type,
+) async {
+  final existing = await PromptVault.getByContentId(contentId);
+  final approved = existing
+      .where((p) => p.type == type && p.status == PromptStatus.approved)
+      .toList();
+  if (approved.isEmpty) return null;
+  approved.sort((a, b) => b.version.compareTo(a.version));
+  return approved.first;
+}
+
+/// Generates a stable content ID from a story title for consistent prompt lookup.
+String _contentIdFromTitle(String title) {
+  final slug = title
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+      .replaceAll(RegExp(r'^-+|-+$'), '');
+  return 'FLWP-$slug';
+}
 
 const _model = 'gemini-3.8-flash';
 // Light model for quick calls (checkStory, analyzeShareability, generateStoryIdea)
@@ -412,6 +441,28 @@ class GeminiVideoResult {
     this.fromReadyPrompt = false,
     this.validationErrors = const [],
   });
+
+  GeminiVideoResult copyWith({
+    String? storyTitle,
+    String? storyFoundation,
+    List<VideoPartPrompt>? parts,
+    String? caption,
+    List<String>? hashtags,
+    String? pinComment,
+    bool? fromReadyPrompt,
+    List<String>? validationErrors,
+  }) {
+    return GeminiVideoResult(
+      storyTitle: storyTitle ?? this.storyTitle,
+      storyFoundation: storyFoundation ?? this.storyFoundation,
+      parts: parts ?? this.parts,
+      caption: caption ?? this.caption,
+      hashtags: hashtags ?? this.hashtags,
+      pinComment: pinComment ?? this.pinComment,
+      fromReadyPrompt: fromReadyPrompt ?? this.fromReadyPrompt,
+      validationErrors: validationErrors ?? this.validationErrors,
+    );
+  }
 
   bool get isValid => validationErrors.isEmpty;
 
@@ -856,7 +907,22 @@ Future<GeminiVideoResult> generateGeminiVideoPrompts({
   bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
+  bool useExistingPrompt = true,
 }) async {
+  final contentId = _contentIdFromTitle(idea);
+
+  // Check for existing approved prompt in PromptVault
+  if (useExistingPrompt) {
+    final existing = await _checkExistingReadyPrompt(
+      _contentIdFromTitle(idea),
+      PromptType.video,
+    );
+    if (existing != null) {
+      // Parse the existing prompt and return it
+      final parsed = GeminiVideoResult.parseReadyPrompt(existing.promptText, idea);
+      return parsed.copyWith(fromReadyPrompt: true);
+    }
+  }
   final parts = (totalSeconds / 10).round().clamp(2, 6);
   final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
   final voiceBlock = _characterVoiceBlock(characters);
@@ -905,6 +971,10 @@ SHAREABILITY:
 
 CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
 The ending state of each part becomes the starting state of the next.
+
+$kStoryAccuracyRules
+
+$kRealisticOutcomeRules
 
 LANGUAGE RULES:
 - All dialogue must be in $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!").
@@ -1716,6 +1786,10 @@ SHAREABILITY:
 CONTINUITY RULE: Part 2 must continue Part 1. Part 3 must continue Part 2. Every transition must be intentional.
 The ending state of each part becomes the starting state of the next.
 
+$kStoryAccuracyRules
+
+$kRealisticOutcomeRules
+
 LANGUAGE RULES:
 - All dialogue must be in $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!").
 - All on-screen text overlays must be in $language — short, readable, max 2 lines.
@@ -1841,6 +1915,12 @@ CONTINUITY:
 - Audience: Indian moms and parents of children aged 1-4
 - Brand: Fun Learning With Palak
 
+$kStoryAccuracyRules
+
+$kRealisticOutcomeRules
+
+$kSafetyRules
+
 Return ONLY valid JSON:
 
 {
@@ -1944,7 +2024,20 @@ Future<GeminiVideoResult> generateGeminiVideoPromptsWithPreview({
   String? apiKey,
   void Function(String)? onWait,
   bool useSheet = false,
+  bool useExistingPrompt = true,
 }) async {
+  // Check for existing approved prompt first
+  if (useExistingPrompt) {
+    final existing = await _checkExistingReadyPrompt(
+      _contentIdFromTitle(idea),
+      PromptType.video,
+    );
+    if (existing != null) {
+      final parsed = GeminiVideoResult.parseReadyPrompt(existing.promptText, idea);
+      return parsed.copyWith(fromReadyPrompt: true);
+    }
+  }
+
   final parts = (totalSeconds / 10).round().clamp(2, 6);
   final prompt = buildGeminiVideoPrompt(
     idea: idea,
@@ -2007,7 +2100,20 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
   String? apiKey,
   void Function(String)? onWait,
   bool useSheet = true,
+  bool useExistingPrompt = true,
 }) async {
+  // Check for existing approved prompt first
+  if (useExistingPrompt) {
+    final existing = await _checkExistingReadyPrompt(
+      _contentIdFromTitle(idea),
+      PromptType.video,
+    );
+    if (existing != null) {
+      final parsed = GeminiVideoResult.parseReadyPrompt(existing.promptText, idea);
+      return parsed.copyWith(fromReadyPrompt: true);
+    }
+  }
+
   final prompt = buildMasterReelPrompt(
     idea: idea,
     characters: characters,
