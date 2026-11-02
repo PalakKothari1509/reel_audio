@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - '.github/workflows/export_content_ideas.yml'
       - 'lib/content_ideas.dart'
       - 'scripts/export_content_ideas.dart'
       - 'scripts/validate_content_ideas.js'
