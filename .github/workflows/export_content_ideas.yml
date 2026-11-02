@@ -29,13 +29,25 @@ jobs:
         run: |
           flutter --version
           dart --version
-          dart pub deps
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Debug dependencies
+        run: dart pub deps
+
       - name: Run exporter
-        run: dart run scripts/export_content_ideas.dart
+        run: |
+          set -o pipefail
+          dart run scripts/export_content_ideas.dart 2>&1 | tee exporter.log
+
+      - name: Upload exporter debug log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exporter-debug-log
+          path: exporter.log
+          if-no-files-found: warn
 
       - name: Independent verification (Dart)
         run: dart run scripts/verify_export.dart
