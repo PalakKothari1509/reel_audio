@@ -1,4 +1,4 @@
-name: Export Content Ideas JSON
+﻿name: Export Content Ideas JSON
 
 on:
   workflow_dispatch:
@@ -24,6 +24,12 @@ jobs:
           flutter-version: '3.47.7'
           channel: 'stable'
           cache: true
+
+      - name: Debug environment
+        run: |
+          flutter --version
+          dart --version
+          dart pub deps
 
       - name: Install dependencies
         run: flutter pub get
