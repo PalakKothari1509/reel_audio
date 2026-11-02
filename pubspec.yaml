@@ -76,6 +76,7 @@ flutter:
     - assets/characters/Papa.jpg
     - assets/characters/Daadi.jpg
     - assets/characters/Teacher.jpg
+    - assets/data/
     # Background music — see assets/music/README.md for how to normalise a track
     # before adding it, then add the line here and in kMusicLibrary.
     # - assets/music/playful_1.mp3
