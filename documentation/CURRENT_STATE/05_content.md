@@ -2,14 +2,15 @@
 
 ## Overview
 
-Content ideas live in three layers, merged at runtime by `ContentLibraryService` (`lib/content_library_service.dart`, 593 lines):
+Content ideas live in three layers, merged at runtime by `ContentLibraryService` (`lib/content_library_service.dart`):
 
-1. **Built-in constants** (`content_ideas.dart`): 98+ built-in `HookIdea` objects
-2. **User edits** (`HookStore` â†’ `hooks.json`): overrides applied at runtime
-3. **User additions** (`QuickIdeaStore` â†’ `quick_ideas.json`): custom QuickIdeas
-4. **Idea inbox** (`IdeaInboxStore` â†’ `quick_ideas.json`-adjacent): "ideas to write" not yet full posts
+1. **Built-in ideas from JSON asset** (`assets/data/content_ideas.json`): 117 `HookIdea` records loaded via `rootBundle.loadString()`, parsed with `HookIdea.fromJson()`, validated by `ContentLibraryService._validateJsonHooks()`. JSON is the primary runtime source.
+2. **Dart fallback** (`content_ideas.dart`): `kDefaultHooksWithRewrite` (alias to `kDefaultHooks` from `buildDefaultHooks()`) used when JSON loading or validation fails.
+3. **User edits** (`HookStore` â†’ `hooks.json`): overrides applied at runtime by ID.
+4. **User additions** (`QuickIdeaStore` â†’ `quick_ideas.json`): custom QuickIdeas.
+5. **Idea inbox** (`IdeaInboxStore` â†’ `quick_ideas.json`-adjacent): "ideas to write" not yet full posts
 
-The runtime canonical list is `kDefaultHooksWithRewrite` â€” built-ins with `kRewrittenStories` applied.
+The runtime canonical list is `kDefaultHooksWithRewrite` â€” built-ins with rewrites applied inline into `storyDetail` fields.
 
 ---
 
@@ -81,21 +82,37 @@ Labels are parsed literally — `Worse:` is the escalation (not aliased to `Reso
 
 ## 2. Built-in Constants (content_ideas.dart)
 
-### kDefaultHooks (94 entries)
+### kDefaultHooks (Dart source)
 
-The master list of all built-in ideas. Categories:
+The master list of all built-in ideas in Dart source code. This serves as the **fallback** when JSON loading fails.
 
-| Category | Count | Description | ID Pattern |
-|----------|-------|-------------|------------|
-| `Warm lesson` | 13 (incl. 6 safety) | Teaching moments + safety hooks | `h*`, `safety-*` |
-| `Relatable` | 35 | Parent/child everyday moments | `h*`, `pal*` |
-| `Struggle first` | 6 | Challenge-before-resolution | `h*` |
-| `Surprising` | 7 | Unexpected twists | `h*` |
-| `Page & milestone` | 8 | Platform milestones | `p01`–`p08` |
-| `Navratri` | 10 | Festival posts | `navratri-*`, `night-before-annual-day` |
-| `Series` | 20 | Robot series | `robot-01`..`robot-20` |
+### kDefaultHooksWithRewrite (ALIAS)
 
-**Total in kDefaultHooks**: 94 entries (99 including 6 safety hooks via spread).
+`kDefaultHooksWithRewrite` is now a simple alias to `kDefaultHooks` — rewrites and upgrades are embedded inline. User edits are preserved via `HookStore.load()`.
+
+```dart
+final kDefaultHooksWithRewrite = kDefaultHooks;
+```
+
+This is the **runtime canonical fallback list**. All built-in ideas pass through this alias before being used.
+
+### Built-in Ideas JSON Asset (`assets/data/content_ideas.json`)
+
+**117 built-in HookIdea records** bundled as a runtime asset. Categories:
+
+| Category | Count | ID Pattern |
+|----------|-------|------------|
+| `Warm lesson` | 16 (incl. 6 safety) | `h01`, `h02`, `h03`, `h04`, `h05`, `h07`, `h08`, `h12`, `h13`, `h16`, `h17`, `h19` + `safety-*` (6) |
+| `Relatable` | 46 | `pal*`, descriptive IDs |
+| `Struggle first` | 5 | `h09`-`h11`, `h14`-`h15`, `h18` |
+| `Surprising` | 5 | `h20`-`h21`, `night-before-annual-day` |
+| `Page & milestone` | 8 | `p01`-`p08` |
+| `Navratri` | 10 | `navratri-*`, `night-before-annual-day` |
+| `Series` | 20 | `robot-01`..`robot-20` |
+| `idea_N` series | 117 unique | `idea_1`–`idea_117` |
+
+**Archived built-in ideas:** `idea_41`, `idea_42`, `idea_43`, `idea_44`, `idea_46` (archived flag set to `true`)
+**Ordering quirk:** `idea_117` appears at index 78 (zero-based) in the JSON, matching its position in `buildDefaultHooks()`.
 
 ### kSafetyHooks (6 entries, content_ideas.dart:184-262)
 
@@ -116,16 +133,6 @@ All category: `Warm lesson`. All have `keepMoralOffScreen: false`. Spread into `
 
 **Merged** into inline `storyDetail` and moment fields in `kDefaultHooks` and **deleted**. Previously separate maps that are no longer used.
 
-### kDefaultHooksWithRewrite (ALIAS)
-
-`kDefaultHooksWithRewrite` is now a simple alias to `kDefaultHooks` — rewrites and upgrades are embedded inline. User edits are preserved via `HookStore.load()`.
-
-```dart
-final kDefaultHooksWithRewrite = kDefaultHooks;
-```
-
-This is the **runtime canonical list**. All built-in ideas pass through this alias before being used.
-
 ---
 
 ## 4. Content Library Service (content_library_service.dart)
@@ -133,12 +140,31 @@ This is the **runtime canonical list**. All built-in ideas pass through this ali
 ### Unified Read Source
 
 `ContentLibraryService` merges and dedupes by id across:
-1. `kDefaultHooksWithRewrite` (built-ins with rewrites)
-2. `HookStore` (user-edited hooks)
-3. `kSafetyHooks` (explicit safety category)
-4. `kDay14Posts` (carousel posts)
+
+1. **Built-in ideas from JSON asset** (`assets/data/content_ideas.json`): loaded via `rootBundle.loadString()`, parsed with `HookIdea.fromJson()`, validated by `_validateJsonHooks()` — requires exactly 117 records, unique IDs `idea_1`–`idea_117`, correct ordering (including `idea_117` at index 78), archived set `{idea_41, idea_42, idea_43, idea_44, idea_46}`
+2. **Dart fallback** (`kDefaultHooksWithRewrite`): used when JSON loading or validation fails
+3. `HookStore` (user-edited hooks): overrides built-ins by ID
+4. `kSafetyHooks` (explicit safety category, already in kDefaultHooksWithRewrite via spread)
 5. `QuickIdeaStore` (user-added QuickIdeas)
 6. `IdeaInboxStore` (user "ideas to write")
+
+### Validation
+
+`_validateJsonHooks()` checks:
+- Exactly 117 records
+- All IDs unique and present (`idea_1`–`idea_117`)
+- Correct ordering (special handling for `idea_117` at index 78)
+- Archived set exactly `{idea_41, idea_42, idea_43, idea_44, idea_46}`
+
+### Fallback
+
+If JSON asset is missing, invalid JSON, empty, fails validation, or any exception occurs, `ContentLibraryService` falls back to `kDefaultHooksWithRewrite` from `lib/content_ideas.dart`. The Dart source is **not deleted** and remains available.
+
+### Caching
+
+- JSON hooks cached statically (`_cachedJsonHooks`); first load sets `_jsonLoadAttempted = true`
+- Full merged cache with 1-minute TTL (`_cacheTtl`)
+- `invalidateCache()` clears the cache; called after any write (add/update/delete)
 
 ### Normalized View
 
@@ -149,7 +175,7 @@ class ContentIdea {
   final String title;        // From cover or opening
   final String category;
   final String collectionId; // From collectionOf()
-  final ContentFormat format; // From postFormat
+  final String format;       // From postFormat
   final String problem;
   final String lesson;
   final String storyDetail;
@@ -177,9 +203,10 @@ class ContentIdea {
 | `deleteIdea(id)` | Delete (only custom ideas) |
 
 ### Caching
+
 - 1-minute TTL cache
-- Invalidated on writes via `onPlanSaved` callback
-   - `HookStore.load()` is async, loads from `hooks.json` + built-ins
+- Invalidated on writes via `invalidateCache()`
+- `HookStore.load()` is async, loads from `hooks.json` + built-ins
 
 ---
 
@@ -199,9 +226,14 @@ class HookStore {
 **Location**: `{appDocsDir}/content_library/hooks.json`
 
 ### Merge Logic
-- Built-ins can be **edited** but not deleted
-- User edits override `storyDetail` only if different from built-in
-- User-added hooks are preserved across updates
+
+`ContentLibraryService._loadAll()` calls `HookStore.load()` to get user-edited built-ins plus custom hooks, then overlays them on the JSON-loaded built-ins by ID:
+
+- Built-ins from JSON are loaded first via `_loadHooksFromJson()`
+- `HookStore.load()` returns saved hooks from `hooks.json` merged with `kDefaultHooksWithRewrite`
+- For each built-in hook ID, if a saved version exists AND its `storyDetail` differs from the original built-in, the saved (user-edited) version wins
+- User-added hooks (`custom: true`) from `hooks.json` are appended
+- Built-ins can be **edited** but not deleted via this path
 - Updates that add new built-ins never fight with existing user changes
 
 ---

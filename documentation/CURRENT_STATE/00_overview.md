@@ -27,7 +27,7 @@
 
 1. **Callback-driven shell**: `ContentStudioHome` (main navigation) delegates to `ContentStudioScreens` via callbacks (`onCreateReel`, `onContentLibrary`, `onAddNewIdea`, etc.). Screens don't know about each other.
 2. **Offline-first persistence**: All data via `JsonFileStore<T>` — generic JSON file store with per-row decoding and safe defaults. Files live in `getApplicationDocumentsDirectory()/content_library/`.
-3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides 94 built-in ideas (including 6 safety hooks via `...kSafetyHooks` spread, totaling 100 entries). `HookStore` merges user edits from `hooks.json`. Rewrites are embedded inline in `storyDetail` fields; `kRewrittenStories` and `kMomentUpgrades` have been merged into inline fields and deleted.
+3. **Built-in data + user overrides**: `kDefaultHooks` in `content_ideas.dart` provides built-in HookIdea objects. The 117 built-in ideas are also bundled as a runtime asset at `assets/data/content_ideas.json`, loaded via `rootBundle` by `ContentLibraryService`, parsed with `HookIdea.fromJson()`, and validated (117 unique records, correct ordering with `idea_117` at index 78, archived set `{idea_41, idea_42, idea_43, idea_44, idea_46}`). JSON is the primary runtime source; `kDefaultHooksWithRewrite` (alias to `kDefaultHooks`) remains as the Dart fallback. `HookStore` merges user edits from `hooks.json`. Rewrites are embedded inline in `storyDetail` fields; `kRewrittenStories` and `kMomentUpgrades` have been merged into inline fields and deleted.
 4. **Two Gemini paths**: Path A (`gemini_call.dart`) — raw HTTP with retry/fallback; Path B (`gemini_client.dart`) — SDK-based, no retry/fallback (see 04_generation.md §5)
 5. **Story label parsing**: `StoryGenerator.extractLine()` parses `Story:`, `Twist:`, `Resolution:`, `Moral:` labels (with `PART 1:` fallback).
 
@@ -55,7 +55,7 @@ Full file listing with line counts:
 | 2970 | content_ideas.dart | Built-in idea constants (HookIdea, kDefaultHooks, kDay14Posts) |
 | 360 | content_library.dart | Persistence model for generated packages |
 | 472 | content_library_screen.dart | Content Library browsing UI |
-| 593 | content_library_service.dart | Unified read API over all idea sources |
+| 593 | content_library_service.dart | Unified read API over all idea sources; loads built-ins from `assets/data/content_ideas.json` via `rootBundle`, parses with `HookIdea.fromJson()`, validates, with Dart fallback |
 | 744 | content_package_v2.dart | ContentPackage model v2 |
 | 2207 | content_quality_gate.dart | Quality check rules and scoring |
 | 225 | content_service.dart | Content service abstraction |
@@ -116,9 +116,10 @@ Full file listing with line counts:
 
 ### Key Constants (content_ideas.dart)
 
-- `kDefaultHooks`: 99 built-in HookIdeas (includes `...kSafetyHooks` spread)
-- `kSafetyHooks`: 6 safety concepts
+- `kDefaultHooks`: built-in HookIdeas from `buildDefaultHooks()` (includes `...kSafetyHooks` spread)
+- `kSafetyHooks`: 6 safety concepts (slug IDs: `safety-good-touch`, `safety-stranger`, `safety-road`, `safety-emergency-number`, `safety-lost-crowd`, `safety-kitchen-line`)
 - `kDefaultHooksWithRewrite`: alias to `kDefaultHooks` (rewrites merged inline into storyDetail & moment fields, kRewrittenStories/kMomentUpgrades deleted)
+- `assets/data/content_ideas.json`: bundled runtime asset with 117 built-in ideas (JSON migration); loaded via `rootBundle`, parsed via `HookIdea.fromJson()`, validated, with `kDefaultHooksWithRewrite` as fallback
 
 ## pubspec.yaml Dependencies
 
@@ -165,7 +166,7 @@ dev_dependencies:
 
 ## Test State
 
-- **499 tests pass** (verified via `flutter test`)
+- **710 tests pass** (verified via `flutter test`)
 - `dart analyze`: no errors, only pre-existing warnings
 - APK builds successfully
 

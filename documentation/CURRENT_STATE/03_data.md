@@ -201,8 +201,8 @@ Tests call `setTestDirectory` to redirect all JSON I/O to a temp directory. Prod
 **Model fields (HookIdea):**
 
 | Field | Type | Description |
-|---|---|---|
-| `id` | `String` | String slug (e.g. `h01`, `safety-good-touch`) |
+|-------|------|-------------|
+| `id` | `String` | String slug (e.g. `h01`, `safety-good-touch`, `idea_1`–`idea_117`) |
 | `category` | `String` | Content bucket category |
 | `cover` | `String` | Hook cover text |
 | `opening` | `String` | Opening line |
@@ -214,6 +214,8 @@ Tests call `setTestDirectory` to redirect all JSON I/O to a temp directory. Prod
 | `storyDetail` | `String` | Full story detail with labels |
 | `custom` | `bool` | User-created vs built-in |
 | `usedOn` | `String?` | ISO timestamp of last use |
+| `archived` | `bool` | Whether the idea is archived |
+| `defaultCast` | `List<String>` | Character list for this story (max 3) |
 
 **Methods:**
 - `load()` — **The key method.** Merges two layers: (1) built-in hooks from `kDefaultHooks` (which includes `...kSafetyHooks` inline), (2) user edits saved in `hooks.json`. Custom hooks appear at the end.
@@ -223,6 +225,20 @@ Tests call `setTestDirectory` to redirect all JSON I/O to a temp directory. Prod
 **Rewrite logic:** Rewrites are now embedded inline in `storyDetail` fields directly — `kRewrittenStories` and `kMomentUpgrades` have been merged into the `storyDetail` and moment fields of `kDefaultHooks` and deleted. If a built-in hook's `storyDetail` in the saved file differs from the original built-in value, user edits are preserved.
 
 **Backup integration:** `onPlanSaved` callback fires after any save — triggers Downloads backup.
+
+---
+
+### Built-in Ideas Asset — `assets/data/content_ideas.json`
+
+**Runtime asset:** 117 built-in HookIdea records bundled with the app package.
+**Loaded by:** `ContentLibraryService._loadHooksFromJson()` via `rootBundle.loadString()`
+**Parsed by:** `HookIdea.fromJson()`
+**Validated by:** `ContentLibraryService._validateJsonHooks()` — requires exactly 117 records, unique IDs `idea_1`–`idea_117`, correct ordering (including `idea_117` at index 78), archived set `{idea_41, idea_42, idea_43, idea_44, idea_46}`
+**Fallback:** On any load or validation failure, falls back to `kDefaultHooksWithRewrite` from `lib/content_ideas.dart`
+**Caching:** Cached statically in `_cachedJsonHooks`; first load sets `_jsonLoadAttempted = true` to avoid re-reading
+
+This asset is the **primary runtime source** for built-in ideas. `ContentLibraryService._loadAll()` loads these first, then applies `HookStore` user edits by ID (overriding built-ins), then merges QuickIdeas and IdeaInbox items.
+
 
 ### 6. Schedule Store — `lib/plan_data.dart`
 

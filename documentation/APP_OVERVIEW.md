@@ -28,12 +28,13 @@ Key APIs:
 
 ### 2. Ideas (source: `lib/content_ideas.dart`)
 - `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`, `setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`, `quote`, `detail`, `punchline`, `readyPrompt`
-- `kDefaultHooks` — 116 built-in ideas using the `idea_N` scheme (`idea_1` through `idea_116`)
-- 6 safety hooks (`idea_1`–`idea_6`) are spread in via `...kSafetyHooks`
+- `kDefaultHooks` — 117 built-in ideas using the `idea_N` scheme (`idea_1` through `idea_117`)
+- 6 safety hooks (`safety-good-touch`, `safety-stranger`, `safety-road`, `safety-emergency-number`, `safety-lost-crowd`, `safety-kitchen-line`) are spread in via `...kSafetyHooks`
+- Archived built-in ideas: `idea_41`, `idea_42`, `idea_43`, `idea_44`, `idea_46` (archived flag set to `true`)
 - `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline in `storyDetail`)
-- `kSafetyHooks` — 6 Kids Safety ideas (idea_1 through idea_6)
+- `kSafetyHooks` — 6 Kids Safety ideas (slug IDs, not idea_N)
 - Categories in `kHookCategories`: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`
-- `readyPrompt` field contains pre-built viral prompts for all 97 hooks that have them (all 94 in `kDefaultHooks` + safety hooks combined)
+- `readyPrompt` field contains pre-built viral prompts for all hooks that have them
 - `kRewrittenStories` and `kMomentUpgrades` were merged into inline `storyDetail` fields (no longer separate maps)
 
 ### 3. Content Collections (source: `lib/content_collections.dart`)
@@ -83,7 +84,11 @@ OfflineEngagementGenerator().generate(storyMoral: String) → OfflineEngagementP
 
 ## Data Layer
 
-All persistent data is stored as JSON files in the app's documents directory, backed by a shared `JsonFileStore<T>` base class. The full store catalog, model fields, ID schemes, cross-store relationships, and error-resilience patterns are documented in [DATA.md](./DATA.md).
+All persistent data is stored as JSON files in the app's documents directory, backed by a shared `JsonFileStore<T>` base class. The full store catalog, model fields, ID schemes, cross-store relationships, and error-resilience patterns are documented in [data architecture](CURRENT_STATE/03_data.md).
+
+### Built-in Ideas JSON Migration
+
+The 117 built-in content ideas are also bundled as a runtime asset at `assets/data/content_ideas.json`. At startup, `ContentLibraryService` loads them via `rootBundle.loadString()`, parses each record with `HookIdea.fromJson()`, and validates the result (exactly 117 unique records, correct ordering including `idea_117` at index 78, archived set `{idea_41, idea_42, idea_43, idea_44, idea_46}`). If loading or validation fails, the app falls back to `kDefaultHooksWithRewrite` from `lib/content_ideas.dart`. HookStore user edits override built-in ideas by ID, and QuickIdeas/IdeaInbox user content merges alongside built-ins. The Dart source `kDefaultHooks` remains available as the fallback and is **not** deleted.
 
 **Quick reference of stores:**
 
@@ -100,7 +105,7 @@ All persistent data is stored as JSON files in the app's documents directory, ba
 | `QuickHistoryStore` | `quick_post_history.json` | `QuickIdea` | Last 50 generated ideas |
 | `QualityCheckCenter` | `quality_reports.json` | `QualityReport2` | Quality check reports |
 
-See DATA.md for full model field tables, methods, ID schemes, versioning, error resilience, and test seams.
+See [data architecture](CURRENT_STATE/03_data.md) for full model field tables, methods, ID schemes, versioning, error resilience, and test seams.
 
 ## Architecture flow
 
@@ -135,7 +140,7 @@ The app is organized into six connected modules for managing content from idea t
 - **File**: `lib/content_library.dart`
 - **Stores**: `ContentLibraryStore` (persists to `content_library.json`)
 - **Model**: `ContentLibraryItem` with `sourceIdeaId`, `status`, `qualityReport`, `formatOutputs`
-- **Bridges**: Connects predefined ideas (`kDefaultHooks`) to production workflow
+- **Bridges**: Connects predefined ideas (loaded from `assets/data/content_ideas.json` via `ContentLibraryService`) to production workflow
 
 ### Module 2: Prompt Vault
 - **File**: `lib/prompt_vault.dart`
@@ -190,6 +195,7 @@ The app is organized into six connected modules for managing content from idea t
 1. **Single source of truth** — Characters defined in `characters.dart`, prompts in `master_prompt.dart` and `gemini_video_master_prompt.dart`, ideas in `content_ideas.dart`, collections in `content_collections.dart`
 2. **No duplication** — All generators import and reference the shared sources
 3. **Rewrite layer** — Rewrites are now embedded inline in `storyDetail` fields directly. `kDefaultHooksWithRewrite` is an alias to `kDefaultHooks`; user edits are preserved via `HookStore.load()` while custom hooks are appended at runtime
+4. **Built-in ideas JSON** — 117 built-in ideas bundled at `assets/data/content_ideas.json`, loaded via `rootBundle` by `ContentLibraryService`, parsed with `HookIdea.fromJson()`, validated, with `kDefaultHooksWithRewrite` as fallback
 4. **Collection grouping** — Ideas are grouped into 14 thematic collections via `collectionOf()`; the vault groups by `sourceIdeaId`
 5. **Automatic offline fallback** — `content_studio_screens.dart` detects Gemini errors (429/400/503) and switches to offline mode
 6. **Deterministic offline** — Uses `dart:math` seeded random for reproducible output
@@ -204,6 +210,7 @@ The app is organized into six connected modules for managing content from idea t
 
 ## Key files to modify
 - `lib/content_ideas.dart` — Add/edit ideas (HookIdea entries, kHookCategories, kSafetyHooks, kDefaultHooks, kDefaultHooksWithRewrite — alias to kDefaultHooks)
+- `assets/data/content_ideas.json` — Bundled runtime asset with 117 built-in ideas (JSON migration); loaded via rootBundle, parsed via HookIdea.fromJson, Dart source remains as fallback
 - `lib/hook_templates.dart` — 12 hook templates, HookGenerator class, power words lists
 - `lib/add_idea_screen.dart` — Form for adding custom ideas to Content Library (title, bucket, format, characters, opening, problem, lesson, story details, notes); saves via ContentLibraryService.addIdea
 - `lib/content_collections.dart` — Add/edit collection mappings
@@ -226,4 +233,4 @@ The app is organized into six connected modules for managing content from idea t
 - `lib/content_library.dart` — ContentLibraryItem model and ContentLibraryStore
 - `lib/models/quick_idea.dart` — QuickIdea model, QuickIdeaStore, QuickHistoryStore
 - `lib/quick_content.dart` — PromoComment model and PromoCommentStore
-- `documentation/DATA.md` — Full data architecture reference (stores, models, IDs, relationships, error resilience)
+- `documentation/CURRENT_STATE/03_data.md` — Full data architecture reference (stores, models, IDs, relationships, error resilience)

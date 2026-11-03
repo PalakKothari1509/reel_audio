@@ -26,14 +26,14 @@ flutter run
 ## Tests
 ```bash
 flutter test
-# Currently 665 tests passing
+# Currently 710 tests passing
 ```
 
 ## Project structure
 ```
 lib/
 ├── master_prompt.dart       # Shared prompt constants (single source of truth)
-├── characters.dart          # Character definitions (all 7 characters)
+├── characters.dart          # Character definitions (all 8 characters including Robot)
 ├── hook_system.dart         # Hook/text generation functions
 ├── content_ideas.dart       # HookIdea model + kDefaultHooks library
 ├── story_generator_offline.dart   # StoryGenerator (11 templates)

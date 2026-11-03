@@ -1,6 +1,6 @@
 # 06 — Tests
 
-Inventory of the 40 test files in `test/` (~665 total widget and unit tests).
+Inventory of the test files in `test/` (~710 total widget and unit tests).
 
 ## Coverage map
 
@@ -74,4 +74,4 @@ QuickContentScreen/CarouselMaker/TrialReel/SingleImage/IdeaInbox/MultiFormat/Qua
   and the library UI depend on, but not the screens themselves.
 
 ## Running
-`flutter test` from the repo root. Current count: **665 tests** (verified by running `flutter test`).
+`flutter test` from the repo root. Current count: **710 tests** (verified by running `flutter test`).

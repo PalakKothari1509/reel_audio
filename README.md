@@ -11,9 +11,7 @@ and what to learn from the result.
 
 ## What exists
 
-- **Idea Vault** — 57 ideas in `content_ideas.md`, each classified on seven
-  axes: pillar, series, content type, narrative format, production method,
-  goal, status. 10 Navratri Reel ideas (N1–N10) recently added.
+- **Idea Vault** — 117 ideas in `assets/data/content_ideas.json`, each classified on seven axes: pillar, series, content type, narrative format, production method, goal, status. 10 Navratri Reel ideas (N1–N10) recently added. The ideas are loaded at runtime via `rootBundle`, parsed with `HookIdea.fromJson()`, validated (117 unique records, correct ordering with `idea_117` at index 78, archived set `{idea_41, idea_42, idea_43, idea_44, idea_46}`), and fall back to `kDefaultHooksWithRewrite` in `lib/content_ideas.dart` if JSON loading fails.
 - **Create** — one `Create Content` action. A finished post is one package:
   hook, script, narration, per-scene dialogue, caption, CTA, hashtags.
 - **Reel Maker** — the existing end-to-end video pipeline (FFmpeg). Works;
@@ -22,8 +20,26 @@ and what to learn from the result.
 - **Promotion Comments** — a vault of saved comment lines.
 - **Brand** — character lock for eight characters: Ria (pigtails, pink star dress), Rio (blue kurta), Cuty (white bunny, pink bow), Robot (friendly AI), Mumma (yellow kurta, blue jeans), Papa (light blue kurta), Daadi (cream saree), and Teacher (blue kurta with book), with the 3D Pixar/Disney visual style injected into every prompt so characters look identical in every scene.
 
-Not built yet, deliberately: Calendar, Analytics, Experiments. They answer
-questions the data cannot yet support — see `REDESIGN_PLAN2.md`.
+## Upcoming
+
+### Content Rating Tool (planned — not yet implemented)
+
+A standalone browser-based Content Rating Tool is planned as a separate project,
+**not** part of this Flutter application. It will:
+
+- Import `content_ideas.json` and display ideas in a laptop browser
+- Rate ideas on 10 dimensions (hook strength, relatability, safety, etc.)
+- Produce verdicts (Ready to Post / Needs Minor Fixes / Needs Major Rewrite / Reject)
+- Enforce critical hard rules for safety and brand compliance
+- Export JSON and CSV reports
+
+**Important:** The browser tool will not modify Flutter screens, Dart logic,
+HookIdea model, JSON migration, or any existing idea records. It is a separate
+evaluation utility.
+
+See `documentation/CONTENT_RATING_TOOL_PLAN.md` for the full plan.
+
+Other planned enhancements are tracked in GitHub Issues.
 
 ## Content system
 
@@ -72,7 +88,7 @@ cp lib/secrets.example.dart lib/secrets.dart   # then fill in real keys
 ## Development
 
 ```bash
-flutter test                 # ~550 tests (505 unit + 44 widget)
+flutter test                 # ~710 tests
 flutter analyze              # lib/ is clean; tool/ has known warnings
 dart run tool/check_formats.dart
 dart run tool/check_axes.dart
