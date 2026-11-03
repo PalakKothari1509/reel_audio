@@ -102,32 +102,33 @@ This is the **runtime canonical fallback list**. All built-in ideas pass through
 
 | Category | Count | ID Pattern |
 |----------|-------|------------|
-| `Warm lesson` | 16 (incl. 6 safety) | `h01`, `h02`, `h03`, `h04`, `h05`, `h07`, `h08`, `h12`, `h13`, `h16`, `h17`, `h19` + `safety-*` (6) |
+| `Warm lesson` | 10 | `h01`, `h02`, `h03`, `h04`, `h05`, `h07`, `h08`, `h12`, `h13`, `h16`, `h17`, `h19` |
 | `Relatable` | 46 | `pal*`, descriptive IDs |
 | `Struggle first` | 5 | `h09`-`h11`, `h14`-`h15`, `h18` |
 | `Surprising` | 5 | `h20`-`h21`, `night-before-annual-day` |
 | `Page & milestone` | 8 | `p01`-`p08` |
 | `Navratri` | 10 | `navratri-*`, `night-before-annual-day` |
 | `Series` | 20 | `robot-01`..`robot-20` |
+| `Safety` | 6 | `idea_1`-`idea_6` |
 | `idea_N` series | 117 unique | `idea_1`–`idea_117` |
 
 **Archived built-in ideas:** `idea_41`, `idea_42`, `idea_43`, `idea_44`, `idea_46` (archived flag set to `true`)
 **Ordering quirk:** `idea_117` appears at index 78 (zero-based) in the JSON, matching its position in `buildDefaultHooks()`.
 
-### kSafetyHooks (6 entries, content_ideas.dart:184-262)
+### kSafetyHooks (6 entries, content_ideas.dart:6927-6929)
 
-All category: `Warm lesson`. All have `keepMoralOffScreen: false`. Spread into `kDefaultHooks` via `...kSafetyHooks`:
+All category: `Safety`. All have `keepMoralOffScreen: false`. Derived by filtering `kDefaultHooks` where `category == 'Safety'`:
 
 | ID | Opening (Hindi) | Cover (English + Hindi) | Topic |
 |----|-----------------|-------------------------|-------|
-| `safety-good-touch` | "Uncle bole 'Ek pappi do'... aur Ria ne bola nahi." | "Meri Marzi!" | Good touch / bad touch |
-| `safety-stranger` | "Park mein aunty ne chocolate di... Ria ne kya kiya?" | "Chocolate Nahi!" | Stranger danger |
-| `safety-road` | "Zebra crossing par Rio ruk gaya... koi nahi bola." | "Ruko, Dekho, Chalo!" | Road safety |
-| `safety-emergency-number` | "Ria ko Mumma ka number yaad nahi tha... phir gaana bana." | "Mera Number Gaana" | Emergency numbers |
-| `safety-lost-crowd` | "Bheed mein Mumma ka haath chhoot gaya... ab kya?" | "Mela Mein Kho Gayi" | Lost in crowd |
-| `safety-kitchen-line` | "Rasoi mein Ria ko aage jaana tha... par ek line thi." | "Laal Line Ke Peeche" | Kitchen safety |
+| `idea_1` | "Uncle bole 'Ek pappi do'... aur Ria ne bola nahi." | "Meri Marzi!" | Good touch / bad touch |
+| `idea_2` | "Park mein aunty ne chocolate di... Ria ne kya kiya?" | "Chocolate Nahi!" | Stranger danger |
+| `idea_3` | "Zebra crossing par Rio ruk gaya... koi nahi bola." | "Ruko, Dekho, Chalo!" | Road safety |
+| `idea_4` | "Ria ko Mumma ka number yaad nahi tha... phir gaana bana." | "Mera Number Gaana" | Emergency numbers |
+| `idea_5` | "Bheed mein Mumma ka haath chhoot gaya... ab kya?" | "Mela Mein Kho Gayi" | Lost in crowd |
+| `idea_6` | "Rasoi mein Ria ko aage jaana tha... par ek line thi." | "Laal Line Ke Peeche" | Kitchen safety |
 
-> **Note**: These are inside `kDefaultHooks` via the `...kSafetyHooks` spread — NOT a separate loss bug. Rewrites are now embedded inline in `storyDetail` and moment fields directly.
+> **Note**: These are inside `kDefaultHooks` via `buildDefaultHooks()` — NOT a separate list or loss bug. `kSafetyHooks` is `kDefaultHooks.where((h) => h.category == 'Safety').toList()`. Rewrites are embedded inline in `storyDetail` and moment fields directly.
 
 ### kRewrittenStories / kMomentUpgrades (MERGED & DELETED)
 
@@ -288,7 +289,7 @@ String collectionOf(String id, {bool custom = false}) {
 | **play** | 5 | day2-which-doesnt-belong, day4-kitchen-challenge, day8-find-cuty, day9-sock-hunt, day13-pattern-game |
 | **guides** | 4 | day5-ask-tonight, day6-3year-skills, day10-3-questions, day11-4year-skills |
 | **milestones** | 9 | p01â€“p08, day14-favorite-format |
-| **safety** | 6 | safety-good-touch, safety-stranger, safety-road, safety-emergency-number, safety-lost-crowd, safety-kitchen-line |
+| **safety** | 6 | idea_1, idea_2, idea_3, idea_4, idea_5, idea_6 |
 | **robot** | 20 | robot-01..robot-20 (via `id.startsWith('robot-')` rule, not in _members) |
 | **festivals** | 11 | navratri-01..navratri-09, navratri-10, night-before-annual-day (via startsWith rule) |
 | **missions** | 11 | day15..day25 (via `RegExp(r'^day(1[5-9]2|0-5)-)` rule) |

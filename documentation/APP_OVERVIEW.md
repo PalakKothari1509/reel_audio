@@ -29,11 +29,11 @@ Key APIs:
 ### 2. Ideas (source: `lib/content_ideas.dart`)
 - `HookIdea` class: `id`, `category`, `cover`, `opening`, `problem`, `lesson`, `caption`, `pinnedComment`, `forApp`, `storyDetail`, `setting`, `sceneDetail`, `dialogue`, `mess`, `innerThought`, `endingBeat`, `defaultCast`, `keepMoralOffScreen`, `quote`, `detail`, `punchline`, `readyPrompt`
 - `kDefaultHooks` — 117 built-in ideas using the `idea_N` scheme (`idea_1` through `idea_117`)
-- 6 safety hooks (`safety-good-touch`, `safety-stranger`, `safety-road`, `safety-emergency-number`, `safety-lost-crowd`, `safety-kitchen-line`) are spread in via `...kSafetyHooks`
+- 6 safety hooks (`idea_1` through `idea_6`) — derived by filtering `kDefaultHooks` for category `Safety`, exposed as `kSafetyHooks`
 - Archived built-in ideas: `idea_41`, `idea_42`, `idea_43`, `idea_44`, `idea_46` (archived flag set to `true`)
 - `kDefaultHooksWithRewrite` — alias to `kDefaultHooks` (rewrites now embedded inline in `storyDetail`)
-- `kSafetyHooks` — 6 Kids Safety ideas (slug IDs, not idea_N)
-- Categories in `kHookCategories`: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`
+- `kSafetyHooks` — 6 Kids Safety ideas (`idea_1` through `idea_6`), filtered from `kDefaultHooks` where category is `Safety`
+- Categories: `Relatable`, `Struggle first`, `Surprising`, `Warm lesson`, `Page & milestone`, `Navratri`, `Series`, `Safety`
 - `readyPrompt` field contains pre-built viral prompts for all hooks that have them
 - `kRewrittenStories` and `kMomentUpgrades` were merged into inline `storyDetail` fields (no longer separate maps)
 
