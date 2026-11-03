@@ -39,7 +39,7 @@ jobs:
       - name: Run exporter
         run: |
           set -o pipefail
-          dart run scripts/export_content_ideas.dart 2>&1 | tee exporter.log
+          flutter test test/export_content_ideas_runner_test.dart 2>&1 | tee exporter.log
 
       - name: Upload exporter debug log
         if: always()
