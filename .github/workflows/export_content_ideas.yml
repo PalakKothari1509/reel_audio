@@ -50,7 +50,17 @@ jobs:
           if-no-files-found: warn
 
       - name: Independent verification (Dart)
-        run: dart run scripts/verify_export.dart
+        run: |
+          set -o pipefail
+          flutter test test/verify_export_runner_test.dart 2>&1 | tee verifier.log
+
+      - name: Upload verifier debug log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verifier-debug-log
+          path: verifier.log
+          if-no-files-found: warn
 
       - name: Validate JSON (Node)
         run: node scripts/validate_content_ideas.js
