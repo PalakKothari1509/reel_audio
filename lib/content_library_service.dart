@@ -22,12 +22,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
 import 'brand_system.dart';
 import 'content_axes.dart';
 import 'content_collections.dart';
 import 'content_ideas.dart';
+import 'hook_store.dart';
+import 'idea_inbox_store.dart';
+import 'idea_status.dart';
 import 'models/quick_idea.dart';
 import 'plan_data.dart';
 import 'idea_inbox_store.dart';
@@ -215,6 +219,84 @@ class ContentLibraryService {
   List<ContentIdea>? _cache;
   DateTime? _cacheTime;
   static const _cacheTtl = Duration(minutes: 1);
+  static List<HookIdea>? _cachedJsonHooks;
+  static bool _jsonLoadAttempted = false;
+
+  static bool _validateJsonHooks(List<HookIdea> hooks) {
+    if (hooks.length != 117) return false;
+    final seen = <String>{};
+    for (var i = 0; i < hooks.length; i++) {
+      final h = hooks[i];
+      if (seen.contains(h.id)) return false;
+      seen.add(h.id);
+      if (i == 75 && h.id == 'idea_76') continue;
+      if (i == 76 && h.id == 'idea_77') continue;
+      if (i == 77 && h.id == 'idea_78') continue;
+      if (i == 78 && h.id == 'idea_117') continue;
+      if (i == 79 && h.id == 'idea_79') continue;
+      if (i < 75 && h.id != 'idea_${i + 1}') return false;
+      if (i >= 80 && i <= 116 && h.id != 'idea_${i}') return false;
+    }
+    for (var i = 1; i <= 117; i++) {
+      if (!seen.contains('idea_$i')) return false;
+    }
+    final archived = hooks.where((h) => h.archived).map((h) => h.id).toSet();
+    const requiredArchived = {'idea_41', 'idea_42', 'idea_43', 'idea_44', 'idea_46'};
+    if (archived.length != requiredArchived.length) return false;
+    for (final a in requiredArchived) {
+      if (!archived.contains(a)) return false;
+    }
+    return true;
+  }
+
+  static Future<List<HookIdea>> _loadHooksFromJson() async {
+    if (_jsonLoadAttempted && _cachedJsonHooks != null) {
+      return _cachedJsonHooks!;
+    }
+    _jsonLoadAttempted = true;
+    try {
+      String jsonStr;
+      try {
+        jsonStr = await rootBundle.loadString('assets/data/content_ideas.json');
+      } catch (e) {
+        debugPrint('ContentLibraryService: JSON asset not found, falling back to code: $e');
+        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        return _cachedJsonHooks!;
+      }
+      final jsonData = jsonDecode(jsonStr);
+      if (jsonData is! Map) {
+        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        return _cachedJsonHooks!;
+      }
+      final ideas = jsonData['ideas'];
+      if (ideas is! List) {
+        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        return _cachedJsonHooks!;
+      }
+      final hooks = <HookIdea>[];
+      for (final item in ideas) {
+        if (item is! Map) continue;
+        try {
+          final hook = HookIdea.fromJson(Map<String, dynamic>.from(item));
+          hooks.add(hook);
+        } catch (e) {
+          debugPrint('ContentLibraryService: skipped invalid JSON idea: $e');
+          continue;
+        }
+      }
+      if (hooks.isEmpty || !_validateJsonHooks(hooks)) {
+        debugPrint('ContentLibraryService: JSON validation failed, falling back to code');
+        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        return _cachedJsonHooks!;
+      }
+      _cachedJsonHooks = hooks;
+      return _cachedJsonHooks!;
+    } catch (e) {
+      debugPrint('ContentLibraryService: JSON load error, falling back to code: $e');
+      _cachedJsonHooks = kDefaultHooksWithRewrite;
+      return _cachedJsonHooks!;
+    }
+  }
 
   /// Whether the cache should be considered stale.
   bool get _isCacheStale {
@@ -408,7 +490,8 @@ class ContentLibraryService {
     final savedHooksById = {for (final h in savedHooks) h.id: h};
 
     // 1. Built-in hooks with rewrites applied, overridden by persisted edits
-    for (final h in kDefaultHooksWithRewrite) {
+    final builtInHooks = await _loadHooksFromJson();
+    for (final h in builtInHooks) {
       final effectiveHook = savedHooksById.remove(h.id) ?? h;
       if (!seen.add(effectiveHook.id)) continue;
       result.add(_hookToIdea(effectiveHook, isCustom: effectiveHook.custom));
