@@ -634,12 +634,12 @@ void main() {
 
     test('idea_76 endingBeat does not show child holding sparkler', () {
       expect(idea76.endingBeat, isNot(contains('holding sparkler with Mumma')));
-      expect(idea76.endingBeat, contains('lights sparklers at a safe distance'));
+      expect(idea76.endingBeat, contains('safe spot with the family'));
     });
 
     test('idea_76 detail states adult lights, child watches', () {
-      expect(idea76.detail, contains('Adult lights'));
-      expect(idea76.detail, contains('child watches from safe distance'));
+      expect(idea76.detail, contains('Adults handle fireworks'));
+      expect(idea76.detail, contains('Children watch from safe distance'));
     });
   });
 }

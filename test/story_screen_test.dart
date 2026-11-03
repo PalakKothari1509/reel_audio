@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/json_file_store.dart';
+import 'package:reel_audio/content_library_service.dart';
 import 'package:reel_audio/main.dart';
 
 void main() {
@@ -16,6 +17,11 @@ void main() {
   });
 
   group('StoryScreen', () {
+    test('pre-populates ContentLibraryService cache from JSON', () async {
+      final all = await ContentLibraryService.instance.getAllIdeas();
+      expect(all.length, 117);
+    });
+
     testWidgets('displays initialText in the story box when provided',
         (tester) async {
       const testText = 'Ria ne joote ulte se pehne — silly story for testing.';
@@ -65,19 +71,16 @@ void main() {
         ),
       );
 
-      // Allow async loading from ContentLibraryService to complete.
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('Main khud'),
+        find.byType(TextField),
         findsOneWidget,
       );
-      expect(
-        find.textContaining('try karogi'),
-        findsOneWidget,
-      );
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.controller, isNotNull);
+      expect(textField.controller!.text, contains('Main khud'));
+      expect(textField.controller!.text, contains('try karogi'));
       expect(tester.takeException(), isNull);
     });
 
@@ -88,12 +91,14 @@ void main() {
         ),
       );
 
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('Shabash'),
+        find.textContaining('Main Khud'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('fill in anything'),
         findsOneWidget,
       );
     });
@@ -106,9 +111,7 @@ void main() {
         ),
       );
 
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
 
       // idea_999 is not a real idea — the screen should not crash and should
       // show an empty text field.
