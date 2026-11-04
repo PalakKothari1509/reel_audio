@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Rating Tool — Fun Learning With Palak</title>
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <h1>📊 Content Rating Tool</h1>
+      <p class="subtitle">Standalone evaluator for Fun Learning With Palak content ideas</p>
+      <div class="status-badge" id="modeBadge">Offline mode</div>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+    <button class="nav-btn" data-view="library">Content Library</button>
+    <button class="nav-btn" data-view="export">Export</button>
+  </nav>
+
+  <main class="app-main">
+    <!-- Dashboard -->
+    <section id="view-dashboard" class="view active">
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Ideas</div>
+          <div class="stat-value" id="statTotal">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Evaluated</div>
+          <div class="stat-value" id="statEvaluated">-</div>
+        </div>
+        <div class="stat-card stat-ready">
+          <div class="stat-label">Ready to Post</div>
+          <div class="stat-value" id="statReady">-</div>
+        </div>
+        <div class="stat-card stat-minor">
+          <div class="stat-label">Needs Minor Fixes</div>
+          <div class="stat-value" id="statMinor">-</div>
+        </div>
+        <div class="stat-card stat-major">
+          <div class="stat-label">Needs Major Rewrite</div>
+          <div class="stat-value" id="statMajor">-</div>
+        </div>
+        <div class="stat-card stat-reject">
+          <div class="stat-label">Reject</div>
+          <div class="stat-value" id="statReject">-</div>
+        </div>
+      </div>
+      <div class="dashboard-actions">
+        <button class="btn btn-primary" onclick="app.navigateTo('library')">Browse All Ideas</button>
+        <button class="btn btn-secondary" onclick="app.batchEvaluateAll()">Evaluate All Ideas</button>
+        <button class="btn btn-primary" onclick="app.batchReEvaluateAll()">Re-evaluate All Ideas</button>
+      </div>
+
+      <div class="dashboard-ratings" id="dashboardRatings">
+        <div class="section-header">
+          <div>
+            <h2>All Ideas &amp; Evaluation Details</h2>
+            <p class="table-description" id="allIdeasTableDescription"></p>
+          </div>
+          <div class="table-actions">
+            <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Full Table CSV</button>
+            <button class="btn btn-secondary" onclick="app.exportAllIdeasJson()">Export Full Table JSON</button>
+          </div>
+        </div>
+        <div class="table-container full-data-table-container">
+          <table id="allIdeasTable">
+            <thead id="allIdeasTableHead"></thead>
+            <tbody id="allIdeasTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Library -->
+    <section id="view-library" class="view">
+      <div class="library-header">
+        <h2>Content Library</h2>
+        <div class="library-controls">
+          <input type="text" id="libSearch" placeholder="Search by title, hook, or ID..." />
+          <select id="libCategory">
+            <option value="">All Categories</option>
+          </select>
+          <select id="libVerdict">
+            <option value="">All Verdicts</option>
+            <option value="Ready to Post">Ready to Post</option>
+            <option value="Needs Minor Fixes">Needs Minor Fixes</option>
+            <option value="Needs Major Rewrite">Needs Major Rewrite</option>
+            <option value="Reject">Reject</option>
+          </select>
+          <select id="libStatus">
+            <option value="">All Status</option>
+            <option value="evaluated">Evaluated</option>
+            <option value="unevaluated">Not Evaluated</option>
+            <option value="failed">Evaluation Failed</option>
+          </select>
+          <button class="btn btn-secondary" onclick="app.batchEvaluateUnevaluated()">Evaluate Unevaluated</button>
+        </div>
+      </div>
+      <div class="library-list" id="libList">
+        <!-- Idea cards injected here -->
+      </div>
+    </section>
+
+    <!-- Export -->
+    <section id="view-export" class="view">
+      <div class="export-card">
+        <h2>Export All Ideas &amp; Ratings</h2>
+        <p>Download one row per idea, including the complete idea content, all dimension scores and feedback, findings, and suggestions. Ideas not yet evaluated are included with blank rating fields.</p>
+        <div class="export-actions">
+          <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Full Table CSV</button>
+          <button class="btn btn-primary" onclick="app.exportAllIdeasJson()">Export Full Table JSON</button>
+          <button class="btn btn-secondary" onclick="app.clearRatings()">Clear All Ratings</button>
+        </div>
+        <div class="export-note">
+          The full-table export combines <code>assets/data/content_ideas.json</code> with saved ratings in <code>data/ratings/</code>. Exporting does not modify either file.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Idea Detail Modal -->
+  <div id="ideaModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Idea Details</h2>
+        <button class="close-btn" onclick="app.closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Content injected by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="app.evaluateSelected()">Evaluate This Idea</button>
+        <button class="btn btn-secondary" onclick="app.closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluation Result Modal -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content result-modal">
+      <div class="modal-header">
+        <h2 id="resultTitle">Evaluation Result</h2>
+        <button class="close-btn" onclick="app.closeResultModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="resultBody">
+        <!-- Content injected by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="app.copyResult()">Copy Result</button>
+        <button class="btn btn-secondary" onclick="app.closeResultModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/app.js?v=4"></script>
+  <script src="js/library.js?v=2"></script>
+  <script src="js/rating.js?v=2"></script>
+  <script src="js/export.js"></script>
+</body>
+</html>
