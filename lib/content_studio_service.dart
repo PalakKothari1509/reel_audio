@@ -1851,6 +1851,7 @@ String buildMasterReelPrompt({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  String storySpecificPrompt = '',
   bool hasReferenceImages = false,
 }) {
   final charBlock = _characterBlock(characters, hasReferenceImages: hasReferenceImages);
@@ -1870,6 +1871,7 @@ PRODUCE A COMPLETE 30-SECOND REEL IN 3 CONNECTED 10-SECOND CLIPS.
 STORY IDEA: $idea
 LANGUAGE: $language (Hinglish = Hindi words in English script, e.g. "Mumma ne kaha — beta, jaldi karo!")
 ${additionalInstructions.trim().isEmpty ? '' : 'ADDITIONAL INSTRUCTIONS: $additionalInstructions'}
+${buildStorySpecificPromptBlock(storySpecificPrompt)}
 
 ${_videoBrandStyleBlock()}
 
@@ -2096,6 +2098,7 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
   required List<String> characters,
   String language = 'Hinglish',
   String additionalInstructions = '',
+  String storySpecificPrompt = '',
   bool hasReferenceImages = false,
   String? apiKey,
   void Function(String)? onWait,
@@ -2103,7 +2106,7 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
   bool useExistingPrompt = true,
 }) async {
   // Check for existing approved prompt first
-  if (useExistingPrompt) {
+  if (useExistingPrompt && storySpecificPrompt.trim().isEmpty) {
     final existing = await _checkExistingReadyPrompt(
       _contentIdFromTitle(idea),
       PromptType.video,
@@ -2119,6 +2122,7 @@ Future<GeminiVideoResult> generateMasterReelPromptsWithPreview({
     characters: characters,
     language: language,
     additionalInstructions: additionalInstructions,
+    storySpecificPrompt: storySpecificPrompt,
     hasReferenceImages: hasReferenceImages,
   );
   final key = (apiKey ?? '').trim().isNotEmpty ? apiKey!.trim() : geminiApiKey;

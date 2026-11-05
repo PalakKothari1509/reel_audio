@@ -6,6 +6,28 @@ import 'package:reel_audio/gemini_video_master_prompt.dart';
 import 'package:reel_audio/video_production_plan.dart';
 
 void main() {
+  group('buildStorySpecificPromptBlock', () {
+    test('preserves a supplied prompt and defines precedence clearly', () {
+      const storyPrompt = '''
+Scene 1: Ria asks to sleep beside Mumma.
+Mumma: "Tab tak thodi extra cuddles toh banti hain!"
+On-screen text: "Little habits. Big memories."
+''';
+
+      final block = buildStorySpecificPromptBlock(storyPrompt);
+
+      expect(block, contains(storyPrompt.trim()));
+      expect(block, contains('Preserve the story'));
+      expect(block, contains('three connected 10-second clips'));
+      expect(block, contains('do not render text in the video'));
+      expect(block, contains('JSON-output rules'));
+    });
+
+    test('returns an empty block when there is no story-specific prompt', () {
+      expect(buildStorySpecificPromptBlock('  \n '), isEmpty);
+    });
+  });
+
   group('renderVideoMasterPrompt', () {
     test('replaces all placeholders with variable values', () {
       final vars = VideoPromptVariables(

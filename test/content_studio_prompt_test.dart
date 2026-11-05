@@ -566,6 +566,37 @@ void main() {
     });
   });
 
+  group('buildMasterReelPrompt story specificity', () {
+    test('includes a selected idea ready prompt with shared precedence rules', () {
+      const storyPrompt = '''
+Scene 1: Ria says good night in her own bed.
+Scene 2: Ria walks over to Mumma and Papa whispers, "Yeh phir aa gayi!"
+Voice-over: "Din bhar apni duniya mein busy, aur raat ko bas Mumma ki cuddles chahiye."
+''';
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria comes to Mumma for a cuddle at bedtime.',
+        characters: ['Mumma', 'Papa', 'Ria'],
+        storySpecificPrompt: storyPrompt,
+      );
+
+      expect(prompt, contains(storyPrompt.trim()));
+      expect(prompt, contains('STORY-SPECIFIC PRECEDENCE'));
+      expect(prompt, contains('3 CONNECTED 10-SECOND CLIPS'));
+      expect(prompt, contains('CHARACTER LOCK'));
+      expect(prompt, contains('SAFETY:'));
+      expect(prompt, contains('Return ONLY valid JSON'));
+    });
+
+    test('omits the story-specific section when no ready prompt is available', () {
+      final prompt = buildMasterReelPrompt(
+        idea: 'Ria learns to share',
+        characters: ['Ria', 'Mumma'],
+      );
+
+      expect(prompt, isNot(contains('STORY-SPECIFIC PRECEDENCE')));
+    });
+  });
+
   group('buildMasterReelPrompt JSON schema compatibility', () {
     test('JSON schema has all required fields for each part', () {
       final prompt = buildMasterReelPrompt(

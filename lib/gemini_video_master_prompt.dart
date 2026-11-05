@@ -302,6 +302,31 @@ SAFETY (overrides any conflicting idea field):
 - No fear-based scenarios that could frighten a sensitive child.
 ''';
 
+/// Formats a saved, story-specific prompt as source material for the master prompt.
+///
+/// The master prompt continues to control brand, character, safety, and output
+/// format. This block controls the story's events, order, setting, and dialogue.
+String buildStorySpecificPromptBlock(String storySpecificPrompt) {
+  final storyPrompt = storySpecificPrompt.trim();
+  if (storyPrompt.isEmpty) return '';
+
+  return '''
+STORY-SPECIFIC PROMPT (authoritative story source):
+$storyPrompt
+
+STORY-SPECIFIC PRECEDENCE:
+- Preserve the story's characters, setting, events, chronological order, dialogue,
+  emotional beats, and ending. Do not replace them with a generic story.
+- Adapt the supplied scenes to the master's three connected 10-second clips,
+  keeping every important story beat in order. Do not add or omit story events.
+- Keep any supplied on-screen wording exact in the output's editor-metadata fields,
+  but do not render text in the video.
+- This source supplies story content, not a replacement for the master's brand,
+  character-consistency, safety, or JSON-output rules. If a direction conflicts,
+  follow the master rule while preserving the story's safe intent.
+''';
+}
+
 /// Renders the master prompt by replacing {{...}} placeholders.
 String renderVideoMasterPrompt(VideoPromptVariables vars) {
   final charDescSection = vars.hasReferenceImages

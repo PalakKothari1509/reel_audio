@@ -44,6 +44,7 @@ class IdeaInputScreen extends StatefulWidget {
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
+    String? readyPrompt,
   })? onGeneratePromptOnly;
 
   /// Extra controls specific to the feature (e.g. slide count, duration).
@@ -116,9 +117,7 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       );
       return;
     }
-    final chars = _selectedChars.isEmpty
-        ? ['ria', 'rio', 'cuty']
-        : List<String>.from(_selectedChars);
+    final chars = _selectedCharacterNames();
     final readyPrompt = _selectedHook?.readyPrompt.trim() ?? '';
     final caption = _selectedHook?.caption;
     final pinnedComment = _selectedHook?.pinnedComment;
@@ -141,14 +140,31 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       );
       return;
     }
-    final chars = _selectedChars.isEmpty
-        ? ['ria', 'rio', 'cuty']
-        : List<String>.from(_selectedChars);
+    final chars = _selectedCharacterNames();
+    final readyPrompt = _selectedHook?.readyPrompt.trim() ?? '';
     widget.onGeneratePromptOnly!(
       idea: idea,
       characters: chars,
       additionalInstructions: _instrCtrl.text.trim(),
+      readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
     );
+  }
+
+  List<String> _selectedCharacterNames() {
+    final ids = _selectedChars.isEmpty
+        ? ['ria', 'rio', 'cuty']
+        : _selectedChars;
+    return ids.map((id) {
+      final normalized = id.toLowerCase();
+      return kCharacterOptions
+          .firstWhere(
+            (character) =>
+                character.id.toLowerCase() == normalized ||
+                character.name.toLowerCase() == normalized,
+            orElse: () => (id: id, name: id, emoji: ''),
+          )
+          .name;
+    }).toList();
   }
 
   @override

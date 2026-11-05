@@ -47,7 +47,9 @@ import 'settings_screen.dart';
 import 'character_definitions.dart';
 import 'content_ideas.dart';
 import 'add_idea_screen.dart';
-import 'content_studio_screens.dart';
+import 'content_studio_screens.dart'
+    hide HookChoice, CarouselPromptsScreen, GeminiVideoScreen, ImagePromptScreen;
+import 'content_generation_screens.dart';
 import 'offline_story_maker_screen.dart';
 import 'quick_content.dart';
 import 'instagram_workflow_screen.dart';
