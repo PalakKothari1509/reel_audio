@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 import 'content_axes.dart';
-import 'content_ideas.dart';
 import 'content_library_service.dart';
 import 'prompt_vault.dart';
 import 'quality_check_center.dart';
@@ -28,7 +27,6 @@ class ReviewIdeaScreen extends StatefulWidget {
 
 class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   ContentIdea? _idea;
-  HookIdea? _hookIdea;
   bool _loading = true;
   String? _generatedScript;
   bool _isGeneratingScript = false;
@@ -50,24 +48,9 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       });
       return;
     }
-    
-    HookIdea? hookIdea;
-    final sourceType = idea.sourceType;
-    final sourceIdeaId = idea.sourceIdeaId;
-    if (sourceType == 'HookIdea' && sourceIdeaId != null) {
-      // Try to find the original HookIdea from the built-in list
-      final allHooks = <HookIdea>[];
-      allHooks.addAll(kDefaultHooks);
-      try {
-        hookIdea = allHooks.firstWhere((h) => h.id == sourceIdeaId);
-      } catch (_) {
-        hookIdea = null;
-      }
-    }
-    
+
     setState(() {
       _idea = idea;
-      _hookIdea = hookIdea;
       _loading = false;
     });
   }
@@ -96,7 +79,6 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   }
 
   Widget _buildContent(ContentIdea idea) {
-    final hook = _hookIdea;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -126,19 +108,6 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           _section('Story Details', idea.storyDetail),
           _section('Learning Outcome', idea.lesson),
           if (idea.caption.isNotEmpty) _section('Caption', idea.caption),
-
-          // ── Original HookIdea Cover Hook & Choices ──────────────
-          if (hook != null) ...[
-            const SizedBox(height: 24),
-            Text('Original HookIdea Cover & Choices', style: AppText.section),
-            const SizedBox(height: 8),
-            _section('Cover Hook', hook.cover),
-            _section('Opening', hook.opening),
-            _section('Problem', hook.problem),
-            _section('Lesson', hook.lesson),
-            if (hook.storyDetail.isNotEmpty) _section('Story Detail', hook.storyDetail),
-            if (hook.readyPrompt.isNotEmpty) _section('Ready Prompt', hook.readyPrompt),
-          ],
 
           // ── Content Status ──────────────────────────────────────
           const SizedBox(height: 8),
@@ -229,8 +198,46 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
   }
 
   Widget _buildHealthCheck(ContentIdea idea) {
-    return const Center(
-      child: Text('Health check requires HookIdea — see IdeaInputScreen'),
+    final checks = <_HealthCheck>[
+      _HealthCheck('Has opening hook', idea.opening.trim().isNotEmpty),
+      _HealthCheck('Has problem statement', idea.problem.trim().isNotEmpty),
+      _HealthCheck('Has learning outcome', idea.lesson.trim().isNotEmpty),
+      _HealthCheck('Has story detail', idea.storyDetail.trim().isNotEmpty),
+      _HealthCheck('Has cover hook', idea.caption.trim().isNotEmpty),
+      _HealthCheck('Has characters', idea.characterIds.isNotEmpty),
+      _HealthCheck('Status beyond idea', idea.status.index > IdeaStatus.idea.index),
+    ];
+
+    final passed = checks.where((c) => c.passed).length;
+    final total = checks.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Completeness: $passed / $total', style: AppText.body),
+        const SizedBox(height: 8),
+        ...checks.map((c) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              Icon(
+                c.passed ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: c.passed ? AppColors.success : AppColors.textSoft,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(c.label, style: AppText.body),
+            ],
+          ),
+        )),
+        if (passed == total) ...[
+          const SizedBox(height: 8),
+          Text('✅ Idea is ready for content generation', style: AppText.body.copyWith(color: AppColors.success)),
+        ] else ...[
+          const SizedBox(height: 8),
+          Text('⚠️ Complete missing fields before generating', style: AppText.body.copyWith(color: AppColors.warning)),
+        ],
+      ],
     );
   }
 
@@ -606,4 +613,10 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       ),
     );
   }
+}
+
+class _HealthCheck {
+  final String label;
+  final bool passed;
+  const _HealthCheck(this.label, this.passed);
 }

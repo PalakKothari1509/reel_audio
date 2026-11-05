@@ -3,23 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/brand_system.dart';
 import 'package:reel_audio/characters.dart';
 import 'package:reel_audio/content_ideas.dart';
+import 'package:reel_audio/content_library_service.dart';
 import 'package:reel_audio/content_studio_service.dart';
 import 'package:reel_audio/master_prompt.dart';
 
 void main() {
-  group('buildMasterReelPrompt character handling', () {
-    test('uses the characters parameter for CHARACTER LOCK, not hardcoded cast', () {
-      final prompt = buildMasterReelPrompt(
-        idea: 'Priya learns to share with Daadi',
-        characters: ['Priya', 'Daadi', 'Ria'],
-        language: 'Hinglish',
-      );
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-      expect(prompt, contains('CHARACTER LOCK'));
-      expect(prompt, contains(characterDescription('Priya')));
-      expect(prompt, contains(characterDescription('Daadi')));
-      expect(prompt, contains(characterDescription('Ria')));
-    });
+  group('buildMasterReelPrompt character handling', () {
+    test(
+      'uses the characters parameter for CHARACTER LOCK, not hardcoded cast',
+      () {
+        final prompt = buildMasterReelPrompt(
+          idea: 'Priya learns to share with Daadi',
+          characters: ['Priya', 'Daadi', 'Ria'],
+          language: 'Hinglish',
+        );
+
+        expect(prompt, contains('CHARACTER LOCK'));
+        expect(prompt, contains(characterDescription('Priya')));
+        expect(prompt, contains(characterDescription('Daadi')));
+        expect(prompt, contains(characterDescription('Ria')));
+      },
+    );
 
     test('does not hardcode Ria, Rio, Cuty in the CHARACTER LOCK section', () {
       final prompt = buildMasterReelPrompt(
@@ -56,7 +62,11 @@ void main() {
         characters: ['Ria', 'Mumma'],
         language: 'Hinglish',
       );
-      expect(withRia, contains('Ria'), reason: 'Should mention Ria when selected');
+      expect(
+        withRia,
+        contains('Ria'),
+        reason: 'Should mention Ria when selected',
+      );
 
       final withoutRia = buildMasterReelPrompt(
         idea: 'Mumma cooks',
@@ -138,20 +148,28 @@ void main() {
         hasReferenceImages: true,
       );
 
-      expect(prompt, contains('Use the attached reference images as the definitive character references'));
+      expect(
+        prompt,
+        contains(
+          'Use the attached reference images as the definitive character references',
+        ),
+      );
       expect(prompt, contains('Do not redesign or replace characters'));
     });
 
-    test('includes character descriptions when no reference images (fallback)', () {
-      final prompt = buildMasterReelPrompt(
-        idea: 'Ria plays',
-        characters: ['Ria'],
-        language: 'Hinglish',
-        hasReferenceImages: false,
-      );
+    test(
+      'includes character descriptions when no reference images (fallback)',
+      () {
+        final prompt = buildMasterReelPrompt(
+          idea: 'Ria plays',
+          characters: ['Ria'],
+          language: 'Hinglish',
+          hasReferenceImages: false,
+        );
 
-      expect(prompt, contains(characterDescription('Ria')));
-    });
+        expect(prompt, contains(characterDescription('Ria')));
+      },
+    );
   });
 
   group('buildGeminiVideoPrompt character handling', () {
@@ -212,26 +230,43 @@ void main() {
         hasReferenceImages: true,
       );
 
-      expect(prompt, contains('Use the attached reference images as the definitive character references'));
-      expect(prompt, isNot(contains('Use the exact descriptions above for every part')));
-    });
-
-    test('includes character descriptions when no reference images (fallback)', () {
-      final prompt = buildGeminiVideoPrompt(
-        idea: 'Ria plays',
-        totalSeconds: 30,
-        characters: ['Ria'],
-        hasReferenceImages: false,
+      expect(
+        prompt,
+        contains(
+          'Use the attached reference images as the definitive character references',
+        ),
       );
-
-      expect(prompt, contains(characterDescription('Ria')));
-      expect(prompt, contains('Use the exact descriptions above for every part'));
+      expect(
+        prompt,
+        isNot(contains('Use the exact descriptions above for every part')),
+      );
     });
+
+    test(
+      'includes character descriptions when no reference images (fallback)',
+      () {
+        final prompt = buildGeminiVideoPrompt(
+          idea: 'Ria plays',
+          totalSeconds: 30,
+          characters: ['Ria'],
+          hasReferenceImages: false,
+        );
+
+        expect(prompt, contains(characterDescription('Ria')));
+        expect(
+          prompt,
+          contains('Use the exact descriptions above for every part'),
+        );
+      },
+    );
   });
 
   group('master_prompt kCharacterRules', () {
     test('does not hardcode specific character names', () {
-      expect(kCharacterRules, isNot(contains('Ria and Rio NEVER wear glasses')));
+      expect(
+        kCharacterRules,
+        isNot(contains('Ria and Rio NEVER wear glasses')),
+      );
       expect(kCharacterRules, isNot(contains('Cuty is ALWAYS')));
       expect(kCharacterRules, isNot(contains('Robot is friendly')));
     });
@@ -269,9 +304,7 @@ void main() {
     });
 
     test('omits Cuty rule when Cuty is not in cast', () {
-      final lock = CharacterLibrary.characterLockFor([
-        CharacterLibrary.mumma,
-      ]);
+      final lock = CharacterLibrary.characterLockFor([CharacterLibrary.mumma]);
       expect(lock, isNot(contains('Cuty')));
     });
   });
@@ -332,7 +365,10 @@ void main() {
       );
 
       expect(prompt, contains('SHAREABILITY:'));
-      expect(prompt, contains('Why would one parent send this to another parent'));
+      expect(
+        prompt,
+        contains('Why would one parent send this to another parent'),
+      );
     });
   });
 
@@ -349,15 +385,18 @@ void main() {
       expect(prompt, contains('Cuty:'));
     });
 
-    test('omits voice patterns section when characters have no speech patterns', () {
-      final prompt = buildMasterReelPrompt(
-        idea: 'Story with unnamed characters',
-        characters: ['Unknown1', 'Unknown2'],
-        language: 'Hinglish',
-      );
+    test(
+      'omits voice patterns section when characters have no speech patterns',
+      () {
+        final prompt = buildMasterReelPrompt(
+          idea: 'Story with unnamed characters',
+          characters: ['Unknown1', 'Unknown2'],
+          language: 'Hinglish',
+        );
 
-      expect(prompt, isNot(contains('CHARACTER VOICE PATTERNS')));
-    });
+        expect(prompt, isNot(contains('CHARACTER VOICE PATTERNS')));
+      },
+    );
   });
 
   group('buildMasterReelPrompt caption and pin_comment fields', () {
@@ -521,11 +560,49 @@ void main() {
       );
 
       expect(prompt, isNot(contains('chalk line alone')));
-      expect(prompt, isNot(contains('chalk-drawn circle marking the safe zone')));
+      expect(
+        prompt,
+        isNot(contains('chalk-drawn circle marking the safe zone')),
+      );
     });
   });
 
   group('buildMasterReelPrompt story specificity', () {
+    test(
+      'includes a selected idea ready prompt with shared precedence rules',
+      () {
+        const storyPrompt = '''
+Scene 1: Ria says good night in her own bed.
+Scene 2: Ria walks over to Mumma and Papa whispers, "Yeh phir aa gayi!"
+Voice-over: "Din bhar apni duniya mein busy… aur raat ko bas Mumma ki cuddles chahiye."
+''';
+        final prompt = buildMasterReelPrompt(
+          idea: 'Ria comes to Mumma for a cuddle at bedtime.',
+          characters: ['Mumma', 'Papa', 'Ria'],
+          storySpecificPrompt: storyPrompt,
+        );
+
+        expect(prompt, contains(storyPrompt.trim()));
+        expect(prompt, contains('STORY-SPECIFIC PRECEDENCE'));
+        expect(prompt, contains('3 CONNECTED 10-SECOND CLIPS'));
+        expect(prompt, contains('CHARACTER LOCK'));
+        expect(prompt, contains('SAFETY:'));
+        expect(prompt, contains('Return ONLY valid JSON'));
+      },
+    );
+
+    test(
+      'omits the story-specific section when no ready prompt is available',
+      () {
+        final prompt = buildMasterReelPrompt(
+          idea: 'Ria learns to share',
+          characters: ['Ria', 'Mumma'],
+        );
+
+        expect(prompt, isNot(contains('STORY-SPECIFIC PRECEDENCE')));
+      },
+    );
+
     test('does not contain generic placeholder brackets', () {
       final prompt = buildMasterReelPrompt(
         idea: 'Ria refuses to wear shoes',
@@ -563,37 +640,6 @@ void main() {
 
       expect(prompt, contains('CHARACTER LOCK'));
       expect(prompt, contains('character names from CHARACTER LOCK'));
-    });
-  });
-
-  group('buildMasterReelPrompt story specificity', () {
-    test('includes a selected idea ready prompt with shared precedence rules', () {
-      const storyPrompt = '''
-Scene 1: Ria says good night in her own bed.
-Scene 2: Ria walks over to Mumma and Papa whispers, "Yeh phir aa gayi!"
-Voice-over: "Din bhar apni duniya mein busy, aur raat ko bas Mumma ki cuddles chahiye."
-''';
-      final prompt = buildMasterReelPrompt(
-        idea: 'Ria comes to Mumma for a cuddle at bedtime.',
-        characters: ['Mumma', 'Papa', 'Ria'],
-        storySpecificPrompt: storyPrompt,
-      );
-
-      expect(prompt, contains(storyPrompt.trim()));
-      expect(prompt, contains('STORY-SPECIFIC PRECEDENCE'));
-      expect(prompt, contains('3 CONNECTED 10-SECOND CLIPS'));
-      expect(prompt, contains('CHARACTER LOCK'));
-      expect(prompt, contains('SAFETY:'));
-      expect(prompt, contains('Return ONLY valid JSON'));
-    });
-
-    test('omits the story-specific section when no ready prompt is available', () {
-      final prompt = buildMasterReelPrompt(
-        idea: 'Ria learns to share',
-        characters: ['Ria', 'Mumma'],
-      );
-
-      expect(prompt, isNot(contains('STORY-SPECIFIC PRECEDENCE')));
     });
   });
 
@@ -649,8 +695,9 @@ Voice-over: "Din bhar apni duniya mein busy, aur raat ko bas Mumma ki cuddles ch
   group('buildMasterReelPrompt idea_76 HookIdea data integrity', () {
     late HookIdea idea76;
 
-    setUp(() {
-      idea76 = buildDefaultHooks().firstWhere((h) => h.id == 'idea_76');
+    setUp(() async {
+      final hooks = await ContentLibraryService.loadBuiltInHooks();
+      idea76 = hooks.firstWhere((h) => h.id == 'idea_76');
     });
 
     test('idea_76 sceneDetail does not show child holding sparklers', () {

@@ -14,6 +14,9 @@ import 'prompts.dart';
 import 'story_ideas.dart';
 import 'prompt_preview.dart';
 
+import 'browser_evaluation_result.dart';
+import 'content_evaluation_service.dart';
+
 // ── Shared brand-aware prompt generation service ──────────────────────────────
 //
 // All four content features (Reel from Images, Image Prompt, Carousel Prompts,
@@ -198,6 +201,19 @@ String _videoBrandStyleBlock() =>
     '$kMasterPrompt\n\nNEGATIVE INSTRUCTIONS: $kNegativeInstructions\n'
     'Audience: ${BrandDefaults.audience}\n'
     'Brand: ${BrandDefaults.name}';
+
+/// Exception thrown when the browser Content Rating Tool is unavailable.
+///
+/// This preserves the original idea so the UI can offer a retry action
+/// without losing the user's input.
+class EvaluationUnavailableException implements Exception {
+  final String message;
+  final String originalIdea;
+  const EvaluationUnavailableException(this.message, { required this.originalIdea });
+
+  @override
+  String toString() => 'EvaluationUnavailableException: ' + message;
+}
 
 // ── Feature 2: Single image prompt ───────────────────────────────────────────
 
@@ -1289,11 +1305,24 @@ specific sender and recipient is not ready.
   return ShareabilityAnalysis.fromJson(json);
 }
 
-/// Evaluates an idea before production: quality check + shareability analysis.
+
+/// Evaluates an idea before production using the browser Content Rating Tool
+/// as the single creative evaluation authority.
 ///
-/// Reuses [checkStory] for the 10-criteria story quality score and hooks, then
-/// runs [analyzeShareability] for the share trigger. Returns a combined
-/// [IdeaEvaluation] that the review screen presents to the user.
+/// Flutter does not maintain an independent duplicate content-quality scoring
+/// system. All creative evaluation — scoring, verdicts, critical findings,
+/// and improvement suggestions — is performed by the browser backend.
+///
+/// Flutter retains operational validation only:
+///   - Video file validation
+///   - Duration validation
+///   - Aspect-ratio validation
+///   - Production pipeline availability
+///   - Content-format compatibility
+///
+/// If the browser service is unavailable, this throws an [EvaluationUnavailableException]
+/// with the original idea preserved for retry. It does NOT silently fall back
+/// to a local Dart evaluator.
 Future<IdeaEvaluation> evaluateIdea({
   required String idea,
   String? apiKey,
@@ -1304,25 +1333,106 @@ Future<IdeaEvaluation> evaluateIdea({
     throw Exception('Write a bit more of the story first.');
   }
 
-  onWait?.call('Checking story quality...');
-  final check = await checkStory(
-    idea,
-    apiKey: apiKey,
-    onWait: onWait,
-  );
+  onWait?.call('Evaluating idea quality...');
 
-  onWait?.call('Analyzing shareability...');
-  final shareability = await analyzeShareability(
-    idea: idea,
-    apiKey: apiKey,
-    onWait: onWait,
-  );
+  // Build HookIdea-like content payload for the browser evaluator.
+  // The browser evaluates the exact content submitted — it never substitutes
+  // a different version from its own database.
+  final content = <String, dynamic>{
+    'id': '',
+    'category': '',
+    'title': idea,
+    'cover': '',
+    'opening': idea,
+    'problem': '',
+    'lesson': '',
+    'storyDetail': idea,
+    'endingBeat': '',
+    'caption': '',
+    'pinnedComment': '',
+    'dialogue': '',
+    'defaultCast': <String>[],
+    'setting': '',
+    'sceneDetail': '',
+    'postFormat': 'Reel',
+    'strategy': '',
+    'mess': '',
+    'innerThought': '',
+    'keepMoralOffScreen': false,
+    'quote': '',
+    'detail': '',
+    'punchline': '',
+    'readyPrompt': '',
+    'forApp': true,
+    'custom': true,
+    'archived': false,
+    'usedOn': '',
+    'score': 0,
+    'band': '',
+    'reviewedOn': '',
+  };
+
+  BrowserEvaluationResult result;
+  try {
+    onWait?.call('Contacting browser evaluator...');
+    result = await ContentEvaluationService.evaluate(
+      content: content,
+      evaluationMode: 'offline',
+    ).timeout(const Duration(seconds: 30), onTimeout: () {
+      throw EvaluationUnavailableException(
+        'Browser evaluator timed out after 30 seconds.',
+        originalIdea: idea,
+      );
+    });
+  } on EvaluationUnavailableException {
+    rethrow;
+} catch (e) {
+    // Wrap any browser connectivity error in our custom exception
+    throw EvaluationUnavailableException(
+      'Browser evaluator unavailable: ${e.toString()}',
+      originalIdea: idea,
+    );
+  }
+
+  final passed = result.dimensionScores.where((dimension) {
+    return dimension.score >= 7;
+  }).toList();
+  final needsWork = result.dimensionScores.where((dimension) {
+    return dimension.score < 7;
+  }).toList();
 
   return IdeaEvaluation(
-    check: check,
-    shareability: shareability,
+    check: StoryCheck(
+      good: passed.map((dimension) {
+        return dimension.name + ': ' + dimension.whatWorks;
+      }).toList(),
+      missing: needsWork.map((dimension) {
+        return dimension.name + ': ' + dimension.needsImprovement;
+      }).toList(),
+      verdict: result.verdict,
+      rows: result.dimensionScores.map((dimension) {
+        return CheckRow(
+          dimension.name,
+          dimension.score >= 7,
+          dimension.explanation,
+        );
+      }).toList(),
+      score: result.overallScore,
+    ),
+    shareability: ShareabilityAnalysis(
+      sender: result.improvedHook,
+      recipient: result.storyImprovements,
+      reason: result.suggestions.map((s) => s.suggested).join('; '),
+      confidence: result.overallScore >= 75
+          ? 'high'
+          : result.overallScore >= 50
+              ? 'medium'
+              : 'low',
+      note: result.improvedCaption,
+    ),
   );
 }
+
 
 // ── Engagement Package ────────────────────────────────────────────────────────
 //
