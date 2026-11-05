@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'plan_data.dart';
 import 'content_ideas.dart';
+import 'content_library_service.dart';
 
 // ── Saved stories ─────────────────────────────────────────────────────────────
 //
@@ -549,7 +550,9 @@ class ProjectBackup {
       final incoming = (raw['hooks'] as List).whereType<Map<String, dynamic>>()
           .map(HookIdea.fromJson).where((h) => h.id.isNotEmpty);
       String sig(HookIdea h) => jsonEncode(h.toJson());
-      final defaults = {for (final d in kDefaultHooksWithRewrite) d.id: sig(d)};
+      final builtInDefaults = await ContentLibraryService.loadBuiltInHooks()
+          .onError((_, __) => <HookIdea>[]);
+      final defaults = {for (final d in builtInDefaults) d.id: sig(d)};
       final merged = [
         ...have.map((h) {
           final match = incoming.where((i) => i.id == h.id);

@@ -1,17 +1,93 @@
-const DIMENSIONS = [
-  { id: 'hookStrength', name: 'Hook Strength', weight: 15 },
-  { id: 'relatability', name: 'Relatability', weight: 15 },
-  { id: 'storyStructure', name: 'Story Structure', weight: 12 },
-  { id: 'ageAppropriateness', name: 'Age Appropriateness', weight: 10 },
-  { id: 'hinglishNaturalness', name: 'Hinglish Naturalness', weight: 10 },
-  { id: 'characterConsistency', name: 'Character Consistency', weight: 8 },
-  { id: 'visualFeasibility', name: 'Visual Feasibility', weight: 8 },
-  { id: 'soundOffReadability', name: 'Sound-Off Readability', weight: 7 },
-  { id: 'engagementPotential', name: 'Engagement Potential', weight: 8 },
-  { id: 'brandAndSafety', name: 'Brand and Safety', weight: 7 },
-];
+const fs = require('fs');
+const path = require('path');
 
-const SEVERITIES = ['critical', 'major', 'minor', 'suggestion'];
+const SPEC_PATH = path.resolve(__dirname, '../../../shared/evaluation/evaluation_rules.json');
+const DEPLOY_PATH = path.resolve(__dirname, 'evaluation_rules.json');
+
+function loadSpec(specPath) {
+  let raw;
+  try {
+    raw = fs.readFileSync(specPath, 'utf8');
+  } catch (e) {
+    throw new Error(`Failed to load shared evaluation spec from ${specPath}: ${e.message}`);
+  }
+
+  let spec;
+  try {
+    spec = JSON.parse(raw);
+  } catch (e) {
+    throw new Error(`Invalid JSON in shared evaluation spec at ${specPath}: ${e.message}`);
+  }
+
+  if (!spec || typeof spec !== 'object' || Array.isArray(spec)) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: top-level value is not an object`);
+  }
+
+  if (!Array.isArray(spec.dimensions)) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: missing spec.dimensions`);
+  }
+
+  const dimensions = spec.dimensions.map(d => ({
+    id: d.id,
+    name: d.name,
+    weight: d.weight,
+    minScore: d.minScore,
+    maxScore: d.maxScore,
+  }));
+
+  const weightTotal = dimensions.reduce((sum, d) => sum + d.weight, 0);
+  if (weightTotal !== 100) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: dimension weights must total 100, got ${weightTotal}`);
+  }
+
+  if (!Array.isArray(spec.verdicts) || spec.verdicts.length === 0) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: missing spec.verdicts`);
+  }
+
+  const criticalCap = spec.criticalCap || { enabled: false };
+  if (criticalCap.enabled === true) {
+    if (typeof criticalCap.capThreshold !== 'number') {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: criticalCap.capThreshold must be a number when criticalCap.enabled is true`);
+    }
+    if (typeof criticalCap.cappedScore !== 'number') {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: criticalCap.cappedScore must be a number when criticalCap.enabled is true`);
+    }
+    if (typeof criticalCap.cappedVerdict !== 'string') {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: criticalCap.cappedVerdict must be a string when criticalCap.enabled is true`);
+    }
+  }
+
+  return {
+    specPath,
+    dimensions,
+    severities: spec.severities.map(s => s.id),
+    verdicts: spec.verdicts.map(v => ({
+      id: v.id,
+      label: v.label,
+      minScore: v.minScore,
+      maxScore: v.maxScore,
+    })),
+    criticalCap,
+  };
+}
+
+let loaded;
+try {
+  loaded = loadSpec(SPEC_PATH);
+} catch (e) {
+  try {
+    loaded = loadSpec(DEPLOY_PATH);
+  } catch (e2) {
+    throw new Error(`Failed to load shared evaluation spec. Tried ${SPEC_PATH} and ${DEPLOY_PATH}: ${e2.message}`);
+  }
+}
+
+const { dimensions, severities, verdicts, criticalCap } = loaded;
+
+const DIMENSIONS = dimensions;
+const SEVERITIES = severities;
+const VERDICTS = verdicts;
+const CRITICAL_CAP = criticalCap;
 
 function validateDimensionScore(score) {
   return typeof score === 'number' && Number.isInteger(score) && score >= 0 && score <= 10;
@@ -37,12 +113,10 @@ function validateFinding(f) {
 function validateGeminiResponse(body) {
   if (!body || typeof body !== 'object') return { valid: false, error: 'Response is not an object' };
 
-  // ideaId
   if (typeof body.ideaId !== 'string' || body.ideaId.trim().length === 0) {
     return { valid: false, error: 'Missing or invalid ideaId' };
   }
 
-  // dimensionScores — array of 10
   if (!Array.isArray(body.dimensionScores) || body.dimensionScores.length !== DIMENSIONS.length) {
     return { valid: false, error: `dimensionScores must be an array of ${DIMENSIONS.length} items` };
   }
@@ -52,7 +126,6 @@ function validateGeminiResponse(body) {
     }
   }
 
-  // findings — array
   if (!Array.isArray(body.criticalFindings)) {
     return { valid: false, error: 'Missing criticalFindings array' };
   }
@@ -75,7 +148,6 @@ function validateGeminiResponse(body) {
     return { valid: false, error: 'Missing suggestions array' };
   }
 
-  // improvedHook, storyImprovements, improvedCaption
   if (typeof body.improvedHook !== 'string') return { valid: false, error: 'Missing improvedHook' };
   if (typeof body.storyImprovements !== 'string') return { valid: false, error: 'Missing storyImprovements' };
 
@@ -93,10 +165,56 @@ function computeWeightedScore(dimensionScores) {
 }
 
 function computeVerdict(score) {
-  if (score >= 80) return 'Ready to Post';
-  if (score >= 65) return 'Needs Minor Fixes';
-  if (score >= 45) return 'Needs Major Rewrite';
-  return 'Reject';
+  for (const v of VERDICTS) {
+    if (score >= v.minScore) {
+      return v.label;
+    }
+  }
+  return VERDICTS[VERDICTS.length - 1].label;
 }
 
-module.exports = { DIMENSIONS, SEVERITIES, validateGeminiResponse, computeWeightedScore, computeVerdict };
+function isCriticalCapEnabled() {
+  return CRITICAL_CAP.enabled === true;
+}
+
+function getCriticalCapThreshold() {
+  return CRITICAL_CAP.capThreshold;
+}
+
+function getCriticalCapScore() {
+  return CRITICAL_CAP.cappedScore;
+}
+
+function getCriticalCapVerdict() {
+  return CRITICAL_CAP.cappedVerdict;
+}
+
+function getDimensionCount() {
+  return DIMENSIONS.length;
+}
+
+function getDimensionById(id) {
+  return DIMENSIONS.find(d => d.id === id) || null;
+}
+
+module.exports = {
+  DIMENSIONS,
+  SEVERITIES,
+  VERDICTS,
+  CRITICAL_CAP,
+  validateDimensionScore,
+  validateDimension,
+  validateFinding,
+  validateGeminiResponse,
+  computeWeightedScore,
+  computeVerdict,
+  isCriticalCapEnabled,
+  getCriticalCapThreshold,
+  getCriticalCapScore,
+  getCriticalCapVerdict,
+  getDimensionCount,
+  getDimensionById,
+  loadSpec,
+  SPEC_PATH,
+  DEPLOY_PATH,
+};

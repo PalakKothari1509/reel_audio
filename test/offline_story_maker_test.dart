@@ -10,6 +10,7 @@ import '../lib/video_prompt_generator_offline.dart';
 import '../lib/offline_engagement.dart';
 import '../lib/offline_story_maker_screen.dart';
 import '../lib/content_ideas.dart';
+import '../lib/content_library_service.dart';
 
 void main() {
   late Directory tempDir;
@@ -82,8 +83,9 @@ Moral: The lesson.
       expect(result.problem, isNotEmpty);
     });
 
-    test('all hooks with PART 1: format are parseable by _extractLine', () {
-      final part1Hooks = kDefaultHooksWithRewrite
+    test('all hooks with PART 1: format are parseable by _extractLine', () async {
+      final hooks = await ContentLibraryService.loadBuiltInHooks();
+      final part1Hooks = hooks
           .where((h) => h.storyDetail.contains('PART 1:'));
       if (part1Hooks.isNotEmpty) {
         for (final h in part1Hooks) {
@@ -95,8 +97,9 @@ Moral: The lesson.
       } else {
         // No hooks currently use PART 1: format, but verify the parser
         // works with Story: format on all app-ready hooks that have storyDetail.
-        for (final h in kDefaultHooksWithRewrite) {
-          if (h.forApp && h.storyDetail.isNotEmpty && h.storyDetail.contains('Story:')) {
+        for (final h in hooks) {
+          if (h.forApp && h.storyDetail.isNotEmpty &&
+              h.storyDetail.contains('Story:')) {
             final problem = StoryGenerator.extractLine(h.storyDetail, 'Story:');
             expect(problem, isNotEmpty,
                 reason: 'Hook ${h.id} Story: not parsed');

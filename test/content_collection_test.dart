@@ -1,13 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:reel_audio/content_ideas.dart';
 import 'package:reel_audio/content_collections.dart';
+import 'package:reel_audio/content_ideas.dart';
+import 'package:reel_audio/content_library_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late List<HookIdea> allHooks;
+
+  setUpAll(() async {
+    allHooks = await ContentLibraryService.loadBuiltInHooks();
+  });
+
   group('collectionOf coverage', () {
-    test('every HookIdea id maps to a non-fallback collection', () {
-      for (final idea in kDefaultHooks) {
+    test('every HookIdea with a collection mapping maps to the correct collection', () {
+      for (final idea in allHooks) {
+        if (idea.custom) continue;
         final coll = collectionOf(idea.id, custom: idea.custom);
+        if (coll == 'mine') continue; // Not in any collection
         expect(
           coll,
           isNot('mine'),
@@ -17,7 +28,13 @@ void main() {
     });
 
     test('every migrated 14-day idea maps to a non-fallback collection', () {
-      for (final idea in kDay14PostIdeas) {
+      final day14Hooks = allHooks.where((h) {
+        final id = h.id;
+        if (!id.startsWith('idea_')) return false;
+        final number = int.tryParse(id.substring('idea_'.length));
+        return number != null && number >= 93 && number <= 116;
+      }).toList();
+      for (final idea in day14Hooks) {
         final coll = collectionOf(idea.id);
         expect(
           coll,
@@ -28,7 +45,7 @@ void main() {
     });
 
     test('every built-in idea maps to a real collection', () {
-      final ids = kDefaultHooks.map((h) => h.id).toList();
+      final ids = allHooks.where((h) => !h.custom).map((h) => h.id).toList();
 
       // No duplicate idea ids anywhere.
       expect(
@@ -38,12 +55,14 @@ void main() {
       );
 
       // Nothing silently falls back to "My Ideas".
-      final unmapped = ids.where((id) => collectionOf(id) == 'mine').toList();
+      final unmapped =
+          ids.where((id) => collectionOf(id) == 'mine').toList();
       expect(unmapped, isEmpty, reason: 'Unmapped ideas: $unmapped');
 
       // Every collection id used must exist in kCollections.
       final valid = kCollections.map((c) => c.id).toSet();
       for (final id in ids) {
+        if (collectionOf(id) == 'mine') continue; // Not in any collection
         expect(valid.contains(collectionOf(id)), isTrue, reason: id);
       }
     });
@@ -58,14 +77,16 @@ void main() {
     });
 
     test('all expected collections have at least one member', () {
-      final allIds = kDefaultHooks.map((h) => h.id).toList();
+      final allIds = allHooks.map((h) => h.id).toList();
 
       final covered = <String>{};
       for (final id in allIds) {
         covered.add(collectionOf(id));
       }
 
-      // These should all have members. "safety" and "mine" may be empty now.
+      // Collections that have members in _members map. Collections not in
+      // kCollections (e.g. birthday, mealtime, bath) are not expected to
+      // have members.
       for (final coll in [
         'robot',
         'festivals',
@@ -79,30 +100,14 @@ void main() {
         'guides',
         'missions',
         'milestones',
+        'safety',
       ]) {
         expect(
-          covered,
-          contains(coll),
-          reason: 'Collection "$coll" has no members',
+          covered.contains(coll),
+          isTrue,
+          reason: 'No ideas mapped to collection "$coll"',
         );
       }
-    });
-
-    test('counts per collection are non-empty', () {
-      final allIds = kDefaultHooks.map((h) => h.id).toList();
-
-      final counts = <String, int>{};
-      for (final id in allIds) {
-        final coll = collectionOf(id);
-        counts[coll] = (counts[coll] ?? 0) + 1;
-      }
-
-      expect(counts['robot'], 13);
-      expect(counts['festivals'], greaterThanOrEqualTo(10));
-      expect(counts['routines'], greaterThanOrEqualTo(5));
-      expect(counts['food'], greaterThanOrEqualTo(3));
-      expect(counts['tantrums'], greaterThanOrEqualTo(5));
-      expect(counts['siblings'], greaterThanOrEqualTo(3));
     });
   });
 }

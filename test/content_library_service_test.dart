@@ -39,7 +39,8 @@ void main() {
   test(
     'persisted edits to a built-in idea win when the library reloads',
     () async {
-      final original = kDefaultHooksWithRewrite.first;
+      final allHooks = await ContentLibraryService.loadBuiltInHooks();
+      final original = allHooks.first;
       final edited = original.copyWith(
         cover: 'User-edited cover',
         category: 'User-edited category',

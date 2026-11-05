@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { DIMENSIONS, SEVERITIES, computeWeightedScore, computeVerdict } = require('./schemas');
+const { DIMENSIONS, SEVERITIES, computeWeightedScore, computeVerdict, isCriticalCapEnabled, getCriticalCapThreshold, getCriticalCapScore, getCriticalCapVerdict } = require('./schemas');
 
 const CHARACTERS = ['Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Robot', 'Teacher'];
 
@@ -352,9 +352,11 @@ function offlineEvaluate(idea) {
 
   const overallScore = computeWeightedScore(dims);
   const verdict = computeVerdict(overallScore);
-  const capped = critical.length > 0 && overallScore > 59;
-  const finalScore = capped ? 59 : overallScore;
-  const finalVerdict = capped ? 'Needs Major Rewrite' : verdict;
+  const capEnabled = isCriticalCapEnabled();
+  const capThreshold = capEnabled ? getCriticalCapThreshold() : Infinity;
+  const capped = capEnabled && critical.length > 0 && overallScore > capThreshold;
+  const finalScore = capped ? getCriticalCapScore() : overallScore;
+  const finalVerdict = capped ? getCriticalCapVerdict() : verdict;
 
   return {
     ideaId: idea.id,
@@ -513,9 +515,11 @@ function buildOnlineResult(idea, geminiResponse) {
   const overallScore = computeWeightedScore(dims);
   const verdict = computeVerdict(overallScore);
   const criticalCount = geminiResponse.criticalFindings?.length || 0;
-  const capped = criticalCount > 0 && overallScore > 59;
-  const finalScore = capped ? 59 : overallScore;
-  const finalVerdict = capped ? 'Needs Major Rewrite' : verdict;
+  const capEnabled = isCriticalCapEnabled();
+  const capThreshold = capEnabled ? getCriticalCapThreshold() : Infinity;
+  const capped = capEnabled && criticalCount > 0 && overallScore > capThreshold;
+  const finalScore = capped ? getCriticalCapScore() : overallScore;
+  const finalVerdict = capped ? getCriticalCapVerdict() : verdict;
 
   return {
     ideaId: idea.id,

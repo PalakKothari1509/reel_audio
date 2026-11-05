@@ -209,9 +209,9 @@ class StoryGenerator {
   }
 
   /// Generates a story from a specific [ContentIdea] rather than a random pick.
-  /// Looks up the source HookIdea from kDefaultHooksWithRewrite by ID.
-  GeneratedStory generateFromIdeaSync(ContentIdea idea) {
-    final hook = kDefaultHooksWithRewrite.firstWhere(
+  Future<GeneratedStory> generateFromIdea(ContentIdea idea) async {
+    final hooks = await HookStore.load();
+    final hook = hooks.firstWhere(
       (h) => h.id == idea.id,
       orElse: () => HookIdea(
         id: idea.id,
@@ -221,27 +221,6 @@ class StoryGenerator {
         problem: idea.problem,
         lesson: idea.lesson,
         storyDetail: idea.storyDetail,
-      ),
-    );
-    final who = hook.defaultCast.isNotEmpty ? hook.defaultCast.join(', ') : 'Ria, Rio, Cuty';
-    return _buildFromHook(hook, who);
-  }
-
-  Future<GeneratedStory> generateFromIdea(ContentIdea idea) async {
-    final hooks = await HookStore.load();
-    final hook = hooks.firstWhere(
-      (h) => h.id == idea.id,
-      orElse: () => kDefaultHooksWithRewrite.firstWhere(
-        (h) => h.id == idea.id,
-        orElse: () => HookIdea(
-          id: idea.id,
-          category: idea.category,
-          cover: idea.title,
-          opening: idea.opening,
-          problem: idea.problem,
-          lesson: idea.lesson,
-          storyDetail: idea.storyDetail,
-        ),
       ),
     );
     final who = hook.defaultCast.isNotEmpty ? hook.defaultCast.join(', ') : 'Ria, Rio, Cuty';

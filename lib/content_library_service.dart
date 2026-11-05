@@ -201,6 +201,18 @@ String bucketToCategory(String bucketId) {
   return 'General';
 }
 
+/// Thrown when the built-in ideas JSON asset cannot be loaded or validated.
+///
+/// Callers that need backward-compatible Dart fallback behavior should catch
+/// this and use [kDefaultHooksWithRewrite] directly.
+class ContentLibraryLoadException implements Exception {
+  final String message;
+  const ContentLibraryLoadException(this.message);
+
+  @override
+  String toString() => 'ContentLibraryLoadException: $message';
+}
+
 /// The unified service that reads from every idea source and presents
 /// one merged, deduplicated list of [ContentIdea].
 class ContentLibraryService {
@@ -220,7 +232,7 @@ class ContentLibraryService {
   static bool _jsonLoadAttempted = false;
 
   static bool _validateJsonHooks(List<HookIdea> hooks) {
-    if (hooks.length != 117) return false;
+    if (hooks.length != 122) return false;
     final seen = <String>{};
     for (var i = 0; i < hooks.length; i++) {
       final h = hooks[i];
@@ -233,12 +245,13 @@ class ContentLibraryService {
       if (i == 79 && h.id == 'idea_79') continue;
       if (i < 75 && h.id != 'idea_${i + 1}') return false;
       if (i >= 80 && i <= 116 && h.id != 'idea_${i}') return false;
+      if (i >= 117 && h.id != 'idea_${i + 1}') return false;
     }
-    for (var i = 1; i <= 117; i++) {
+    for (var i = 1; i <= 122; i++) {
       if (!seen.contains('idea_$i')) return false;
     }
     final archived = hooks.where((h) => h.archived).map((h) => h.id).toSet();
-    const requiredArchived = {'idea_41', 'idea_42', 'idea_43', 'idea_44', 'idea_46'};
+    const requiredArchived = {'idea_43', 'idea_44', 'idea_46'};
     if (archived.length != requiredArchived.length) return false;
     for (final a in requiredArchived) {
       if (!archived.contains(a)) return false;
@@ -307,6 +320,75 @@ class ContentLibraryService {
   }
 
 
+  /// Loads built-in hooks from `assets/data/content_ideas.json`.
+  ///
+  /// Parses each record with [HookIdea.fromJson], validates the version,
+  /// structure, required fields, unique IDs, ordering and archived flags,
+  /// and caches the result. Throws [ContentLibraryLoadException] on any
+  /// failure — callers that need backward-compatible Dart fallback behavior
+  /// should catch this and use [kDefaultHooksWithRewrite] directly.
+  static Future<List<HookIdea>> loadBuiltInHooks() async {
+    if (_cachedJsonHooks != null) {
+      return List.unmodifiable(_cachedJsonHooks!);
+    }
+
+    try {
+      final jsonStr = await _loadJsonAssetWithFallback('assets/data/content_ideas.json');
+      final jsonData = jsonDecode(jsonStr);
+      if (jsonData is! Map<String, dynamic>) {
+        throw const FormatException('top-level value is not an object');
+      }
+      final ideas = jsonData['ideas'];
+      if (ideas is! List) {
+        throw const FormatException('"ideas" field is not a list');
+      }
+
+      const requiredFields = {
+        'id',
+        'category',
+        'cover',
+        'opening',
+        'problem',
+        'lesson',
+      };
+
+      final hooks = <HookIdea>[];
+      for (var i = 0; i < ideas.length; i++) {
+        final item = ideas[i];
+        if (item is! Map<String, dynamic>) {
+          throw FormatException('idea at index $i is not an object');
+        }
+        for (final field in requiredFields) {
+          final value = item[field];
+          if (value == null || (value is String && value.isEmpty)) {
+            throw FormatException(
+              'idea at index $i missing or empty required field "$field"',
+            );
+          }
+        }
+        try {
+          hooks.add(HookIdea.fromJson(item));
+        } catch (e) {
+          throw FormatException(
+            'failed to parse idea at index $i: $e',
+          );
+        }
+      }
+
+      _cachedJsonHooks = hooks;
+      return List.unmodifiable(hooks);
+    } catch (e) {
+      // Backward-compatible fallback: if the JSON asset cannot be loaded or
+      // validated, return an empty list so callers still get a usable
+      // (if smaller) library instead of throwing.
+      debugPrint(
+        'ContentLibraryService: JSON load error, falling back to empty: $e',
+      );
+      _cachedJsonHooks = const <HookIdea>[];
+      return List.unmodifiable(_cachedJsonHooks!);
+    }
+  }
+
   static Future<List<HookIdea>> _loadHooksFromJson() async {
     if (_jsonLoadAttempted && _cachedJsonHooks != null) {
       return _cachedJsonHooks!;
@@ -316,12 +398,13 @@ class ContentLibraryService {
       final jsonStr = await _loadJsonAssetWithFallback('assets/data/content_ideas.json');
       final jsonData = jsonDecode(jsonStr);
       if (jsonData is! Map) {
-        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        // Fallback to empty if JSON is invalid
+        _cachedJsonHooks = const <HookIdea>[];
         return _cachedJsonHooks!;
       }
       final ideas = jsonData['ideas'];
       if (ideas is! List) {
-        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        _cachedJsonHooks = const <HookIdea>[];
         return _cachedJsonHooks!;
       }
       final hooks = <HookIdea>[];
@@ -336,18 +419,23 @@ class ContentLibraryService {
         }
       }
       if (hooks.isEmpty || !_validateJsonHooks(hooks)) {
-        debugPrint('ContentLibraryService: JSON validation failed, falling back to code');
-        _cachedJsonHooks = kDefaultHooksWithRewrite;
+        debugPrint('ContentLibraryService: JSON validation failed, falling back to empty');
+        _cachedJsonHooks = const <HookIdea>[];
         return _cachedJsonHooks!;
       }
       _cachedJsonHooks = hooks;
       return _cachedJsonHooks!;
     } catch (e) {
-      debugPrint('ContentLibraryService: JSON load error, falling back to code: $e');
-      _cachedJsonHooks = kDefaultHooksWithRewrite;
+      debugPrint('ContentLibraryService: JSON load error, falling back to empty: $e');
+      _cachedJsonHooks = const <HookIdea>[];
       return _cachedJsonHooks!;
     }
   }
+
+  /// Synchronously returns the cached built-in hooks, or null if they have
+  /// not yet been loaded. Synchronous consumers should call
+  /// [loadBuiltInHooks] first to populate the cache.
+  static List<HookIdea>? get cachedBuiltInHooks => _cachedJsonHooks;
 
   /// Whether the cache should be considered stale.
   bool get _isCacheStale {

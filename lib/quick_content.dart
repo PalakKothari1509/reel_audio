@@ -7,11 +7,13 @@ import 'content_axes.dart';
 import 'content_generator.dart';
 import 'content_service.dart';
 import 'content_ideas.dart' as ideas;
+import 'content_evaluation_service.dart';
+import 'browser_evaluation_result.dart';
+import 'content_library_service.dart';
 import 'format_adapter.dart';
 import 'json_file_store.dart';
 import 'models/quick_idea.dart';
 import 'posting_pack.dart';
-import 'quality_check.dart';
 import 'regenerator.dart';
 import 'slide_prompts.dart';
 import 'theme.dart';
@@ -985,7 +987,47 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
 
       if (!mounted) return;
 
-      final report = QualityChecker.check(pkg, formats);
+      // Evaluate via browser Content Rating Tool as the single evaluation authority.
+      final evalResult = await ContentEvaluationService.evaluate(
+        content: {
+          'id': 'user_${DateTime.now().millisecondsSinceEpoch}',
+          'category': '',
+          'title': idea,
+          'cover': idea,
+          'opening': idea,
+          'problem': idea,
+          'lesson': idea,
+          'storyDetail': idea,
+          'endingBeat': '',
+          'caption': '',
+          'pinnedComment': '',
+          'dialogue': idea,
+          'defaultCast': [],
+          'setting': '',
+          'sceneDetail': '',
+          'postFormat': 'Reel',
+          'strategy': '',
+          'mess': '',
+          'innerThought': '',
+          'keepMoralOffScreen': false,
+          'quote': '',
+          'detail': '',
+          'punchline': '',
+          'readyPrompt': '',
+          'forApp': true,
+          'custom': true,
+          'archived': false,
+          'usedOn': '',
+          'score': 0,
+          'band': '',
+          'reviewedOn': '',
+        },
+        evaluationMode: 'offline',
+      );
+
+      if (!mounted) return;
+
+      final report = _convertBrowserResultToQuickReport(evalResult);
 
       if (!report.isReadyToPost && mounted) {
         final proceed = await showDialog<bool>(
@@ -1070,6 +1112,23 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
   }
 
   Future<void> _pick14DayPost() async {
+    // Load built-in hooks from the central JSON source before showing picker.
+    final hooks = await ContentLibraryService.loadBuiltInHooks();
+    if (!mounted) return;
+    final day14Hooks = hooks
+        .where((h) {
+          final id = h.id;
+          if (!id.startsWith('idea_')) return false;
+          final number = int.tryParse(id.substring('idea_'.length));
+          return number != null && number >= 93 && number <= 116;
+        })
+        .toList()
+      ..sort((a, b) {
+        final na = int.tryParse(a.id.substring('idea_'.length)) ?? 0;
+        final nb = int.tryParse(b.id.substring('idea_'.length)) ?? 0;
+        return na.compareTo(nb);
+      });
+
     final chosen = await showModalBottomSheet<ideas.HookIdea>(
       context: context,
       isScrollControlled: true,
@@ -1089,7 +1148,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
               style: AppText.hint,
             ),
             Gap.m,
-            ...ideas.kDay14PostIdeas.map(
+            ...day14Hooks.map(
               (post) => Card(
                 child: ListTile(
                   leading: CircleAvatar(
@@ -1110,7 +1169,7 @@ class _QuickContentScreenState extends State<QuickContentScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   subtitle: Text(
-                    '${post.postFormat} • ${post.category}\n${post.opening}',
+                    '${post.postFormat} â€¢ ${post.category}\n${post.opening}',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppText.hint,
@@ -4420,3 +4479,49 @@ class _SingleImageScreenState extends State<SingleImageScreen> {
     );
   }
 }
+
+
+    /// Converts a browser evaluation result into a QuickContent-compatible
+    /// report for backward compatibility with existing UI.
+    _QuickContentReport _convertBrowserResultToQuickReport(
+      BrowserEvaluationResult result,
+    ) {
+      final failCount = result.criticalFindings.length;
+      final warnCount = result.majorFindings.length +
+          result.minorFindings.length;
+      final allFindings = <String>[];
+      allFindings.addAll(
+        result.criticalFindings.map((f) => '${f.title}: ${f.explanation}'),
+      );
+      allFindings.addAll(
+        result.majorFindings.map((f) => '${f.title}: ${f.explanation}'),
+      );
+      allFindings.addAll(
+        result.minorFindings.map((f) => '${f.title}: ${f.explanation}'),
+      );
+
+      return _QuickContentReport(
+        isReadyToPost: BrowserVerdict.isReady(result.verdict),
+        failCount: failCount,
+        warnCount: warnCount,
+        messages: allFindings,
+        suggestions: result.suggestions.map((s) => s.suggested).toList(),
+      );
+    }
+
+    /// Compatibility result type for QuickContent screening.
+    class _QuickContentReport {
+      final bool isReadyToPost;
+      final int failCount;
+      final int warnCount;
+      final List<String> messages;
+      final List<String> suggestions;
+
+      const _QuickContentReport({
+        required this.isReadyToPost,
+        required this.failCount,
+        required this.warnCount,
+        required this.messages,
+        required this.suggestions,
+      });
+    }

@@ -9,6 +9,7 @@ import 'package:reel_audio/video_library.dart';
 import 'package:reel_audio/video_library_store.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('AssetCompletenessService', () {
     late Directory tempDir;
 

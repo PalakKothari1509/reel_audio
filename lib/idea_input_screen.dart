@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'characters.dart';
 import 'content_collections.dart';
 import 'content_ideas.dart';
+import 'content_library_service.dart';
 import 'theme.dart';
 
 // ── Shared idea input screen ──────────────────────────────────────────────────
@@ -11,8 +12,14 @@ import 'theme.dart';
 // optional instructions, then tap the feature-specific generate button.
 
 enum ContentFeature {
-  reelFromImages('🎬 Reel from Images', 'Complete Reel script and scene prompts'),
-  imagePrompt('🖼️ Image Generation Prompt', 'One detailed image-generation prompt'),
+  reelFromImages(
+    '🎬 Reel from Images',
+    'Complete Reel script and scene prompts',
+  ),
+  imagePrompt(
+    '🖼️ Image Generation Prompt',
+    'One detailed image-generation prompt',
+  ),
   carouselPrompts('🎠 Carousel Generation', 'Complete prompts for all slides'),
   geminiVideo('🎬 Gemini Story Video', 'Connected 10-second video prompts');
 
@@ -36,7 +43,8 @@ class IdeaInputScreen extends StatefulWidget {
     String? readyPrompt,
     String? caption,
     String? pinnedComment,
-  }) onGenerate;
+  })
+  onGenerate;
 
   /// Optional: called when user taps "Show Prompt Only" — builds and displays
   /// the prompt without sending to Gemini.
@@ -45,7 +53,8 @@ class IdeaInputScreen extends StatefulWidget {
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
-  })? onGeneratePromptOnly;
+  })?
+  onGeneratePromptOnly;
 
   /// Extra controls specific to the feature (e.g. slide count, duration).
   final Widget? extraControls;
@@ -96,7 +105,8 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
     if (hook == null || !mounted) return;
     setState(() {
       _selectedHook = hook;
-      _ideaCtrl.text = '${hook.cover}\n\n${hook.opening}\n\n'
+      _ideaCtrl.text =
+          '${hook.cover}\n\n${hook.opening}\n\n'
           'Problem: ${hook.problem}\nLesson: ${hook.lesson}';
       if (hook.storyDetail.trim().isNotEmpty) {
         _ideaCtrl.text += '\n\n${hook.storyDetail.trim()}';
@@ -190,9 +200,13 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                   minLines: 3,
                   style: AppText.body,
                   decoration: InputDecoration(
-                    hintText: 'e.g. Rio refuses to put away his toys. '
+                    hintText:
+                        'e.g. Rio refuses to put away his toys. '
                         'Cuty helps him understand that toys belong in their proper places.',
-                    hintStyle: const TextStyle(color: AppColors.textFaint, fontSize: 13),
+                    hintStyle: const TextStyle(
+                      color: AppColors.textFaint,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -224,12 +238,18 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                       }),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
-                          color: selected ? AppColors.primary : AppColors.surface,
+                          color: selected
+                              ? AppColors.primary
+                              : AppColors.surface,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: selected ? AppColors.primary : AppColors.border,
+                            color: selected
+                                ? AppColors.primary
+                                : AppColors.border,
                           ),
                         ),
                         child: Row(
@@ -262,7 +282,10 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                 ],
 
                 // ── Additional instructions ─────────────────────────────────
-                const Text('Additional instructions (optional)', style: AppText.section),
+                const Text(
+                  'Additional instructions (optional)',
+                  style: AppText.section,
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _instrCtrl,
@@ -271,7 +294,10 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
                   style: AppText.body,
                   decoration: const InputDecoration(
                     hintText: 'e.g. Focus on Mumma\'s reaction. Use warm evening lighting.',
-                    hintStyle: TextStyle(color: AppColors.textFaint, fontSize: 13),
+                    hintStyle: TextStyle(
+                      color: AppColors.textFaint,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ],
@@ -320,6 +346,31 @@ class _LibraryPickerState extends State<_LibraryPicker> {
   String _filter = '';
   final _ctrl = TextEditingController();
   String? _selectedCollection;
+  List<HookIdea> _libraryHooks = const [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final hooks = await ContentLibraryService.loadBuiltInHooks();
+      if (mounted)
+        setState(() {
+          _libraryHooks = hooks;
+          _isLoading = false;
+        });
+    } catch (_) {
+      if (mounted)
+        setState(() {
+          _libraryHooks = const [];
+          _isLoading = false;
+        });
+    }
+  }
 
   @override
   void dispose() {
@@ -329,15 +380,18 @@ class _LibraryPickerState extends State<_LibraryPicker> {
 
   List<HookIdea> get _filtered {
     final q = _filter.toLowerCase();
-    return kDefaultHooksWithRewrite
-        .where((h) =>
-            (_selectedCollection == null ||
-                collectionOf(h.id, custom: h.custom) == _selectedCollection) &&
-            (q.isEmpty ||
-                h.cover.toLowerCase().contains(q) ||
-                h.opening.toLowerCase().contains(q) ||
-                h.problem.toLowerCase().contains(q) ||
-                h.category.toLowerCase().contains(q)))
+    return _libraryHooks
+        .where(
+          (h) =>
+              (_selectedCollection == null ||
+                  collectionOf(h.id, custom: h.custom) ==
+                      _selectedCollection) &&
+              (q.isEmpty ||
+                  h.cover.toLowerCase().contains(q) ||
+                  h.opening.toLowerCase().contains(q) ||
+                  h.problem.toLowerCase().contains(q) ||
+                  h.category.toLowerCase().contains(q)),
+        )
         .toList();
   }
 
@@ -360,6 +414,9 @@ class _LibraryPickerState extends State<_LibraryPicker> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
     final grouped = _grouped;
     final orderedKeys = _orderedKeys;
 
@@ -368,57 +425,55 @@ class _LibraryPickerState extends State<_LibraryPicker> {
       initialChildSize: 0.75,
       maxChildSize: 0.95,
       builder: (ctx, scroll) => Column(
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.border,
-                borderRadius: BorderRadius.circular(2),
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          _collectionChips(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: TextField(
+              controller: _ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(
+                hintText: 'Search ideas...',
+                prefixIcon: Icon(Icons.search, size: 20),
+                isDense: true,
               ),
+              onChanged: (v) => setState(() => _filter = v.toLowerCase()),
             ),
-            _collectionChips(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: TextField(
-                controller: _ctrl,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search ideas...',
-                  prefixIcon: Icon(Icons.search, size: 20),
-                  isDense: true,
-                ),
-                onChanged: (v) => setState(() => _filter = v.toLowerCase()),
-              ),
-            ),
-            Expanded(
-              child: grouped.isEmpty
-                  ? _empty()
-                  : ListView.builder(
-                      controller: scroll,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: orderedKeys.length,
-                      itemBuilder: (ctx, i) {
-                        final collectionId = orderedKeys[i];
-                        final ideas = grouped[collectionId]!;
-                        return ExpansionTile(
-                          key: PageStorageKey('col-$collectionId'),
-                          title: Text(
-                            '${kCollectionById[collectionId]?.emoji ?? '✏️'} '
-                            '${kCollectionById[collectionId]?.label ?? 'My Ideas'} '
-                            '(${ideas.length})',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          children: [
-                            for (final h in ideas) _ideaTile(ctx, h),
-                          ],
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: grouped.isEmpty
+                ? _empty()
+                : ListView.builder(
+                    controller: scroll,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: orderedKeys.length,
+                    itemBuilder: (ctx, i) {
+                      final collectionId = orderedKeys[i];
+                      final ideas = grouped[collectionId]!;
+                      return ExpansionTile(
+                        key: PageStorageKey('col-$collectionId'),
+                        title: Text(
+                          '${kCollectionById[collectionId]?.emoji ?? '✏️'} '
+                          '${kCollectionById[collectionId]?.label ?? 'My Ideas'} '
+                          '(${ideas.length})',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        children: [for (final h in ideas) _ideaTile(ctx, h)],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -436,7 +491,11 @@ class _LibraryPickerState extends State<_LibraryPicker> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         children: [
           _collectionChip(
-              null, 'All', _filtered.length, _selectedCollection == null),
+            null,
+            'All',
+            _filtered.length,
+            _selectedCollection == null,
+          ),
           for (final c in kCollections)
             if (counts[c.id] != null || c.id == 'mine' || c.id == 'safety')
               _collectionChip(
@@ -478,14 +537,12 @@ class _LibraryPickerState extends State<_LibraryPicker> {
     final hasReadyPrompt = h.readyPrompt.trim().isNotEmpty;
     return ListTile(
       dense: true,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       title: Row(
         children: [
           Text(
             h.cover,
-            style:
-                const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
           if (hasReadyPrompt) ...[
             const SizedBox(width: 6),
@@ -505,13 +562,16 @@ class _LibraryPickerState extends State<_LibraryPicker> {
           if (hasReadyPrompt)
             const Tooltip(
               message: 'Ready-to-post viral prompt',
-              child: Icon(Icons.auto_awesome, size: 16, color: AppColors.accent),
+              child: Icon(
+                Icons.auto_awesome,
+                size: 16,
+                color: AppColors.accent,
+              ),
             ),
           const SizedBox(width: 8),
           Text(
             h.category,
-            style:
-                const TextStyle(fontSize: 11, color: AppColors.textFaint),
+            style: const TextStyle(fontSize: 11, color: AppColors.textFaint),
           ),
         ],
       ),
@@ -520,9 +580,9 @@ class _LibraryPickerState extends State<_LibraryPicker> {
   }
 
   Widget _empty() => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text('No matching ideas'),
-        ),
-      );
+    child: Padding(
+      padding: EdgeInsets.all(32),
+      child: Text('No matching ideas'),
+    ),
+  );
 }

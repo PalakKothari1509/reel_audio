@@ -299,7 +299,7 @@ A short moral end card is allowed and does **not** trigger a Critical finding.
 
 ### JSON Export
 
-Click **"Export JSON"** on the dashboard to download `content_ideas.json` containing:
+Click **"Export JSON"** on the dashboard to download `content_ratings.json` containing:
 - All evaluated ideas with full detail
 - Dimension scores, weighted scores, verdicts
 - Findings and suggestions
@@ -338,7 +338,7 @@ Click **"Export CSV"** on the dashboard to download `content_ratings.csv` contai
 
 ### If Server Won't Start
 
-1. Kill any existing node process on port 3001:
+1. Identify the process listening on port 3001:
    ```powershell
    netstat -ano | findstr 3001
    ```
@@ -355,10 +355,7 @@ Click **"Export CSV"** on the dashboard to download `content_ratings.csv` contai
 
 ### Server Binding Security
 
-The Express server binds to all network interfaces (`0.0.0.0`), not just `localhost`. This means the tool is accessible from any device on your local network at `http://<your-computer-ip>:3001`. The `contentrating.local` hostname is just a local hostname entry — it does not make the tool publicly accessible on the internet. If you need to restrict access to localhost only, modify `server.js` line 178:
-```javascript
-app.listen(PORT, '127.0.0.1', () => {
-```
+The Express server binds to the loopback interface only (`127.0.0.1:3001`), not all network interfaces. This means the tool is accessible only from the same machine (localhost). The `contentrating.local` hostname is just a local hostname entry — it does not make the tool publicly accessible on the internet. No external network access is possible.
 
 ## Verification Record
 
@@ -369,7 +366,7 @@ app.listen(PORT, '127.0.0.1', () => {
 | Number of ideas verified | 117 |
 | Offline evaluation verification | **Verified** — all 117 ideas loaded and evaluated successfully via `node -e` test against `http://localhost:3001/api/evaluate/idea_1` |
 | Gemini online evaluation verification | **Not configured** — no `GEMINI_API_KEY` present in `.env`; online endpoint exists but is untested |
-| Server binding | `0.0.0.0:3001` (all network interfaces) |
+| Server binding | `127.0.0.1:3001` (loopback only) |
 
 ---
 

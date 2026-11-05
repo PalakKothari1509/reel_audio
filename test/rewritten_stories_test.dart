@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:reel_audio/content_ideas.dart';
+import 'package:reel_audio/content_library_service.dart';
 
 /// IDs that originally had entries in kRewrittenStories.
 /// These stories should now be embedded directly in storyDetail.
@@ -12,9 +13,17 @@ const kRewrittenStoryIds = {
 };
 
 void main() {
-  group('Story format on kDefaultHooks', () {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late List<HookIdea> allHooks;
+
+  setUpAll(() async {
+    allHooks = await ContentLibraryService.loadBuiltInHooks();
+  });
+
+  group('Story format on built-in hooks', () {
     test('every rewritten story ID has a matching HookIdea', () {
-      final ideaIds = kDefaultHooks.map((h) => h.id).toSet();
+      final ideaIds = allHooks.map((h) => h.id).toSet();
       for (final id in kRewrittenStoryIds) {
         expect(ideaIds, contains(id),
             reason: 'Rewritten story ID "$id" has no matching idea');
@@ -22,7 +31,7 @@ void main() {
     });
 
     test('rewritten storyDetail contains Story:, Twist:, Resolution:, Moral:', () {
-      final byId = {for (final h in kDefaultHooks) h.id: h};
+      final byId = {for (final h in allHooks) h.id: h};
       for (final id in kRewrittenStoryIds) {
         final story = byId[id]!.storyDetail;
         expect(story, contains('Story:'),
@@ -36,12 +45,9 @@ void main() {
       }
     });
 
-    test('kDefaultHooksWithRewrite equals kDefaultHooks', () {
-      expect(kDefaultHooksWithRewrite, same(kDefaultHooks));
-    });
-
     test('safety hooks have storyDetail format matching their category', () {
-      for (final h in kSafetyHooks) {
+      final safetyHooks = allHooks.where((h) => h.category == 'Safety');
+      for (final h in safetyHooks) {
         expect(h.storyDetail, isNotEmpty,
             reason: '${h.id} has empty storyDetail');
       }

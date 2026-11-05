@@ -55,6 +55,8 @@ const Map<String, List<String>> _members = {
     'idea_diwali_shopping_papa',
     'idea_76', 'idea_77', 'idea_78',
     'idea_117',
+    'idea_118',
+    'idea_119',
   ],
   'routines': [
     'idea_7', 'idea_10', 'idea_11', 'idea_12', 'idea_18', 'idea_19',
