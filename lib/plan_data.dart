@@ -1,4 +1,5 @@
 import 'content_ideas.dart';
+import 'content_library_service.dart';
 import 'json_file_store.dart';
 
 // ── The content plan, kept on the phone ───────────────────────────────────────
@@ -62,12 +63,19 @@ class HookStore {
       }
     } catch (_) {}
 
+    late final List<HookIdea> builtInHooks;
+    try {
+      builtInHooks = await ContentLibraryService.loadBuiltInHooks();
+    } on ContentLibraryLoadException {
+      builtInHooks = const <HookIdea>[];
+    }
+
     final originalDefaults = {
-      for (final d in kDefaultHooks) d.id: d,
+      for (final d in builtInHooks) d.id: d,
     };
 
     return [
-      ...kDefaultHooksWithRewrite.map((d) {
+      ...builtInHooks.map((d) {
         final savedHook = saved[d.id];
         if (savedHook == null) return d;
         // Since stories and moments are now baked into kDefaultHooks directly,

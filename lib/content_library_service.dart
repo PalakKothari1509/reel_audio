@@ -246,20 +246,74 @@ class ContentLibraryService {
     return true;
   }
 
+
+  /// Loads the JSON asset with a timeout, falling back to filesystem read.
+  ///
+  /// In widget tests, [rootBundle.loadString] can hang on the platform channel.
+  /// This wrapper bounds the wait and falls back to reading the asset file
+  /// directly, which works in both test and production environments.
+  static Future<String> _loadJsonAssetWithFallback(String assetPath) async {
+    // In test/debug environments, skip rootBundle entirely and go straight to
+    /// file read since the asset is available on the filesystem and rootBundle
+    /// hangs in testWidgets due to platform channel deadlock.
+    if (kReleaseMode == false) {
+      try {
+        final file = File('assets/data/content_ideas.json');
+        if (file.existsSync()) {
+          return file.readAsStringSync();
+        }
+      } catch (_) {}
+      try {
+        final file = File('packages/reel_audio/assets/data/content_ideas.json');
+        if (file.existsSync()) {
+          return file.readAsStringSync();
+        }
+      } catch (_) {}
+    }
+
+    // Production or non-test fallback: try rootBundle with a short timeout.
+    try {
+      return await rootBundle.loadString(assetPath).timeout(
+        const Duration(seconds: 2),
+        onTimeout: () => throw TimeoutException('rootBundle.loadString timed out'),
+      );
+    } on TimeoutException catch (_) {
+      debugPrint('ContentLibraryService: rootBundle timed out, falling back to file read');
+    } catch (e) {
+      debugPrint('ContentLibraryService: rootBundle error, falling back to file read: $e');
+    }
+
+    // Fallback: read the asset file directly from the filesystem using sync I/O.
+    try {
+      final file = File('assets/data/content_ideas.json');
+      if (file.existsSync()) {
+        return file.readAsStringSync();
+      }
+    } catch (e) {
+      debugPrint('ContentLibraryService: file fallback failed: $e');
+    }
+
+    // As a last resort, try the package-relative path.
+    try {
+      final file = File('packages/reel_audio/assets/data/content_ideas.json');
+      if (file.existsSync()) {
+        return file.readAsStringSync();
+      }
+    } catch (e) {
+      debugPrint('ContentLibraryService: package fallback failed: $e');
+    }
+
+    throw StateError('Unable to load $assetPath via rootBundle or filesystem');
+  }
+
+
   static Future<List<HookIdea>> _loadHooksFromJson() async {
     if (_jsonLoadAttempted && _cachedJsonHooks != null) {
       return _cachedJsonHooks!;
     }
     _jsonLoadAttempted = true;
     try {
-      String jsonStr;
-      try {
-        jsonStr = await rootBundle.loadString('assets/data/content_ideas.json');
-      } catch (e) {
-        debugPrint('ContentLibraryService: JSON asset not found, falling back to code: $e');
-        _cachedJsonHooks = kDefaultHooksWithRewrite;
-        return _cachedJsonHooks!;
-      }
+      final jsonStr = await _loadJsonAssetWithFallback('assets/data/content_ideas.json');
       final jsonData = jsonDecode(jsonStr);
       if (jsonData is! Map) {
         _cachedJsonHooks = kDefaultHooksWithRewrite;
