@@ -2,39 +2,234 @@
   "$schema": "evaluation_rules.schema.json",
   "spec": {
     "id": "shared-evaluation-rules",
-    "version": "1.0.0",
-    "title": "Shared Content Evaluation Rules",
-    "description": "Single source of truth for content evaluation configuration shared between Flutter and Browser platforms.",
+    "version": "2.0.0",
+    "title": "Shared Content Evaluation Rules v2",
+    "description": "Single source of truth for content evaluation configuration shared between Flutter and Browser platforms. v2 introduces gates, anchors, deterministic checks, and enhanced result contract.",
     "sources": {
       "browser": "tools/content_rating_web/backend/schemas.js",
       "browserEngine": "tools/content_rating_web/backend/ratingEngine.js",
       "flutter": "lib/quality_check.dart and lib/content_quality_gate.dart (untouched, future migration)"
     },
-    "generatedAt": "2026-11-04T12:15:00Z"
+    "generatedAt": "2026-11-12T10:59:51Z"
   },
-  "dimensions": [
-    { "id": "hookStrength", "name": "Hook Strength", "weight": 15, "description": "Opening hook strength and engagement potential", "minScore": 0, "maxScore": 10 },
-    { "id": "relatability", "name": "Relatability", "weight": 15, "description": "How relatable the content is to the target audience", "minScore": 0, "maxScore": 10 },
-    { "id": "storyStructure", "name": "Story Structure", "weight": 12, "description": "Narrative arc completeness (story, twist, resolution, moral, ending)", "minScore": 0, "maxScore": 10 },
-    { "id": "ageAppropriateness", "name": "Age Appropriateness", "weight": 10, "description": "Suitability for children aged 1-4", "minScore": 0, "maxScore": 10 },
-    { "id": "hinglishNaturalness", "name": "Hinglish Naturalness", "weight": 10, "description": "Natural use of Hinglish in dialogue and text", "minScore": 0, "maxScore": 10 },
-    { "id": "characterConsistency", "name": "Character Consistency", "weight": 8, "description": "Approved character names used consistently (Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher)", "minScore": 0, "maxScore": 10 },
-    { "id": "visualFeasibility", "name": "Visual Feasibility", "weight": 8, "description": "How feasible the content is to visualize and produce", "minScore": 0, "maxScore": 10 },
-    { "id": "soundOffReadability", "name": "Sound-Off Readability", "weight": 7, "description": "Content understandable without audio (captions, overlay text)", "minScore": 0, "maxScore": 10 },
-    { "id": "engagementPotential", "name": "Engagement Potential", "weight": 8, "description": "Likelihood of comments, saves, shares", "minScore": 0, "maxScore": 10 },
-    { "id": "brandAndSafety", "name": "Brand and Safety", "weight": 7, "description": "Brand safety, no unsafe language or behavior depicted", "minScore": 0, "maxScore": 10 }
-  ],
   "scoring": {
     "dimensionMaxScore": 10,
     "maxTotalScore": 100,
+    "weightsMustSumTo": 100,
     "formula": "sum((dimensionScore / dimensionMaxScore) * dimensionWeight), rounded to nearest integer",
     "rounding": "nearest"
   },
+  "dimensions": [
+    {
+      "id": "hookStrength",
+      "name": "Hook Strength",
+      "weight": 15,
+      "description": "Opening hook strength and engagement potential in the first 3 seconds",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Opens on a specific, visual, unresolved moment from the story (action/choice/consequence). Under 90 chars. Ends with a question or cliffhanger that demands the next frame.",
+        "6": "Opens on the story topic but is generic, descriptive, or over 100 chars. Has a question but lacks a concrete visual hook.",
+        "2": "Missing, purely thematic, or a title-style label. No action, no question, no curiosity loop."
+      }
+    },
+    {
+      "id": "relatabilityAudienceFit",
+      "name": "Relatability & Audience Fit",
+      "weight": 15,
+      "description": "How relatable the problem/setting is to parents of children aged 1-4; everyday family routines",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Problem is a specific, named everyday routine (mealtime, bedtime, leaving house, screen time, sharing, potty, transition). Setting is a recognizable home/park/school location. Language reflects parent vocabulary.",
+        "6": "Problem is recognizably toddler-relevant but vague (\"tantrum\", \"not listening\"). Setting is generic. Some parent-facing language.",
+        "2": "Abstract, adult-centric, or fantasy problem. No identifiable routine. Setting is vague or missing. No parent-facing hooks."
+      }
+    },
+    {
+      "id": "payoffRetention",
+      "name": "Payoff & Retention",
+      "weight": 14,
+      "description": "Narrative arc completeness: problem → twist → resolution → moral/ending. Resolution and moral are optional; an unresolved ending can be a deliberate payoff.",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Clear problem, twist, and resolution. Moral/ending beat lands emotionally or practically. Payoff feels earned. Retention hooks (callback, reveal, emotion) present.",
+        "6": "Problem and twist present. Resolution exists but moral/ending is thin or missing. Some retention element.",
+        "2": "Missing storyDetail or only problem stated. No twist, no resolution, no payoff structure."
+      }
+    },
+    {
+      "id": "hinglishNaturalness",
+      "name": "Hinglish Naturalness",
+      "weight": 10,
+      "description": "Natural use of Hinglish in dialogue and on-screen text; adults speak natural Hindi, children use age-appropriate Hinglish",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Dialogue feels like real family speech. Adults use natural Hindi phrases. Children (1-4) use age-appropriate Hinglish (single words, simple phrases). Code-switching is organic.",
+        "6": "Some Hinglish present but feels scripted or uneven. Adult/child voice not clearly differentiated. Occasional unnatural phrasing.",
+        "2": "Pure English or pure Hindi with no mixing. Or forced/inauthentic Hinglish. No dialogue at all."
+      }
+    },
+    {
+      "id": "visualFeasibility",
+      "name": "Visual Feasibility",
+      "weight": 10,
+      "description": "How feasible the content is to visualize and produce as a 15-30s Reel",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Clear setting, 1-3 characters, 3-5 distinct beats, simple props, single location. Fits 15-30s with breathing room. On-screen text beats ≤ 7, well-paced.",
+        "6": "Multiple locations, >3 characters, complex action, or >7 text beats. Produceable but tight or ambitious.",
+        "2": "Crowd scenes, many location changes, abstract concepts hard to show, >10 text beats, or duration unclear/outside 15-30s."
+      }
+    },
+    {
+      "id": "soundOffReadability",
+      "name": "Sound-Off Readability",
+      "weight": 8,
+      "description": "Content understandable without audio (captions, overlay text, visual storytelling)",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Story is clear from visuals + on-screen text alone. Key beats have text overlays. Caption summarizes the takeaway. Pinned comment adds context.",
+        "6": "Visuals convey main action but 1-2 beats rely on dialogue. Caption present. Pinned comment missing or generic.",
+        "2": "Story incomprehensible without audio. No on-screen text. Caption missing or irrelevant."
+      }
+    },
+    {
+      "id": "shareSaveTrigger",
+      "name": "Share/Save Trigger",
+      "weight": 8,
+      "description": "Likelihood of shares and saves: actionable tip, relatable debate, emotional payoff, or visual cheat-sheet",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Clear save trigger: 3-step visual rule, script parents can use, or \"try this tonight\" action. Or strong emotional/shareable moment (\"send this to your husband\").",
+        "6": "Some shareable element (question, tip) but not formatted for saves. Emotional beat present but not highlighted.",
+        "2": "No clear save/share trigger. Generic engagement question only (\"what do you think?\")."
+      }
+    },
+    {
+      "id": "captionCommentPackage",
+      "name": "Caption & Comment Package",
+      "weight": 8,
+      "description": "Caption quality (first-line hook, hashtags 3-5, CTA) and pinned comment (specific question/tip, not generic)",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Caption: first line is a hook/debate question, 3-5 relevant hashtags, clear CTA. Pinned comment: specific, non-generic question or actionable tip tied to the story.",
+        "6": "Caption has hashtags and CTA but first line is descriptive. Pinned comment present but generic or template-like.",
+        "2": "Caption missing, no hashtags, or >5 hashtags. Pinned comment missing, generic template, or copied from another idea."
+      }
+    },
+    {
+      "id": "originality",
+      "name": "Originality",
+      "weight": 7,
+      "description": "Concept freshness vs. duplicate/near-duplicate ideas in the library",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Unique problem/angle not seen in library. Fresh twist on a routine. No near-duplicate (title+problem+story cosine < 0.8).",
+        "6": "Similar to existing idea but distinct problem/twist/character. Cosine similarity 0.5-0.8.",
+        "2": "Near-duplicate of existing idea (cosine > 0.8). Same problem, same beat structure, only minor wording changes."
+      }
+    },
+    {
+      "id": "audioHook",
+      "name": "Audio Hook",
+      "weight": 5,
+      "description": "First 3 seconds of audio: dialogue, sound effect, or music cue that grabs attention",
+      "minScore": 0,
+      "maxScore": 10,
+      "anchors": {
+        "10": "Opening audio is a distinct sound effect, character exclamation, or dialogue line that matches the visual hook. Creates immediate curiosity.",
+        "6": "Audio present (dialogue/music) but generic or not synced to the visual hook moment.",
+        "2": "No audio described. Silent opening. Or generic background music only."
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "ageAppropriateness",
+      "name": "Age Appropriateness",
+      "description": "Content is suitable for children aged 1-4 (the characters shown) and parents watching. No scary, sexual, violent, or developmentally inappropriate content.",
+      "severityOnFail": "critical"
+    },
+    {
+      "id": "characterConsistency",
+      "name": "Character Consistency",
+      "description": "Only approved characters (Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher) are used. Names spelled correctly. Pronouns consistent per character across all fields.",
+      "severityOnFail": "major"
+    },
+    {
+      "id": "brandAndSafety",
+      "name": "Brand & Safety",
+      "description": "No brand names (Britannia, Parle-G, Amul, Maggi, Cadbury, etc.) or IP-style terms (Pixar, Disney, Peppa Pig, etc.) in readyPrompt, caption, pinnedComment, storyDetail. No unsafe language depicting harm to children as positive.",
+      "severityOnFail": "critical"
+    },
+    {
+      "id": "formatFit",
+      "name": "Format Fit",
+      "description": "The idea fits its declared postFormat (Reel, Carousel, Story). Reels need 15-30s narrative. Carousels need 5-7 slides. Stories need interactive element.",
+      "severityOnFail": "major"
+    }
+  ],
   "verdicts": [
-    { "id": "ready_to_post", "label": "Ready to Post", "minScore": 80, "maxScore": 100, "description": "Content is ready to publish" },
-    { "id": "needs_minor_fixes", "label": "Needs Minor Fixes", "minScore": 65, "maxScore": 79, "description": "Content needs minor improvements before publishing" },
-    { "id": "needs_major_rewrite", "label": "Needs Major Rewrite", "minScore": 45, "maxScore": 64, "description": "Content needs significant rework" },
-    { "id": "reject", "label": "Reject", "minScore": 0, "maxScore": 44, "description": "Content should not be published" }
+    {
+      "id": "ready_to_post",
+      "label": "Ready to Post",
+      "minScore": 80,
+      "maxScore": 100,
+      "description": "Content is ready to publish",
+      "requires": {
+        "hookStrengthMin": 7,
+        "payoffRetentionMin": 6,
+        "criticalFindingsMax": 0,
+        "majorFindingsMax": 1
+      }
+    },
+    {
+      "id": "needs_minor_fixes",
+      "label": "Needs Minor Fixes",
+      "minScore": 65,
+      "maxScore": 79,
+      "description": "Content needs minor improvements before publishing",
+      "requires": {
+        "hookStrengthMin": 5,
+        "payoffRetentionMin": 5,
+        "criticalFindingsMax": 0,
+        "majorFindingsMax": 3
+      }
+    },
+    {
+      "id": "needs_major_rewrite",
+      "label": "Needs Major Rewrite",
+      "minScore": 45,
+      "maxScore": 64,
+      "description": "Content needs significant rework",
+      "requires": {
+        "hookStrengthMin": 3,
+        "payoffRetentionMin": 3,
+        "criticalFindingsMax": 2,
+        "majorFindingsMax": 5
+      }
+    },
+    {
+      "id": "reject",
+      "label": "Reject",
+      "minScore": 0,
+      "maxScore": 44,
+      "description": "Content should not be published",
+      "requires": {
+        "hookStrengthMin": 0,
+        "payoffRetentionMin": 0,
+        "criticalFindingsMax": 10,
+        "majorFindingsMax": 10
+      }
+    }
   ],
   "criticalCap": {
     "enabled": true,
@@ -43,6 +238,152 @@
     "cappedScore": 59,
     "cappedVerdict": "Needs Major Rewrite",
     "description": "When critical findings exist, the final score is capped at 59 and the verdict is forced to Needs Major Rewrite, regardless of the raw weighted score."
+  },
+  "additionalCaps": [
+    {
+      "id": "gateFailureCap",
+      "enabled": true,
+      "condition": "any gate failed with severityOnFail === 'critical'",
+      "cappedScore": 59,
+      "cappedVerdict": "Needs Major Rewrite",
+      "description": "If a critical-severity gate fails, cap score at 59 and force Needs Major Rewrite verdict."
+    },
+    {
+      "id": "majorGateFailureCap",
+      "enabled": true,
+      "condition": "any gate failed with severityOnFail === 'major' AND rawScore > 79",
+      "cappedScore": 79,
+      "cappedVerdict": "Needs Minor Fixes",
+      "description": "If a major-severity gate fails and raw score would be Ready to Post, cap at 79 (Needs Minor Fixes)."
+    }
+  ],
+  "deterministicChecks": {
+    "checks": [
+      {
+        "id": "placeholderText",
+        "name": "Placeholder Text Detection",
+        "description": "Detects placeholder patterns like X{4,}, TODO, lorem, Archived in readyPrompt, caption, pinnedComment, storyDetail",
+        "severity": "major",
+        "gate": "characterConsistency"
+      },
+      {
+        "id": "missingFields",
+        "name": "Missing Required Fields",
+        "description": "Flags empty readyPrompt, caption, or pinnedComment",
+        "severity": "minor",
+        "gate": "formatFit"
+      },
+      {
+        "id": "genericPinnedComment",
+        "name": "Generic Pinned Comment",
+        "description": "Compares pinnedComment against genericPinnedComments.json templates using normalized substring/fuzzy match",
+        "severity": "minor",
+        "gate": "captionCommentPackage"
+      },
+      {
+        "id": "pinnedCommentMismatch",
+        "name": "Pinned Comment Story Mismatch",
+        "description": "Tokenizes pinnedComment and story fields; flags if keyword overlap with title/problem/storyDetail is below threshold (default 1 shared meaningful keyword)",
+        "severity": "minor",
+        "gate": "captionCommentPackage"
+      },
+      {
+        "id": "captionStoryMismatch",
+        "name": "Caption Story Mismatch",
+        "description": "Tokenizes caption and story fields; flags if keyword overlap with title/problem/storyDetail is below 15% threshold",
+        "severity": "minor",
+        "gate": "captionCommentPackage"
+      },
+      {
+        "id": "openingCastMismatch",
+        "name": "Opening Cast Mismatch",
+        "description": "Detects capitalized character-like words or relationship words (Uncle, Aunty) in opening that are not in defaultCast or storyDetail",
+        "severity": "major",
+        "gate": "characterConsistency"
+      },
+      {
+        "id": "unapprovedCharacterName",
+        "name": "Unapproved Character Name",
+        "description": "Flags names outside approved list; checks pronoun consistency (he/she) for same character across fields",
+        "severity": "major",
+        "gate": "characterConsistency"
+      },
+      {
+        "id": "brandNames",
+        "name": "Brand Name Detection",
+        "description": "Scans readyPrompt, caption, pinnedComment, storyDetail against brandAndIpBlocklist.json",
+        "severity": "critical",
+        "gate": "brandAndSafety"
+      },
+      {
+        "id": "textBeatDensity",
+        "name": "Text Beat Density",
+        "description": "Parses On-Screen Text: lines with [a-b]s timestamps; flags >7 beats or >1 beat per 2.5s",
+        "severity": "minor",
+        "gate": "visualFeasibility"
+      },
+      {
+        "id": "durationCheck",
+        "name": "Duration Check",
+        "description": "Infers duration from last timestamp; flags outside 15-30s",
+        "severity": "minor",
+        "gate": "visualFeasibility"
+      },
+      {
+        "id": "repeatedEndSlate",
+        "name": "Repeated End Slate",
+        "description": "Flags if final overlay text appears in >50% of library",
+        "severity": "suggestion",
+        "gate": "originality"
+      },
+      {
+        "id": "hashtagCount",
+        "name": "Hashtag Count",
+        "description": "Validates 3-5 hashtags in caption",
+        "severity": "minor",
+        "gate": "captionCommentPackage"
+      },
+      {
+        "id": "duplicateSimilarity",
+        "name": "Duplicate Similarity",
+        "description": "Online: embedding cosine similarity >0.8. Offline: TF-IDF cosine on title+problem+storyDetail with configurable threshold. Returns duplicateOf ids.",
+        "severity": "major",
+        "gate": "originality"
+      },
+      {
+        "id": "seasonality",
+        "name": "Seasonality",
+        "description": "Uses festivalCalendar.json keywords; if dates filled and date passed, flags; if empty, only tags with seasonTag",
+        "severity": "suggestion",
+        "gate": "formatFit"
+      },
+      {
+        "id": "typoCheck",
+        "name": "Typo Check",
+        "description": "Lightweight check on on-screen text/dialogue; small allow-list for valid Hinglish words",
+        "severity": "suggestion",
+        "gate": "hinglishNaturalness"
+      }
+    ]
+  },
+  "calibration": {
+    "targetDistributions": {
+      "ready_to_post": 0.25,
+      "needs_minor_fixes": 0.35,
+      "needs_major_rewrite": 0.30,
+      "reject": 0.10
+    },
+    "notes": "Run scripts/calibrate.js against content_ideas.json to verify distributions."
+  },
+  "performanceFeedback": {
+    "enabled": true,
+    "metrics": ["views", "likes", "shares", "saves", "comments", "completionRate"],
+    "description": "Future: correlate evaluation scores with actual post performance to refine weights/anchors."
+  },
+  "audience": {
+    "primary": "Parents of children aged 1-4",
+    "charactersShownAged": "1-4",
+    "notes": "Characters in the content (Ria, Rio, Cuty) are depicted as children aged 1-4. Adults (Mumma, Papa, Daadi, Teacher) are caregivers. Language rules: adults speak natural Hindi; children use age-appropriate Hinglish."
   },
   "severities": [
     { "id": "critical", "label": "Critical", "description": "Safety violation or severe issue that must be fixed", "blocksPublishing": true },
@@ -53,18 +394,28 @@
   "resultContract": {
     "fields": [
       { "name": "ideaId", "type": "string", "required": true, "description": "Unique identifier of the evaluated idea" },
-      { "name": "dimensionScores", "type": "array", "required": true, "description": "Array of dimension score objects, one per configured dimension", "itemSchema": { "id": "string", "name": "string", "weight": "number", "score": "number (0-10, integer)", "explanation": "string", "whatWorks": "string", "needsImprovement": "string" } },
-      { "name": "overallScore", "type": "number", "required": true, "description": "Final weighted score after critical cap (0-100)" },
-      { "name": "rawScore", "type": "number", "required": true, "description": "Raw weighted score before critical cap (0-100)" },
-      { "name": "scoreCapped", "type": "boolean", "required": true, "description": "Whether the score was capped due to critical findings" },
+      { "name": "dimensionScores", "type": "array", "required": true, "description": "Array of dimension score objects, one per configured dimension", "itemSchema": { "id": "string", "name": "string", "weight": "number", "score": "number (0-10, integer)", "anchorMatched": "string (10|6|2)", "explanation": "string", "whatWorks": "string", "needsImprovement": "string" } },
+      { "name": "gateResults", "type": "array", "required": true, "description": "Array of gate results (pass/fail) with gate id, name, passed, severityOnFail, detail", "itemSchema": { "id": "string", "name": "string", "passed": "boolean", "severityOnFail": "string", "detail": "string" } },
+      { "name": "overallScore", "type": "number", "required": true, "description": "Final weighted score after all caps (0-100)" },
+      { "name": "rawScore", "type": "number", "required": true, "description": "Raw weighted score before any caps (0-100)" },
+      { "name": "scoreCapped", "type": "boolean", "required": true, "description": "Whether the score was capped due to critical findings or gate failures" },
+      { "name": "capsApplied", "type": "array", "required": true, "description": "Array of cap ids that were applied (e.g., ['criticalCap', 'gateFailureCap'])" },
       { "name": "verdict", "type": "string", "required": true, "description": "Overall verdict label" },
       { "name": "criticalFindings", "type": "array", "required": true, "description": "Array of critical severity findings" },
       { "name": "majorFindings", "type": "array", "required": true, "description": "Array of major severity findings" },
       { "name": "minorFindings", "type": "array", "required": true, "description": "Array of minor severity findings" },
       { "name": "suggestions", "type": "array", "required": true, "description": "Array of improvement suggestions" },
+      { "name": "fixesToReach10", "type": "array", "required": true, "description": "Ordered fixes to reach 100: each has fix, dimensionId, estimatedGain (points)", "itemSchema": { "fix": "string", "dimensionId": "string", "estimatedGain": "number" } },
+      { "name": "potentialScore", "type": "number", "required": true, "description": "Score if all fixesToReach10 are applied (max 100)" },
+      { "name": "rewrittenHook", "type": "string", "required": true, "description": "Suggested first-3-second hook rewrite" },
+      { "name": "duplicateOf", "type": "array", "required": true, "description": "Array of idea ids that are near-duplicates (cosine > threshold)" },
+      { "name": "recommendedFormat", "type": "string", "required": true, "description": "reel | carousel | story | merge-into-series" },
+      { "name": "seasonTag", "type": "string", "required": false, "description": "Festival/season tag from festivalCalendar.json if keywords matched" },
+      { "name": "deterministicChecks", "type": "array", "required": true, "description": "Results of all deterministic checks", "itemSchema": { "id": "string", "passed": "boolean", "severity": "string", "gate": "string", "detail": "string" } },
+      { "name": "confidence", "type": "string", "required": true, "description": "high | medium | low (online: based on median spread; offline: always low)" },
       { "name": "evaluationMode", "type": "string", "required": true, "description": "offline or online" },
       { "name": "evaluatedAt", "type": "string", "required": true, "description": "ISO 8601 timestamp" },
-      { "name": "evaluationVersion", "type": "string", "required": true, "description": "Engine version string" }
+      { "name": "evaluationVersion", "type": "string", "required": true, "description": "Engine version string, set to 2.0.0" }
     ]
   },
   "conflicts": {
@@ -91,18 +442,19 @@
     },
     "browser": {
       "file": "tools/content_rating_web/backend/schemas.js and ratingEngine.js",
-      "scoringModel": "Weighted 0-100 score from 10 dimensions",
-      "ruleCount": 10,
+      "scoringModel": "Weighted 0-100 score from 10 dimensions + 4 gates",
+      "ruleCount": "10 dimensions + 4 gates + 15 deterministic checks",
       "severities": ["critical", "major", "minor", "suggestion"],
       "verdicts": ["Ready to Post", "Needs Minor Fixes", "Needs Major Rewrite", "Reject"],
-      "criticalCap": "Score capped at 59 if critical findings exist and raw score > 59",
-      "status": "Browser engine updated to use this shared specification."
+      "criticalCap": "Score capped at 59 if critical findings exist and raw score > 59; additional caps for gate failures",
+      "status": "Browser engine updated to use this v2 shared specification."
     },
     "unresolved": [
       "Flutter QualityChecker rules (42 code-based rules) cannot be expressed as JSON configuration - they remain in Dart code.",
       "Flutter QualityGate PASS/FAIL/UNKNOWN model differs from Browser's weighted scoring model - no common verdict schema defined.",
       "Flutter reach dimensions (reach_hook_strength, etc.) are warn-only heuristics, not scored dimensions.",
-      "Browser online evaluation uses Gemini API; Flutter has no equivalent online evaluation in the quality gate."
+      "Browser online evaluation uses Gemini API; Flutter has no equivalent online evaluation in the quality gate.",
+      "v2 dimension IDs changed: relatability->relatabilityAudienceFit, storyStructure->payoffRetention, engagementPotential split into shareSaveTrigger + captionCommentPackage, new: originality, audioHook. Gates replace ageAppropriateness, characterConsistency, brandAndSafety as scored dimensions."
     ]
   }
 }

@@ -1,113 +1,66 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
-import 'browser_evaluation_result.dart';
-import 'content_evaluation_service.dart';
+import 'characters.dart';
+import 'content_axes.dart';
 import 'content_library_service.dart';
-import 'content_studio_service.dart';
+import 'prompt_vault.dart';
+import 'quality_check_center.dart';
+import 'story_generator_offline.dart';
 import 'theme.dart';
+import 'video_library.dart';
+import 'video_library_store.dart';
 
-class EvaluationResultScreen extends StatefulWidget {
+/// Shows a single idea in readable sections, with actions to edit, create content,
+/// view saved prompts, run quality check, etc.
+///
+/// This screen is opened from ContentLibraryScreen's "Review Idea" button.
+/// It reads the idea from [ContentLibraryService] by ID.
+class ReviewIdeaScreen extends StatefulWidget {
   final String ideaId;
-  final String originalIdea;
-  final ContentIdea? contentIdea;
+  final VoidCallback? onCreateContent;
 
-  const EvaluationResultScreen({
-    super.key,
-    required this.ideaId,
-    required this.originalIdea,
-    this.contentIdea,
-  });
+  const ReviewIdeaScreen({super.key, required this.ideaId, this.onCreateContent});
 
   @override
-  State<EvaluationResultScreen> createState() => _EvaluationResultScreenState();
+  State<ReviewIdeaScreen> createState() => _ReviewIdeaScreenState();
 }
 
-class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
-  BrowserEvaluationResult? _result;
+class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
+  ContentIdea? _idea;
   bool _loading = true;
-  String? _error;
+  String? _generatedScript;
+  bool _isGeneratingScript = false;
+  String _status = '';
 
   @override
   void initState() {
     super.initState();
-    _loadEvaluation();
+    _load();
   }
 
-  Future<void> _loadEvaluation() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-
-    try {
-      final result = await ContentEvaluationService.evaluate(
-        content: _buildContentPayload(widget.originalIdea),
-        evaluationMode: 'offline',
-      );
-
-      if (!mounted) return;
+  Future<void> _load() async {
+    final idea = await ContentLibraryService.instance.getIdeaById(widget.ideaId);
+    if (!mounted) return;
+    if (idea == null) {
       setState(() {
-        _result = result;
+        _idea = null;
         _loading = false;
       });
-    } on EvaluationUnavailableException catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = e.message;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = 'Evaluation failed: ${e.toString()}';
-      });
+      return;
     }
-  }
 
-  Map<String, dynamic> _buildContentPayload(String idea) {
-    return {
-      'id': widget.contentIdea?.id ?? '',
-      'category': widget.contentIdea?.category ?? '',
-      'title': widget.contentIdea?.title ?? widget.originalIdea,
-      'cover': widget.contentIdea?.caption ?? '',
-      'opening': widget.contentIdea?.opening ?? widget.originalIdea,
-      'problem': widget.contentIdea?.problem ?? '',
-      'lesson': widget.contentIdea?.lesson ?? '',
-      'storyDetail': widget.contentIdea?.storyDetail ?? widget.originalIdea,
-      'endingBeat': widget.contentIdea?.storyDetail ?? '',
-      'caption': widget.contentIdea?.caption ?? '',
-      'pinnedComment': '',
-      'dialogue': widget.contentIdea?.storyDetail ?? '',
-      'defaultCast': widget.contentIdea?.characterIds ?? <String>[],
-      'setting': widget.contentIdea?.storyDetail ?? '',
-      'sceneDetail': widget.contentIdea?.storyDetail ?? '',
-      'postFormat': widget.contentIdea?.format ?? 'Reel',
-      'strategy': '',
-      'mess': '',
-      'innerThought': '',
-      'keepMoralOffScreen': false,
-      'quote': '',
-      'detail': '',
-      'punchline': '',
-      'readyPrompt': '',
-      'forApp': true,
-      'custom': widget.contentIdea?.isCustom ?? true,
-      'archived': false,
-      'usedOn': '',
-      'score': 0,
-      'band': '',
-      'reviewedOn': '',
-    };
+    setState(() {
+      _idea = idea;
+      _loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Evaluation Result'),
+        title: const Text('Review Idea'),
         actions: [
           if (_result != null)
             IconButton(
@@ -129,10 +82,10 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
               ),
             )
           : _error != null
-          ? _buildErrorState()
-          : _result == null
-          ? const Center(child: Text('No evaluation result'))
-          : _buildResultContent(),
+              ? _buildErrorState()
+              : _result == null
+                  ? const Center(child: Text('No evaluation result'))
+                  : _buildResultContent(),
     );
   }
 
@@ -143,7 +96,11 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off, size: 64, color: AppColors.danger),
+            const Icon(
+              Icons.cloud_off,
+              size: 64,
+              color: AppColors.danger,
+            ),
             const SizedBox(height: 16),
             Text(
               'Evaluation Unavailable',
@@ -216,9 +173,7 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
               ),
             ),
           ),
-        ],
-      ),
-    );
+        ]);
 
     children.add(const SizedBox(height: 16));
 
@@ -256,11 +211,11 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
                   'Score was capped at 100',
                   style: AppText.hint.copyWith(color: AppColors.warning),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
     children.add(const SizedBox(height: 16));
 
@@ -276,34 +231,22 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
     // Findings
     if (result.criticalFindings.isNotEmpty) {
       children.add(
-        _buildFindingsSection(
-          'Critical Findings',
-          result.criticalFindings,
-          AppColors.danger,
-          Icons.error,
-        ),
+        _buildFindingsSection('Critical Findings', result.criticalFindings,
+            AppColors.danger, Icons.error),
       );
       children.add(const SizedBox(height: 16));
     }
     if (result.majorFindings.isNotEmpty) {
       children.add(
-        _buildFindingsSection(
-          'Major Findings',
-          result.majorFindings,
-          AppColors.warning,
-          Icons.warning_amber_rounded,
-        ),
+        _buildFindingsSection('Major Findings', result.majorFindings,
+            AppColors.warning, Icons.warning_amber_rounded),
       );
       children.add(const SizedBox(height: 16));
     }
     if (result.minorFindings.isNotEmpty) {
       children.add(
-        _buildFindingsSection(
-          'Minor Findings',
-          result.minorFindings,
-          AppColors.textSoft,
-          Icons.info_outline,
-        ),
+        _buildFindingsSection('Minor Findings', result.minorFindings,
+            AppColors.textSoft, Icons.info_outline),
       );
       children.add(const SizedBox(height: 16));
     }
@@ -349,8 +292,7 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
 
     children.add(const SizedBox(height: 24));
 
@@ -375,7 +317,6 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
           ),
         ],
       ),
-    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -397,29 +338,20 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: Text(
-                    dim.name,
-                    style: AppText.body.copyWith(fontWeight: FontWeight.bold),
-                  ),
+                  child: Text(dim.name, style: AppText.body.copyWith(fontWeight: FontWeight.bold)),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color:
-                        (dim.score >= 7 ? AppColors.success : AppColors.warning)
-                            .withValues(alpha: 0.15),
+                    color: (dim.score >= 7 ? AppColors.success : AppColors.warning)
+                        .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${dim.score}/${dim.weight}',
                     style: AppText.body.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: dim.score >= 7
-                          ? AppColors.success
-                          : AppColors.warning,
+                      color: dim.score >= 7 ? AppColors.success : AppColors.warning,
                     ),
                   ),
                 ),
@@ -428,27 +360,78 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
             const SizedBox(height: 8),
             Text('Explanation: ${dim.explanation}', style: AppText.body),
             if (dim.whatWorks.isNotEmpty)
-              Text(
-                '[OK] What works: ${dim.whatWorks}',
-                style: AppText.body.copyWith(color: AppColors.success),
-              ),
+              Text('[OK] What works: ${dim.whatWorks}',
+                  style: AppText.body.copyWith(color: AppColors.success)),
             if (dim.needsImprovement.isNotEmpty)
-              Text(
-                '[WARN] Needs improvement: ${dim.needsImprovement}',
-                style: AppText.body.copyWith(color: AppColors.warning),
-              ),
+              Text('[WARN] Needs improvement: ${dim.needsImprovement}',
+                  style: AppText.body.copyWith(color: AppColors.warning)),
           ],
         ),
-      ),
-    );
+      );
   }
 
-  Widget _buildFindingsSection(
-    String title,
-    List<EvaluationFinding> findings,
-    Color color,
-    IconData icon,
-  ) {
+  Widget _buildFindingsSection(String title, List<EvaluationFinding> findings,
+      Color color, IconData icon) {
+    final List<Widget> sectionChildren = <Widget>[];
+
+    sectionChildren.add(
+      Row(
+        children: <Widget>[
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Text(title, style: AppText.section.copyWith(color: color)),
+        ],
+      ),
+    );
+
+    sectionChildren.add(const SizedBox(height: 8));
+
+    for (final f in findings) {
+      sectionChildren.add(
+        Card(
+          color: color.withValues(alpha: 0.05),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Icon(Icons.circle, size: 10, color: color),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(f.title, style: AppText.body.copyWith(fontWeight: FontWeight.bold)),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        f.severity.toUpperCase(),
+                        style: AppText.small.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text('Explanation: ${f.explanation}', style: AppText.body),
+                if (f.evidence.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text('Evidence: ${f.evidence}', style: AppText.hint),
+                ],
+                if (f.suggestedFix.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text('Suggested fix: ${f.suggestedFix}',
+                      style: AppText.body.copyWith(color: AppColors.accent)),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -473,18 +456,10 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
                       Icon(Icons.circle, size: 10, color: color),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          f.title,
-                          style: AppText.body.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text(f.title, style: AppText.body.copyWith(fontWeight: FontWeight.bold)),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: color,
                           borderRadius: BorderRadius.circular(8),
@@ -501,17 +476,14 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
                   if (f.evidence.isNotEmpty)
                     Text('Evidence: ${f.evidence}', style: AppText.hint),
                   if (f.suggestedFix.isNotEmpty)
-                    Text(
-                      'Suggested fix: ${f.suggestedFix}',
-                      style: AppText.body.copyWith(color: AppColors.accent),
-                    ),
+                    Text('Suggested fix: ${f.suggestedFix}',
+                        style: AppText.body.copyWith(color: AppColors.accent)),
                 ],
               ),
             ),
           ),
         ),
-      ],
-    );
+      );
   }
 
   Widget _metaRow(String label, String value) {
@@ -520,8 +492,13 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SizedBox(width: 120, child: Text(label, style: AppText.hint)),
-          Expanded(child: Text(value, style: AppText.body)),
+          SizedBox(
+            width: 120,
+            child: Text(label, style: AppText.hint),
+          ),
+          Expanded(
+            child: Text(value, style: AppText.body),
+          ),
         ],
       ),
     );
@@ -550,8 +527,7 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
     buffer.writeln('Dimension Scores:');
     for (final dim in result.dimensionScores) {
       buffer.writeln(
-        '  ${dim.name}: ${dim.score}/${dim.weight} -- ${dim.explanation}',
-      );
+          '  ${dim.name}: ${dim.score}/${dim.weight} -- ${dim.explanation}');
     }
     if (result.criticalFindings.isNotEmpty) {
       buffer.writeln('');
@@ -561,9 +537,9 @@ class _EvaluationResultScreenState extends State<EvaluationResultScreen> {
       }
     }
     Clipboard.setData(ClipboardData(text: buffer.toString()));
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Evaluation summary copied')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Evaluation summary copied')),
+    );
   }
 
   void _copyFullReport() {

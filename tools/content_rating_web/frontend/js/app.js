@@ -202,12 +202,13 @@ const app = {
       { key: 'rawScore', label: 'Raw Score', value: (_idea, rating) => rating?.rawScore },
       { key: 'verdict', label: 'Verdict', value: (_idea, rating) => rating?.verdict },
       { key: 'scoreCapped', label: 'Score Capped', value: (_idea, rating) => rating ? rating.scoreCapped : '' },
+      { key: 'evaluationVersion', label: 'Version', value: (_idea, rating) => rating?.evaluationVersion },
     ];
 
     const dimensionIds = [
-      'hookStrength', 'relatability', 'storyStructure', 'ageAppropriateness',
-      'hinglishNaturalness', 'characterConsistency', 'visualFeasibility',
-      'soundOffReadability', 'engagementPotential', 'brandAndSafety',
+      'hookStrength', 'relatabilityAudienceFit', 'payoffRetention', 'hinglishNaturalness',
+      'visualFeasibility', 'soundOffReadability', 'shareSaveTrigger', 'captionCommentPackage',
+      'originality', 'audioHook',
     ];
     dimensionIds.forEach(id => {
       columns.push({
@@ -235,10 +236,19 @@ const app = {
         value: (_idea, rating) => rating?.dimensionScores,
         expandable: true,
       },
+      { key: 'gateResults', label: 'Gate Results', value: (_idea, rating) => rating?.gateResults, expandable: true },
       { key: 'criticalFindings', label: 'Critical Findings', value: (_idea, rating) => rating?.criticalFindings, expandable: true },
       { key: 'majorFindings', label: 'Major Findings', value: (_idea, rating) => rating?.majorFindings, expandable: true },
       { key: 'minorFindings', label: 'Minor Findings', value: (_idea, rating) => rating?.minorFindings, expandable: true },
       { key: 'suggestions', label: 'Suggestions', value: (_idea, rating) => rating?.suggestions, expandable: true },
+      { key: 'fixesToReach10', label: 'Fixes to Reach 100', value: (_idea, rating) => rating?.fixesToReach10, expandable: true },
+      { key: 'potentialScore', label: 'Potential Score', value: (_idea, rating) => rating?.potentialScore },
+      { key: 'rewrittenHook', label: 'Rewritten Hook', value: (_idea, rating) => rating?.rewrittenHook, expandable: true },
+      { key: 'duplicateOf', label: 'Duplicate Of', value: (_idea, rating) => rating?.duplicateOf },
+      { key: 'recommendedFormat', label: 'Recommended Format', value: (_idea, rating) => rating?.recommendedFormat },
+      { key: 'seasonTag', label: 'Season Tag', value: (_idea, rating) => rating?.seasonTag },
+      { key: 'deterministicChecks', label: 'Deterministic Checks', value: (_idea, rating) => rating?.deterministicChecks, expandable: true },
+      { key: 'confidence', label: 'Confidence', value: (_idea, rating) => rating?.confidence },
       { key: 'evaluationMode', label: 'Evaluation Mode', value: (_idea, rating) => rating?.evaluationMode },
       { key: 'evaluatedAt', label: 'Evaluated At', value: (_idea, rating) => rating?.evaluatedAt },
       { key: 'evaluationVersion', label: 'Evaluation Version', value: (_idea, rating) => rating?.evaluationVersion },
@@ -452,17 +462,21 @@ const app = {
   showResultModal(result) {
     this.resultModalData = result;
     const body = document.getElementById('resultBody');
-    const capped = result.scoreCapped ? '<span style="color:#c0392b; font-weight:600;"> (capped at 59 due to critical findings)</span>' : '';
+    const capped = result.scoreCapped ? '<span style="color:#c0392b; font-weight:600;"> (capped)</span>' : '';
     const verdictClass = `verdict-${result.verdict.toLowerCase().replace(' ', '-')}`;
+    const isV1 = result.evaluationVersion && result.evaluationVersion.startsWith('1.');
+    const versionLabel = isV1 ? ' (v1)' : ' (v2)';
 
     let dimsHtml = '';
     result.dimensionScores.forEach(d => {
+      const anchor = d.anchorMatched ? `<span class="dim-anchor">Anchor: ${d.anchorMatched}</span>` : '';
       dimsHtml += `
         <div class="dimension-card">
           <div class="dim-header">
             <span class="dim-name">${d.name}</span>
             <span class="dim-score">${d.score}/10</span>
             <span class="dim-weight">${d.weight}%</span>
+            ${anchor}
           </div>
           <div class="dim-text"><strong>Explanation:</strong> ${this.escapeHtml(d.explanation)}</div>
           ${d.whatWorks ? `<div class="dim-text" style="margin-top:0.25rem;"><strong>Works:</strong> ${this.escapeHtml(d.whatWorks)}</div>` : ''}
@@ -470,6 +484,25 @@ const app = {
         </div>
       `;
     });
+
+    let gateHtml = '';
+    if (result.gateResults && result.gateResults.length > 0) {
+      gateHtml = '<h4>Gate Results</h4><div class="gates-grid">';
+      result.gateResults.forEach(g => {
+        const badgeClass = g.passed ? 'gate-pass' : 'gate-fail';
+        gateHtml += `
+          <div class="gate-card ${badgeClass}">
+            <div class="gate-header">
+              <span class="gate-name">${this.escapeHtml(g.name)}</span>
+              <span class="gate-status">${g.passed ? 'PASS' : 'FAIL'}</span>
+            </div>
+            <div class="gate-detail">${this.escapeHtml(g.detail)}</div>
+            <div class="gate-severity">Severity on fail: ${g.severityOnFail}</div>
+          </div>
+        `;
+      });
+      gateHtml += '</div>';
+    }
 
     let findingsHtml = '';
     [['Critical', result.criticalFindings, 'finding-critical', 'sev-critical'],
@@ -495,10 +528,59 @@ const app = {
       });
     });
 
+    let fixesHtml = '';
+    if (result.fixesToReach10 && result.fixesToReach10.length > 0) {
+      fixesHtml = '<h4>Fixes to Reach 100</h4><div class="fixes-list">';
+      result.fixesToReach10.slice(0, 5).forEach((f, i) => {
+        fixesHtml += `
+          <div class="fix-item">
+            <span class="fix-rank">${i + 1}.</span>
+            <span class="fix-text">${this.escapeHtml(f.fix)}</span>
+            <span class="fix-dimension">(${f.dimensionId})</span>
+            <span class="fix-gain">+${f.estimatedGain} pts</span>
+          </div>
+        `;
+      });
+      fixesHtml += `</div><div class="potential-score">Potential Score: ${result.potentialScore || 'N/A'}/100</div>`;
+    }
+
+    let metaHtml = '';
+    if (!isV1) {
+      metaHtml = `
+        <div class="meta-grid">
+          <div class="meta-item"><strong>Confidence:</strong> ${result.confidence || 'N/A'}</div>
+          <div class="meta-item"><strong>Caps Applied:</strong> ${result.capsApplied?.join(', ') || 'none'}</div>
+          <div class="meta-item"><strong>Rewritten Hook:</strong> ${this.escapeHtml(result.rewrittenHook || 'N/A')}</div>
+          <div class="meta-item"><strong>Duplicate Of:</strong> ${result.duplicateOf?.join(', ') || 'none'}</div>
+          <div class="meta-item"><strong>Recommended Format:</strong> ${result.recommendedFormat || 'N/A'}</div>
+          <div class="meta-item"><strong>Season Tag:</strong> ${result.seasonTag || 'none'}</div>
+        </div>
+      `;
+    }
+
+    let deterministicHtml = '';
+    if (result.deterministicChecks && result.deterministicChecks.length > 0) {
+      deterministicHtml = '<h4>Deterministic Checks</h4><div class="deterministic-grid">';
+      result.deterministicChecks.forEach(c => {
+        const badgeClass = c.passed ? 'check-pass' : 'check-fail';
+        deterministicHtml += `
+          <div class="check-card ${badgeClass}">
+            <div class="check-header">
+              <span class="check-id">${c.id}</span>
+              <span class="check-status">${c.passed ? 'PASS' : 'FAIL'}</span>
+            </div>
+            <div class="check-detail">${this.escapeHtml(c.detail)}</div>
+            <div class="check-severity">${c.severity} | Gate: ${c.gate}</div>
+          </div>
+        `;
+      });
+      deterministicHtml += '</div>';
+    }
+
     let improvementsHtml = '';
     if (result.improvedHook || result.storyImprovements || result.improvedCaption) {
       improvementsHtml = `
-        <h4>Suggested Improvements</h4>
+        <h4>Suggested Improvements (v1)</h4>
         <div class="suggestion-card">
           <div class="suggestion-pair">
             <div class="suggestion-col">
@@ -524,15 +606,19 @@ const app = {
           <div>${result.overallScore}</div>
           <div class="score-label">Overall Score</div>
         </div>
-        <div class="score-verdict verdict-${verdictClass}">${result.verdict}</div>
+        <div class="score-verdict verdict-${verdictClass}">${result.verdict}${versionLabel}</div>
         <div style="font-size:0.9rem; color:var(--text-muted);">
           Mode: <strong>${result.evaluationMode}</strong> ${capped}<br>
-          Critical: ${result.criticalFindings.length} | Major: ${result.majorFindings.length} | Minor: ${result.minorFindings.length} | Suggestions: ${result.suggestions.length}<br>
-          Evaluated: ${new Date(result.evaluatedAt).toLocaleString()}
+          Raw: ${result.rawScore} | Critical: ${result.criticalFindings.length} | Major: ${result.majorFindings.length} | Minor: ${result.minorFindings.length} | Suggestions: ${result.suggestions.length}<br>
+          Evaluated: ${new Date(result.evaluatedAt).toLocaleString()} | Version: ${result.evaluationVersion}
         </div>
       </div>
       <div class="dimensions-grid">${dimsHtml}</div>
+      ${gateHtml}
       ${findingsHtml}
+      ${fixesHtml}
+      ${metaHtml}
+      ${deterministicHtml}
       ${improvementsHtml}
     `;
 
@@ -546,27 +632,48 @@ const app = {
   async copyResult() {
     if (!this.resultModalData) return;
     const r = this.resultModalData;
-    
+    const isV1 = r.evaluationVersion && r.evaluationVersion.startsWith('1.');
+
     let text = `Content Idea Evaluation Result\n`;
     text += `==============================\n`;
     text += `ID: ${r.ideaId}\n`;
     text += `Overall Score: ${r.overallScore}/100\n`;
+    text += `Raw Score: ${r.rawScore}/100\n`;
     text += `Verdict: ${r.verdict}\n`;
-    text += `Score Capped: ${r.scoreCapped ? 'Yes (59)' : 'No'}\n`;
+    text += `Score Capped: ${r.scoreCapped ? 'Yes' : 'No'}\n`;
+    text += `Caps Applied: ${r.capsApplied?.join(', ') || 'none'}\n`;
     text += `Evaluation Mode: ${r.evaluationMode}\n`;
     text += `Evaluated At: ${new Date(r.evaluatedAt).toLocaleString()}\n`;
     text += `Evaluation Version: ${r.evaluationVersion}\n`;
+    if (!isV1) {
+      text += `Confidence: ${r.confidence || 'N/A'}\n`;
+      text += `Rewritten Hook: ${r.rewrittenHook || 'N/A'}\n`;
+      text += `Duplicate Of: ${r.duplicateOf?.join(', ') || 'none'}\n`;
+      text += `Recommended Format: ${r.recommendedFormat || 'N/A'}\n`;
+      text += `Season Tag: ${r.seasonTag || 'none'}\n`;
+    }
     text += `\n`;
-    
-    text += `=== TEN DIMENSION SCORES ===\n`;
+
+    text += `=== DIMENSION SCORES ===\n`;
     for (const d of r.dimensionScores) {
-      text += `${d.name} (${d.weight}%): ${d.score}/10\n`;
+      text += `${d.name} (${d.weight}%): ${d.score}/10`;
+      if (d.anchorMatched) text += ` [Anchor: ${d.anchorMatched}]`;
+      text += `\n`;
       text += `  Explanation: ${d.explanation}\n`;
       if (d.whatWorks) text += `  What Works: ${d.whatWorks}\n`;
       if (d.needsImprovement) text += `  Needs Improvement: ${d.needsImprovement}\n`;
       text += `\n`;
     }
-    
+
+    if (r.gateResults && r.gateResults.length > 0) {
+      text += `=== GATE RESULTS ===\n`;
+      for (const g of r.gateResults) {
+        text += `${g.name}: ${g.passed ? 'PASS' : 'FAIL'} (severity on fail: ${g.severityOnFail})\n`;
+        text += `  ${g.detail}\n`;
+      }
+      text += `\n`;
+    }
+
     text += `=== CRITICAL FINDINGS (${r.criticalFindings.length}) ===\n`;
     for (const f of r.criticalFindings) {
       text += `- ${f.title}\n`;
@@ -575,7 +682,7 @@ const app = {
       text += `  Fix: ${f.suggestedFix}\n`;
     }
     text += `\n`;
-    
+
     text += `=== MAJOR FINDINGS (${r.majorFindings.length}) ===\n`;
     for (const f of r.majorFindings) {
       text += `- ${f.title}\n`;
@@ -584,7 +691,7 @@ const app = {
       text += `  Fix: ${f.suggestedFix}\n`;
     }
     text += `\n`;
-    
+
     text += `=== MINOR FINDINGS (${r.minorFindings.length}) ===\n`;
     for (const f of r.minorFindings) {
       text += `- ${f.title}\n`;
@@ -593,7 +700,7 @@ const app = {
       text += `  Fix: ${f.suggestedFix}\n`;
     }
     text += `\n`;
-    
+
     text += `=== SUGGESTIONS (${r.suggestions.length}) ===\n`;
     for (const s of r.suggestions) {
       text += `- ${s.title}\n`;
@@ -602,18 +709,40 @@ const app = {
       if (s.suggested) text += `  Suggested: ${s.suggested}\n`;
       text += `\n`;
     }
-    
-    text += `=== IMPROVEMENTS ===\n`;
-    if (r.improvedHook) text += `Improved Hook: ${r.improvedHook}\n`;
-    if (r.storyImprovements) text += `Story Improvements: ${r.storyImprovements}\n`;
-    if (r.improvedCaption) text += `Improved Caption: ${r.improvedCaption}\n`;
-    
+
+    if (r.fixesToReach10 && r.fixesToReach10.length > 0) {
+      text += `=== FIXES TO REACH 100 ===\n`;
+      for (const f of r.fixesToReach10) {
+        text += `- ${f.fix} (${f.dimensionId}) +${f.estimatedGain} pts\n`;
+      }
+      text += `Potential Score: ${r.potentialScore || 'N/A'}/100\n`;
+      text += `\n`;
+    }
+
+    if (r.deterministicChecks && r.deterministicChecks.length > 0) {
+      text += `=== DETERMINISTIC CHECKS ===\n`;
+      for (const c of r.deterministicChecks) {
+        text += `${c.id}: ${c.passed ? 'PASS' : 'FAIL'} (${c.severity}) - ${c.detail}\n`;
+      }
+      text += `\n`;
+    }
+
+    if (!isV1) {
+      text += `=== V2 IMPROVEMENTS ===\n`;
+      if (r.rewrittenHook) text += `Rewritten Hook: ${r.rewrittenHook}\n`;
+      text += `\n`;
+    } else {
+      text += `=== IMPROVEMENTS ===\n`;
+      if (r.improvedHook) text += `Improved Hook: ${r.improvedHook}\n`;
+      if (r.storyImprovements) text += `Story Improvements: ${r.storyImprovements}\n`;
+      if (r.improvedCaption) text += `Improved Caption: ${r.improvedCaption}\n`;
+    }
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
         this.showToast('Result copied to clipboard!', 'success');
       } else {
-        // Fallback for older browsers or non-secure contexts
         const textarea = document.createElement('textarea');
         textarea.value = text;
         textarea.style.position = 'fixed';

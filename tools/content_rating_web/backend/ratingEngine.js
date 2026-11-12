@@ -1,8 +1,38 @@
 const fs = require('fs');
 const path = require('path');
-const { DIMENSIONS, SEVERITIES, computeWeightedScore, computeVerdict, isCriticalCapEnabled, getCriticalCapThreshold, getCriticalCapScore, getCriticalCapVerdict } = require('./schemas');
-
-const CHARACTERS = ['Ria', 'Rio', 'Cuty', 'Mumma', 'Papa', 'Daadi', 'Robot', 'Teacher'];
+const {
+  DIMENSIONS,
+  GATES,
+  GATE_IDS,
+  SEVERITIES,
+  VERDICTS,
+  CRITICAL_CAP,
+  ADDITIONAL_CAPS,
+  DETERMINISTIC_CHECKS,
+  CALIBRATION,
+  PERFORMANCE_FEEDBACK,
+  AUDIENCE,
+  SCORING,
+  validateDimensionScore,
+  validateDimension,
+  validateFinding,
+  validateGateResult,
+  validateFixToReach10,
+  validateDeterministicCheckResult,
+  validateGeminiResponse,
+  computeWeightedScore,
+  computeVerdict,
+  isCriticalCapEnabled,
+  getCriticalCapThreshold,
+  getCriticalCapScore,
+  getCriticalCapVerdict,
+  getDimensionCount,
+  getDimensionById,
+  getGateById,
+  getVerdictByLabel,
+  getVerdictRequires,
+} = require('./schemas');
+const { runAllChecks } = require('./deterministicChecks');
 
 function buildEmptyDimensionScores() {
   return DIMENSIONS.map(d => ({
@@ -10,6 +40,7 @@ function buildEmptyDimensionScores() {
     name: d.name,
     weight: d.weight,
     score: 0,
+    anchorMatched: '2',
     explanation: '',
     whatWorks: '',
     needsImprovement: '',
@@ -20,40 +51,144 @@ function findDimension(dimensionScores, id) {
   return dimensionScores.find(d => d.id === id);
 }
 
-function setDimension(dimensionScores, id, score, explanation, whatWorks, needsImprovement) {
+function setDimension(dimensionScores, id, score, anchorMatched, explanation, whatWorks, needsImprovement) {
   const d = findDimension(dimensionScores, id);
   if (d) {
     d.score = Math.max(0, Math.min(10, score));
+    d.anchorMatched = anchorMatched || '2';
     d.explanation = explanation || '';
     d.whatWorks = whatWorks || '';
     d.needsImprovement = needsImprovement || '';
   }
 }
 
-function findUnsafeWords(text) {
-  const unsafeWords = ['hit', 'slap', 'spank', 'punish', 'scary', 'terrifying', 'violent', 'blood', 'weapon'];
-  return unsafeWords.filter(word => {
-    const matches = text.matchAll(new RegExp(`\\b${word}\\b`, 'g'));
-    for (const match of matches) {
-      const before = text.slice(Math.max(0, match.index - 48), match.index);
-      const after = text.slice(match.index + match[0].length, match.index + match[0].length + 48);
-      if (/\b(?:no|not|never|without|avoid|avoiding|don't|doesn't|shouldn't)\s+(?:\w+\s+){0,2}$/i.test(before)) continue;
-      if (word === 'hit' && /\b(?:the\s+)?(?:hit|hits|hitting)\s+of\b/i.test(match[0] + after)) continue;
-      if (word === 'hit' && !/\b(?:hit|hits|hitting)\s+(?:(?:the|a|an)\s+)?(?:child|kid|baby|toddler|me|him|her|them|ria|rio|cuty|mumma|papa|daadi)\b|\b(?:child|kid|baby|toddler|ria|rio|cuty|mumma|papa|daadi)\s+(?:hit|hits|hitting)\b/i.test(before + match[0] + after)) continue;
-      return true;
+function evaluateGates(idea, deterministicResults) {
+  const gateResults = [];
+  for (const gate of GATES) {
+    const checksForGate = deterministicResults.filter(c => c.gate === gate.id);
+    const criticalFailures = checksForGate.filter(c => !c.passed && c.severity === 'critical');
+    const majorFailures = checksForGate.filter(c => !c.passed && c.severity === 'major');
+    const minorFailures = checksForGate.filter(c => !c.passed && c.severity === 'minor');
+    const suggestionFailures = checksForGate.filter(c => !c.passed && c.severity === 'suggestion');
+
+    let passed = true;
+    let detail = 'All deterministic checks passed';
+    if (criticalFailures.length > 0) {
+      passed = false;
+      detail = `Critical failures: ${criticalFailures.map(c => c.id).join(', ')}`;
+    } else if (majorFailures.length > 0) {
+      passed = false;
+      detail = `Major failures: ${majorFailures.map(c => c.id).join(', ')}`;
+    } else if (minorFailures.length > 0) {
+      detail = `Minor issues: ${minorFailures.map(c => c.id).join(', ')}`;
+    } else if (suggestionFailures.length > 0) {
+      detail = `Suggestions: ${suggestionFailures.map(c => c.id).join(', ')}`;
     }
-    return false;
-  });
+
+    gateResults.push({
+      id: gate.id,
+      name: gate.name,
+      passed,
+      severityOnFail: gate.severityOnFail,
+      detail,
+    });
+  }
+  return gateResults;
 }
 
-// ── Offline heuristic engine ──────────────────────────────────────────
+function applyCaps(rawScore, criticalFindings, gateResults) {
+  const capsApplied = [];
+  let cappedScore = rawScore;
+  let cappedVerdict = null;
 
-function offlineEvaluate(idea) {
+  if (isCriticalCapEnabled() && criticalFindings.length > 0 && rawScore > getCriticalCapThreshold()) {
+    cappedScore = Math.min(cappedScore, getCriticalCapScore());
+    cappedVerdict = getCriticalCapVerdict();
+    capsApplied.push('criticalCap');
+  }
+
+  for (const cap of ADDITIONAL_CAPS) {
+    if (!cap.enabled) continue;
+    let conditionMet = false;
+    if (cap.condition.includes('gate') && cap.condition.includes('critical')) {
+      const criticalGateFailed = gateResults.some(g => !g.passed && g.severityOnFail === 'critical');
+      conditionMet = criticalGateFailed;
+    } else if (cap.condition.includes('gate') && cap.condition.includes('major')) {
+      const majorGateFailed = gateResults.some(g => !g.passed && g.severityOnFail === 'major');
+      conditionMet = majorGateFailed && rawScore > 79;
+    }
+    if (conditionMet) {
+      cappedScore = Math.min(cappedScore, cap.cappedScore);
+      if (cap.cappedVerdict) {
+        cappedVerdict = cap.cappedVerdict;
+      }
+      capsApplied.push(cap.id);
+    }
+  }
+
+  return { cappedScore, cappedVerdict, capsApplied };
+}
+
+function determineVerdict(overallScore, criticalFindings, majorFindings, capsApplied, cappedVerdict) {
+  if (cappedVerdict) return cappedVerdict;
+
+  let verdict = computeVerdict(overallScore);
+
+  if (verdict === 'Ready to Post') {
+    const requires = getVerdictRequires('Ready to Post');
+    const hookScore = overallScore >= 80 ? 7 : 0;
+    const payoffScore = overallScore >= 80 ? 6 : 0;
+    if (criticalFindings.length > requires.criticalFindingsMax ||
+        majorFindings.length > requires.majorFindingsMax) {
+      verdict = 'Needs Minor Fixes';
+    }
+  }
+
+  return verdict;
+}
+
+function buildFixesToReach10(dimensionScores, rawScore) {
+  const scoredDimensions = dimensionScores
+    .filter(d => d.score < 10)
+    .map(d => {
+      const gain = Math.round(((10 - d.score) / 10) * d.weight);
+      return {
+        fix: d.needsImprovement || `Improve ${d.name} from ${d.score} to 10`,
+        dimensionId: d.id,
+        estimatedGain: gain,
+      };
+    })
+    .sort((a, b) => b.estimatedGain - a.estimatedGain);
+
+  const potentialScore = Math.min(100, rawScore + scoredDimensions.reduce((sum, d) => sum + d.estimatedGain, 0));
+
+  return { fixesToReach10: scoredDimensions, potentialScore };
+}
+
+function getRewrittenHook(idea, dimensionScores) {
+  const hookDim = findDimension(dimensionScores, 'hookStrength');
+  if (hookDim && hookDim.score < 7 && idea.problem) {
+    return `Open on the moment: ${idea.problem.slice(0, 80)}...?`;
+  }
+  if (hookDim && hookDim.score < 7 && idea.opening) {
+    return `Trim to: "${idea.opening.slice(0, 80)}?"`;
+  }
+  return idea.opening || 'Add a visual hook in the first 3 seconds';
+}
+
+function getRecommendedFormat(idea, gateResults, duplicateOf) {
+  const formatFitGate = gateResults.find(g => g.id === 'formatFit');
+  const postFormat = idea.postFormat || 'Reel';
+  if (duplicateOf.length > 0) return 'merge-into-series';
+  if (formatFitGate && !formatFitGate.passed) {
+    if (postFormat === 'Carousel') return 'reel';
+    if (postFormat === 'Story') return 'carousel';
+  }
+  return postFormat.toLowerCase();
+}
+
+function buildOfflineDimensionScores(idea, deterministicResults) {
   const dims = buildEmptyDimensionScores();
-  const critical = [];
-  const major = [];
-  const minor = [];
-  const suggestions = [];
 
   const title = idea.title || '';
   const cover = idea.cover || '';
@@ -67,68 +202,78 @@ function offlineEvaluate(idea) {
   const defaultCast = Array.isArray(idea.defaultCast) ? idea.defaultCast : [];
   const category = idea.category || '';
   const dialogue = idea.dialogue || '';
+  const setting = idea.setting || '';
+  const sceneDetail = idea.sceneDetail || '';
+  const pinnedComment = idea.pinnedComment || '';
 
   const textBlob = `${title} ${cover} ${opening} ${problem} ${lesson} ${storyDetail} ${caption}`.toLowerCase();
 
-  // ── Hook Strength ──
+  const isSeriesRecap = category === 'Series' && idea.postFormat === 'Carousel' && !hasProblem;
+  const isAudiencePost = category === 'Series' && /feedback|audience/i.test(`${title} ${problem}`);
+
   let hookScore = 5;
+  let hookAnchor = '6';
   if (opening.length > 10) hookScore += 1;
   if (opening.includes('?') || opening.includes('!')) hookScore += 1;
   if (opening.length > 0 && opening.length < 120) hookScore += 1;
   if (opening.includes('?') && opening.length <= 90) hookScore += 1;
-  if (opening.length === 0) hookScore -= 3;
+  if (opening.length === 0) { hookScore -= 3; hookAnchor = '2'; }
+  else if (opening.length > 100) { hookAnchor = '6'; }
+  else if (/[?!]/.test(opening)) { hookAnchor = '10'; }
   const hookFeedback = opening.length === 0
     ? 'Open on a specific action or choice from the story.'
     : opening.length > 100
       ? 'Trim the setup and keep the unresolved moment.'
       : !/[?!]/.test(opening)
-        ? 'End on the story’s unresolved choice or consequence.'
+        ? 'End on the story\'s unresolved choice or consequence.'
         : '';
-  setDimension(dims, 'hookStrength', hookScore,
+  setDimension(dims, 'hookStrength', hookScore, hookAnchor,
     `Opening is ${opening.length} characters. ${opening.length === 0 ? 'Missing.' : opening.length > 100 ? 'Long for a first-line hook.' : opening.includes('?') ? 'Uses a question to open a curiosity loop.' : /[!]/.test(opening) ? 'Opens with an emphatic moment.' : 'Present.'}`,
     opening.length > 0 ? 'Opening line exists.' : 'No opening hook found.',
     hookFeedback);
 
-  // ── Relatability ──
   let relScore = 5;
+  let relAnchor = '6';
   const relatableWords = ['mumma', 'papa', 'daadi', 'teacher', 'relative', 'aunt', 'uncle', 'mum', 'dad'];
   const hasRelatable = relatableWords.some(w => textBlob.includes(w));
-  const relatableContext = `${problem} ${idea.setting || ''} ${storyDetail}`;
+  const relatableContext = `${problem} ${setting} ${storyDetail}`;
   const everydayContext = /\b(at home|home|ghar|morning|breakfast|bedtime|getting ready|school|park|grocery|supermarket|shopping|mall|bath|bathroom|playtime|art time|drawing table|drawing room|dinner|lunch|dining table|snack time|snack table|kitchen|bedroom|living room|front door|shoe rack|parking|garba|navratri|festival|changing room|courtyard|daadi|grandma|laundry|checkout|classroom|playground|temple|street|market|society compound|meal|family time)\b/i.test(relatableContext);
-  const isSeriesRecap = category === 'Series' && idea.postFormat === 'Carousel' && !hasProblem;
-  const isAudiencePost = category === 'Series' && /feedback|audience/i.test(`${title} ${problem}`);
-  if (hasRelatable) relScore += 1;
-  if (hasProblem) relScore += 1;
-  if (everydayContext) relScore += 1;
-  if (category === 'Safety' || category === 'Learning Lesson') relScore += 1;
-  if (!hasProblem && !isSeriesRecap && !isAudiencePost) relScore -= 2;
+  if (isSeriesRecap || isAudiencePost) { relScore = 8; relAnchor = '10'; }
+  else {
+    if (hasRelatable) relScore += 1;
+    if (hasProblem) relScore += 1;
+    if (everydayContext) relScore += 1;
+    if (category === 'Safety' || category === 'Learning Lesson') relScore += 1;
+    if (!hasProblem && !isSeriesRecap && !isAudiencePost) { relScore -= 2; relAnchor = '2'; }
+    else if (hasProblem && everydayContext) { relAnchor = '10'; }
+  }
   const relatableFeedback = isSeriesRecap || isAudiencePost
     ? ''
     : !hasProblem
-    ? 'Describe the child’s problem in a familiar family routine.'
-    : !everydayContext
-      ? 'Add one recognizable family routine or everyday setting to the problem or story.'
-      : '';
-  setDimension(dims, 'relatability', relScore,
+      ? 'Describe the child\'s problem in a familiar family routine.'
+      : !everydayContext
+        ? 'Add one recognizable family routine or everyday setting to the problem or story.'
+        : '';
+  setDimension(dims, 'relatabilityAudienceFit', relScore, relAnchor,
     isSeriesRecap || isAudiencePost
       ? 'Audience-focused series format; a child problem is not required.'
       : `Problem described in ${hasProblem ? `${problem.length} characters` : 'not applicable'}. Family terms ${hasRelatable ? 'present' : 'not detected'}. Everyday routine ${everydayContext ? 'identified' : 'not identified'}.`,
     isSeriesRecap || isAudiencePost ? 'Audience-focused series format.' : hasProblem ? 'Real-world problem stated.' : 'No problem described.',
     relatableFeedback);
 
-  // ── Story Structure ──
   const hasStory = storyDetail.length > 0;
   const hasTwist = /twist/i.test(storyDetail);
   const hasResolution = /resolution/i.test(storyDetail);
   const hasMoral = /moral/i.test(storyDetail);
   const hasEnding = endingBeat.length > 0;
   let storyScore = 3;
-  if (hasStory) storyScore += 2;
+  let storyAnchor = '2';
+  if (hasStory) { storyScore += 2; storyAnchor = '6'; }
   if (hasTwist) storyScore += 1;
-  if (hasResolution) storyScore += 2;
+  if (hasResolution) { storyScore += 2; storyAnchor = '10'; }
   if (hasMoral) storyScore += 1;
   if (hasEnding) storyScore += 1;
-  if (!hasStory) storyScore -= 2;
+  if (!hasStory) { storyScore -= 2; storyAnchor = '2'; }
   const missingStoryParts = [
     !hasStory && 'Story',
     !hasTwist && 'Twist',
@@ -136,28 +281,11 @@ function offlineEvaluate(idea) {
     !hasMoral && 'Moral',
     !hasEnding && 'endingBeat',
   ].filter(Boolean);
-  setDimension(dims, 'storyStructure', Math.max(0, Math.min(10, storyScore)),
+  setDimension(dims, 'payoffRetention', Math.max(0, Math.min(10, storyScore)), storyAnchor,
     `Story detail: ${hasStory ? 'present' : 'missing'}. Twist: ${hasTwist}. Resolution: ${hasResolution}. Moral: ${hasMoral}. Ending: ${hasEnding ? 'present' : 'missing'}.`,
     hasStory ? 'Story structure with labels detected.' : 'No story detail found.',
     missingStoryParts.length ? `Add or clarify: ${missingStoryParts.join(', ')}.` : '');
 
-  // ── Age Appropriateness ──
-  let ageScore = 6;
-  const babyWords = ['ball', 'hug', 'chocolate', 'park', 'mumma', 'papa', 'daadi', 'teacher'];
-  const hasBabyContent = babyWords.some(w => textBlob.includes(w));
-  if (hasBabyContent) ageScore += 1;
-  if (lesson.length > 0) ageScore += 1;
-  if (category === 'Safety') ageScore += 1;
-  if (lesson.length === 0) ageScore -= 1;
-  const ageFeedback = lesson.length === 0
-    ? 'Add one short, concrete action a toddler can understand.'
-    : '';
-  setDimension(dims, 'ageAppropriateness', ageScore,
-    `Lesson: ${lesson.length > 0 ? 'present' : 'missing'}. Toddler-relevant terms: ${hasBabyContent ? 'present' : 'not detected'}.`,
-    lesson.length > 0 ? 'A lesson is stated; the offline check does not judge its developmental fit.' : 'No lesson provided.',
-    ageFeedback);
-
-  // ── Hinglish Naturalness ──
   const hinglishMarkers = [
     'hai', 'hain', 'nahi', 'nahin', 'haan', 'beti', 'beta', 'dekho', 'sun', 'jao',
     'chalo', 'kyun', 'kaise', 'kya', 'kaunsa', 'karein', 'mujhe', 'tum', 'tumhein', 'aaj', 'mera', 'meri', 'chahiye',
@@ -167,247 +295,284 @@ function offlineEvaluate(idea) {
   const dialogueBlob = `${textBlob} ${dialogue}`.toLowerCase();
   const hinglishCount = hinglishMarkers.filter(w => new RegExp(`\\b${w}\\b`).test(dialogueBlob)).length;
   let hScore = dialogue.length === 0 ? 8 : 5;
-  if (dialogue.length > 0 && hinglishCount >= 2) hScore += 2;
-  if (dialogue.length > 0 && hinglishCount === 1) hScore += 1;
+  let hAnchor = dialogue.length === 0 ? '10' : '6';
+  if (dialogue.length > 0 && hinglishCount >= 2) { hScore += 2; hAnchor = '10'; }
+  else if (dialogue.length > 0 && hinglishCount === 1) { hScore += 1; hAnchor = '6'; }
   if (dialogue.length > 0) hScore += 1;
-  setDimension(dims, 'hinglishNaturalness', Math.max(0, Math.min(10, hScore)),
+  setDimension(dims, 'hinglishNaturalness', Math.max(0, Math.min(10, hScore)), hAnchor,
     dialogue.length === 0
       ? 'No spoken dialogue; Hinglish naturalness is not applicable.'
       : `Hinglish markers found: ${hinglishCount}. Dialogue: present.`,
     dialogue.length === 0 ? 'No spoken dialogue to assess.' : hinglishCount > 0 ? 'Natural Hinglish elements detected.' : 'No Hinglish markers found.',
-    dialogue.length > 0 && hinglishCount === 0 ? 'Use a familiar spoken phrase in the dialogue, such as “chalo” or “koi baat nahi.”' : '');
+    dialogue.length > 0 && hinglishCount === 0 ? 'Use a familiar spoken phrase in the dialogue, such as "chalo" or "koi baat nahi".' : '');
 
-  // ── Character Consistency ──
-  const castValid = defaultCast.length > 0 && defaultCast.every(c => CHARACTERS.includes(c));
-  const unknownCast = defaultCast.filter(c => !CHARACTERS.includes(c));
-  const characterText = [title, opening, problem, storyDetail, endingBeat, dialogue].join(' ').toLowerCase();
-  const mentionedCharacters = CHARACTERS.filter(c => new RegExp(`\\b${c.toLowerCase()}\\b`).test(characterText));
-  const missingCast = idea.archived ? [] : mentionedCharacters.filter(c => !defaultCast.includes(c));
-  const charScore = defaultCast.length === 0 ? 3 : !castValid ? 4 : missingCast.length > 0 ? 6 : 9;
-  setDimension(dims, 'characterConsistency', Math.max(0, Math.min(10, charScore)),
-    `Cast: ${defaultCast.join(', ') || 'none'}. Valid characters: ${castValid ? 'yes' : 'no'}. Characters named in content: ${mentionedCharacters.join(', ') || 'none'}. Missing from cast: ${missingCast.join(', ') || 'none'}.`,
-    !castValid ? 'Some cast names are not from the approved character list.' : missingCast.length === 0 ? 'All named characters are included in the approved cast.' : `Cast is missing: ${missingCast.join(', ')}.`,
-    !castValid ? 'Use only defined characters: Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher.' : missingCast.length > 0 ? `Add ${missingCast.join(', ')} to defaultCast.` : '');
-
-  // ── Visual Feasibility ──
   let visScore = 5;
-  if (idea.setting && idea.setting.length > 0) visScore += 1;
-  if (idea.sceneDetail && idea.sceneDetail.length > 0) visScore += 1;
-  if (category !== 'Safety') visScore += 1; // safety can be harder to visualize gently
-  if (!idea.setting || idea.setting.length === 0) visScore -= 1;
-  if (!idea.sceneDetail || idea.sceneDetail.length === 0) visScore -= 1;
-  const visualFeedback = !idea.setting
+  let visAnchor = '6';
+  if (setting && setting.length > 0) visScore += 1;
+  if (sceneDetail && sceneDetail.length > 0) visScore += 1;
+  if (category !== 'Safety') visScore += 1;
+  if (!setting || setting.length === 0) visScore -= 1;
+  if (!sceneDetail || sceneDetail.length === 0) visScore -= 1;
+  if (setting && sceneDetail && category !== 'Safety') visAnchor = '10';
+  const visualFeedback = !setting
     ? 'Name the location and time of day.'
-    : !idea.sceneDetail
+    : !sceneDetail
       ? 'Describe the visible action, prop, and ending image.'
       : '';
-  setDimension(dims, 'visualFeasibility', Math.max(0, Math.min(10, visScore)),
-    `Setting: ${idea.setting && idea.setting.length > 0 ? 'present' : 'missing'}. Scene detail: ${idea.sceneDetail && idea.sceneDetail.length > 0 ? 'present' : 'missing'}.`,
-    idea.setting && idea.setting.length > 0 ? 'Location described.' : 'No setting provided.',
+  setDimension(dims, 'visualFeasibility', Math.max(0, Math.min(10, visScore)), visAnchor,
+    `Setting: ${setting && setting.length > 0 ? 'present' : 'missing'}. Scene detail: ${sceneDetail && sceneDetail.length > 0 ? 'present' : 'missing'}.`,
+    setting && setting.length > 0 ? 'Location described.' : 'No setting provided.',
     visualFeedback);
 
-  // ── Sound-Off Readability ──
   const hasCaption = caption.length > 0;
-  const hasPinned = idea.pinnedComment && idea.pinnedComment.length > 0;
+  const hasPinned = pinnedComment && pinnedComment.length > 0;
   let soundScore = 4;
+  let soundAnchor = '6';
   if (hasCaption) soundScore += 2;
   if (hasPinned) soundScore += 1;
   if (dialogue.length > 0) soundScore += 1;
-  if (!hasCaption) soundScore -= 1;
+  if (!hasCaption) { soundScore -= 1; soundAnchor = '2'; }
+  else if (hasCaption && hasPinned) soundAnchor = '10';
   const soundFeedback = !hasCaption
     ? 'Add a caption that communicates the story without audio.'
     : caption.length > 300
       ? `Trim the ${caption.length}-character caption to its key takeaway and question.`
       : '';
-  setDimension(dims, 'soundOffReadability', soundScore,
+  setDimension(dims, 'soundOffReadability', soundScore, soundAnchor,
     `Caption: ${hasCaption ? `present (${caption.length} characters)` : 'missing'}. Pinned comment: ${hasPinned ? 'present' : 'missing'}.`,
     hasCaption ? 'Caption available for sound-off viewing.' : 'No caption found.',
     soundFeedback);
 
-  // ── Engagement Potential ──
   let engScore = 5;
+  let engAnchor = '6';
   if (hasProblem) engScore += 1;
   if (lesson.length > 0) engScore += 1;
   if (category === 'Safety' || category === 'Funny') engScore += 1;
-  if (idea.pinnedComment && idea.pinnedComment.length > 0) engScore += 1;
-  const hasEngagementQuestion = /\?/.test(caption) || /\?/.test(idea.pinnedComment || '');
+  if (pinnedComment && pinnedComment.length > 0) engScore += 1;
+  const hasEngagementQuestion = /\?/.test(caption) || /\?/.test(pinnedComment || '');
   const engagementFeedback = isSeriesRecap || isAudiencePost
     ? !hasEngagementQuestion ? 'Ask a specific question that invites audience input.' : ''
     : !hasProblem
       ? 'Define the specific situation the story addresses.'
       : !hasEngagementQuestion ? 'Ask viewers a specific question about this story or routine in the caption or pinned comment.' : '';
-  setDimension(dims, 'engagementPotential', engScore,
+  if (hasProblem && hasEngagementQuestion) engAnchor = '10';
+  setDimension(dims, 'shareSaveTrigger', engScore, engAnchor,
     `Problem: ${isSeriesRecap || isAudiencePost ? 'not applicable (audience-focused format)' : hasProblem}. Lesson: ${lesson.length > 0}. Discussion question: ${hasEngagementQuestion ? 'present' : 'missing'}.`,
     isSeriesRecap || isAudiencePost ? 'Audience-focused format.' : hasProblem ? 'Clear problem drives engagement.' : 'No problem stated.',
     engagementFeedback);
 
-  // ── Brand and Safety ──
-  let brandScore = 7;
-  const detectedUnsafeWords = findUnsafeWords(textBlob);
-  const hasUnsafe = detectedUnsafeWords.length > 0;
-  if (hasUnsafe) brandScore -= 3;
-  if (category === 'Safety') brandScore += 1;
-  if (lesson.length > 0 && lesson.toLowerCase().includes('respect')) brandScore += 1;
-  if (lesson.length === 0) brandScore -= 1;
-  setDimension(dims, 'brandAndSafety', Math.max(0, Math.min(10, brandScore)),
-    `Unsafe language: ${hasUnsafe ? 'detected' : 'none'}. Lesson: ${lesson.length > 0 ? 'present' : 'missing'}.`,
-    !hasUnsafe ? 'No unsafe behavior detected.' : 'Potentially unsafe language found.',
-    hasUnsafe ? `Review the context around: ${detectedUnsafeWords.join(', ')}.` : lesson.length === 0 ? 'Add a positive, respectful lesson.' : '');
+  let capScore = 5;
+  let capAnchor = '6';
+  if (hasCaption) capScore += 1;
+  if (hasPinned) capScore += 1;
+  const hashtags = caption.match(/#[^\s#]+/g) || [];
+  if (hashtags.length >= 3 && hashtags.length <= 5) capScore += 1;
+  const pinnedGeneric = deterministicResults.find(c => c.id === 'genericPinnedComment');
+  if (hasPinned && !pinnedGeneric.passed) capScore -= 1;
+  if (!hasCaption) { capScore -= 2; capAnchor = '2'; }
+  else if (hasCaption && hasPinned && hashtags.length >= 3 && hashtags.length <= 5 && (!pinnedGeneric || pinnedGeneric.passed)) capAnchor = '10';
+  setDimension(dims, 'captionCommentPackage', Math.max(0, Math.min(10, capScore)), capAnchor,
+    `Caption: ${hasCaption ? `present (${caption.length} chars, ${hashtags.length} hashtags)` : 'missing'}. Pinned: ${hasPinned ? 'present' : 'missing'}.`,
+    hasCaption ? 'Caption with hashtags present.' : 'No caption found.',
+    !hasCaption ? 'Add a caption with 3-5 hashtags.' : !hasPinned ? 'Add a pinned comment.' : pinnedGeneric && !pinnedGeneric.passed ? 'Replace generic pinned comment with specific question.' : '');
 
-  // ── Critical findings ──
-  if (hasUnsafe) {
+  let origScore = 8;
+  let origAnchor = '10';
+  const dupCheck = deterministicResults.find(c => c.id === 'duplicateSimilarity');
+  if (dupCheck && !dupCheck.passed) { origScore = 3; origAnchor = '2'; }
+  else if (dupCheck && dupCheck.detail.includes('similarity')) {
+    const simMatch = dupCheck.detail.match(/(\d\.\d+)/);
+    if (simMatch && parseFloat(simMatch[1]) > 0.5) { origScore = 5; origAnchor = '6'; }
+  }
+  setDimension(dims, 'originality', Math.max(0, Math.min(10, origScore)), origAnchor,
+    dupCheck ? dupCheck.detail : 'Duplicate check not run',
+    dupCheck && dupCheck.passed ? 'No near-duplicates detected.' : 'Original concept.',
+    dupCheck && !dupCheck.passed ? 'Differentiate from similar ideas in library.' : '');
+
+  let audioScore = 5;
+  let audioAnchor = '6';
+  if (dialogue.length > 0 && opening.length > 0) { audioScore += 2; audioAnchor = '10'; }
+  else if (dialogue.length > 0) audioScore += 1;
+  setDimension(dims, 'audioHook', Math.max(0, Math.min(10, audioScore)), audioAnchor,
+    `Opening dialogue: ${dialogue.length > 0 ? 'present' : 'missing'}. Opening text: ${opening.length > 0 ? 'present' : 'missing'}.`,
+    dialogue.length > 0 ? 'Audio hook present.' : 'No dialogue for audio hook.',
+    dialogue.length === 0 ? 'Add a sound effect or dialogue line for the first 3 seconds.' : '');
+
+  return dims;
+}
+
+function buildOfflineFindings(idea, deterministicResults) {
+  const critical = [];
+  const major = [];
+  const minor = [];
+  const suggestions = [];
+
+  for (const check of deterministicResults) {
+    if (!check.passed) {
+      const finding = {
+        title: check.id.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
+        severity: check.severity,
+        explanation: check.detail,
+        evidence: `Check: ${check.id}`,
+        suggestedFix: getFixForCheck(check.id, idea),
+      };
+      if (check.severity === 'critical') critical.push(finding);
+      else if (check.severity === 'major') major.push(finding);
+      else if (check.severity === 'minor') minor.push(finding);
+      else if (check.severity === 'suggestion') suggestions.push(finding);
+    }
+  }
+
+  const unsafeWords = findUnsafeWords(idea);
+  if (unsafeWords.length > 0) {
     critical.push({
       title: 'Potentially unsafe language detected',
       severity: 'critical',
-      explanation: `Text contains words that may depict unsafe behavior: ${detectedUnsafeWords.join(', ')}`,
-      evidence: textBlob,
+      explanation: `Text contains words that may depict unsafe behavior: ${unsafeWords.join(', ')}`,
+      evidence: `${idea.title} ${idea.opening} ${idea.problem} ${idea.storyDetail}`.toLowerCase(),
       suggestedFix: 'Reframe to teach safe behavior rather than depicting unsafe acts.',
     });
   }
-  if (!hasStory && category === 'Safety') {
-    critical.push({
-      title: 'Safety idea missing story structure',
-      severity: 'critical',
-      explanation: 'Safety content requires a clear Story/Twist/Resolution/Moral structure to model correct behavior.',
-      evidence: 'storyDetail is empty',
-      suggestedFix: 'Add a complete story with labels showing the safe behavior and adult response.',
+
+  if (!deterministicResults.find(c => c.id === 'missingFields')?.passed) {
+    major.push({
+      title: 'Missing required fields',
+      severity: 'major',
+      explanation: 'Required fields (readyPrompt, caption, pinnedComment) are empty',
+      evidence: 'missingFields check failed',
+      suggestedFix: 'Fill in all required fields before evaluation.',
     });
   }
 
-  // ── Major findings ──
-  if (!hasStory) {
-    major.push({
-      title: 'Missing story structure',
-      severity: 'major',
-      explanation: 'No Story/Twist/Resolution/Moral labels found in storyDetail.',
-      evidence: 'storyDetail is empty',
-      suggestedFix: 'Add labeled story sections so the narrative arc is clear.',
-    });
-  }
-  if (!hasEnding) {
-    major.push({
-      title: 'Missing ending beat',
-      severity: 'major',
-      explanation: 'No endingBeat defined — the story lacks a closing visual.',
-      evidence: 'endingBeat is empty',
-      suggestedFix: 'Add a final image or action that resolves the scene.',
-    });
-  }
-  if (defaultCast.length === 0) {
-    major.push({
-      title: 'No character cast defined',
-      severity: 'major',
-      explanation: 'defaultCast is empty, making character consistency impossible to verify.',
-      evidence: 'defaultCast is an empty array',
-      suggestedFix: 'Add 1-3 characters from the approved cast (Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher).',
-    });
-  }
-
-  // ── Minor findings ──
-  if (!hasCaption) {
-    minor.push({
-      title: 'Missing caption',
-      severity: 'minor',
-      explanation: 'No Instagram caption provided.',
-      evidence: 'caption is empty',
-      suggestedFix: 'Write a caption with relevant hashtags for the post.',
-    });
-  }
-  if (!hasPinned) {
-    minor.push({
-      title: 'Missing pinned comment',
-      severity: 'minor',
-      explanation: 'No pinned comment to drive engagement.',
-      evidence: 'pinnedComment is empty',
-      suggestedFix: 'Add a question or tip as a pinned comment.',
-    });
-  }
-  if (opening.length > 0 && opening.length > 100) {
-    minor.push({
-      title: 'Opening hook may be too long',
-      severity: 'minor',
-      explanation: `Opening is ${opening.length} characters — may lose attention in the first 3 seconds.`,
-      evidence: `opening length: ${opening.length}`,
-      suggestedFix: 'Shorten the opening to under 100 characters for impact.',
-    });
-  }
-
-  // Suggestions are emitted only when the evaluator can offer a concrete replacement.
-  if (!opening && problem) {
+  if (suggestions.length === 0 && idea.opening && idea.problem && !idea.opening.includes('?')) {
     suggestions.push({
       title: 'Add an opening hook',
       explanation: 'The idea has no opening line; use its concrete problem as the starting moment.',
       original: '',
-      suggested: problem,
-    });
-  }
-  if (!lesson && endingBeat) {
-    suggestions.push({
-      title: 'Add a lesson',
-      explanation: 'The story has an ending but no stated takeaway.',
-      original: '',
-      suggested: `After ${endingBeat.charAt(0).toLowerCase()}${endingBeat.slice(1)}`,
+      suggested: idea.problem,
     });
   }
 
-  const overallScore = computeWeightedScore(dims);
-  const verdict = computeVerdict(overallScore);
-  const capEnabled = isCriticalCapEnabled();
-  const capThreshold = capEnabled ? getCriticalCapThreshold() : Infinity;
-  const capped = capEnabled && critical.length > 0 && overallScore > capThreshold;
-  const finalScore = capped ? getCriticalCapScore() : overallScore;
-  const finalVerdict = capped ? getCriticalCapVerdict() : verdict;
+  return { critical, major, minor, suggestions };
+}
+
+function getFixForCheck(checkId, idea) {
+  const fixes = {
+    placeholderText: 'Replace placeholder text with actual content.',
+    missingFields: 'Fill in readyPrompt, caption, and pinnedComment.',
+    genericPinnedComment: 'Write a specific question or tip related to this story.',
+    pinnedCommentMismatch: 'Align pinned comment keywords with the story problem/title.',
+    captionStoryMismatch: 'Ensure caption references the story\'s key elements.',
+    openingCastMismatch: 'Use only approved character names in the opening hook.',
+    unapprovedCharacterName: 'Use only approved characters (Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher).',
+    brandNames: 'Remove brand names and IP-style terms from all fields.',
+    textBeatDensity: 'Reduce on-screen text beats to ≤7, space ≥2.5s apart.',
+    durationCheck: 'Adjust story beats to fit 15-30 second duration.',
+    repeatedEndSlate: 'Create a unique end slate for this idea.',
+    hashtagCount: 'Use 3-5 relevant hashtags in the caption.',
+    duplicateSimilarity: 'Differentiate the problem, twist, or character from similar ideas.',
+    seasonality: 'Consider seasonal relevance for timing.',
+    typoCheck: 'Review on-screen text and dialogue for typos.',
+  };
+  return fixes[checkId] || 'Review and fix the flagged issue.';
+}
+
+function findUnsafeWords(idea) {
+  const unsafeWords = ['hit', 'slap', 'spank', 'punish', 'scary', 'terrifying', 'violent', 'blood', 'weapon'];
+  const textBlob = `${idea.title} ${idea.opening} ${idea.problem} ${idea.storyDetail} ${idea.caption}`.toLowerCase();
+  return unsafeWords.filter(word => {
+    const matches = textBlob.matchAll(new RegExp(`\\b${word}\\b`, 'g'));
+    for (const match of matches) {
+      const before = textBlob.slice(Math.max(0, match.index - 48), match.index);
+      const after = textBlob.slice(match.index + word.length, match.index + word.length + 48);
+      if (/\b(?:no|not|never|without|avoid|avoiding|don't|doesn't|shouldn't)\s+(?:\w+\s+){0,2}$/i.test(before)) continue;
+      if (word === 'hit' && /\b(?:the\s+)?(?:hit|hits|hitting)\s+of\b/i.test(word + after)) continue;
+      if (word === 'hit' && !/\b(?:hit|hits|hitting)\s+(?:(?:the|a|an)\s+)?(?:child|kid|baby|toddler|ria|rio|cuty|mumma|papa|daadi)\b|\b(?:child|kid|baby|toddler|ria|rio|cuty|mumma|papa|daadi)\s+(?:hit|hits|hitting)\b/i.test(before + word + after)) continue;
+      return true;
+    }
+    return false;
+  });
+}
+
+function offlineEvaluate(idea, allIdeas = []) {
+  const deterministicResults = runAllChecks(idea, allIdeas, 'offline');
+  const gateResults = evaluateGates(idea, deterministicResults);
+  const dimensionScores = buildOfflineDimensionScores(idea, deterministicResults);
+  const { critical, major, minor, suggestions } = buildOfflineFindings(idea, deterministicResults);
+
+  const rawScore = computeWeightedScore(dimensionScores);
+  const { cappedScore, cappedVerdict, capsApplied } = applyCaps(rawScore, critical, gateResults);
+  const verdict = determineVerdict(cappedScore, critical, major, capsApplied, cappedVerdict);
+
+  const { fixesToReach10, potentialScore } = buildFixesToReach10(dimensionScores, rawScore);
+  const rewrittenHook = getRewrittenHook(idea, dimensionScores);
+  const duplicateOf = deterministicResults.find(c => c.id === 'duplicateSimilarity')?.duplicateOf || [];
+  const recommendedFormat = getRecommendedFormat(idea, gateResults, duplicateOf);
+  const seasonTag = deterministicResults.find(c => c.id === 'seasonality')?.seasonTag || '';
+  const confidence = 'low';
 
   return {
     ideaId: idea.id,
-    dimensionScores: dims,
-    overallScore: finalScore,
-    rawScore: overallScore,
-    scoreCapped: capped,
-    verdict: finalVerdict,
+    dimensionScores,
+    gateResults,
+    overallScore: cappedScore,
+    rawScore,
+    scoreCapped: capsApplied.length > 0,
+    capsApplied,
+    verdict,
     criticalFindings: critical,
     majorFindings: major,
     minorFindings: minor,
     suggestions,
+    fixesToReach10,
+    potentialScore,
+    rewrittenHook,
+    duplicateOf,
+    recommendedFormat,
+    seasonTag,
+    deterministicChecks: deterministicResults,
+    confidence,
     evaluationMode: 'offline',
     evaluatedAt: new Date().toISOString(),
-    evaluationVersion: '1.2.0-offline',
+    evaluationVersion: '2.0.0',
   };
 }
 
-// ── Online (Gemini) evaluation ────────────────────────────────────────
-
-async function onlineEvaluate(idea, geminiApiKey) {
+async function onlineEvaluate(idea, geminiApiKey, allIdeas = []) {
   const fetch = (await import('node-fetch')).default;
   const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
+
+  const deterministicResults = runAllChecks(idea, allIdeas, 'online');
+  const gateResults = evaluateGates(idea, deterministicResults);
+
+  const dimensionsList = DIMENSIONS.map((d, i) =>
+    `${i + 1}. ${d.name} (${d.weight}%): ${d.description}\n   Anchors: 10="${d.anchors['10']}" | 6="${d.anchors['6']}" | 2="${d.anchors['2']}"`
+  ).join('\n');
+
+  const deterministicFacts = deterministicResults.map(c =>
+    `- ${c.id}: ${c.passed ? 'PASS' : 'FAIL'} (${c.severity}) - ${c.detail}`
+  ).join('\n');
 
   const prompt = `
 You are a content quality evaluator for "Fun Learning With Palak" — Instagram Reels for Indian parents of children aged 1-4.
 
-Evaluate the following idea on these 10 dimensions (score each 0-10):
-1. Hook Strength (15%)
-2. Relatability (15%)
-3. Story Structure (12%)
-4. Age Appropriateness (10%)
-5. Hinglish Naturalness (10%)
-6. Character Consistency (8%)
-7. Visual Feasibility (8%)
-8. Sound-Off Readability (7%)
-9. Engagement Potential (8%)
-10. Brand and Safety (7%)
+AUDIENCE: Parents of children aged 1-4 watch these Reels. Characters shown (Ria, Rio, Cuty) are aged 1-4. Adults (Mumma, Papa, Daadi, Teacher) are caregivers.
+LANGUAGE RULES: Adults speak natural Hindi. Children use age-appropriate Hinglish (single words, simple phrases).
+RESOLUTION & MORAL: These are OPTIONAL. An unresolved ending can be a deliberate payoff (e.g., cliffhanger, open question). Do not penalize missing resolution/moral if the payoff works.
 
-Also identify:
-- Critical findings (safety violations, unsafe behavior as good, scary content, character contradictions, no resolution, preachy delivery, child blame/shame, inappropriate touching, uncalm adult response, scary language in safety content)
-- Major findings
-- Minor findings
-- Suggestions (improved hook, story improvements, improved ending, improved moral, caption suggestions)
+Evaluate the following idea on these ${DIMENSIONS.length} dimensions (score each 0-10 integer, and indicate which anchor matched: "10", "6", or "2"):
+
+${dimensionsList}
+
+DETERMINISTIC CHECK RESULTS (treat as facts you must respect):
+${deterministicFacts}
 
 Return ONLY valid JSON with this exact structure:
 {
   "ideaId": "${idea.id}",
   "dimensionScores": [
-    {"id": "hookStrength", "score": N, "explanation": "...", "whatWorks": "...", "needsImprovement": "..."},
-    ... (all 10 dimensions)
+    {"id": "hookStrength", "score": N, "anchorMatched": "10|6|2", "explanation": "...", "whatWorks": "...", "needsImprovement": "..."},
+    ... (all ${DIMENSIONS.length} dimensions)
   ],
   "criticalFindings": [
     {"title": "...", "explanation": "...", "evidence": "...", "suggestedFix": "..."}
@@ -417,9 +582,14 @@ Return ONLY valid JSON with this exact structure:
   "suggestions": [
     {"title": "...", "explanation": "...", "original": "...", "suggested": "..."}
   ],
-  "improvedHook": "...",
-  "storyImprovements": "...",
-  "improvedCaption": "..."
+  "fixesToReach10": [
+    {"fix": "...", "dimensionId": "...", "estimatedGain": N}
+  ],
+  "rewrittenHook": "...",
+  "duplicateOf": ["idea_id1", "idea_id2"],
+  "recommendedFormat": "reel|carousel|story|merge-into-series",
+  "seasonTag": "Diwali|Navratri|...",
+  "confidence": "high|medium|low"
 }
 
 Idea to evaluate:
@@ -438,18 +608,19 @@ Dialogue: ${idea.dialogue}
 Default Cast: ${JSON.stringify(idea.defaultCast)}
 Setting: ${idea.setting}
 Scene Detail: ${idea.sceneDetail}
+Post Format: ${idea.postFormat || 'Reel'}
 `;
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.3,
-      maxOutputTokens: 4000,
+      maxOutputTokens: 6000,
     },
   };
 
   let lastError = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const resp = await fetch(`${apiUrl}?key=${geminiApiKey}`, {
         method: 'POST',
@@ -470,7 +641,6 @@ Scene Detail: ${idea.sceneDetail}
       const data = await resp.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-      // Extract JSON from markdown code blocks if present
       let jsonText = text.trim();
       const jsonMatch = jsonText.match(/```json\n([\s\S]*?)\n```/) || jsonText.match(/```([\s\S]*?)```/) || [null, jsonText];
       jsonText = jsonMatch[1] || jsonText;
@@ -480,12 +650,12 @@ Scene Detail: ${idea.sceneDetail}
         return parsed;
       } catch (e) {
         lastError = `Invalid JSON: ${e.message}`;
-        if (attempt === 0) continue;
+        if (attempt < 2) continue;
         throw new Error(lastError);
       }
     } catch (e) {
       lastError = e.message;
-      if (attempt === 0) {
+      if (attempt < 2) {
         await new Promise(r => setTimeout(r, 2000));
         continue;
       }
@@ -495,50 +665,71 @@ Scene Detail: ${idea.sceneDetail}
   throw new Error(lastError || 'Unknown Gemini error');
 }
 
-function buildOnlineResult(idea, geminiResponse) {
-  const { validateGeminiResponse, computeWeightedScore, computeVerdict } = require('./schemas');
+function buildOnlineResult(idea, geminiResponse, allIdeas = []) {
   const validation = validateGeminiResponse(geminiResponse);
   if (!validation.valid) {
     throw new Error(`Gemini response validation failed: ${validation.error}`);
   }
 
-  const dims = geminiResponse.dimensionScores.map(d => ({
-    id: d.id,
-    name: DIMENSIONS.find(x => x.id === d.id)?.name || d.id,
-    weight: DIMENSIONS.find(x => x.id === d.id)?.weight || 0,
-    score: d.score,
-    explanation: d.explanation,
-    whatWorks: d.whatWorks,
-    needsImprovement: d.needsImprovement,
-  }));
+  const deterministicResults = runAllChecks(idea, allIdeas, 'online');
+  const gateResults = evaluateGates(idea, deterministicResults);
 
-  const overallScore = computeWeightedScore(dims);
-  const verdict = computeVerdict(overallScore);
-  const criticalCount = geminiResponse.criticalFindings?.length || 0;
-  const capEnabled = isCriticalCapEnabled();
-  const capThreshold = capEnabled ? getCriticalCapThreshold() : Infinity;
-  const capped = capEnabled && criticalCount > 0 && overallScore > capThreshold;
-  const finalScore = capped ? getCriticalCapScore() : overallScore;
-  const finalVerdict = capped ? getCriticalCapVerdict() : verdict;
+  const dims = geminiResponse.dimensionScores.map(d => {
+    const dimDef = DIMENSIONS.find(x => x.id === d.id);
+    return {
+      id: d.id,
+      name: dimDef?.name || d.id,
+      weight: dimDef?.weight || 0,
+      score: d.score,
+      anchorMatched: d.anchorMatched || '2',
+      explanation: d.explanation,
+      whatWorks: d.whatWorks,
+      needsImprovement: d.needsImprovement,
+    };
+  });
+
+  const rawScore = computeWeightedScore(dims);
+  const criticalFindings = geminiResponse.criticalFindings || [];
+  const majorFindings = geminiResponse.majorFindings || [];
+  const minorFindings = geminiResponse.minorFindings || [];
+  const suggestions = geminiResponse.suggestions || [];
+
+  const { cappedScore, cappedVerdict, capsApplied } = applyCaps(rawScore, criticalFindings, gateResults);
+  const verdict = determineVerdict(cappedScore, criticalFindings, majorFindings, capsApplied, cappedVerdict);
+
+  const fixesToReach10 = geminiResponse.fixesToReach10 || [];
+  const potentialScore = geminiResponse.potentialScore || Math.min(100, rawScore + fixesToReach10.reduce((sum, f) => sum + (f.estimatedGain || 0), 0));
+  const rewrittenHook = geminiResponse.rewrittenHook || '';
+  const duplicateOf = geminiResponse.duplicateOf || [];
+  const recommendedFormat = geminiResponse.recommendedFormat || 'reel';
+  const seasonTag = geminiResponse.seasonTag || '';
+  const confidence = geminiResponse.confidence || 'low';
 
   return {
     ideaId: idea.id,
     dimensionScores: dims,
-    overallScore: finalScore,
-    rawScore: overallScore,
-    scoreCapped: capped,
-    verdict: finalVerdict,
-    criticalFindings: geminiResponse.criticalFindings || [],
-    majorFindings: geminiResponse.majorFindings || [],
-    minorFindings: geminiResponse.minorFindings || [],
-    suggestions: geminiResponse.suggestions || [],
-    improvedHook: geminiResponse.improvedHook || '',
-    storyImprovements: geminiResponse.storyImprovements || '',
-    improvedCaption: geminiResponse.improvedCaption || '',
+    gateResults,
+    overallScore: cappedScore,
+    rawScore,
+    scoreCapped: capsApplied.length > 0,
+    capsApplied,
+    verdict,
+    criticalFindings,
+    majorFindings,
+    minorFindings,
+    suggestions,
+    fixesToReach10,
+    potentialScore,
+    rewrittenHook,
+    duplicateOf,
+    recommendedFormat,
+    seasonTag,
+    deterministicChecks: deterministicResults,
+    confidence,
     evaluationMode: 'online',
     evaluatedAt: new Date().toISOString(),
-    evaluationVersion: '1.0.0-online',
+    evaluationVersion: '2.0.0',
   };
 }
 
-module.exports = { buildEmptyDimensionScores, offlineEvaluate, onlineEvaluate, buildOnlineResult, CHARACTERS };
+module.exports = { buildEmptyDimensionScores, offlineEvaluate, onlineEvaluate, buildOnlineResult };

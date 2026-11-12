@@ -33,16 +33,82 @@ function loadSpec(specPath) {
     weight: d.weight,
     minScore: d.minScore,
     maxScore: d.maxScore,
+    description: d.description,
+    anchors: d.anchors,
   }));
 
   const weightTotal = dimensions.reduce((sum, d) => sum + d.weight, 0);
-  if (weightTotal !== 100) {
-    throw new Error(`Invalid shared evaluation spec at ${specPath}: dimension weights must total 100, got ${weightTotal}`);
+  const weightsMustSumTo = spec.scoring?.weightsMustSumTo ?? 100;
+  if (weightTotal !== weightsMustSumTo) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: dimension weights must total ${weightsMustSumTo}, got ${weightTotal}`);
+  }
+
+  for (const dim of dimensions) {
+    if (!dim.anchors || typeof dim.anchors !== 'object') {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: dimension ${dim.id} missing anchors`);
+    }
+    for (const key of ['10', '6', '2']) {
+      if (!dim.anchors[key] || typeof dim.anchors[key] !== 'string') {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: dimension ${dim.id} missing anchor ${key}`);
+      }
+    }
+  }
+
+  if (!Array.isArray(spec.gates) || spec.gates.length === 0) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: missing spec.gates`);
+  }
+
+  const gates = spec.gates.map(g => ({
+    id: g.id,
+    name: g.name,
+    description: g.description,
+    severityOnFail: g.severityOnFail,
+  }));
+
+  const gateIds = new Set(gates.map(g => g.id));
+  for (const gate of gates) {
+    if (!['critical', 'major', 'minor', 'suggestion'].includes(gate.severityOnFail)) {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: gate ${gate.id} has invalid severityOnFail: ${gate.severityOnFail}`);
+    }
   }
 
   if (!Array.isArray(spec.verdicts) || spec.verdicts.length === 0) {
     throw new Error(`Invalid shared evaluation spec at ${specPath}: missing spec.verdicts`);
   }
+
+  const verdicts = spec.verdicts.map(v => ({
+    id: v.id,
+    label: v.label,
+    minScore: v.minScore,
+    maxScore: v.maxScore,
+    description: v.description,
+    requires: v.requires || {},
+  }));
+
+  verdicts.sort((a, b) => b.minScore - a.minScore);
+
+  let prevMax = 100;
+  for (const v of verdicts) {
+    if (v.maxScore !== prevMax) {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ${v.id} maxScore ${v.maxScore} does not connect to previous minScore ${prevMax}`);
+    }
+    prevMax = v.minScore;
+  }
+  if (prevMax !== 0) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ranges do not cover 0-100 (gap at ${prevMax})`);
+  }
+
+  for (let i = 0; i < verdicts.length; i++) {
+    for (let j = i + 1; j < verdicts.length; j++) {
+      const a = verdicts[i];
+      const b = verdicts[j];
+      if (a.minScore <= b.maxScore && b.minScore <= a.maxScore) {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ranges overlap: ${a.id} (${a.minScore}-${a.maxScore}) and ${b.id} (${b.minScore}-${b.maxScore})`);
+      }
+    }
+  }
+
+  const dimensionIds = new Set(dimensions.map(d => d.id));
 
   const criticalCap = spec.criticalCap || { enabled: false };
   if (criticalCap.enabled === true) {
@@ -55,19 +121,57 @@ function loadSpec(specPath) {
     if (typeof criticalCap.cappedVerdict !== 'string') {
       throw new Error(`Invalid shared evaluation spec at ${specPath}: criticalCap.cappedVerdict must be a string when criticalCap.enabled is true`);
     }
+    const capVerdict = verdicts.find(v => v.label === criticalCap.cappedVerdict);
+    if (!capVerdict) {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: criticalCap.cappedVerdict "${criticalCap.cappedVerdict}" not found in verdicts`);
+    }
+  }
+
+  const additionalCaps = spec.additionalCaps || [];
+  for (const cap of additionalCaps) {
+    if (cap.enabled === true) {
+      if (typeof cap.cappedScore !== 'number') {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: additionalCap ${cap.id} cappedScore must be a number when enabled`);
+      }
+      if (typeof cap.cappedVerdict !== 'string') {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: additionalCap ${cap.id} cappedVerdict must be a string when enabled`);
+      }
+      const capVerdict = verdicts.find(v => v.label === cap.cappedVerdict);
+      if (!capVerdict) {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: additionalCap ${cap.id} cappedVerdict "${cap.cappedVerdict}" not found in verdicts`);
+      }
+      if (cap.condition?.includes('gate') && cap.condition?.includes('critical')) {
+        // condition references gate failure - validated at runtime
+      }
+    }
+  }
+
+  if (spec.deterministicChecks?.checks) {
+    for (const check of spec.deterministicChecks.checks) {
+      if (check.gate && !gateIds.has(check.gate)) {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: deterministic check ${check.id} references unknown gate ${check.gate}`);
+      }
+      if (check.dimensionId && !dimensionIds.has(check.dimensionId)) {
+        throw new Error(`Invalid shared evaluation spec at ${specPath}: deterministic check ${check.id} references unknown dimension ${check.dimensionId}`);
+      }
+    }
   }
 
   return {
     specPath,
+    spec,
     dimensions,
+    gates,
+    gateIds,
     severities: spec.severities.map(s => s.id),
-    verdicts: spec.verdicts.map(v => ({
-      id: v.id,
-      label: v.label,
-      minScore: v.minScore,
-      maxScore: v.maxScore,
-    })),
+    verdicts,
     criticalCap,
+    additionalCaps,
+    deterministicChecks: spec.deterministicChecks || { checks: [] },
+    calibration: spec.calibration || {},
+    performanceFeedback: spec.performanceFeedback || {},
+    audience: spec.audience || {},
+    scoring: spec.scoring || {},
   };
 }
 
@@ -82,12 +186,34 @@ try {
   }
 }
 
-const { dimensions, severities, verdicts, criticalCap } = loaded;
+const {
+  spec,
+  dimensions,
+  gates,
+  gateIds,
+  severities,
+  verdicts,
+  criticalCap,
+  additionalCaps,
+  deterministicChecks,
+  calibration,
+  performanceFeedback,
+  audience,
+  scoring,
+} = loaded;
 
 const DIMENSIONS = dimensions;
+const GATES = gates;
+const GATE_IDS = gateIds;
 const SEVERITIES = severities;
 const VERDICTS = verdicts;
 const CRITICAL_CAP = criticalCap;
+const ADDITIONAL_CAPS = additionalCaps;
+const DETERMINISTIC_CHECKS = deterministicChecks;
+const CALIBRATION = calibration;
+const PERFORMANCE_FEEDBACK = performanceFeedback;
+const AUDIENCE = audience;
+const SCORING = scoring;
 
 function validateDimensionScore(score) {
   return typeof score === 'number' && Number.isInteger(score) && score >= 0 && score <= 10;
@@ -97,6 +223,7 @@ function validateDimension(dim) {
   if (!dim || typeof dim !== 'object') return false;
   if (!validateDimensionScore(dim.score)) return false;
   if (typeof dim.explanation !== 'string' || dim.explanation.trim().length === 0) return false;
+  if (dim.anchorMatched && !['10', '6', '2'].includes(dim.anchorMatched)) return false;
   return true;
 }
 
@@ -107,6 +234,34 @@ function validateFinding(f) {
   if (typeof f.explanation !== 'string' || f.explanation.trim().length === 0) return false;
   if (typeof f.evidence !== 'string' || f.evidence.trim().length === 0) return false;
   if (typeof f.suggestedFix !== 'string' || f.suggestedFix.trim().length === 0) return false;
+  return true;
+}
+
+function validateGateResult(g) {
+  if (!g || typeof g !== 'object') return false;
+  if (typeof g.id !== 'string' || g.id.trim().length === 0) return false;
+  if (typeof g.name !== 'string' || g.name.trim().length === 0) return false;
+  if (typeof g.passed !== 'boolean') return false;
+  if (typeof g.severityOnFail !== 'string') return false;
+  if (typeof g.detail !== 'string') return false;
+  return true;
+}
+
+function validateFixToReach10(f) {
+  if (!f || typeof f !== 'object') return false;
+  if (typeof f.fix !== 'string' || f.fix.trim().length === 0) return false;
+  if (typeof f.dimensionId !== 'string' || f.dimensionId.trim().length === 0) return false;
+  if (typeof f.estimatedGain !== 'number') return false;
+  return true;
+}
+
+function validateDeterministicCheckResult(c) {
+  if (!c || typeof c !== 'object') return false;
+  if (typeof c.id !== 'string' || c.id.trim().length === 0) return false;
+  if (typeof c.passed !== 'boolean') return false;
+  if (typeof c.severity !== 'string' || !SEVERITIES.includes(c.severity)) return false;
+  if (typeof c.gate !== 'string' || c.gate.trim().length === 0) return false;
+  if (typeof c.detail !== 'string') return false;
   return true;
 }
 
@@ -148,8 +303,17 @@ function validateGeminiResponse(body) {
     return { valid: false, error: 'Missing suggestions array' };
   }
 
-  if (typeof body.improvedHook !== 'string') return { valid: false, error: 'Missing improvedHook' };
-  if (typeof body.storyImprovements !== 'string') return { valid: false, error: 'Missing storyImprovements' };
+  if (typeof body.fixesToReach10 !== 'undefined' && Array.isArray(body.fixesToReach10)) {
+    for (const f of body.fixesToReach10) {
+      if (!validateFixToReach10(f)) return { valid: false, error: 'Invalid fixesToReach10 entry' };
+    }
+  }
+
+  if (typeof body.rewrittenHook !== 'string') return { valid: false, error: 'Missing rewrittenHook' };
+  if (typeof body.duplicateOf !== 'undefined' && !Array.isArray(body.duplicateOf)) return { valid: false, error: 'duplicateOf must be array' };
+  if (typeof body.recommendedFormat !== 'string') return { valid: false, error: 'Missing recommendedFormat' };
+  if (typeof body.seasonTag !== 'undefined' && typeof body.seasonTag !== 'string') return { valid: false, error: 'seasonTag must be string' };
+  if (typeof body.confidence !== 'string' || !['high', 'medium', 'low'].includes(body.confidence)) return { valid: false, error: 'confidence must be high/medium/low' };
 
   return { valid: true };
 }
@@ -197,14 +361,38 @@ function getDimensionById(id) {
   return DIMENSIONS.find(d => d.id === id) || null;
 }
 
+function getGateById(id) {
+  return GATES.find(g => g.id === id) || null;
+}
+
+function getVerdictByLabel(label) {
+  return VERDICTS.find(v => v.label === label) || null;
+}
+
+function getVerdictRequires(verdictLabel) {
+  const v = getVerdictByLabel(verdictLabel);
+  return v?.requires || {};
+}
+
 module.exports = {
   DIMENSIONS,
+  GATES,
+  GATE_IDS,
   SEVERITIES,
   VERDICTS,
   CRITICAL_CAP,
+  ADDITIONAL_CAPS,
+  DETERMINISTIC_CHECKS,
+  CALIBRATION,
+  PERFORMANCE_FEEDBACK,
+  AUDIENCE,
+  SCORING,
   validateDimensionScore,
   validateDimension,
   validateFinding,
+  validateGateResult,
+  validateFixToReach10,
+  validateDeterministicCheckResult,
   validateGeminiResponse,
   computeWeightedScore,
   computeVerdict,
@@ -214,6 +402,9 @@ module.exports = {
   getCriticalCapVerdict,
   getDimensionCount,
   getDimensionById,
+  getGateById,
+  getVerdictByLabel,
+  getVerdictRequires,
   loadSpec,
   SPEC_PATH,
   DEPLOY_PATH,
