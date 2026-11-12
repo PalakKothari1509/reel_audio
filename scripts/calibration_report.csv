@@ -1,0 +1,123 @@
+id,title,rawScore,overallScore,verdict,capsApplied,confidence,gateFailures,evaluationMode,evaluationVersion,diff,score1,score2
+idea_1,"Meri Marzi!",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_2,"Chocolate Ke Badle Kya? 🍫",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_3,"Ruko, Dekho, Chalo! 🚦",85,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_4,"Ria Ka Safety Song 🎵",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_5,"Mumma Ka Haath Chhoota… Ria Kahan Gayi? 😰",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_6,"Rasoi Mein Ruko, Ria!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_7,"Main Khud! 👟",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_8,"Bas 5 Minute Aur?! 📱",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_9,"Mujhse Nahi Hoga! 🧱",81,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_10,"Cuty Gayab! Toys Ke Jungle Mein 😱",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_11,"Mere Pair, Mera Game!",82,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_12,"Brush Ka Naam Sunte Hi Ria Kambal Mein Gayab! 🪥",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_13,"Broccoli Dekhte Hi Ria Ne Plate Se Doori Bana Li! 🥦",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_14,"Park Se Ghar: Teen Bachche, Teen Reactions 😂",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_15,"7 Things Every Toddler Does 😂",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_16,"Ek Aur Story?!",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_17,"Neend Ka Evidence 😴",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_18,"Morning Checklist: Sock, Shirt, Bottle! ✅",82,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_19,"Ready Captain! Ria Ki Indecision 🎀",80,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_20,"Kaun Kha Gaya? Mystery! 🕵️‍♀️",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_21,"Mumma Ne Kaha Tha! 🗣️",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_22,"Supermarket Team! 🛒",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_23,"Brushing Ka Naya Style!",82,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_24,"Car Bhi Ghar Chalegi! 🚗",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_25,"Big Feelings, Torn Drawing 🎨",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_26,"Blocks Se Shoes Tak! 🧱👟",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_27,"No, Mine, Why — Emotion Validated! 🎭",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_28,"Cuty Stays Close — Scrape Care 🐰🩹",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_29,"Morning Mix-Up: Socks & Bow! 🧦🎀",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_30,"1 Galti, Bada Mess!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_31,"Store Mein Badi Mushkil!",82,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_32,"Mumma Bhi Thak Gayi!",85,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_33,"Tod Diya!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_34,"Music Sudden Ruko!",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_35,"Dabba Ban Gaya Rocket!",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_36,"Bijli Band Ho Gayi!",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_37,"Blocks Box Mein!",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_38,"Bhaago Mat? Dheere Chalo!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_39,"Pyaar Bhi, Rule Bhi",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_40,"Bag On Floor!",85,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_41,"Garden Se Ghar Kaise Laayein? 🌳",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82
+idea_42,"Quiet Corner: Jab Celebration Zyada Loud Ho ✨",81,81,"Ready to Post","",low,"",offline,2.0.0,0,81,81
+idea_43,"Garba Snack Boundary!",84,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_44,"Late Night Garba Vs Neend!",82,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_45,"Diwali Outfit Pehente Hi Ria Boli, “Mumma, Chubh Raha Hai!” ✨",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_46,"Archived — Generic Content",81,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_47,"Diwali Pooja Ka Time… Ria Abhi Ready Nahi! ✨",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82
+idea_48,"Crowd Mein Bachcha Safe! 🪔",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82
+idea_49,"Diwali Prep Mein Bachche Ko Kaise Shaamil Karein? 🪔",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82
+idea_50,"Plate Patana!",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_51,"Four Mothers Turned Around.",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_52,"It took her 9 minutes.",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_53,"Asking for Help, Staying Safe!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_54,"11:40pm. Still stitching.",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_55,"She is ""helping"" — ASMR style!",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_56,"Ghar Mein 2 Minute Ki Shanti... DANGER!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_57,"Ek Joota Gayab — 7:55 AM Panic!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_58,"Biscuit Toota — Duniya Khatam!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_59,"Phone Rakh Do!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_60,"Sabzi Rejection Form",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_61,"Can You Fix My Broken Heart?",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_62,"Mera Sab Kharab!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_63,"Ek Chhota Sa Saans",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_64,"Rio Copy Kar Raha Hai!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_65,"My Drawing Is Wrong!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_66,"Mumma Sun Leti Hai!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_67,"Ek Haath Ka Space",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_68,"There Are Butterflies in My Tummy!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_69,"I'm Dying of Boredom!",81,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_70,"Rio Ne Surprise Diya!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_71,"I Want to Eat the Whole World!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_72,"Plan: Perfect!",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_73,"Park Se Nikalna!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_74,"Wohi Toh Tha!",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_75,"Secret Agent Cuty!",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_76,"Safety First, Sparkle Always!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_77,"Saf Safai = Happy Diwali!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_78,"Rangoli Ki Rani — Imperfect Perfect!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_117,"Papa Ke Bag, Family Ka Bill! 🛍️😂",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_79,"Baal Ka Mahasangram!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_80,"Outfit Drama!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_81,"The Family Tree Surprise!",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_82,"Shopping Ka Jungle!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_83,"Office Wali Mumma vs WFH Mumma!",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_84,"Game Mode: Busy!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_85,"Calm Down Corner!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_86,"Mehfil vs Mess!",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_87,"Team Siblings!",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_88,"Confidence Hack Pack!",85,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_89,"Mumma Ke Chappal Mein Dhamaal! 👡",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_90,"Superhero Cape Towel!",83,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_91,"Papa Ka Makeover! 💄👨",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_92,"Fatela Pant Vs Daadi Ki Silai! 🧵",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_93,"Which One Doesn't Belong?",81,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_94,"Mumma Says This 100x a Day",85,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_95,"5-Minute Kitchen Challenge",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_96,"Ask Your Child This Tonight",84,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_97,"Play Ideas for 3-Year-Olds",77,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_98,"Toddler Mathematics",85,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_99,"Find the Hidden Cuty!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_100,"The Sock Hunt",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_101,"3 Questions to Ask Your Child Tonight",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_102,"5 Play Ideas for 4-Year-Olds!",79,79,"Needs Minor Fixes","",low,"",offline,2.0.0,0,79,79
+idea_103,"Three Types of Kids at Dinner",83,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_104,"What Comes Next? Two Rounds!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_105,"Tell Us What You Want!",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_106,"How to Play Each Mission With Household Items",81,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_107,"Your Ideas Matter!",84,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_108,"Mission 1: On Your Mark!",81,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_109,"Mission 2: Living Room Concert!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_110,"Mission 3: Art Corner Time!",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_111,"Mission 4: Case Open!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_112,"Mission 5: Rescue Time!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_113,"Mission 6: Treasure Hunt!",82,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_114,"Mission 7: Self-Care Squad!",84,59,"Needs Minor Fixes","criticalCap; gateFailureCap; majorGateFailureCap",low,"characterConsistency; brandAndSafety",offline,2.0.0,0,59,59
+idea_115,"7 Missions in 60 Seconds",81,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_116,"We Completed All 7 Missions! Here's What Happened",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_118,"Nasta! Nasta! — Little Helpers at Home 🥣",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82
+idea_119,"Robot Ka Aaj Ka Screen-Free Mission! 🤖",84,59,"Needs Major Rewrite","criticalCap; gateFailureCap",low,"brandAndSafety",offline,2.0.0,0,59,59
+idea_120,"Diwali Ki Safai Aur Mumma Ka Secret Kona! 🧹😂",84,84,"Ready to Post","",low,"",offline,2.0.0,0,84,84
+idea_121,"Building an AI-Powered Learning Page: 1,100 Followers",83,79,"Needs Minor Fixes","majorGateFailureCap",low,"characterConsistency",offline,2.0.0,0,79,79
+idea_122,"Ria Ki Bed Alag, Mumma Ki Cuddles Alag! ❤️",82,82,"Ready to Post","",low,"",offline,2.0.0,0,82,82

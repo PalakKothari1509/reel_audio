@@ -5,7 +5,7 @@ const { offlineEvaluate } = require('../tools/content_rating_web/backend/ratingE
 const IDEAS_PATH = path.resolve(__dirname, '../assets/data/content_ideas.json');
 const OUTPUT_PATH = path.resolve(__dirname, 'calibration_report.csv');
 
-function main() {
+async function main() {
   console.log('Loading content ideas...');
   const raw = fs.readFileSync(IDEAS_PATH, 'utf8');
   const data = JSON.parse(raw);
