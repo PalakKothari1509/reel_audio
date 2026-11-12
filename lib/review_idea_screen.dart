@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
+import 'characters.dart';
 import 'content_axes.dart';
 import 'content_library_service.dart';
 import 'prompt_vault.dart';
@@ -121,6 +122,14 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           const SizedBox(height: 8),
           _buildHealthCheck(idea),
 
+          // ── Character Lock Preview ───────────────────────────────
+          if (idea.characterIds.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            Text('8. Character Lock Preview', style: AppText.section),
+            const SizedBox(height: 8),
+            _buildCharacterLockPreview(idea),
+          ],
+
           // ── Actions ────────────────────────────────────────────
           const SizedBox(height: 24),
           _buildActions(idea),
@@ -197,49 +206,88 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
     );
   }
 
-  Widget _buildHealthCheck(ContentIdea idea) {
-    final checks = <_HealthCheck>[
-      _HealthCheck('Has opening hook', idea.opening.trim().isNotEmpty),
-      _HealthCheck('Has problem statement', idea.problem.trim().isNotEmpty),
-      _HealthCheck('Has learning outcome', idea.lesson.trim().isNotEmpty),
-      _HealthCheck('Has story detail', idea.storyDetail.trim().isNotEmpty),
-      _HealthCheck('Has cover hook', idea.caption.trim().isNotEmpty),
-      _HealthCheck('Has characters', idea.characterIds.isNotEmpty),
-      _HealthCheck('Status beyond idea', idea.status.index > IdeaStatus.idea.index),
-    ];
-
-    final passed = checks.where((c) => c.passed).length;
-    final total = checks.length;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Completeness: $passed / $total', style: AppText.body),
-        const SizedBox(height: 8),
-        ...checks.map((c) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            children: [
-              Icon(
-                c.passed ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: c.passed ? AppColors.success : AppColors.textSoft,
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              Text(c.label, style: AppText.body),
-            ],
-          ),
-        )),
-        if (passed == total) ...[
-          const SizedBox(height: 8),
-          Text('✅ Idea is ready for content generation', style: AppText.body.copyWith(color: AppColors.success)),
-        ] else ...[
-          const SizedBox(height: 8),
-          Text('⚠️ Complete missing fields before generating', style: AppText.body.copyWith(color: AppColors.warning)),
+  if (passed == total) ...[
+            const SizedBox(height: 8),
+            Text('✅ Idea is ready for content generation', style: AppText.body.copyWith(color: AppColors.success)),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text('⚠️ Complete missing fields before generating', style: AppText.body.copyWith(color: AppColors.warning)),
+          ],
         ],
-      ],
-    );
+      );
+    }
   }
+
+  /// Build a read-only character lock preview using the existing CharacterLibrary
+  Widget _buildCharacterLockPreview(ContentIdea idea) {
+    if (idea.characterIds.isEmpty) return const SizedBox.shrink();
+
+    final characterLocks = <Widget>[];
+    for (final characterId in idea.characterIds) {
+      final lock = CharacterLibrary.characterLockFor(characterId);
+      if (lock != null) {
+        characterLocks.add(
+          Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                        child: Text(
+                          lock.name.isNotEmpty ? lock.name[0].toUpperCase() : '?',
+                          style: AppText.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(lock.name, style: AppText.body.copyWith(fontWeight: FontWeight.bold)),
+                            Text('Age: ${lock.age}', style: AppText.hint),
+                            Text('Gender: ${lock.gender}', style: AppText.hint),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (lock.visualDescription.isNotEmpty)
+                    Text('Appearance: ${lock.visualDescription}', style: AppText.body),
+                  if (lock.personality.isNotEmpty)
+                    Text('Personality: ${lock.personality}', style: AppText.body),
+                  if (lock.voiceDescription.isNotEmpty)
+                    Text('Voice: ${lock.voiceDescription}', style: AppText.body),
+                  if (lock.mannerisms.isNotEmpty)
+                    Text('Mannerisms: ${lock.mannerisms}', style: AppText.body),
+                  if (lock.catchphrases.isNotEmpty)
+                    Text('Catchphrases: ${lock.catchphrases.join(", ")}', style: AppText.body),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+      if (characterLocks.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text('Character lock details not available for selected characters.', style: AppText.hint),
+        );
+      }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: characterLocks,
+      );
+    }
 
   Widget _buildActions(ContentIdea idea) {
     final actions = <Widget>[];
@@ -278,7 +326,16 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       onTap: _isGeneratingScript ? null : () { _generateScript(idea); },
     ));
 
-    if (_generatedScript != null && _generatedScript!.isNotEmpty) {
+    // Load and show saved script actions
+    final savedScripts = _getSavedScripts(idea.id);
+    if (savedScripts.isNotEmpty) {
+      actions.add(_actionButton(
+        icon: Icons.visibility_outlined,
+        label: 'View Script',
+        color: AppColors.warning,
+        onTap: () => _showSavedScriptsDialog(idea),
+      ));
+    } else if (_generatedScript != null && _generatedScript!.isNotEmpty) {
       actions.add(_actionButton(
         icon: Icons.visibility_outlined,
         label: 'View Script',
@@ -376,7 +433,10 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
         _status = '';
       });
       if (!mounted) return;
-      _showScriptDialog();
+      // Save the generated script
+      await _saveScript(idea, script);
+      if (!mounted) return;
+      _showScriptDialog(script: script);
     } catch (e) {
       setState(() {
         _isGeneratingScript = false;
@@ -401,7 +461,88 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
     return buffer.toString();
   }
 
-  void _showScriptDialog() {
+  },
+    );
+  }
+
+  /// Load all saved scripts for the given contentId
+  Future<List<SavedPrompt>> _getSavedScripts(String contentId) async {
+    final prompts = await PromptVault.getByContentId(contentId);
+    return prompts.where((p) => p.type == PromptType.script).toList();
+  }
+
+  /// Save the generated script to the PromptVault
+  Future<void> _saveScript(ContentIdea idea, String script) async {
+    try {
+      await PromptVault.saveWithVersion(
+        contentId: idea.id,
+        title: 'Script: ${widget.idea?.title ?? idea.title}',
+        type: PromptType.script,
+        promptText: _generatedScript ?? '',
+        metadata: {
+          'characters': idea.characterIds,
+          'setting': 'auto-generated',
+        },
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Script saved')),
+      );
+      setState(() {});
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save script: $e')),
+      );
+    }
+  }
+
+  /// Show dialog with all saved scripts for this idea
+  Future<void> _showSavedScriptsDialog(ContentIdea idea) async {
+    final scripts = await _getSavedScripts(idea.id);
+    if (!mounted) return;
+
+    if (scripts.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No saved scripts for this idea')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Saved Scripts'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: ListView.separated(
+            itemCount: scripts.length,
+            separatorBuilder: (_, _) => const Divider(height: 1),
+            itemBuilder: (ctx, i) {
+              final p = scripts[i];
+              return ListTile(
+                title: Text(p.title, style: const TextStyle(fontSize: 13)),
+                subtitle: Text('v${p.version} • ${p.updatedAt.toLocal().toString().split('.').first}'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showScriptDialog(script: p.promptText);
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+        ],
+      ),
+    );
+  }
+
+  /// Show the script dialog with the given script content
+  /// Show the script dialog with the given script content
+  void _showScriptDialog({String? script}) {
+    final displayScript = script ?? _generatedScript ?? '';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -411,7 +552,7 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
           height: 400,
           child: SingleChildScrollView(
             child: Text(
-              _generatedScript ?? '',
+              script ?? _generatedScript ?? '',
               style: const TextStyle(fontSize: 13, height: 1.5),
             ),
           ),
