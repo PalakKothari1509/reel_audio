@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'api_key_store.dart';
 import 'content_studio_service.dart';
+import 'gemini_video_master_prompt.dart';
 import 'idea_input_screen.dart';
 import 'prompt_preview.dart';
 
@@ -249,4 +250,47 @@ void _showError(BuildContext context, Object error) {
   ScaffoldMessenger.of(
     context,
   ).showSnackBar(SnackBar(content: Text('Could not generate content: $error')));
+}
+
+String buildImageGenerationPrompt({
+  required String idea,
+  required List<String> characters,
+  String additionalInstructions = '',
+}) {
+  final characterLock = _buildCharacterLock(characters);
+  return '''
+Generate an image prompt for the following story idea:
+
+IDEA: $idea
+
+CHARACTERS: ${characters.join(', ')}
+
+CHARACTER LOCK:
+$characterLock
+
+ADDITIONAL INSTRUCTIONS: $additionalInstructions
+
+VISUAL STYLE:
+Soft 3D Pixar-Disney animation style, vertical 9:16, warm natural lighting, semi-realistic quality, cream background.
+
+NEGATIVE INSTRUCTIONS:
+No distorted hands or anatomy, no floating objects, no blurry faces.
+NO on-screen text of any kind: no captions, titles, subtitles, speech bubbles, readable signs, logos or watermarks. Text is added later in the editor.
+No closing card, moral, quote or summary at the end.
+
+OUTPUT FORMAT:
+Return a JSON object with these fields:
+{
+  "prompt": "The complete image generation prompt text",
+  "negativePrompt": "Negative prompt for the image generator"
+}
+''';
+}
+
+String _buildCharacterLock(List<String> characters) {
+  final buffer = StringBuffer();
+  for (final c in characters) {
+    buffer.writeln('- $c');
+  }
+  return buffer.toString();
 }

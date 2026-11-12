@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'content_axes.dart';
 import 'content_library_service.dart';
+import 'content_studio_service.dart';
+import 'evaluation_result_screen.dart';
 import 'prompt_vault.dart';
 import 'quality_check_center.dart';
 import 'story_generator_offline.dart';
@@ -269,6 +271,14 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       onTap: () {
         widget.onCreateContent?.call();
       },
+    ));
+
+    // ── Evaluate Idea ──────────────────────────────────────────────
+    actions.add(_actionButton(
+      icon: Icons.analytics_outlined,
+      label: 'Evaluate Idea',
+      color: AppColors.accent,
+      onTap: () => _evaluateIdea(idea),
     ));
 
     actions.add(_actionButton(
@@ -580,6 +590,91 @@ class _ReviewIdeaScreenState extends State<ReviewIdeaScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('❌ Quality check failed: $e')),
+      );
+    }
+  }
+
+  Future<void> _evaluateIdea(ContentIdea idea) async {
+    setState(() {
+      _loading = true;
+      _status = 'Evaluating idea with browser Content Rating Tool...';
+    });
+    try {
+      final evaluation = await evaluateIdea(
+        idea: idea.problem.isNotEmpty ? idea.problem : idea.title,
+        onWait: (status) {
+          if (mounted) setState(() => _status = status);
+        },
+      );
+      if (!mounted) return;
+      // Navigate to the evaluation result screen with the original idea text
+      // We need to pass the original idea text that was evaluated
+      final originalIdeaText = idea.problem.isNotEmpty ? idea.problem : idea.title;
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EvaluationResultScreen(
+            ideaId: idea.id,
+            originalIdea: originalIdeaText,
+            contentIdea: idea,
+          ),
+        ),
+      );
+    } on EvaluationUnavailableException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _status = '';
+      });
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.cloud_off, color: AppColors.danger),
+              const SizedBox(width: 8),
+              const Text('Evaluation Unavailable'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(e.message, style: AppText.body),
+              const SizedBox(height: 12),
+              Text(
+                'Your idea has been preserved. You can retry when the browser evaluator is available.',
+                style: AppText.hint,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _evaluateIdea(idea);
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _status = '';
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Evaluation failed: $e')),
       );
     }
   }
