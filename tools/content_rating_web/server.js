@@ -136,17 +136,17 @@ app.post('/api/evaluate/:id', async (req, res) => {
       return res.status(400).json({ error: 'Gemini API key not configured' });
     }
     try {
-      const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY);
+      const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY, data.ideas);
       const validation = validateGeminiResponse(geminiResponse);
       if (!validation.valid) {
         return res.status(422).json({ error: validation.error, raw: geminiResponse });
       }
-      result = buildOnlineResult(idea, geminiResponse);
+      result = buildOnlineResult(idea, geminiResponse, data.ideas);
     } catch (e) {
       return res.status(502).json({ error: `Gemini evaluation failed: ${e.message}` });
     }
   } else {
-    result = offlineEvaluate(idea);
+    result = offlineEvaluate(idea, data.ideas);
   }
 
   const saved = saveRating(result);
@@ -186,7 +186,7 @@ app.post(`${API_BASE_PATH}/evaluate`, authenticate, requireRole(), asyncHandler(
 
   const existingEvalRow = dbGet(
     `SELECT * FROM evaluations WHERE itemId = ? AND contentHash = ? AND hashVersion = ? AND evaluationVersion = ? AND evaluationPolicyVersion = ? AND evaluationMode = ? LIMIT 1`,
-    existingItem.itemId, contentHash, hashVersion, '1.2.0-offline', '1.0.0', evaluationMode
+    existingItem.itemId, contentHash, hashVersion, '2.0.0', '2.0.0', evaluationMode
   );
 
   let evaluationId;
@@ -219,8 +219,8 @@ app.post(`${API_BASE_PATH}/evaluate`, authenticate, requireRole(), asyncHandler(
       itemId: existingItem.itemId,
       contentHash,
       hashVersion,
-      evaluationVersion: '1.2.0-offline',
-      evaluationPolicyVersion: '1.0.0',
+      evaluationVersion: '2.0.0',
+      evaluationPolicyVersion: '2.0.0',
       evaluationMode,
       overallScore: result.overallScore,
       rawScore: result.rawScore,
@@ -623,11 +623,11 @@ app.get('/api/export/json', (_req, res) => {
 app.get('/api/export/csv', (_req, res) => {
   const ratings = listRatings();
   const headers = [
-    'ideaId', 'title', 'category', 'overallScore', 'verdict',
-    'hookStrength', 'relatability', 'storyStructure', 'ageAppropriateness',
-    'hinglishNaturalness', 'characterConsistency', 'visualFeasibility',
-    'soundOffReadability', 'engagementPotential', 'brandAndSafety',
-    'criticalCount', 'majorCount', 'minorCount', 'evaluationMode', 'evaluatedAt',
+    'ideaId', 'title', 'category', 'overallScore', 'rawScore', 'verdict', 'scoreCapped', 'capsApplied', 'evaluationVersion', 'evaluationMode',
+    'hookStrength', 'relatabilityAudienceFit', 'payoffRetention', 'hinglishNaturalness',
+    'visualFeasibility', 'soundOffReadability', 'shareSaveTrigger', 'captionCommentPackage',
+    'originality', 'audioHook',
+    'criticalCount', 'majorCount', 'minorCount', 'confidence', 'potentialScore', 'recommendedFormat', 'duplicateOf', 'seasonTag', 'evaluatedAt',
   ];
 
   let ideasMap = {};
@@ -647,21 +647,30 @@ app.get('/api/export/csv', (_req, res) => {
       `"${(idea.title || '').replace(/"/g, '""')}"`,
       `"${(idea.category || '').replace(/"/g, '""')}"`,
       r.overallScore,
+      r.rawScore,
       `"${r.verdict}"`,
+      r.scoreCapped,
+      `"${(r.capsApplied || []).join('; ')}"`,
+      r.evaluationVersion,
+      r.evaluationMode,
       dims.hookStrength || 0,
-      dims.relatability || 0,
-      dims.storyStructure || 0,
-      dims.ageAppropriateness || 0,
+      dims.relatabilityAudienceFit || dims.relatability || 0,
+      dims.payoffRetention || dims.storyStructure || 0,
       dims.hinglishNaturalness || 0,
-      dims.characterConsistency || 0,
       dims.visualFeasibility || 0,
       dims.soundOffReadability || 0,
-      dims.engagementPotential || 0,
-      dims.brandAndSafety || 0,
+      dims.shareSaveTrigger || dims.engagementPotential || 0,
+      dims.captionCommentPackage || 0,
+      dims.originality || 0,
+      dims.audioHook || 0,
       r.criticalFindings?.length || 0,
       r.majorFindings?.length || 0,
       r.minorFindings?.length || 0,
-      r.evaluationMode,
+      r.confidence || '',
+      r.potentialScore || '',
+      r.recommendedFormat || '',
+      `"${(r.duplicateOf || []).join('; ')}"`,
+      r.seasonTag || '',
       r.evaluatedAt,
     ];
     lines.push(row.join(','));
@@ -669,7 +678,7 @@ app.get('/api/export/csv', (_req, res) => {
 
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=content_ratings.csv');
-  res.send(lines.join(','));
+  res.send(lines.join('\n'));
 });
 
 app.get('/api/health', (_req, res) => {
