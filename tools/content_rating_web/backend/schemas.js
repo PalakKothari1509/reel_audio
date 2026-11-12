@@ -87,15 +87,15 @@ function loadSpec(specPath) {
 
   verdicts.sort((a, b) => b.minScore - a.minScore);
 
-  let prevMax = 100;
+  let prevMin = 101;
   for (const v of verdicts) {
-    if (v.maxScore !== prevMax) {
-      throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ${v.id} maxScore ${v.maxScore} does not connect to previous minScore ${prevMax}`);
+    if (v.maxScore !== prevMin - 1) {
+      throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ${v.id} maxScore ${v.maxScore} does not connect to previous minScore ${prevMin} (expected ${prevMin - 1})`);
     }
-    prevMax = v.minScore;
+    prevMin = v.minScore;
   }
-  if (prevMax !== 0) {
-    throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ranges do not cover 0-100 (gap at ${prevMax})`);
+  if (prevMin !== 0) {
+    throw new Error(`Invalid shared evaluation spec at ${specPath}: verdict ranges do not cover 0-100 (gap at ${prevMin})`);
   }
 
   for (let i = 0; i < verdicts.length; i++) {

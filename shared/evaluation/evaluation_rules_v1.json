@@ -1,0 +1,108 @@
+{
+  "$schema": "evaluation_rules.schema.json",
+  "spec": {
+    "id": "shared-evaluation-rules",
+    "version": "1.0.0",
+    "title": "Shared Content Evaluation Rules",
+    "description": "Single source of truth for content evaluation configuration shared between Flutter and Browser platforms.",
+    "sources": {
+      "browser": "tools/content_rating_web/backend/schemas.js",
+      "browserEngine": "tools/content_rating_web/backend/ratingEngine.js",
+      "flutter": "lib/quality_check.dart and lib/content_quality_gate.dart (untouched, future migration)"
+    },
+    "generatedAt": "2026-11-04T12:15:00Z"
+  },
+  "dimensions": [
+    { "id": "hookStrength", "name": "Hook Strength", "weight": 15, "description": "Opening hook strength and engagement potential", "minScore": 0, "maxScore": 10 },
+    { "id": "relatability", "name": "Relatability", "weight": 15, "description": "How relatable the content is to the target audience", "minScore": 0, "maxScore": 10 },
+    { "id": "storyStructure", "name": "Story Structure", "weight": 12, "description": "Narrative arc completeness (story, twist, resolution, moral, ending)", "minScore": 0, "maxScore": 10 },
+    { "id": "ageAppropriateness", "name": "Age Appropriateness", "weight": 10, "description": "Suitability for children aged 1-4", "minScore": 0, "maxScore": 10 },
+    { "id": "hinglishNaturalness", "name": "Hinglish Naturalness", "weight": 10, "description": "Natural use of Hinglish in dialogue and text", "minScore": 0, "maxScore": 10 },
+    { "id": "characterConsistency", "name": "Character Consistency", "weight": 8, "description": "Approved character names used consistently (Ria, Rio, Cuty, Mumma, Papa, Daadi, Robot, Teacher)", "minScore": 0, "maxScore": 10 },
+    { "id": "visualFeasibility", "name": "Visual Feasibility", "weight": 8, "description": "How feasible the content is to visualize and produce", "minScore": 0, "maxScore": 10 },
+    { "id": "soundOffReadability", "name": "Sound-Off Readability", "weight": 7, "description": "Content understandable without audio (captions, overlay text)", "minScore": 0, "maxScore": 10 },
+    { "id": "engagementPotential", "name": "Engagement Potential", "weight": 8, "description": "Likelihood of comments, saves, shares", "minScore": 0, "maxScore": 10 },
+    { "id": "brandAndSafety", "name": "Brand and Safety", "weight": 7, "description": "Brand safety, no unsafe language or behavior depicted", "minScore": 0, "maxScore": 10 }
+  ],
+  "scoring": {
+    "dimensionMaxScore": 10,
+    "maxTotalScore": 100,
+    "formula": "sum((dimensionScore / dimensionMaxScore) * dimensionWeight), rounded to nearest integer",
+    "rounding": "nearest"
+  },
+  "verdicts": [
+    { "id": "ready_to_post", "label": "Ready to Post", "minScore": 80, "maxScore": 100, "description": "Content is ready to publish" },
+    { "id": "needs_minor_fixes", "label": "Needs Minor Fixes", "minScore": 65, "maxScore": 79, "description": "Content needs minor improvements before publishing" },
+    { "id": "needs_major_rewrite", "label": "Needs Major Rewrite", "minScore": 45, "maxScore": 64, "description": "Content needs significant rework" },
+    { "id": "reject", "label": "Reject", "minScore": 0, "maxScore": 44, "description": "Content should not be published" }
+  ],
+  "criticalCap": {
+    "enabled": true,
+    "condition": "critical findings count > 0 AND raw score > capThreshold",
+    "capThreshold": 59,
+    "cappedScore": 59,
+    "cappedVerdict": "Needs Major Rewrite",
+    "description": "When critical findings exist, the final score is capped at 59 and the verdict is forced to Needs Major Rewrite, regardless of the raw weighted score."
+  },
+  "severities": [
+    { "id": "critical", "label": "Critical", "description": "Safety violation or severe issue that must be fixed", "blocksPublishing": true },
+    { "id": "major", "label": "Major", "description": "Significant issue that should be addressed", "blocksPublishing": false },
+    { "id": "minor", "label": "Minor", "description": "Minor improvement opportunity", "blocksPublishing": false },
+    { "id": "suggestion", "label": "Suggestion", "description": "Optional improvement suggestion", "blocksPublishing": false }
+  ],
+  "resultContract": {
+    "fields": [
+      { "name": "ideaId", "type": "string", "required": true, "description": "Unique identifier of the evaluated idea" },
+      { "name": "dimensionScores", "type": "array", "required": true, "description": "Array of dimension score objects, one per configured dimension", "itemSchema": { "id": "string", "name": "string", "weight": "number", "score": "number (0-10, integer)", "explanation": "string", "whatWorks": "string", "needsImprovement": "string" } },
+      { "name": "overallScore", "type": "number", "required": true, "description": "Final weighted score after critical cap (0-100)" },
+      { "name": "rawScore", "type": "number", "required": true, "description": "Raw weighted score before critical cap (0-100)" },
+      { "name": "scoreCapped", "type": "boolean", "required": true, "description": "Whether the score was capped due to critical findings" },
+      { "name": "verdict", "type": "string", "required": true, "description": "Overall verdict label" },
+      { "name": "criticalFindings", "type": "array", "required": true, "description": "Array of critical severity findings" },
+      { "name": "majorFindings", "type": "array", "required": true, "description": "Array of major severity findings" },
+      { "name": "minorFindings", "type": "array", "required": true, "description": "Array of minor severity findings" },
+      { "name": "suggestions", "type": "array", "required": true, "description": "Array of improvement suggestions" },
+      { "name": "evaluationMode", "type": "string", "required": true, "description": "offline or online" },
+      { "name": "evaluatedAt", "type": "string", "required": true, "description": "ISO 8601 timestamp" },
+      { "name": "evaluationVersion", "type": "string", "required": true, "description": "Engine version string" }
+    ]
+  },
+  "conflicts": {
+    "description": "Known differences between Flutter and Browser evaluation systems that were NOT resolved in this shared specification. Flutter files remain untouched.",
+    "flutterQualityChecker": {
+      "file": "lib/quality_check.dart",
+      "scoringModel": "passCount / totalCount (0.0 to 1.0)",
+      "ruleCount": 42,
+      "severities": ["pass", "warn", "fail"],
+      "readyToPostRule": "failCount == 0",
+      "dimensions": "None - rules are not grouped into weighted dimensions",
+      "verdicts": "Boolean readyToPost only",
+      "criticalCap": "None",
+      "status": "Flutter file untouched. Future migration will map these rules to shared dimensions."
+    },
+    "flutterQualityGate": {
+      "file": "lib/content_quality_gate.dart",
+      "scoringModel": "None - PASS/FAIL/UNKNOWN verdicts only",
+      "dimensions": ["strategy", "creative", "production", "performance"],
+      "verdicts": ["PASS", "FAIL", "UNKNOWN"],
+      "readyToGenerateRule": "All checks PASS, no FAILs",
+      "criticalCap": "None",
+      "status": "Flutter file untouched. Separate system from the shared browser specification."
+    },
+    "browser": {
+      "file": "tools/content_rating_web/backend/schemas.js and ratingEngine.js",
+      "scoringModel": "Weighted 0-100 score from 10 dimensions",
+      "ruleCount": 10,
+      "severities": ["critical", "major", "minor", "suggestion"],
+      "verdicts": ["Ready to Post", "Needs Minor Fixes", "Needs Major Rewrite", "Reject"],
+      "criticalCap": "Score capped at 59 if critical findings exist and raw score > 59",
+      "status": "Browser engine updated to use this shared specification."
+    },
+    "unresolved": [
+      "Flutter QualityChecker rules (42 code-based rules) cannot be expressed as JSON configuration - they remain in Dart code.",
+      "Flutter QualityGate PASS/FAIL/UNKNOWN model differs from Browser's weighted scoring model - no common verdict schema defined.",
+      "Flutter reach dimensions (reach_hook_strength, etc.) are warn-only heuristics, not scored dimensions.",
+      "Browser online evaluation uses Gemini API; Flutter has no equivalent online evaluation in the quality gate."
+    ]
+  }
+}

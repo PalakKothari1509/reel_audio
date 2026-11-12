@@ -1,0 +1,13 @@
+{
+  "names": ["Ria", "Rio", "Cuty", "Mumma", "Papa", "Daadi", "Robot", "Teacher"],
+  "pronouns": {
+    "Ria": "she",
+    "Rio": "he",
+    "Cuty": "she",
+    "Mumma": "she",
+    "Papa": "he",
+    "Daadi": "she",
+    "Robot": "it",
+    "Teacher": "any"
+  }
+}

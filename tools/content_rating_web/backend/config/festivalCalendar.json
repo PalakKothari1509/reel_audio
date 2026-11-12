@@ -1,0 +1,14 @@
+{
+  "festivals": [
+    {
+      "name": "Diwali",
+      "keywords": ["diwali", "diya", "rangoli", "phataka"],
+      "dates": []
+    },
+    {
+      "name": "Navratri",
+      "keywords": ["navratri", "garba", "dandiya"],
+      "dates": []
+    }
+  ]
+}

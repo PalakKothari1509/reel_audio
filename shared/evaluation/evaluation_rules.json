@@ -278,21 +278,21 @@
         "name": "Generic Pinned Comment",
         "description": "Compares pinnedComment against genericPinnedComments.json templates using normalized substring/fuzzy match",
         "severity": "minor",
-        "gate": "captionCommentPackage"
+        "gate": "formatFit"
       },
       {
         "id": "pinnedCommentMismatch",
         "name": "Pinned Comment Story Mismatch",
         "description": "Tokenizes pinnedComment and story fields; flags if keyword overlap with title/problem/storyDetail is below threshold (default 1 shared meaningful keyword)",
         "severity": "minor",
-        "gate": "captionCommentPackage"
+        "gate": "formatFit"
       },
       {
         "id": "captionStoryMismatch",
         "name": "Caption Story Mismatch",
         "description": "Tokenizes caption and story fields; flags if keyword overlap with title/problem/storyDetail is below 15% threshold",
         "severity": "minor",
-        "gate": "captionCommentPackage"
+        "gate": "formatFit"
       },
       {
         "id": "openingCastMismatch",
@@ -320,35 +320,35 @@
         "name": "Text Beat Density",
         "description": "Parses On-Screen Text: lines with [a-b]s timestamps; flags >7 beats or >1 beat per 2.5s",
         "severity": "minor",
-        "gate": "visualFeasibility"
+        "gate": "formatFit"
       },
       {
         "id": "durationCheck",
         "name": "Duration Check",
         "description": "Infers duration from last timestamp; flags outside 15-30s",
         "severity": "minor",
-        "gate": "visualFeasibility"
+        "gate": "formatFit"
       },
       {
         "id": "repeatedEndSlate",
         "name": "Repeated End Slate",
         "description": "Flags if final overlay text appears in >50% of library",
         "severity": "suggestion",
-        "gate": "originality"
+        "gate": "formatFit"
       },
       {
         "id": "hashtagCount",
         "name": "Hashtag Count",
         "description": "Validates 3-5 hashtags in caption",
         "severity": "minor",
-        "gate": "captionCommentPackage"
+        "gate": "formatFit"
       },
       {
         "id": "duplicateSimilarity",
         "name": "Duplicate Similarity",
         "description": "Online: embedding cosine similarity >0.8. Offline: TF-IDF cosine on title+problem+storyDetail with configurable threshold. Returns duplicateOf ids.",
         "severity": "major",
-        "gate": "originality"
+        "gate": "formatFit"
       },
       {
         "id": "seasonality",
@@ -362,7 +362,7 @@
         "name": "Typo Check",
         "description": "Lightweight check on on-screen text/dialogue; small allow-list for valid Hinglish words",
         "severity": "suggestion",
-        "gate": "hinglishNaturalness"
+        "gate": "formatFit"
       }
     ]
   },

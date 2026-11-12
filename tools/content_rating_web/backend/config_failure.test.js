@@ -15,16 +15,22 @@ function writeTempSpec(content) {
 function validSpec() {
   return JSON.stringify({
     dimensions: [
-      { id: 'hookStrength', name: 'Hook Strength', weight: 15, minScore: 0, maxScore: 10 },
-      { id: 'relatability', name: 'Relatability', weight: 15, minScore: 0, maxScore: 10 },
-      { id: 'storyStructure', name: 'Story Structure', weight: 12, minScore: 0, maxScore: 10 },
-      { id: 'ageAppropriateness', name: 'Age Appropriateness', weight: 10, minScore: 0, maxScore: 10 },
-      { id: 'hinglishNaturalness', name: 'Hinglish Naturalness', weight: 10, minScore: 0, maxScore: 10 },
-      { id: 'characterConsistency', name: 'Character Consistency', weight: 8, minScore: 0, maxScore: 10 },
-      { id: 'visualFeasibility', name: 'Visual Feasibility', weight: 8, minScore: 0, maxScore: 10 },
-      { id: 'soundOffReadability', name: 'Sound-Off Readability', weight: 7, minScore: 0, maxScore: 10 },
-      { id: 'engagementPotential', name: 'Engagement Potential', weight: 8, minScore: 0, maxScore: 10 },
-      { id: 'brandAndSafety', name: 'Brand and Safety', weight: 7, minScore: 0, maxScore: 10 },
+      { id: 'hookStrength', name: 'Hook Strength', weight: 15, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'relatabilityAudienceFit', name: 'Relatability', weight: 15, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'payoffRetention', name: 'Story Structure', weight: 14, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'hinglishNaturalness', name: 'Hinglish Naturalness', weight: 10, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'visualFeasibility', name: 'Visual Feasibility', weight: 10, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'soundOffReadability', name: 'Sound-Off Readability', weight: 8, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'shareSaveTrigger', name: 'Engagement Potential', weight: 8, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'captionCommentPackage', name: 'Caption Package', weight: 8, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'originality', name: 'Originality', weight: 7, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+      { id: 'audioHook', name: 'Audio Hook', weight: 5, minScore: 0, maxScore: 10, anchors: { '10': 'a', '6': 'b', '2': 'c' } },
+    ],
+    gates: [
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', description: 'Age check', severityOnFail: 'critical' },
+      { id: 'characterConsistency', name: 'Character Consistency', description: 'Character check', severityOnFail: 'major' },
+      { id: 'brandAndSafety', name: 'Brand & Safety', description: 'Brand check', severityOnFail: 'critical' },
+      { id: 'formatFit', name: 'Format Fit', description: 'Format check', severityOnFail: 'major' },
     ],
     verdicts: [
       { id: 'ready_to_post', label: 'Ready to Post', minScore: 80, maxScore: 100 },
@@ -38,6 +44,8 @@ function validSpec() {
       cappedScore: 59,
       cappedVerdict: 'Needs Major Rewrite',
     },
+    additionalCaps: [],
+    deterministicChecks: { checks: [] },
     severities: [
       { id: 'critical', label: 'Critical', blocksPublishing: true },
       { id: 'major', label: 'Major', blocksPublishing: false },
@@ -74,11 +82,27 @@ test('loadSpec throws explicit error when dimension weights do not total 100', (
   fs.rmSync(path.dirname(file), { recursive: true, force: true });
 });
 
+test('loadSpec throws explicit error when dimension missing anchors', () => {
+  const spec = JSON.parse(validSpec());
+  delete spec.dimensions[0].anchors;
+  const file = writeTempSpec(JSON.stringify(spec));
+  assert.throws(() => loadSpec(file), /missing anchors/);
+  fs.rmSync(path.dirname(file), { recursive: true, force: true });
+});
+
 test('loadSpec throws explicit error when verdicts is missing', () => {
   const spec = JSON.parse(validSpec());
   delete spec.verdicts;
   const file = writeTempSpec(JSON.stringify(spec));
   assert.throws(() => loadSpec(file), /missing spec\.verdicts/);
+  fs.rmSync(path.dirname(file), { recursive: true, force: true });
+});
+
+test('loadSpec throws explicit error when gates is missing', () => {
+  const spec = JSON.parse(validSpec());
+  delete spec.gates;
+  const file = writeTempSpec(JSON.stringify(spec));
+  assert.throws(() => loadSpec(file), /missing spec\.gates/);
   fs.rmSync(path.dirname(file), { recursive: true, force: true });
 });
 
@@ -114,6 +138,7 @@ test('loadSpec succeeds with valid spec and returns all expected fields', () => 
   const result = loadSpec(file);
   assert.equal(result.dimensions.length, 10);
   assert.equal(result.verdicts.length, 4);
+  assert.equal(result.gates.length, 4);
   assert.equal(result.criticalCap.enabled, true);
   assert.equal(result.criticalCap.capThreshold, 59);
   assert.equal(result.criticalCap.cappedScore, 59);
