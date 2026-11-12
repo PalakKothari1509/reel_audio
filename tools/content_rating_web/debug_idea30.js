@@ -1,0 +1,14 @@
+const { offlineEvaluate } = require('./backend/ratingEngine');
+const fs = require('fs');
+const path = require('path');
+const ideasPath = path.join('C:', 'Flutter', 'reel_audio', 'assets', 'data', 'content_ideas.json');
+const ideas = JSON.parse(fs.readFileSync(ideasPath, 'utf8')).ideas;
+const idea = ideas.find(i => i.id === 'idea_30');
+console.log('Idea 30 defaultCast:', idea.defaultCast);
+console.log('Idea 30 opening:', idea.opening);
+console.log('Idea 30 storyDetail:', idea.storyDetail.slice(0, 200));
+const result = offlineEvaluate(idea, ideas);
+console.log('Critical findings:', result.criticalFindings.length);
+result.criticalFindings.forEach(f => console.log('  -', f.title, ':', f.explanation));
+console.log('Gate results:', result.gateResults.map(g => ({id: g.id, passed: g.passed, detail: g.detail})));
+console.log('Failed deterministic checks:', result.deterministicChecks.filter(c => !c.passed).map(c => ({id: c.id, detail: c.detail})));

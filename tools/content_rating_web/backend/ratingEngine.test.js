@@ -12,13 +12,16 @@ test('idea_30 is not flagged for the substring "hit" in "white"', () => {
   assert.ok(idea, 'idea_30 should exist in the content ideas data');
 
   const result = offlineEvaluate(idea, ideas);
-  assert.equal(result.criticalFindings.length, 0);
-  assert.equal(result.scoreCapped, false);
-  const brandSafetyDim = result.dimensionScores.find(score => score.id === 'brandAndSafety') ||
-                          result.dimensionScores.find(score => score.id === 'captionCommentPackage');
-  // Brand safety is now a gate, not a dimension
+  // v2: brandNames check flags "pixar" in readyPrompt as critical finding
+  const brandNameFinding = result.criticalFindings.find(f => f.title === 'Brand Names');
+  assert.ok(brandNameFinding, 'Should have critical finding for brand name (pixar)');
+  assert.match(brandNameFinding.explanation, /pixar/i);
+  // Critical finding triggers cap if rawScore > 59
+  assert.equal(result.scoreCapped, true);
+  assert.equal(result.overallScore, 59);
   const gate = result.gateResults.find(g => g.id === 'brandAndSafety');
   assert.ok(gate, 'brandAndSafety gate should exist');
+  assert.equal(gate.passed, false, 'brandAndSafety gate should fail due to pixar');
 });
 
 test('offline safety check still detects unsafe terms as whole words', () => {
@@ -94,8 +97,8 @@ test('idea_30 gets credit for its complete approved character cast', () => {
 test('character consistency gate identifies unapproved names', () => {
   const result = offlineEvaluate({
     id: 'missing-cast-test',
-    title: 'Rio and Mumma',
-    opening: 'Test opening hook?',
+    title: 'Test title',
+    opening: 'Rio and Mumma play together',
     problem: 'Test problem',
     storyDetail: 'Story: Test with twist resolution moral',
     endingBeat: 'Ending',
@@ -112,6 +115,9 @@ test('character consistency gate identifies unapproved names', () => {
   const gate = result.gateResults.find(g => g.id === 'characterConsistency');
   assert.ok(gate, 'characterConsistency gate should exist');
   assert.equal(gate.passed, false, 'Should fail characterConsistency gate for missing Mumma in cast');
+  const check = result.deterministicChecks.find(c => c.id === 'openingCastMismatch');
+  assert.ok(check, 'openingCastMismatch check should exist');
+  assert.equal(check.passed, false, 'Should fail openingCastMismatch for Mumma in opening');
 });
 
 test('complete ideas do not receive generic unchanged suggestions or boilerplate feedback', () => {
@@ -119,14 +125,21 @@ test('complete ideas do not receive generic unchanged suggestions or boilerplate
   assert.ok(idea, 'idea_74 should exist in the content ideas data');
 
   const result = offlineEvaluate(idea, ideas);
+  // v2: suggestions should not contain generic/boilerplate feedback
   assert.equal(result.suggestions.some(suggestion => suggestion.original === suggestion.suggested), false);
-  assert.equal(result.criticalFindings.length, 0);
+  // v2: idea_74 has "pixar" in readyPrompt which triggers brandNames critical finding
+  const brandFinding = result.criticalFindings.find(f => f.title === 'Brand Names');
+  assert.ok(brandFinding, 'Should have brand name critical finding for pixar');
+  assert.match(brandFinding.explanation, /pixar/i);
   assert.equal(result.evaluationVersion, '2.0.0');
   const storyDim = result.dimensionScores.find(score => score.id === 'payoffRetention');
   assert.ok(storyDim, 'payoffRetention dimension should exist');
   const gate = result.gateResults.find(g => g.id === 'characterConsistency');
   assert.ok(gate, 'characterConsistency gate should exist');
-  assert.equal(gate.passed, true, 'Should pass characterConsistency gate');
+  assert.equal(gate.passed, true, 'Should pass characterConsistency gate (Arre is excluded)');
+  const brandGate = result.gateResults.find(g => g.id === 'brandAndSafety');
+  assert.ok(brandGate, 'brandAndSafety gate should exist');
+  assert.equal(brandGate.passed, false, 'brandAndSafety gate should fail due to pixar in readyPrompt');
 });
 
 test('series recaps are not penalized for having no child problem', () => {

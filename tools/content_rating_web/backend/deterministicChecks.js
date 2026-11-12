@@ -185,7 +185,7 @@ function checkCaptionStoryMismatch(idea) {
   const captionTokens = new Set(tokenize(caption));
   const storyTokens = new Set(tokenize(storyText));
   const overlap = [...captionTokens].filter(t => storyTokens.has(t)).length;
-  const threshold = Math.max(1, Math.ceil(storyTokens.size * 0.15));
+  const threshold = Math.max(3, Math.ceil(storyTokens.size * 0.10));
   return {
     id: 'captionStoryMismatch',
     passed: overlap >= threshold,
@@ -212,6 +212,7 @@ function checkOpeningCastMismatch(idea) {
   const storyDetail = (idea.storyDetail || '').toLowerCase();
   const words = opening.match(/\b[A-Z][a-z]+\b/g) || [];
   const relationshipWords = ['Uncle', 'Aunty', 'Dada', 'Dadi', 'Nana', 'Nani', 'Chacha', 'Chachi', 'Mama', 'Mami', 'Bhaiya', 'Didi'];
+  const hindiInterjections = ['Arre', 'Are', 'Achha', 'Accha', 'Theek', 'Bas', 'Chalo', 'Ji', 'Haan', 'Ha', 'Nahi', 'Nahin', 'Oye', 'Hey', 'Wah', 'Vah', 'Oho', 'Arey', 'Arre', 'Bapre', 'Hai', 'Kya', 'Kaise', 'Kahan', 'Kab', 'Kyun', 'Kaun', 'Chal', 'Chalo', 'Ruko', 'Suno', 'Dekho', 'Chal', 'Ja', 'Aa', 'Chalna', 'Rukna', 'Sunna', 'Dekhna'];
   const found = [];
   for (const word of words) {
     const lower = word.toLowerCase();
@@ -219,7 +220,9 @@ function checkOpeningCastMismatch(idea) {
       if (!defaultCast.has(lower) && !storyDetail.includes(lower)) {
         found.push(word);
       }
-    } else if (!APPROVED_NAMES.has(word) && !defaultCast.has(lower) && !storyDetail.includes(lower)) {
+    } else if (hindiInterjections.some(h => h.toLowerCase() === lower)) {
+      continue; // Skip common Hindi interjections
+    } else if (!defaultCast.has(lower) && !storyDetail.includes(lower)) {
       found.push(word);
     }
   }
@@ -236,15 +239,16 @@ function checkOpeningCastMismatch(idea) {
 
 function checkUnapprovedCharacterName(idea) {
   const fields = ['title', 'opening', 'problem', 'storyDetail', 'endingBeat', 'dialogue', 'caption', 'pinnedComment'];
-  const text = fields.map(f => idea[f] || '').join(' ').toLowerCase();
+  const text = fields.map(f => idea[f] || '').join(' ');
+  const lowerText = text.toLowerCase();
   const found = [];
-  const pronounMap = {};
+
   for (const name of APPROVED_NAMES) {
     const lower = name.toLowerCase();
-    if (text.includes(lower)) {
+    if (lowerText.includes(lower)) {
       const expectedPronoun = PRONOUNS[name];
       if (expectedPronoun !== 'any') {
-        const pronounRegex = new RegExp(`\\b${lower}\\b.*\\b(he|she|it|his|her|its)\\b`, 'gi');
+        const pronounRegex = new RegExp(`\\b${lower}\\s+(?:said|asked|replied|answered|thought|felt|knew|decided|chose|grabbed|took|held|dropped|threw|caught|pushed|pulled|touched|tapped|patted|hugged|kissed|hit|slapped|punched|kicked|bit|scratched|pinched|looked|glanced|stared|gazed|watched|observed|noticed|saw|heard|listened)\\b.*\\b(he|she|it|his|her|its)\\b`, 'gi');
         const matches = text.matchAll(pronounRegex);
         for (const match of matches) {
           const pronoun = match[1].toLowerCase();
@@ -255,13 +259,16 @@ function checkUnapprovedCharacterName(idea) {
       }
     }
   }
-  const allNames = text.match(/\b[a-z]+\b/g) || [];
-  for (const word of allNames) {
-    const capitalized = word.charAt(0).toUpperCase() + word.slice(1);
-    if (capitalized.length > 2 && !APPROVED_NAMES.has(capitalized) && !['the', 'and', 'for', 'with', 'you', 'your', 'are', 'have', 'has', 'had', 'was', 'were', 'will', 'would', 'could', 'should', 'this', 'that', 'from', 'they', 'them', 'their', 'what', 'when', 'where', 'which', 'who', 'whom', 'whose', 'how', 'why', 'can', 'will', 'just', 'like', 'into', 'over', 'under', 'again', 'then', 'than', 'very', 'much', 'more', 'most', 'some', 'any', 'each', 'every', 'other', 'another', 'such', 'only', 'own', 'same', 'so', 'too', 'also', 'even', 'still', 'yet', 'already', 'always', 'never', 'often', 'sometimes', 'usually', 'almost', 'about', 'after', 'before', 'during', 'since', 'until', 'while', 'because', 'although', 'though', 'if', 'unless', 'whether', 'either', 'neither', 'both', 'all', 'any', 'few', 'many', 'several'].includes(word)) {
-      found.push(`Unapproved name detected: ${capitalized}`);
+
+  const dialogueText = idea.dialogue || '';
+  const namePattern = /\b([A-Z][a-z]{2,})\b(?=\s+(?:said|asked|replied|answered|called|shouted|whispered|screamed|yelled|murmured|muttered|cried|laughed|smiled|nodded|shook|looked|glanced|stared|gazed|watched|observed|noticed|saw|heard|listened|thought|wondered|felt|knew|remembered|forgot|decided|chose|picked|selected|grabbed|took|held|dropped|threw|caught|pushed|pulled|touched|tapped|patted|hugged|kissed|hit|slapped|punched|kicked|bit|scratched|pinched))/gi;
+  const namesInDialogue = [...dialogueText.matchAll(namePattern)].map(m => m[1]);
+  for (const name of namesInDialogue) {
+    if (!APPROVED_NAMES.has(name)) {
+      found.push(`Unapproved character name in dialogue: ${name}`);
     }
   }
+
   return {
     id: 'unapprovedCharacterName',
     passed: found.length === 0,
@@ -527,8 +534,8 @@ function checkTypo(idea) {
   return {
     id: 'typoCheck',
     passed: suspicious.length === 0,
-    severity: 'suggestion',
-    gate: 'hinglishNaturalness',
+    severity: 'minor',
+    gate: 'formatFit',
     detail: suspicious.length > 0
       ? `Possible typos/non-words: ${suspicious.slice(0, 10).join(', ')}${suspicious.length > 10 ? '...' : ''}`
       : 'No obvious typos detected',

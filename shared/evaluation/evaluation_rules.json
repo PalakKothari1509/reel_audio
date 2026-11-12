@@ -357,11 +357,11 @@
         "severity": "suggestion",
         "gate": "formatFit"
       },
-      {
+{
         "id": "typoCheck",
         "name": "Typo Check",
         "description": "Lightweight check on on-screen text/dialogue; small allow-list for valid Hinglish words",
-        "severity": "suggestion",
+        "severity": "minor",
         "gate": "formatFit"
       }
     ]
