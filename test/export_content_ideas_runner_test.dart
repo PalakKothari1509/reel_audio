@@ -14,19 +14,22 @@ void main() {
 
     final raw = file.readAsStringSync();
     final d = jsonDecode(raw) as Map<String, dynamic>;
-    expect(d['version'], '1.0.0');
+    expect(d['version'], '2.0.4');
     final ideas = (d['ideas'] as List).cast<Map<String, dynamic>>();
-    expect(ideas.length, greaterThanOrEqualTo(117));
+    expect(ideas.length, greaterThanOrEqualTo(122));
 
-    // Every built-in id idea_1..idea_117 must be present exactly once.
+    // Every built-in id idea_1..idea_122 must be present exactly once.
     final ids = ideas.map((i) => i['id'] as String).toSet();
-    for (var i = 1; i <= 117; i++) {
+    for (var i = 1; i <= 122; i++) {
       expect(ids.contains('idea_$i'), isTrue,
           reason: 'missing built-in idea_$i');
     }
 
-    // idea_117 sits at index 78 (after the 77 that precede it).
-    expect(ideas[78]['id'], 'idea_117');
+    // Built-in ideas appear in fixture order: idea_1..idea_122.
+    for (var i = 0; i < 122; i++) {
+      expect(ideas[i]['id'], 'idea_${i + 1}',
+          reason: 'expected idea_${i + 1} at index $i');
+    }
 
     // Archived set is exactly {idea_43, idea_44, idea_46}.
     final archived =

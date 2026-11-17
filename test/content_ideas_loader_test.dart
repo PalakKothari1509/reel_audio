@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reel_audio/content_axes.dart';
-import 'package:reel_audio/content_ideas.dart';
 import 'package:reel_audio/content_library_service.dart';
 import 'package:reel_audio/idea_inbox_store.dart';
 import 'package:reel_audio/json_file_store.dart';
@@ -52,13 +51,12 @@ void main() {
       expect(ids.toSet().length, ids.length);
     });
 
-    test('IDs are idea_1 through idea_122 (with idea_117 at index 78)', () async {
+    test('IDs are idea_1 through idea_122 in fixture order', () async {
       final hooks = await ContentLibraryService.loadBuiltInHooks();
       final expectedIds = <String>[];
-      for (var i = 1; i <= 75; i++) expectedIds.add('idea_$i');
-      expectedIds.addAll(['idea_76', 'idea_77', 'idea_78', 'idea_117', 'idea_79']);
-      for (var i = 80; i <= 116; i++) expectedIds.add('idea_$i');
-      expectedIds.addAll(['idea_118', 'idea_119', 'idea_120', 'idea_121', 'idea_122']);
+      for (var i = 1; i <= 122; i++) {
+        expectedIds.add('idea_$i');
+      }
       for (var i = 0; i < 122; i++) {
         expect(hooks[i].id, expectedIds[i]);
       }
@@ -81,7 +79,7 @@ void main() {
       expect(idea.title, contains('Cuddles'));
       expect(
         idea.opening,
-        'Ria ki apni bed hai… par raat hote hi Mumma ki bed yaad aa jaati hai! 😂',
+        "Ria agrees to sleep in her own bed beside Mumma and Papa, but later comes looking for Mumma's comfort.",
       );
       expect(idea.readyPrompt, contains('Scene 1 — Bedtime (0-5 sec)'));
       expect(idea.readyPrompt, contains('Scene 5 — Ending (25-30 sec)'));
@@ -93,9 +91,9 @@ void main() {
       );
     });
 
-    test('idea_117 remains at index 78', () async {
+    test('idea_117 is present and correctly numbered', () async {
       final hooks = await ContentLibraryService.loadBuiltInHooks();
-      expect(hooks[78].id, 'idea_117');
+      expect(hooks[116].id, 'idea_117');
     });
 
     test('archived IDs are idea_43, idea_44, idea_46', () async {

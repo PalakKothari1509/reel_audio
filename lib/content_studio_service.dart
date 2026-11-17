@@ -157,6 +157,24 @@ Future<String> _geminiText(
   throw StateError('All models in the fallback chain were exhausted.');
 }
 
+/// Public wrapper for [geminiPost] with retry/fallback logic.
+/// Used by external callers (e.g., content_generation_screens.dart).
+Future<String> geminiText(
+  String prompt, {
+  String? apiKey,
+  double temperature = 0.7,
+  int maxTokens = 8192,
+  void Function(String message)? onWait,
+}) {
+  return _geminiText(
+    prompt,
+    apiKey: apiKey,
+    temperature: temperature,
+    maxTokens: maxTokens,
+    onWait: onWait,
+  );
+}
+
 // ── Character block builder ───────────────────────────────────────────────────
 
 /// Builds the character lock section from canonical descriptions.
@@ -512,9 +530,29 @@ class GeminiVideoResult {
 
     final trimmed = readyPrompt.trim();
 
+    // Handle Markdown code fences (```json ... ``` or ``` ... ```)
+    String jsonCandidate = trimmed;
+    if (trimmed.startsWith('```')) {
+      final lines = trimmed.split('\n');
+      if (lines.length >= 3) {
+        // Find the first non-fence line and join until closing fence
+        var startIdx = 1;
+        while (startIdx < lines.length && (lines[startIdx].trim().startsWith('json') || lines[startIdx].trim().isEmpty)) {
+          startIdx++;
+        }
+        var endIdx = lines.length - 1;
+        while (endIdx > startIdx && lines[endIdx].trim().startsWith('```')) {
+          endIdx--;
+        }
+        if (endIdx >= startIdx) {
+          jsonCandidate = lines.sublist(startIdx, endIdx + 1).join('\n').trim();
+        }
+      }
+    }
+
     // Try JSON format first (newer structured format)
-    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-      return _parseJsonReadyPrompt(trimmed, title);
+    if (jsonCandidate.startsWith('{') || jsonCandidate.startsWith('[')) {
+      return _parseJsonReadyPrompt(jsonCandidate, title);
     }
 
     // Legacy text format (PROMPT:, Part 1:, Part 2:, Part 3:, etc.)

@@ -19,7 +19,7 @@ void main() {
   group('StoryScreen', () {
     test('pre-populates ContentLibraryService cache from JSON', () async {
       final all = await ContentLibraryService.instance.getAllIdeas();
-      expect(all.length, 117);
+      expect(all.length, 122);
     });
 
     testWidgets('displays initialText in the story box when provided',

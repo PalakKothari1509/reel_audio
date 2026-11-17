@@ -3,11 +3,11 @@ import 'dart:io';
 
 /// Re-exports `assets/data/content_ideas.json` in canonical form.
 ///
-/// Reads the current JSON, validates the built-in set (idea_1..idea_117,
-/// idea_117 at index 78, archived = {idea_43, idea_44, idea_46}), and writes
-/// it back with a fresh `generatedAt` timestamp. The total record count is
-/// allowed to grow when users add custom ideas (idea_118+), so the count is
-/// reported but not asserted.
+/// Reads the current JSON, validates the built-in set (idea_1..idea_122,
+/// unique ids, archived = {idea_43, idea_44, idea_46}), and writes it back
+/// with a fresh `generatedAt` timestamp. The total record count is allowed
+/// to grow when users add custom ideas, so the count is reported but not
+/// asserted.
 
 void main() {
   final rawContent = File('assets/data/content_ideas.json').readAsStringSync();
@@ -27,21 +27,25 @@ void main() {
     }
   }
 
-  // Every built-in idea_1..idea_117 must be present exactly once.
+  // Every built-in idea_1..idea_122 must be present exactly once.
   final idSet = seen;
-  for (var i = 1; i <= 117; i++) {
+  for (var i = 1; i <= 122; i++) {
     if (!idSet.contains('idea_$i')) {
       stderr.writeln('MISSING_BUILTIN: idea_$i');
       exit(1);
     }
   }
 
-  // idea_117 sits at index 78.
-  if (ideas[78]['id'] != 'idea_117') {
-    stderr.writeln(
-      'ORDER_MISMATCH: expected idea_117 at index 78, got ${ideas[78]['id']}',
-    );
-    exit(1);
+  // Built-in ideas must appear in fixture order: idea_1 at index 0 through
+  // idea_122 at index 121.
+  for (var i = 0; i < 122; i++) {
+    final expected = 'idea_${i + 1}';
+    if (ideas[i]['id'] != expected) {
+      stderr.writeln(
+        'ORDER_MISMATCH: expected $expected at index $i, got ${ideas[i]['id']}',
+      );
+      exit(1);
+    }
   }
 
   // Archived set is exactly {idea_43, idea_44, idea_46}.
@@ -75,7 +79,7 @@ void main() {
   }
 
   final out = {
-    'version': '1.0.0',
+    'version': '2.0.4',
     'generatedAt': DateTime.now().toUtc().toIso8601String(),
     'ideas': ideas,
   };

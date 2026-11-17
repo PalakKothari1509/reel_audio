@@ -35,7 +35,7 @@ class IdeaInputScreen extends StatefulWidget {
   /// character names, and additional instructions. If a hook with a
   /// pre-built viral prompt was selected, [readyPrompt] contains it.
   /// If the hook has engagement data, [caption] and [pinnedComment]
-  /// will be populated.
+  /// will be populated. [hook] is the selected HookIdea if available.
   final void Function({
     required String idea,
     required List<String> characters,
@@ -43,16 +43,18 @@ class IdeaInputScreen extends StatefulWidget {
     String? readyPrompt,
     String? caption,
     String? pinnedComment,
+    HookIdea? hook,
   })
   onGenerate;
 
   /// Optional: called when user taps "Show Prompt Only" — builds and displays
-  /// the prompt without sending to Gemini.
+  /// the prompt without sending to Gemini. [hook] is the selected HookIdea if available.
   final void Function({
     required String idea,
     required List<String> characters,
     required String additionalInstructions,
     String? readyPrompt,
+    HookIdea? hook,
   })?
   onGeneratePromptOnly;
 
@@ -62,6 +64,10 @@ class IdeaInputScreen extends StatefulWidget {
   /// Pre-fills the idea field. Used when returning from the review screen.
   final String? initialText;
 
+  /// Pre-selects a HookIdea from the library. When provided, the hook is
+  /// automatically selected and the library picker is not required.
+  final HookIdea? initialHook;
+
   const IdeaInputScreen({
     super.key,
     required this.feature,
@@ -69,6 +75,7 @@ class IdeaInputScreen extends StatefulWidget {
     this.onGeneratePromptOnly,
     this.extraControls,
     this.initialText,
+    this.initialHook,
   });
 
   @override
@@ -86,6 +93,23 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
   void initState() {
     super.initState();
     if (widget.initialText != null) _ideaCtrl.text = widget.initialText!;
+    if (widget.initialHook != null) {
+      _selectedHook = widget.initialHook!;
+      // Populate the idea field with the hook's content
+      final hook = widget.initialHook!;
+      _ideaCtrl.text =
+          '${hook.cover}\n\n${hook.opening}\n\n'
+          'Problem: ${hook.problem}\nLesson: ${hook.lesson}';
+      if (hook.storyDetail.trim().isNotEmpty) {
+        _ideaCtrl.text += '\n\n${hook.storyDetail.trim()}';
+      }
+      // Set the selected characters from the hook's default cast
+      if (hook.defaultCast.isNotEmpty) {
+        _selectedChars
+          ..clear()
+          ..addAll(hook.defaultCast.map((c) => c.toLowerCase()));
+      }
+    }
   }
 
   @override
@@ -138,6 +162,7 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
       caption: caption?.isNotEmpty == true ? caption : null,
       pinnedComment: pinnedComment?.isNotEmpty == true ? pinnedComment : null,
+      hook: _selectedHook,
     );
   }
 
@@ -157,6 +182,7 @@ class _IdeaInputScreenState extends State<IdeaInputScreen> {
       characters: chars,
       additionalInstructions: _instrCtrl.text.trim(),
       readyPrompt: readyPrompt.isNotEmpty ? readyPrompt : null,
+      hook: _selectedHook,
     );
   }
 

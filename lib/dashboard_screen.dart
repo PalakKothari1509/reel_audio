@@ -57,6 +57,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _error = null;
     });
 
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+
     try {
       final libraryItems = await ContentLibraryStore.getAll();
       final auditItems = await ContentAuditStore.instance.loadAll();

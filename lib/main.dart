@@ -752,6 +752,9 @@ class _StoryScreenState extends State<StoryScreen> {
   Project? _project;
   Timer? _saveTimer;
 
+  /// The HookIdea loaded from the content library, if any.
+  HookIdea? _loadedIdea;
+
   @override
   void initState() {
     super.initState();
@@ -764,9 +767,10 @@ class _StoryScreenState extends State<StoryScreen> {
 
   /// Loads a story idea from the content library and populates the story box.
   Future<void> _loadIdea(String ideaId) async {
-    final idea = await ContentLibraryService.instance.getIdeaById(ideaId);
+    final idea = await ContentLibraryService.instance.getHookIdeaById(ideaId);
     if (idea == null || !mounted) return;
     setState(() {
+      _loadedIdea = idea;
       _descCtrl.text = idea.storyDetail.isNotEmpty
           ? idea.storyDetail
           : '${idea.problem}\n${idea.lesson}';
@@ -1525,7 +1529,7 @@ class _StoryScreenState extends State<StoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Story Reel Maker'),
-        actions: [
+actions: [
           // The dependable way to begin the next reel. Clearing the box works too, but
           // pasting a new story over the old one cannot be told apart from editing it.
           IconButton(
@@ -1534,8 +1538,8 @@ class _StoryScreenState extends State<StoryScreen> {
             onPressed: _isGenerating
                 ? null
                 : () => _startNewStory(
-                    status: 'New story. The last one is in Saved stories.',
-                  ),
+                      status: 'New story. The last one is in Saved stories.',
+                    ),
           ),
           IconButton(
             tooltip: 'Plan: hooks, when to post, results',
@@ -1547,6 +1551,26 @@ class _StoryScreenState extends State<StoryScreen> {
             icon: const Icon(Icons.folder_open, size: 21),
             onPressed: _isGenerating ? null : _openSaved,
           ),
+          // Generate Video button — navigates to GeminiVideoScreen with the loaded HookIdea
+          if (_loadedIdea != null)
+            IconButton(
+              tooltip: 'Generate Video',
+              icon: const Icon(Icons.videocam_outlined, size: 21),
+              onPressed: _isGenerating
+                  ? null
+                  : () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GeminiVideoScreen(
+                            keyStore: _keyStore!,
+                            preSelectedHook: _loadedIdea!,
+                            initialStoryText: _descCtrl.text.trim().isNotEmpty
+                                ? _descCtrl.text.trim()
+                                : null,
+                          ),
+                        ),
+                      ),
+            ),
           // The old-path entry lives up here now. It still works, but it is not what
           // the app is for, and as a full-width button it read like a main choice.
           IconButton(
@@ -1555,9 +1579,9 @@ class _StoryScreenState extends State<StoryScreen> {
             onPressed: _isGenerating
                 ? null
                 : () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  ),
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    ),
           ),
         ],
       ),

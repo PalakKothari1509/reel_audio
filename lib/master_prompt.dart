@@ -5,6 +5,8 @@
 // offline deterministic generation). Both paths must reference these
 // constants so that prompts never drift between formats.
 
+import 'brand_system.dart';
+
 /// The shared brand and style context injected at the top of every prompt.
 /// Character descriptions are NOT included here — each generation path injects
 /// the selected cast dynamically via its own character block, so stories starring
@@ -37,9 +39,9 @@ STORY QUALITY:
   Lessons are demonstrated through actions and consequences, not forced dialogue or moralizing.''';
 
 /// The visual style suffix appended to generation prompts.
-const String kVisualStyle =
-    'Soft 3D Pixar-Disney animation style, vertical 9:16, '
-    'warm natural lighting, semi-realistic quality, cream background';
+///
+/// References the single authoritative definition in [BrandDefaults.visualStyle].
+const String kVisualStyle = BrandDefaults.visualStyle;
 
 /// Character appearance rules that must never change between parts.
 ///

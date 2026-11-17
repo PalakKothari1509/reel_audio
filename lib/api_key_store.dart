@@ -13,6 +13,10 @@ class ApiKeyStore {
   static const String _geminiKeyPref = 'custom_gemini_api_key';
   static const String _elevenLabsKeyPref = 'custom_elevenlabs_api_key';
 
+  /// Sentinel value used in secrets.example.dart to detect unconfigured keys.
+  static const String _placeholderPrefix = 'YOUR_';
+  static const String _placeholderSuffix = '_HERE';
+
   SharedPreferences? _prefs;
 
   ApiKeyStore();
@@ -26,13 +30,27 @@ class ApiKeyStore {
   String getGeminiApiKey() {
     final saved = _prefs?.getString(_geminiKeyPref);
     if (saved != null && saved.trim().isNotEmpty) return saved.trim();
-    return geminiApiKey;
+    final key = geminiApiKey;
+    _validateNotPlaceholder(key, 'Gemini');
+    return key;
   }
 
   String getElevenLabsApiKey() {
     final saved = _prefs?.getString(_elevenLabsKeyPref);
     if (saved != null && saved.trim().isNotEmpty) return saved.trim();
-    return elevenLabsApiKey;
+    final key = elevenLabsApiKey;
+    _validateNotPlaceholder(key, 'ElevenLabs');
+    return key;
+  }
+
+  void _validateNotPlaceholder(String key, String serviceName) {
+    if (key.startsWith(_placeholderPrefix) && key.endsWith(_placeholderSuffix)) {
+      throw Exception(
+        '$serviceName API key not configured. '
+        'Copy lib/secrets.example.dart to lib/secrets.dart and add your key. '
+        'Or set a custom key in the Settings screen.',
+      );
+    }
   }
 
   String getElevenVoiceId() => elevenVoiceId;

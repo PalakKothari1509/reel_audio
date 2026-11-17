@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'api_key_store.dart';
+import 'content_ideas.dart';
 import 'content_studio_service.dart';
-import 'gemini_video_master_prompt.dart';
 import 'idea_input_screen.dart';
 import 'prompt_preview.dart';
+import 'reel_prompt_generator.dart';
 
 class ImagePromptScreen extends StatelessWidget {
   final ApiKeyStore keyStore;
@@ -24,6 +25,7 @@ class ImagePromptScreen extends StatelessWidget {
             readyPrompt,
             caption,
             pinnedComment,
+            hook,
           }) async {
             try {
               final result = await generateImagePrompt(
@@ -47,6 +49,7 @@ class ImagePromptScreen extends StatelessWidget {
             required characters,
             required additionalInstructions,
             readyPrompt,
+            hook,
           }) {
             final prompt = buildImageGenerationPrompt(
               idea: idea,
@@ -85,6 +88,7 @@ class CarouselPromptsScreen extends StatelessWidget {
             readyPrompt,
             caption,
             pinnedComment,
+            hook,
           }) async {
             try {
               final result = await generateCarouselPromptsWithPreview(
@@ -113,6 +117,7 @@ class CarouselPromptsScreen extends StatelessWidget {
             required characters,
             required additionalInstructions,
             readyPrompt,
+            hook,
           }) {
             final prompt = buildCarouselPromptsPrompt(
               idea: idea,
@@ -133,13 +138,21 @@ class CarouselPromptsScreen extends StatelessWidget {
 
 class GeminiVideoScreen extends StatelessWidget {
   final ApiKeyStore keyStore;
+  final HookIdea? preSelectedHook;
+  final String? initialStoryText;
 
-  const GeminiVideoScreen({super.key, required this.keyStore});
+  const GeminiVideoScreen({
+    super.key,
+    required this.keyStore,
+    this.preSelectedHook,
+    this.initialStoryText,
+  });
 
   @override
   Widget build(BuildContext context) {
     return IdeaInputScreen(
       feature: ContentFeature.geminiVideo,
+      initialHook: preSelectedHook,
       onGenerate:
           ({
             required idea,
@@ -148,18 +161,59 @@ class GeminiVideoScreen extends StatelessWidget {
             readyPrompt,
             caption,
             pinnedComment,
+            hook,
           }) async {
             try {
-              final result = await generateMasterReelPromptsWithPreview(
+              final generator = ReelPromptGenerator();
+              String prompt;
+
+              // Use the hook from the callback if provided, otherwise use preSelectedHook
+              final effectiveHook = hook ?? preSelectedHook;
+
+              if (effectiveHook != null) {
+                // Use the new ReelPromptGenerator with the HookIdea
+                // Pass initialStoryText as storyOverride if provided
+                prompt = generator.generateMasterPrompt(
+                  idea: effectiveHook,
+                  selectedCharacters: characters,
+                  additionalInstructions: additionalInstructions,
+                  hasReferenceImages: false,
+                  storyOverride: initialStoryText,
+                );
+              } else {
+                // Manual path: use the same authoritative template via ReelPromptGenerator
+                prompt = generator.generateMasterPromptFromManual(
+                  idea: idea,
+                  selectedCharacters: characters,
+                  additionalInstructions: additionalInstructions,
+                  hasReferenceImages: false,
+                );
+              }
+
+              final key = keyStore.getGeminiApiKey();
+
+              final text = await prompt.withPromptPreview<String>(
                 context: context,
-                idea: idea,
-                characters: characters,
-                additionalInstructions: additionalInstructions,
-                storySpecificPrompt: readyPrompt ?? '',
-                hasReferenceImages: false,
-                apiKey: keyStore.getGeminiApiKey(),
+                title: 'Master 30-Second Reel (3 Clips)',
+                modelName: 'gemini-3.8-flash',
+                generationConfig: kVideoGenConfig,
                 useSheet: true,
+                onSend: () async {
+                  return geminiText(prompt, apiKey: key);
+                },
               );
+
+              // Use centralized parser for both HookIdea and manual paths
+              final result = generator.parseResponse(text, idea);
+
+              if (result.validationErrors.isNotEmpty) {
+                throw Exception('Validation failed: ${result.validationErrors.join('; ')}');
+              }
+
+              if (result.parts.isEmpty) {
+                throw Exception('Gemini returned no video prompts.');
+              }
+
               if (context.mounted) {
                 await _showPromptResults(
                   context,
@@ -177,13 +231,28 @@ class GeminiVideoScreen extends StatelessWidget {
             required characters,
             required additionalInstructions,
             readyPrompt,
+            hook,
           }) {
-            final prompt = buildMasterReelPrompt(
-              idea: idea,
-              characters: characters,
-              additionalInstructions: additionalInstructions,
-              storySpecificPrompt: readyPrompt ?? '',
-            );
+            String prompt;
+            if (hook != null) {
+              final generator = ReelPromptGenerator();
+              prompt = generator.generateMasterPrompt(
+                idea: hook,
+                selectedCharacters: characters,
+                additionalInstructions: additionalInstructions,
+                hasReferenceImages: false,
+                storyOverride: initialStoryText,
+              );
+            } else {
+              // Manual path: use the same authoritative template
+              final generator = ReelPromptGenerator();
+              prompt = generator.generateMasterPromptFromManual(
+                idea: idea,
+                selectedCharacters: characters,
+                additionalInstructions: additionalInstructions,
+                hasReferenceImages: false,
+              );
+            }
             prompt.showPromptOnly(
               context: context,
               title: 'Master 30-Second Reel (3 Clips)',

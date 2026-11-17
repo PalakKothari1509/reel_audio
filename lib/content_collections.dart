@@ -37,7 +37,7 @@ final Map<String, IdeaCollection> kCollectionById = {
 
 /// Members of each collection.
 ///
-/// Every built-in idea id (idea_1 through idea_117) is listed here so the
+/// Every built-in idea id (idea_1 through idea_122) is listed here so the
 /// collection is always resolvable without fragile prefix rules.
 const Map<String, List<String>> _members = {
   'safety': [

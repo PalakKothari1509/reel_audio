@@ -234,18 +234,9 @@ class ContentLibraryService {
   static bool _validateJsonHooks(List<HookIdea> hooks) {
     if (hooks.length != 122) return false;
     final seen = <String>{};
-    for (var i = 0; i < hooks.length; i++) {
-      final h = hooks[i];
-      if (seen.contains(h.id)) return false;
-      seen.add(h.id);
-      if (i == 75 && h.id == 'idea_76') continue;
-      if (i == 76 && h.id == 'idea_77') continue;
-      if (i == 77 && h.id == 'idea_78') continue;
-      if (i == 78 && h.id == 'idea_117') continue;
-      if (i == 79 && h.id == 'idea_79') continue;
-      if (i < 75 && h.id != 'idea_${i + 1}') return false;
-      if (i >= 80 && i <= 116 && h.id != 'idea_${i}') return false;
-      if (i >= 117 && h.id != 'idea_${i + 1}') return false;
+    for (final h in hooks) {
+      if (h.id.isEmpty) return false;
+      if (!seen.add(h.id)) return false;
     }
     for (var i = 1; i <= 122; i++) {
       if (!seen.contains('idea_$i')) return false;
@@ -259,6 +250,12 @@ class ContentLibraryService {
     return true;
   }
 
+  /// Test-only access to the JSON hooks validator.
+  ///
+  /// Allows tests to exercise [_validateJsonHooks] directly with constructed
+  /// hook lists without going through the asset loading pipeline.
+  @visibleForTesting
+  static bool validateJsonHooksForTest(List<HookIdea> hooks) => _validateJsonHooks(hooks);
 
   /// Loads the JSON asset with a timeout, falling back to filesystem read.
   ///
@@ -286,14 +283,21 @@ class ContentLibraryService {
 
     // Production or non-test fallback: try rootBundle with a short timeout.
     try {
-      return await rootBundle.loadString(assetPath).timeout(
-        const Duration(seconds: 2),
-        onTimeout: () => throw TimeoutException('rootBundle.loadString timed out'),
-      );
+      return await rootBundle
+          .loadString(assetPath)
+          .timeout(
+            const Duration(seconds: 2),
+            onTimeout: () =>
+                throw TimeoutException('rootBundle.loadString timed out'),
+          );
     } on TimeoutException catch (_) {
-      debugPrint('ContentLibraryService: rootBundle timed out, falling back to file read');
+      debugPrint(
+        'ContentLibraryService: rootBundle timed out, falling back to file read',
+      );
     } catch (e) {
-      debugPrint('ContentLibraryService: rootBundle error, falling back to file read: $e');
+      debugPrint(
+        'ContentLibraryService: rootBundle error, falling back to file read: $e',
+      );
     }
 
     // Fallback: read the asset file directly from the filesystem using sync I/O.
@@ -319,7 +323,6 @@ class ContentLibraryService {
     throw StateError('Unable to load $assetPath via rootBundle or filesystem');
   }
 
-
   /// Loads built-in hooks from `assets/data/content_ideas.json`.
   ///
   /// Parses each record with [HookIdea.fromJson], validates the version,
@@ -333,7 +336,9 @@ class ContentLibraryService {
     }
 
     try {
-      final jsonStr = await _loadJsonAssetWithFallback('assets/data/content_ideas.json');
+      final jsonStr = await _loadJsonAssetWithFallback(
+        'assets/data/content_ideas.json',
+      );
       final jsonData = jsonDecode(jsonStr);
       if (jsonData is! Map<String, dynamic>) {
         throw const FormatException('top-level value is not an object');
@@ -369,9 +374,7 @@ class ContentLibraryService {
         try {
           hooks.add(HookIdea.fromJson(item));
         } catch (e) {
-          throw FormatException(
-            'failed to parse idea at index $i: $e',
-          );
+          throw FormatException('failed to parse idea at index $i: $e');
         }
       }
 
@@ -395,7 +398,9 @@ class ContentLibraryService {
     }
     _jsonLoadAttempted = true;
     try {
-      final jsonStr = await _loadJsonAssetWithFallback('assets/data/content_ideas.json');
+      final jsonStr = await _loadJsonAssetWithFallback(
+        'assets/data/content_ideas.json',
+      );
       final jsonData = jsonDecode(jsonStr);
       if (jsonData is! Map) {
         // Fallback to empty if JSON is invalid
@@ -419,14 +424,18 @@ class ContentLibraryService {
         }
       }
       if (hooks.isEmpty || !_validateJsonHooks(hooks)) {
-        debugPrint('ContentLibraryService: JSON validation failed, falling back to empty');
+        debugPrint(
+          'ContentLibraryService: JSON validation failed, falling back to empty',
+        );
         _cachedJsonHooks = const <HookIdea>[];
         return _cachedJsonHooks!;
       }
       _cachedJsonHooks = hooks;
       return _cachedJsonHooks!;
     } catch (e) {
-      debugPrint('ContentLibraryService: JSON load error, falling back to empty: $e');
+      debugPrint(
+        'ContentLibraryService: JSON load error, falling back to empty: $e',
+      );
       _cachedJsonHooks = const <HookIdea>[];
       return _cachedJsonHooks!;
     }
@@ -448,6 +457,15 @@ class ContentLibraryService {
   void invalidateCache() {
     _cache = null;
     _cacheTime = null;
+  }
+
+  /// Clears every in-memory cache, including the static built-in hooks cache
+  /// used by [loadBuiltInHooks]. Intended for tests that swap the asset on
+  /// disk (missing file, malformed JSON) between cases.
+  static void clearAllCaches() {
+    instance.invalidateCache();
+    _cachedJsonHooks = null;
+    _jsonLoadAttempted = false;
   }
 
   // ── Public read API ───────────────────────────────────────────────────
@@ -499,6 +517,19 @@ class ContentLibraryService {
     final all = await getAllIdeas();
     try {
       return all.firstWhere((i) => i.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Look up a built-in [HookIdea] by its stable ID.
+  ///
+  /// Used by screens that need the full hook detail (readyPrompt, defaultCast,
+  /// scene fields) rather than the normalized [ContentIdea] view.
+  Future<HookIdea?> getHookIdeaById(String id) async {
+    final hooks = await loadBuiltInHooks();
+    try {
+      return hooks.firstWhere((h) => h.id == id);
     } catch (_) {
       return null;
     }
@@ -747,15 +778,18 @@ class ContentLibraryService {
     if (lower.contains('mumma') ||
         lower.contains('मम्मा') ||
         lower.contains('माँ') ||
-        lower.contains('मम्मी'))
+        lower.contains('मम्मी')) {
       ids.add('mumma');
+    }
     if (lower.contains('papa') ||
         lower.contains('पापा') ||
-        lower.contains('पिता'))
+        lower.contains('पिता')) {
       ids.add('papa');
+    }
     if (lower.contains('daadi') || lower.contains('दादी')) ids.add('daadi');
-    if (lower.contains('teacher') || lower.contains('शिक्षक'))
+    if (lower.contains('teacher') || lower.contains('शिक्षक')) {
       ids.add('teacher');
+    }
     return ids;
   }
 

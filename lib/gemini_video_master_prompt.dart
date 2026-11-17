@@ -45,6 +45,7 @@ class VideoPromptVariables {
   final String language;
   final bool hasReferenceImages;
   final StoryHookSource? storyHook;
+  final String additionalInstructions;
 
   const VideoPromptVariables({
     required this.storyTitle,
@@ -58,6 +59,7 @@ class VideoPromptVariables {
     this.language = 'Hinglish',
     this.hasReferenceImages = false,
     this.storyHook,
+    this.additionalInstructions = '',
   });
 
   /// Only the selected characters that exist in the character library.
@@ -117,6 +119,7 @@ Story idea: {{STORY_IDEA}}
 Real-life problem: {{REAL_LIFE_PROBLEM}}
 Learning outcome: {{LEARNING_OUTCOME}}
 {{STORY_HOOK_BLOCK}}
+{{ADDITIONAL_INSTRUCTIONS_BLOCK}}
 Target audience: Indian parents and caregivers of children aged 1-4.
 Primary objective: Create a relatable, engaging, visually understandable
 story that parents will want to watch, share, or save.
@@ -353,12 +356,21 @@ Ending beat: ${vars.storyHook!.endingBeat}
 '''
       : '';
 
+  // Build the ADDITIONAL_INSTRUCTIONS_BLOCK if provided
+  final additionalInstructionsBlock = vars.additionalInstructions.trim().isNotEmpty
+      ? '''
+ADDITIONAL USER INSTRUCTIONS (supplement the story, do not override safety/character/story rules):
+${vars.additionalInstructions.trim()}
+'''
+      : '';
+
   return kGeminiVideoMasterPrompt
       .replaceAll('{{STORY_TITLE}}', vars.storyTitle)
       .replaceAll('{{STORY_IDEA}}', vars.storyIdea)
       .replaceAll('{{REAL_LIFE_PROBLEM}}', vars.realLifeProblem)
       .replaceAll('{{LEARNING_OUTCOME}}', vars.learningOutcome)
       .replaceAll('{{STORY_HOOK_BLOCK}}', storyHookBlock)
+      .replaceAll('{{ADDITIONAL_INSTRUCTIONS_BLOCK}}', additionalInstructionsBlock)
       .replaceAll('{{SELECTED_CHARACTERS}}', vars.validCharacters.join(', '))
       .replaceAll('{{CHARACTER_DESC_SECTION}}', charDescSection)
       .replaceAll('{{REF_IMAGE_INSTRUCTION}}', refImageInstruction)

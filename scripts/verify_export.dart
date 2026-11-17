@@ -1,9 +1,6 @@
 ﻿import 'dart:convert';
 import 'dart:io';
 
-import 'package:reel_audio/content_ideas.dart';
-import 'package:reel_audio/content_library_service.dart';
-
 void main() {
   try {
     verifyExport();
@@ -53,12 +50,11 @@ void verifyExport({String jsonPath = 'assets/data/content_ideas.json'}) {
     }
   }
 
-  // Verify ordering: existing ideas remain in place, followed by ideas 121 and 122
+  // Verify ordering: built-in ideas appear in fixture order, idea_1..idea_122.
   final expectedOrder = <String>[];
-  for (var i = 1; i <= 75; i++) expectedOrder.add('idea_$i');
-  expectedOrder.addAll(['idea_76', 'idea_77', 'idea_78', 'idea_117', 'idea_79']);
-  for (var i = 80; i <= 116; i++) expectedOrder.add('idea_$i');
-  expectedOrder.addAll(['idea_118', 'idea_119', 'idea_120', 'idea_121', 'idea_122']);
+  for (var i = 1; i <= 122; i++) {
+    expectedOrder.add('idea_$i');
+  }
 
   for (var i = 0; i < ideas.length; i++) {
     final actualId = ideas[i]['id'];
