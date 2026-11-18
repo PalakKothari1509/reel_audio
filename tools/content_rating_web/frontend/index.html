@@ -64,8 +64,8 @@
             <p class="table-description" id="allIdeasTableDescription"></p>
           </div>
           <div class="table-actions">
-            <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Full Table CSV</button>
-            <button class="btn btn-secondary" onclick="app.exportAllIdeasJson()">Export Full Table JSON</button>
+            <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Hook/Story/Caption CSV</button>
+            <button class="btn btn-secondary" onclick="app.exportAllIdeasJson()">Export Hook/Story/Caption JSON</button>
           </div>
         </div>
         <div class="table-container full-data-table-container">
@@ -110,11 +110,11 @@
     <!-- Export -->
     <section id="view-export" class="view">
       <div class="export-card">
-        <h2>Export All Ideas &amp; Ratings</h2>
-        <p>Download one row per idea, including the complete idea content, all dimension scores and feedback, findings, and suggestions. Ideas not yet evaluated are included with blank rating fields.</p>
+        <h2>Export Ideas</h2>
+        <p>Download only the important updates for each idea: <strong>Hook</strong>, <strong>Story</strong>, and <strong>Caption</strong>, with one problem and solution for each.</p>
         <div class="export-actions">
-          <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Full Table CSV</button>
-          <button class="btn btn-primary" onclick="app.exportAllIdeasJson()">Export Full Table JSON</button>
+          <button class="btn btn-primary" onclick="app.exportAllIdeasCsv()">Export Hook/Story/Caption CSV</button>
+          <button class="btn btn-primary" onclick="app.exportAllIdeasJson()">Export Hook/Story/Caption JSON</button>
           <button class="btn btn-secondary" onclick="app.clearRatings()">Clear All Ratings</button>
         </div>
         <div class="export-note">

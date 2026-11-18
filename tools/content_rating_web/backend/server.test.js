@@ -300,10 +300,25 @@ test('GET /api/export/json still works (legacy)', async () => {
   const res = await get('/api/export/json');
   assert.equal(res.status, 200);
   assert.ok(Array.isArray(res.body));
+  if (res.body.length > 0) {
+    assert.ok(Object.hasOwn(res.body[0], 'idea_id'));
+    assert.ok(Object.hasOwn(res.body[0], 'hook_problem'));
+    assert.ok(Object.hasOwn(res.body[0], 'hook_solution'));
+    assert.ok(Object.hasOwn(res.body[0], 'story_problem'));
+    assert.ok(Object.hasOwn(res.body[0], 'story_solution'));
+    assert.ok(Object.hasOwn(res.body[0], 'caption_problem'));
+    assert.ok(Object.hasOwn(res.body[0], 'caption_solution'));
+  }
 });
 
 test('GET /api/export/csv still works (legacy)', async () => {
   const res = await get('/api/export/csv');
   assert.equal(res.status, 200);
-  assert.ok(res.body.includes('ideaId'));
+  assert.ok(res.body.includes('idea_id'));
+  assert.ok(res.body.includes('hook_problem'));
+  assert.ok(res.body.includes('hook_solution'));
+  assert.ok(res.body.includes('story_problem'));
+  assert.ok(res.body.includes('story_solution'));
+  assert.ok(res.body.includes('caption_problem'));
+  assert.ok(res.body.includes('caption_solution'));
 });

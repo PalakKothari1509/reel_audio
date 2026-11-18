@@ -614,70 +614,164 @@ app.delete('/api/ratings', (_req, res) => {
 });
 
 app.get('/api/export/json', (_req, res) => {
-  const ratings = listRatings();
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', 'attachment; filename=content_ratings.json');
-  res.send(JSON.stringify(ratings, null, 2));
-});
-
-app.get('/api/export/csv', (_req, res) => {
-  const ratings = listRatings();
-  const headers = [
-    'ideaId', 'title', 'category', 'overallScore', 'rawScore', 'verdict', 'scoreCapped', 'capsApplied', 'evaluationVersion', 'evaluationMode',
-    'hookStrength', 'relatabilityAudienceFit', 'payoffRetention', 'hinglishNaturalness',
-    'visualFeasibility', 'soundOffReadability', 'shareSaveTrigger', 'captionCommentPackage',
-    'originality', 'audioHook',
-    'criticalCount', 'majorCount', 'minorCount', 'confidence', 'potentialScore', 'recommendedFormat', 'duplicateOf', 'seasonTag', 'evaluatedAt',
-  ];
-
-  let ideasMap = {};
+  let ideas = [];
   try {
     const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
     const data = JSON.parse(raw);
-    data.ideas.forEach(i => { ideasMap[i.id] = i; });
+    ideas = data.ideas || [];
   } catch (e) {}
+  const ratings = listRatings();
+  const ratingsById = new Map(ratings.map(rating => [rating.ideaId, rating]));
+  const buildExportRow = idea => {
+    const rating = ratingsById.get(idea.id);
+    const getDimension = id => rating?.dimensionScores?.find(dimension => dimension.id === id);
+    const getFinding = category => {
+      const items = [
+        ...(rating?.criticalFindings || []),
+        ...(rating?.majorFindings || []),
+        ...(rating?.minorFindings || []),
+        ...(rating?.suggestions || []),
+      ];
+      const keywords = category === 'hook'
+        ? ['hook', 'opening']
+        : category === 'story'
+          ? ['story', 'narrative', 'twist', 'resolution', 'moral']
+          : ['caption', 'pinned', 'hashtag', 'comment'];
+      return items.find(item => {
+        const text = `${item.title || ''} ${item.explanation || ''}`.toLowerCase();
+        return keywords.some(keyword => text.includes(keyword));
+      });
+    };
+    const problem = category => {
+      const dimensionId = category === 'hook' ? 'hookStrength'
+        : category === 'story' ? 'payoffRetention'
+          : 'captionCommentPackage';
+      const dimension = getDimension(dimensionId);
+      if (dimension?.needsImprovement) return dimension.needsImprovement;
+      if (category === 'story') return idea.problem || 'No story problem identified.';
+      if (category === 'caption') {
+        const finding = getFinding(category);
+        if (finding?.explanation) return finding.explanation;
+      }
+      return category === 'hook' ? (idea.opening || 'No hook problem identified.')
+        : category === 'story' ? (idea.storyDetail || 'No story problem identified.')
+          : (idea.caption || 'No caption problem identified.');
+    };
+    const solution = category => {
+      if (category === 'hook') {
+        const rewrite = rating?.rewrittenHook;
+        if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.opening || 'No hook solution identified.';
+      }
+      if (category === 'story') return idea.lesson || 'No story solution identified.';
+      if (category === 'caption') {
+        const rewrite = rating?.improvedCaption;
+        if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.caption || 'No caption solution identified.';
+      }
+      return category === 'hook' ? (idea.opening || 'No hook solution identified.')
+        : category === 'story' ? (idea.lesson || 'No story solution identified.')
+          : (idea.caption || 'No caption solution identified.');
+    };
+    return {
+      idea_id: idea.id || '',
+      hook_problem: problem('hook'),
+      hook_solution: solution('hook'),
+      story_problem: problem('story'),
+      story_solution: solution('story'),
+      caption_problem: problem('caption'),
+      caption_solution: solution('caption'),
+    };
+  };
+  const exported = ideas
+    .map(buildExportRow);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename=content_ideas_problem_solution.json');
+  res.send(JSON.stringify(exported, null, 2));
+});
 
-  const lines = [headers.join(',')];
-  ratings.forEach(r => {
-    const idea = ideasMap[r.ideaId] || {};
-    const dims = {};
-    r.dimensionScores.forEach(d => { dims[d.id] = d.score; });
+app.get('/api/export/csv', (_req, res) => {
+  const headers = ['idea_id', 'hook_problem', 'hook_solution', 'story_problem', 'story_solution', 'caption_problem', 'caption_solution'];
+  let ideas = [];
+  try {
+    const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+    const data = JSON.parse(raw);
+    ideas = data.ideas || [];
+  } catch (e) {}
+  const ratings = listRatings();
+  const ratingsById = new Map(ratings.map(rating => [rating.ideaId, rating]));
+
+  const csvCell = value => {
+    let text = value == null ? '' : String(value);
+    if (/^[\s]*[=+\-@]/.test(text)) text = `'${text}`;
+    return `"${text.replace(/"/g, '""')}"`;
+  };
+  const lines = [headers.map(csvCell).join(',')];
+  ideas.forEach(idea => {
+    const rating = ratingsById.get(idea.id);
+    const getDimension = id => rating?.dimensionScores?.find(dimension => dimension.id === id);
+    const getFinding = category => {
+      const items = [
+        ...(rating?.criticalFindings || []),
+        ...(rating?.majorFindings || []),
+        ...(rating?.minorFindings || []),
+        ...(rating?.suggestions || []),
+      ];
+      const keywords = category === 'hook'
+        ? ['hook', 'opening']
+        : category === 'story'
+          ? ['story', 'narrative', 'twist', 'resolution', 'moral']
+          : ['caption', 'pinned', 'hashtag', 'comment'];
+      return items.find(item => {
+        const text = `${item.title || ''} ${item.explanation || ''}`.toLowerCase();
+        return keywords.some(keyword => text.includes(keyword));
+      });
+    };
+    const problem = category => {
+      const dimensionId = category === 'hook' ? 'hookStrength'
+        : category === 'story' ? 'payoffRetention'
+          : 'captionCommentPackage';
+      const dimension = getDimension(dimensionId);
+      if (dimension?.needsImprovement) return dimension.needsImprovement;
+      if (category === 'story') return idea.problem || 'No story problem identified.';
+      if (category === 'caption') {
+        const finding = getFinding(category);
+        if (finding?.explanation) return finding.explanation;
+      }
+      return category === 'hook' ? (idea.opening || 'No hook problem identified.')
+        : category === 'story' ? (idea.storyDetail || 'No story problem identified.')
+          : (idea.caption || 'No caption problem identified.');
+    };
+    const solution = category => {
+      if (category === 'hook') {
+        const rewrite = rating?.rewrittenHook;
+        if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.opening || 'No hook solution identified.';
+      }
+      if (category === 'story') return idea.lesson || 'No story solution identified.';
+      if (category === 'caption') {
+        const rewrite = rating?.improvedCaption;
+        if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.caption || 'No caption solution identified.';
+      }
+      return category === 'hook' ? (idea.opening || 'No hook solution identified.')
+        : category === 'story' ? (idea.lesson || 'No story solution identified.')
+          : (idea.caption || 'No caption solution identified.');
+    };
     const row = [
-      r.ideaId,
-      `"${(idea.title || '').replace(/"/g, '""')}"`,
-      `"${(idea.category || '').replace(/"/g, '""')}"`,
-      r.overallScore,
-      r.rawScore,
-      `"${r.verdict}"`,
-      r.scoreCapped,
-      `"${(r.capsApplied || []).join('; ')}"`,
-      r.evaluationVersion,
-      r.evaluationMode,
-      dims.hookStrength || 0,
-      dims.relatabilityAudienceFit || dims.relatability || 0,
-      dims.payoffRetention || dims.storyStructure || 0,
-      dims.hinglishNaturalness || 0,
-      dims.visualFeasibility || 0,
-      dims.soundOffReadability || 0,
-      dims.shareSaveTrigger || dims.engagementPotential || 0,
-      dims.captionCommentPackage || 0,
-      dims.originality || 0,
-      dims.audioHook || 0,
-      r.criticalFindings?.length || 0,
-      r.majorFindings?.length || 0,
-      r.minorFindings?.length || 0,
-      r.confidence || '',
-      r.potentialScore || '',
-      r.recommendedFormat || '',
-      `"${(r.duplicateOf || []).join('; ')}"`,
-      r.seasonTag || '',
-      r.evaluatedAt,
+      csvCell(idea.id || ''),
+      csvCell(problem('hook')),
+      csvCell(solution('hook')),
+      csvCell(problem('story')),
+      csvCell(solution('story')),
+      csvCell(problem('caption')),
+      csvCell(solution('caption')),
     ];
     lines.push(row.join(','));
   });
 
   res.setHeader('Content-Type', 'text/csv');
-  res.setHeader('Content-Disposition', 'attachment; filename=content_ratings.csv');
+  res.setHeader('Content-Disposition', 'attachment; filename=content_ideas_problem_solution.csv');
   res.send(lines.join('\n'));
 });
 

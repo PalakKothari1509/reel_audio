@@ -258,9 +258,102 @@ const app = {
     return columns;
   },
 
+  getDimension(rating, dimensionId) {
+    return rating?.dimensionScores?.find(dimension => dimension.id === dimensionId);
+  },
+
+  getRelevantFinding(rating, category) {
+    const collections = [
+      rating?.criticalFindings,
+      rating?.majorFindings,
+      rating?.minorFindings,
+      rating?.suggestions,
+    ].filter(Array.isArray).flat();
+    const keywords = category === 'hook'
+      ? ['hook', 'opening']
+      : category === 'story'
+        ? ['story', 'narrative', 'twist', 'resolution', 'moral']
+        : ['caption', 'pinned', 'hashtag', 'comment'];
+    return collections.find(item => {
+      const text = `${item.title || ''} ${item.explanation || ''}`.toLowerCase();
+      return keywords.some(keyword => text.includes(keyword));
+    });
+  },
+
+  getGroupedProblem(row, category) {
+    const dimensionId = category === 'hook'
+      ? 'hookStrength'
+      : category === 'story'
+        ? 'payoffRetention'
+        : 'captionCommentPackage';
+    const dimension = this.getDimension(row.rating, dimensionId);
+    if (dimension?.needsImprovement) return dimension.needsImprovement;
+    if (category === 'story') return row.idea.problem || 'No story problem identified.';
+    if (category === 'caption') {
+      const finding = this.getRelevantFinding(row.rating, category);
+      if (finding?.explanation) return finding.explanation;
+    }
+    return category === 'hook'
+      ? (row.idea.opening || 'No hook problem identified.')
+      : category === 'story'
+        ? (row.idea.storyDetail || 'No story problem identified.')
+        : (row.idea.caption || 'No caption problem identified.');
+  },
+
+  getGroupedSolution(row, category) {
+    if (category === 'hook') {
+      const rewrite = row.rating?.rewrittenHook;
+      if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
+      return row.idea.opening || 'No hook solution identified.';
+    }
+    if (category === 'story') return row.idea.lesson || 'No story solution identified.';
+    if (category === 'caption') {
+      const rewrite = row.rating?.improvedCaption;
+      if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+      return row.idea.caption || 'No caption solution identified.';
+    }
+    return category === 'hook'
+      ? (row.idea.opening || 'No hook solution identified.')
+      : category === 'story'
+        ? (row.idea.lesson || 'No story solution identified.')
+        : (row.idea.caption || 'No caption solution identified.');
+  },
+
+  getHookProblem(row) {
+    return this.getGroupedProblem(row, 'hook');
+  },
+
+  getHookSolution(row) {
+    return this.getGroupedSolution(row, 'hook');
+  },
+
+  getStoryProblem(row) {
+    return this.getGroupedProblem(row, 'story');
+  },
+
+  getStorySolution(row) {
+    return this.getGroupedSolution(row, 'story');
+  },
+
+  getCaptionProblem(row) {
+    return this.getGroupedProblem(row, 'caption');
+  },
+
+  getCaptionSolution(row) {
+    return this.getGroupedSolution(row, 'caption');
+  },
+
   async exportAllIdeasCsv() {
-    const columns = this.getFullTableColumns();
     const rows = this.getAllIdeaRows();
+    const columns = [
+      { label: 'idea_id', value: ({ idea }) => idea.id },
+      { label: 'hook_problem', value: row => this.getHookProblem(row) },
+      { label: 'hook_solution', value: row => this.getHookSolution(row) },
+      { label: 'story_problem', value: row => this.getStoryProblem(row) },
+      { label: 'story_solution', value: row => this.getStorySolution(row) },
+      { label: 'caption_problem', value: row => this.getCaptionProblem(row) },
+      { label: 'caption_solution', value: row => this.getCaptionSolution(row) },
+    ];
     const csvCell = value => {
       let text = value == null ? '' : typeof value === 'string' ? value : JSON.stringify(value);
       if (/^[\s]*[=+\-@]/.test(text)) text = `'${text}`;
@@ -268,17 +361,25 @@ const app = {
     };
     const csv = [
       columns.map(column => csvCell(column.label)).join(','),
-      ...rows.map(({ idea, rating }) => columns
-        .map(column => csvCell(column.value(idea, rating)))
+      ...rows.map(row => columns
+        .map(column => csvCell(column.value(row)))
         .join(',')),
     ].join('\r\n');
-    this.downloadBlob(`\uFEFF${csv}`, 'content_ideas_full_table.csv', 'text/csv;charset=utf-8');
+    this.downloadBlob(`\uFEFF${csv}`, 'content_ideas_problem_solution.csv', 'text/csv;charset=utf-8');
     this.showToast(`Exported ${rows.length} ideas to CSV.`, 'success');
   },
 
   async exportAllIdeasJson() {
-    const rows = this.getAllIdeaRows().map(({ idea, rating }) => ({ idea, rating }));
-    this.downloadBlob(JSON.stringify(rows, null, 2), 'content_ideas_full_table.json', 'application/json;charset=utf-8');
+    const rows = this.getAllIdeaRows().map(row => ({
+      idea_id: row.idea.id || '',
+      hook_problem: this.getHookProblem(row),
+      hook_solution: this.getHookSolution(row),
+      story_problem: this.getStoryProblem(row),
+      story_solution: this.getStorySolution(row),
+      caption_problem: this.getCaptionProblem(row),
+      caption_solution: this.getCaptionSolution(row),
+    }));
+    this.downloadBlob(JSON.stringify(rows, null, 2), 'content_ideas_problem_solution.json', 'application/json;charset=utf-8');
     this.showToast(`Exported ${rows.length} ideas to JSON.`, 'success');
   },
 
