@@ -48,11 +48,12 @@ import 'character_definitions.dart';
 import 'content_ideas.dart';
 import 'add_idea_screen.dart';
 import 'content_studio_screens.dart'
-    hide HookChoice, CarouselPromptsScreen, GeminiVideoScreen, ImagePromptScreen;
+    hide HookChoice, CarouselPromptsScreen, GeminiVideoScreen, ImagePromptScreen, GeminiVideoResult;
 import 'content_generation_screens.dart';
 import 'offline_story_maker_screen.dart';
 import 'quick_content.dart';
 import 'instagram_workflow_screen.dart';
+import 'content_studio_service.dart';
 
 /// Android side of saving a finished reel.
 /// because saving a video has nothing to do with speech.
@@ -507,6 +508,10 @@ Future<void> main() async {
                 _appNavigatorKey.currentContext!,
                 MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
               ),
+              onCreateContent: (ideaId) => Navigator.push(
+                _appNavigatorKey.currentContext!,
+                MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
+              ),
             ),
           ),
         ),
@@ -535,6 +540,10 @@ Future<void> main() async {
               onAddNewIdea: () => Navigator.push(
                 _appNavigatorKey.currentContext!,
                 MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
+              ),
+              onCreateContent: (ideaId) => Navigator.push(
+                _appNavigatorKey.currentContext!,
+                MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
               ),
             ),
           ),
@@ -755,6 +764,9 @@ class _StoryScreenState extends State<StoryScreen> {
   /// The HookIdea loaded from the content library, if any.
   HookIdea? _loadedIdea;
 
+  /// Saved generated prompts, parsed from the project's promptsJson field.
+  final List<String> _savedPromptTexts = [];
+
   @override
   void initState() {
     super.initState();
@@ -914,6 +926,21 @@ class _StoryScreenState extends State<StoryScreen> {
       if (chosen.language.isNotEmpty) _language = chosen.language;
       _seconds = chosen.seconds;
       _status = 'Opened "${chosen.displayName}".';
+
+      // Restore previously generated prompts, if any.
+      if (chosen.promptsJson.isNotEmpty) {
+        try {
+          final result = GeminiVideoResult.parseReadyPrompt(
+            chosen.promptsJson,
+            chosen.title,
+          );
+          _savedPromptTexts
+            ..clear()
+            ..addAll(result.parts.map((p) => p.promptText));
+        } catch (_) {
+          // Ignore parse errors — saved prompts may be from an older format.
+        }
+      }
     });
   }
 
@@ -1567,6 +1594,7 @@ actions: [
                             initialStoryText: _descCtrl.text.trim().isNotEmpty
                                 ? _descCtrl.text.trim()
                                 : null,
+                            projectId: _project?.id,
                           ),
                         ),
                       ),
@@ -1614,6 +1642,47 @@ actions: [
                   ),
                 ),
                 Gap.s,
+
+                // Previously generated prompts, restored from the saved project.
+                // Shown without re-calling Gemini — nothing is regenerated here.
+                if (_savedPromptTexts.isNotEmpty) ...[
+                  const Text('Previously generated prompts',
+                      style: AppText.screenTitle),
+                  Gap.xs,
+                  ..._savedPromptTexts.asMap().entries.map((entry) {
+                    final i = entry.key + 1;
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text('Part $i',
+                                  style: AppText.body
+                                      .copyWith(fontWeight: FontWeight.w600)),
+                              Gap.wS,
+                              const Icon(Icons.play_circle_outline,
+                                  size: 16, color: AppColors.accent),
+                            ],
+                          ),
+                          Gap.xs,
+                          SelectableText(
+                            entry.value,
+                            style: AppText.body,
+                          ),
+                          Gap.s,
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  Gap.m,
+                ],
 
                 // Real buttons rather than three tiny text links crammed above the box.
                 // These are the three things worth doing before writing a script, and

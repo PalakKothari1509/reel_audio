@@ -221,9 +221,12 @@ REQUIRED OUTPUT FORMAT
 Return ONLY valid JSON:
 
 {
-  "story_title": "short title",
-  "story_foundation": "2-3 sentences describing the complete story arc",
-  "parts": [
+      "story_title": "short title",
+      "story_foundation": "2-3 sentences describing the complete story arc",
+      "caption": "Short engaging caption for social media",
+      "hashtags": ["#tag1", "#tag2", "#tag3", "#tag4", "#tag5"],
+      "pin_comment": "Engaging question or call-to-action to pin",
+      "parts": [
     {
       "part_number": 1,
       "purpose": "What story beat this part communicates",

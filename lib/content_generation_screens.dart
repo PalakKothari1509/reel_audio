@@ -6,6 +6,7 @@ import 'content_ideas.dart';
 import 'content_studio_service.dart';
 import 'idea_input_screen.dart';
 import 'prompt_preview.dart';
+import 'projects.dart';
 import 'reel_prompt_generator.dart';
 
 class ImagePromptScreen extends StatelessWidget {
@@ -140,12 +141,14 @@ class GeminiVideoScreen extends StatelessWidget {
   final ApiKeyStore keyStore;
   final HookIdea? preSelectedHook;
   final String? initialStoryText;
+  final String? projectId;
 
   const GeminiVideoScreen({
     super.key,
     required this.keyStore,
     this.preSelectedHook,
     this.initialStoryText,
+    this.projectId,
   });
 
   @override
@@ -219,6 +222,15 @@ class GeminiVideoScreen extends StatelessWidget {
                   context,
                   result.storyTitle,
                   result.parts.map((part) => part.promptText).toList(),
+                );
+              }
+
+              // Persist the raw Gemini response so the project can reopen
+              // without calling Gemini again.
+              if (projectId != null) {
+                await ProjectStore.update(
+                  projectId!,
+                  (p) => p.copyWith(promptsJson: text),
                 );
               }
             } catch (error) {
