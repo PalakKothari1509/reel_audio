@@ -310,6 +310,11 @@ function validateGeminiResponse(body) {
   }
 
   if (typeof body.rewrittenHook !== 'string') return { valid: false, error: 'Missing rewrittenHook' };
+  if (typeof body.storyImprovements !== 'string') return { valid: false, error: 'Missing storyImprovements' };
+  if (typeof body.improvedCaption !== 'string') return { valid: false, error: 'Missing improvedCaption' };
+  if (typeof body.improvedPinnedComment !== 'string') return { valid: false, error: 'Missing improvedPinnedComment' };
+  if (typeof body.pinned_comment_problem !== 'string') return { valid: false, error: 'Missing pinned_comment_problem' };
+  if (typeof body.pinned_comment_solution !== 'string') return { valid: false, error: 'Missing pinned_comment_solution' };
   if (typeof body.duplicateOf !== 'undefined' && !Array.isArray(body.duplicateOf)) return { valid: false, error: 'duplicateOf must be array' };
   if (typeof body.recommendedFormat !== 'string') return { valid: false, error: 'Missing recommendedFormat' };
   if (typeof body.seasonTag !== 'undefined' && typeof body.seasonTag !== 'string') return { valid: false, error: 'seasonTag must be string' };

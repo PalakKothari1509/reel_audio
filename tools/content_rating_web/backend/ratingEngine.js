@@ -165,15 +165,409 @@ function buildFixesToReach10(dimensionScores, rawScore) {
   return { fixesToReach10: scoredDimensions, potentialScore };
 }
 
-function getRewrittenHook(idea, dimensionScores) {
+function getRewrittenHook(idea, dimensionScores, gateResults, deterministicResults) {
+  const opening = idea.opening || '';
+  const problem = idea.problem || '';
+  const title = idea.title || '';
+  const cast = Array.isArray(idea.defaultCast) ? idea.defaultCast : [];
   const hookDim = findDimension(dimensionScores, 'hookStrength');
-  if (hookDim && hookDim.score < 7 && idea.problem) {
-    return `Open on the moment: ${idea.problem.slice(0, 80)}...?`;
+
+  const openingCastMismatch = deterministicResults.find(c => c.id === 'openingCastMismatch');
+  const isGenericOrInstructional = /^(end on|trim the|add a|use only|open on|replace|write|avoid|do not|never|keep the|make sure|ensure|consider|try to|think about|focus on|remember to|don't|please|let's|we should|you should|the creator|the model|the system|this idea|this story|this post|this reel|this video|this content)/i.test(opening);
+  const isTooLong = opening.length > 100;
+  const isMissing = opening.length === 0;
+  const isTitleLabel = opening === title || opening === idea.cover;
+
+  if (isMissing || isGenericOrInstructional || isTooLong || isTitleLabel || openingCastMismatch?.passed === false) {
+    const subject = cast.length > 0 ? cast[0] : 'the child';
+    const problemFirstSentence = problem.split(/[.!?]/)[0].trim();
+    let hookSubject = problemFirstSentence.length > 0 ? problemFirstSentence : problem.slice(0, 60);
+    if (hookSubject.length > 60) {
+      const lastSpace = hookSubject.lastIndexOf(' ', 60);
+      hookSubject = lastSpace > 0 ? hookSubject.slice(0, lastSpace) : hookSubject.slice(0, 60);
+    }
+    return `"${hookSubject}?"`;
   }
-  if (hookDim && hookDim.score < 7 && idea.opening) {
-    return `Trim to: "${idea.opening.slice(0, 80)}?"`;
+
+  return 'PASS — No change required.';
+}
+
+function getImprovedStory(idea, dimensionScores, findings) {
+  const storyScoreDim = findDimension(dimensionScores, 'payoffRetention');
+  const hasStory = (idea.storyDetail || '').trim().length > 0;
+  const hasTwist = /twist/i.test(idea.storyDetail || '');
+  const hasResolution = /resolution/i.test(idea.storyDetail || '');
+  const hasMoral = /moral/i.test(idea.storyDetail || '');
+  const hasEnding = (idea.endingBeat || '').trim().length > 0;
+
+  const missingParts = [];
+  if (!hasStory) missingParts.push('story detail');
+  if (!hasTwist) missingParts.push('twist');
+  if (!hasResolution) missingParts.push('resolution');
+  if (!hasMoral) missingParts.push('moral/lesson');
+  if (!hasEnding) missingParts.push('ending beat');
+
+  if (missingParts.length === 0 && storyScoreDim && storyScoreDim.score >= 7) {
+    return 'PASS — No change required.';
   }
-  return idea.opening || 'Add a visual hook in the first 3 seconds';
+
+  const problem = idea.problem || '';
+  const lesson = idea.lesson || '';
+  const title = idea.title || '';
+  const cast = Array.isArray(idea.defaultCast) ? idea.defaultCast : [];
+  const setting = idea.setting || '';
+
+  const mainChar = cast.length > 0 ? cast[0] : 'the child';
+  const supportChar = cast.length > 1 ? cast[1] : 'a parent';
+
+  const storyText = `Story: ${mainChar} faces ${problem.toLowerCase()}. ${supportChar} guides them with patience. Twist: The obvious fix doesn't work — ${mainChar} must try something new. Resolution: ${mainChar} succeeds by staying calm and trying once more. Moral: ${lesson || 'Small steps and patience help children learn.'}
+Setting: ${setting || 'A familiar home setting.'}
+Dialogue: "${mainChar}: I can't do it!" "${supportChar}: Try one more time, I'm right here."`;
+
+  return storyText;
+}
+
+function getImprovedCaption(idea, dimensionScores, findings) {
+  const captionDim = findDimension(dimensionScores, 'captionCommentPackage');
+  const soundDim = findDimension(dimensionScores, 'soundOffReadability');
+  const caption = idea.caption || '';
+  const problem = idea.problem || '';
+  const lesson = idea.lesson || '';
+  const title = idea.title || '';
+
+  const captionCaptionMismatch = findings.some(f =>
+    (f.title || '').toLowerCase().includes('caption') ||
+    (f.explanation || '').toLowerCase().includes('caption')
+  );
+
+  const isGeneric = /^(replace generic|tag a parent|what do you think|comment below|like and share|follow for more|check this out|tell us)/i.test(caption);
+  const hasHashtags = /#[^\s#]+/.test(caption);
+  const hashtagCount = (caption.match(/#[^\s#]+/g) || []).length;
+  const isTooLong = caption.length > 300;
+
+  if (!isGeneric && hasHashtags && hashtagCount >= 3 && hashtagCount <= 5 && !isTooLong && !captionCaptionMismatch) {
+    return 'PASS — No change required.';
+  }
+
+  const takeaway = lesson || problem.split(/[.!?]/)[0] || title;
+  const hashtags = '#ChildSafety #IndianParents #FunLearningWithPalak';
+  const maxTakeawayLen = 300 - hashtags.length - 1;
+  let captionText = `${takeaway.slice(0, maxTakeawayLen)} ${hashtags}`;
+  return captionText;
+}
+
+function getImprovedPinnedComment(idea, dimensionScores, findings) {
+  const pinned = idea.pinnedComment || '';
+  const problem = idea.problem || '';
+  const title = idea.title || '';
+  const lesson = idea.lesson || '';
+
+  const genericPinned = findings.some(f =>
+    (f.title || '').toLowerCase().includes('generic pinned') ||
+    (f.explanation || '').toLowerCase().includes('generic pinned')
+  );
+  const pinnedMismatch = findings.some(f =>
+    (f.title || '').toLowerCase().includes('pinned comment') ||
+    (f.explanation || '').toLowerCase().includes('pinned comment')
+  );
+
+  const isGeneric = /^(tip:|isi concept|tag a parent|what do you think|comment below|like and share|follow for more|check this out|tell us|aapka bachcha)/i.test(pinned);
+  const hasQuestion = /\?/.test(pinned);
+  const isTooShort = pinned.trim().length < 10;
+
+  if (!isGeneric && hasQuestion && !isTooShort && !genericPinned && !pinnedMismatch) {
+    return 'PASS — No change required.';
+  }
+
+  const questionTopic = lesson || problem.split(/[.!?]/)[0] || title;
+  const cleanTopic = questionTopic.replace(/[.,!?;:()\[\]{}"'“”‘’]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
+  return `What's your ${cleanTopic.toLowerCase()} experience?`;
+}
+
+function validateSolutionQuality(result) {
+  const issues = [];
+
+  // Hook solution must actually be a hook (not an instruction or story summary)
+  const hookSol = result.rewrittenHook || '';
+  if (hookSol && !hookSol.startsWith('PASS')) {
+    const instructionPatterns = [
+      /^(end on|trim|add a|use only|open on|replace|write|avoid|do not|never|keep the|make sure|ensure|consider|try to|think about|focus on|remember to|don't|please|let's|we should|you should|the creator|the model|the system|this idea|this story|this post|this reel|this video|this content)/i,
+      /^(story|narrative|plot|summary|overview|description|explanation)/i,
+    ];
+    for (const pattern of instructionPatterns) {
+      if (pattern.test(hookSol.trim())) {
+        issues.push(`Hook solution appears to be an instruction, not a hook: "${hookSol.slice(0, 80)}"`);
+        break;
+      }
+    }
+    // Hook should not be a story summary (>200 chars is likely a summary)
+    if (hookSol.length > 200) {
+      issues.push(`Hook solution is too long to be a hook (${hookSol.length} chars)`);
+    }
+  }
+
+  // Story solution must be an actual story, not just advice
+  const storySol = result.storyImprovements || '';
+  if (storySol && !storySol.startsWith('PASS')) {
+    const adviceOnlyPatterns = [
+      /^(parents should|parents must|never|always|avoid|don't|should|encourage|praise|validate|acknowledge|listen|understand|respect|support|help|guide|teach|allow|give|offer|provide|set|create|establish|maintain|ensure|make sure|remember to|try to|think about|focus on|consider|believe|trust|love|care for|spend time with|be patient|be kind|be gentle|be firm|be clear|be consistent|be positive|be proactive|be involved|be present|be available|be attentive|be responsive|be supportive|be understanding|be empathetic|be compassionate|be nurturing|be encouraging|be affirming|be validating|be respectful|be honoring|be celebrating|be appreciative|be grateful|be thankful|be mindful|be aware|be conscious|be intentional|be deliberate|be purposeful|be meaningful|be significant|be impactful|be powerful|be strong|be brave|be confident|be secure|be safe|be healthy|be happy|be joyful|be peaceful|be calm|be relaxed|be comfortable|be content|be satisfied|be fulfilled|be enriched|be empowered|be inspired|be motivated|be energized|be refreshed|be renewed|be restored|be healed|be whole|be complete|be perfect|be excellent|be outstanding|be exceptional|be extraordinary|be amazing|be wonderful|be fantastic|be superb|be terrific|be marvelous|be magnificent|be splendid|be brilliant|be spectacular|be stunning|be breathtaking|be awe-inspiring|be mind-blowing|be life-changing|be transformative|be revolutionary|be groundbreaking|be innovative|be creative|be imaginative|be original|be unique|be special|be precious|be valuable|be worthwhile|be important|be essential|be necessary|be vital|be crucial|be critical|be key|be central|be fundamental|be primary|be principal|be main|be major|be significant|be notable|be remarkable|be memorable|be unforgettable|be legendary|be iconic|be classic|be timeless|be eternal|be forever|be always|be never|be sometimes|be often|be usually|be rarely|be seldom|be occasionally|be frequently|be constantly|be continuously|be perpetually|be endlessly|be infinitely|be boundlessly|be limitlessly|be measurelessly|be immeasurably|be incomprehensibly|be indescribably|be inexplicably|be unexplainably|be unaccountably|be inexplicably|be unexplainably|be unaccountably|be unexplainably|be inexplicably|be unexplainably|be unaccountably)/i,
+    ];
+    for (const pattern of adviceOnlyPatterns) {
+      if (pattern.test(storySol.trim())) {
+        issues.push(`Story solution appears to be parenting advice, not an improved story: "${storySol.slice(0, 80)}"`);
+        break;
+      }
+    }
+    // Story should have narrative elements
+    if (!/story|twist|resolution|moral|setting|dialogue|character|scene/i.test(storySol)) {
+      issues.push(`Story solution lacks narrative elements (story, twist, resolution, moral, setting, dialogue)`);
+    }
+  }
+
+  // Caption solution must be an actual caption
+  const capSol = result.improvedCaption || '';
+  if (capSol && !capSol.startsWith('PASS')) {
+    if (!/#\w/.test(capSol)) {
+      issues.push(`Caption solution has no hashtags`);
+    }
+    if (capSol.length > 300) {
+      issues.push(`Caption solution is too long (${capSol.length} chars)`);
+    }
+  }
+
+  // Pinned comment must be separate from caption
+  const pinnedSol = result.improvedPinnedComment || '';
+  if (pinnedSol && !pinnedSol.startsWith('PASS')) {
+    if (!/\?/.test(pinnedSol)) {
+      issues.push(`Pinned comment solution has no question`);
+    }
+    if (pinnedSol === capSol) {
+      issues.push(`Pinned comment solution duplicates caption solution`);
+    }
+  }
+
+  return { valid: issues.length === 0, issues };
+}
+
+function offlineEvaluate(idea, allIdeas = []) {
+  const deterministicResults = runAllChecks(idea, allIdeas, 'offline');
+  const gateResults = evaluateGates(idea, deterministicResults);
+  const dimensionScores = buildOfflineDimensionScores(idea, deterministicResults);
+  const { critical, major, minor, suggestions } = buildOfflineFindings(idea, deterministicResults);
+
+  const rawScore = computeWeightedScore(dimensionScores);
+  const { cappedScore, cappedVerdict, capsApplied } = applyCaps(rawScore, critical, gateResults);
+  const verdict = determineVerdict(cappedScore, critical, major, capsApplied, cappedVerdict);
+
+  const { fixesToReach10, potentialScore } = buildFixesToReach10(dimensionScores, rawScore);
+  const rewrittenHook = getRewrittenHook(idea, dimensionScores, gateResults, deterministicResults);
+  const storyImprovements = getImprovedStory(idea, dimensionScores, critical.concat(major).concat(minor));
+  const improvedCaption = getImprovedCaption(idea, dimensionScores, critical.concat(major).concat(minor));
+  const improvedPinnedComment = getImprovedPinnedComment(idea, dimensionScores, critical.concat(major).concat(minor));
+  const duplicateOf = deterministicResults.find(c => c.id === 'duplicateSimilarity')?.duplicateOf || [];
+  const recommendedFormat = getRecommendedFormat(idea, gateResults, duplicateOf);
+  const seasonTag = deterministicResults.find(c => c.id === 'seasonality')?.seasonTag || '';
+  const confidence = 'low';
+
+  const validation = validateSolutionQuality({
+    rewrittenHook,
+    storyImprovements,
+    improvedCaption,
+    improvedPinnedComment,
+  });
+
+  return {
+    ideaId: idea.id,
+    dimensionScores,
+    gateResults,
+    overallScore: cappedScore,
+    rawScore,
+    scoreCapped: capsApplied.length > 0,
+    capsApplied,
+    verdict,
+    criticalFindings: critical,
+    majorFindings: major,
+    minorFindings: minor,
+    suggestions,
+    fixesToReach10,
+    potentialScore,
+    rewrittenHook,
+    storyImprovements,
+    improvedCaption,
+    improvedPinnedComment,
+    pinned_comment_problem: getPinnedCommentProblem(idea, dimensionScores, critical.concat(major).concat(minor)),
+    pinned_comment_solution: improvedPinnedComment,
+    duplicateOf,
+    recommendedFormat,
+    seasonTag,
+    deterministicChecks: deterministicResults,
+    confidence,
+    evaluationMode: 'offline',
+    evaluatedAt: new Date().toISOString(),
+    evaluationVersion: '2.0.0',
+    solutionValidation: validation,
+  };
+}
+
+function getPinnedCommentProblem(idea, dimensionScores, findings) {
+  const pinned = idea.pinnedComment || '';
+  const captionDim = findDimension(dimensionScores, 'captionCommentPackage');
+  const genericPinned = findings.some(f =>
+    (f.title || '').toLowerCase().includes('generic pinned') ||
+    (f.explanation || '').toLowerCase().includes('generic pinned')
+  );
+  const pinnedMismatch = findings.some(f =>
+    (f.title || '').toLowerCase().includes('pinned comment') ||
+    (f.explanation || '').toLowerCase().includes('pinned comment')
+  );
+  const isGeneric = /^(tip:|isi concept|tag a parent|what do you think|comment below|like and share|follow for more|check this out|tell us|aapka bachcha)/i.test(pinned);
+  const hasQuestion = /\?/.test(pinned);
+  const isTooShort = pinned.trim().length < 10;
+
+  if (!isGeneric && hasQuestion && !isTooShort && !genericPinned && !pinnedMismatch) {
+    return 'PASS — No change required.';
+  }
+
+  const reasons = [];
+  if (isGeneric || genericPinned) reasons.push('Generic template');
+  if (pinnedMismatch) reasons.push('Does not relate to story');
+  if (!hasQuestion) reasons.push('No question for parents');
+  if (isTooShort) reasons.push('Too short to engage');
+  if (!pinned) reasons.push('Missing pinned comment');
+
+  return reasons.length > 0 ? reasons.join('; ') : 'PASS — No change required.';
+}
+
+async function onlineEvaluate(idea, geminiApiKey, allIdeas = []) {
+  const fetch = (await import('node-fetch')).default;
+  const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
+
+  const deterministicResults = runAllChecks(idea, allIdeas, 'online');
+  const gateResults = evaluateGates(idea, deterministicResults);
+
+  const dimensionsList = DIMENSIONS.map((d, i) =>
+    `${i + 1}. ${d.name} (${d.weight}%): ${d.description}\n   Anchors: 10="${d.anchors['10']}" | 6="${d.anchors['6']}" | 2="${d.anchors['2']}"`
+  ).join('\n');
+
+  const deterministicFacts = deterministicResults.map(c =>
+    `- ${c.id}: ${c.passed ? 'PASS' : 'FAIL'} (${c.severity}) - ${c.detail}`
+  ).join('\n');
+
+  const prompt = `
+You are a content quality evaluator for "Fun Learning With Palak" — Instagram Reels for Indian parents of children aged 1-4.
+
+AUDIENCE: Parents of children aged 1-4 watch these Reels. Characters shown (Ria, Rio, Cuty) are aged 1-4. Adults (Mumma, Papa, Daadi, Teacher) are caregivers.
+LANGUAGE RULES: Adults speak natural Hindi. Children use age-appropriate Hinglish (single words, simple phrases).
+RESOLUTION & MORAL: These are OPTIONAL. An unresolved ending can be a deliberate payoff (e.g., cliffhanger, open question). Do not penalize missing resolution/moral if the payoff works.
+
+Evaluate the following idea on these ${DIMENSIONS.length} dimensions (score each 0-10 integer, and indicate which anchor matched: "10", "6", or "2"):
+
+${dimensionsList}
+
+DETERMINISTIC CHECK RESULTS (treat as facts you must respect):
+${deterministicFacts}
+
+Return ONLY valid JSON with this exact structure:
+{
+  "ideaId": "${idea.id}",
+  "dimensionScores": [
+    {"id": "hookStrength", "score": N, "anchorMatched": "10|6|2", "explanation": "...", "whatWorks": "...", "needsImprovement": "..."},
+    ... (all ${DIMENSIONS.length} dimensions)
+  ],
+  "criticalFindings": [
+    {"title": "...", "explanation": "...", "evidence": "...", "suggestedFix": "..."}
+  ],
+  "majorFindings": [...],
+  "minorFindings": [...],
+  "suggestions": [
+    {"title": "...", "explanation": "...", "original": "...", "suggested": "..."}
+  ],
+  "fixesToReach10": [
+    {"fix": "...", "dimensionId": "...", "estimatedGain": N}
+  ],
+  "rewrittenHook": "...",
+  "storyImprovements": "...",
+  "improvedCaption": "...",
+  "improvedPinnedComment": "...",
+  "pinned_comment_problem": "...",
+  "pinned_comment_solution": "...",
+  "duplicateOf": ["idea_id1", "idea_id2"],
+  "recommendedFormat": "reel|carousel|story|merge-into-series",
+  "seasonTag": "Diwali|Navratri|...",
+  "confidence": "high|medium|low"
+}
+
+Idea to evaluate:
+ID: ${idea.id}
+Title: ${idea.title}
+Category: ${idea.category}
+Cover: ${idea.cover}
+Opening: ${idea.opening}
+Problem: ${idea.problem}
+Lesson: ${idea.lesson}
+Story Detail: ${idea.storyDetail}
+Ending Beat: ${idea.endingBeat}
+Caption: ${idea.caption}
+Pinned Comment: ${idea.pinnedComment}
+Dialogue: ${idea.dialogue}
+Default Cast: ${JSON.stringify(idea.defaultCast)}
+Setting: ${idea.setting}
+Scene Detail: ${idea.sceneDetail}
+Post Format: ${idea.postFormat || 'Reel'}
+`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.3,
+      maxOutputTokens: 6000,
+    },
+  };
+
+  let lastError = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const resp = await fetch(`${apiUrl}?key=${geminiApiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!resp.ok) {
+        const text = await resp.text();
+        lastError = `HTTP ${resp.status}: ${text}`;
+        if (resp.status === 429 || resp.status === 503 || resp.status === 500) {
+          await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+          continue;
+        }
+        throw new Error(lastError);
+      }
+
+      const data = await resp.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      let jsonText = text.trim();
+      const jsonMatch = jsonText.match(/```json\n([\s\S]*?)\n```/) || jsonText.match(/```([\s\S]*?)```/) || [null, jsonText];
+      jsonText = jsonMatch[1] || jsonText;
+
+      try {
+        const parsed = JSON.parse(jsonText);
+        return parsed;
+      } catch (e) {
+        lastError = `Invalid JSON: ${e.message}`;
+        if (attempt < 2) continue;
+        throw new Error(lastError);
+      }
+    } catch (e) {
+      lastError = e.message;
+      if (attempt < 2) {
+        await new Promise(r => setTimeout(r, 2000));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error(lastError || 'Unknown Gemini error');
 }
 
 function getRecommendedFormat(idea, gateResults, duplicateOf) {
@@ -494,50 +888,6 @@ function findUnsafeWords(idea) {
   });
 }
 
-function offlineEvaluate(idea, allIdeas = []) {
-  const deterministicResults = runAllChecks(idea, allIdeas, 'offline');
-  const gateResults = evaluateGates(idea, deterministicResults);
-  const dimensionScores = buildOfflineDimensionScores(idea, deterministicResults);
-  const { critical, major, minor, suggestions } = buildOfflineFindings(idea, deterministicResults);
-
-  const rawScore = computeWeightedScore(dimensionScores);
-  const { cappedScore, cappedVerdict, capsApplied } = applyCaps(rawScore, critical, gateResults);
-  const verdict = determineVerdict(cappedScore, critical, major, capsApplied, cappedVerdict);
-
-  const { fixesToReach10, potentialScore } = buildFixesToReach10(dimensionScores, rawScore);
-  const rewrittenHook = getRewrittenHook(idea, dimensionScores);
-  const duplicateOf = deterministicResults.find(c => c.id === 'duplicateSimilarity')?.duplicateOf || [];
-  const recommendedFormat = getRecommendedFormat(idea, gateResults, duplicateOf);
-  const seasonTag = deterministicResults.find(c => c.id === 'seasonality')?.seasonTag || '';
-  const confidence = 'low';
-
-  return {
-    ideaId: idea.id,
-    dimensionScores,
-    gateResults,
-    overallScore: cappedScore,
-    rawScore,
-    scoreCapped: capsApplied.length > 0,
-    capsApplied,
-    verdict,
-    criticalFindings: critical,
-    majorFindings: major,
-    minorFindings: minor,
-    suggestions,
-    fixesToReach10,
-    potentialScore,
-    rewrittenHook,
-    duplicateOf,
-    recommendedFormat,
-    seasonTag,
-    deterministicChecks: deterministicResults,
-    confidence,
-    evaluationMode: 'offline',
-    evaluatedAt: new Date().toISOString(),
-    evaluationVersion: '2.0.0',
-  };
-}
-
 async function onlineEvaluate(idea, geminiApiKey, allIdeas = []) {
   const fetch = (await import('node-fetch')).default;
   const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
@@ -700,10 +1050,20 @@ function buildOnlineResult(idea, geminiResponse, allIdeas = []) {
   const fixesToReach10 = geminiResponse.fixesToReach10 || [];
   const potentialScore = geminiResponse.potentialScore || Math.min(100, rawScore + fixesToReach10.reduce((sum, f) => sum + (f.estimatedGain || 0), 0));
   const rewrittenHook = geminiResponse.rewrittenHook || '';
+  const storyImprovements = geminiResponse.storyImprovements || getImprovedStory(idea, dims, criticalFindings.concat(majorFindings).concat(minorFindings));
+  const improvedCaption = geminiResponse.improvedCaption || getImprovedCaption(idea, dims, criticalFindings.concat(majorFindings).concat(minorFindings));
+  const improvedPinnedComment = geminiResponse.improvedPinnedComment || getImprovedPinnedComment(idea, dims, criticalFindings.concat(majorFindings).concat(minorFindings));
   const duplicateOf = geminiResponse.duplicateOf || [];
   const recommendedFormat = geminiResponse.recommendedFormat || 'reel';
   const seasonTag = geminiResponse.seasonTag || '';
   const confidence = geminiResponse.confidence || 'low';
+
+  const solutionValidation = validateSolutionQuality({
+    rewrittenHook,
+    storyImprovements,
+    improvedCaption,
+    improvedPinnedComment,
+  });
 
   return {
     ideaId: idea.id,
@@ -721,6 +1081,11 @@ function buildOnlineResult(idea, geminiResponse, allIdeas = []) {
     fixesToReach10,
     potentialScore,
     rewrittenHook,
+    storyImprovements,
+    improvedCaption,
+    improvedPinnedComment,
+    pinned_comment_problem: getPinnedCommentProblem(idea, dims, criticalFindings.concat(majorFindings).concat(minorFindings)),
+    pinned_comment_solution: improvedPinnedComment,
     duplicateOf,
     recommendedFormat,
     seasonTag,
@@ -729,6 +1094,7 @@ function buildOnlineResult(idea, geminiResponse, allIdeas = []) {
     evaluationMode: 'online',
     evaluatedAt: new Date().toISOString(),
     evaluationVersion: '2.0.0',
+    solutionValidation: solutionValidation,
   };
 }
 

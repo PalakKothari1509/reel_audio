@@ -158,7 +158,7 @@ function checkPinnedCommentMismatch(idea) {
   const pinnedTokens = new Set(tokenize(pinned));
   const storyTokens = new Set(tokenize(storyText));
   const overlap = [...pinnedTokens].filter(t => storyTokens.has(t)).length;
-  const threshold = 1;
+  const threshold = 3;
   return {
     id: 'pinnedCommentMismatch',
     passed: overlap >= threshold,
@@ -542,6 +542,77 @@ function checkTypo(idea) {
   };
 }
 
+function checkHashtagRelevance(idea) {
+  const caption = idea.caption || '';
+  const hashtags = caption.match(/#[^\s#]+/g) || [];
+  if (hashtags.length === 0) {
+    return {
+      id: 'hashtagRelevance',
+      passed: true,
+      severity: 'minor',
+      gate: 'captionCommentPackage',
+      detail: 'No hashtags to check',
+    };
+  }
+  const storyText = `${idea.title || ''} ${idea.problem || ''} ${idea.storyDetail || ''} ${idea.lesson || ''}`;
+  const storyTokens = new Set(tokenize(storyText));
+  const irrelevant = [];
+  for (const tag of hashtags) {
+    const tagText = tag.replace(/^#/, '').toLowerCase();
+    const tagTokens = new Set(tokenize(tagText));
+    const overlap = [...tagTokens].filter(t => storyTokens.has(t)).length;
+    if (overlap === 0) irrelevant.push(tag);
+  }
+  return {
+    id: 'hashtagRelevance',
+    passed: irrelevant.length === 0,
+    severity: 'minor',
+    gate: 'captionCommentPackage',
+    detail: irrelevant.length === 0
+      ? `All ${hashtags.length} hashtags are relevant to the story`
+      : `Irrelevant hashtags: ${irrelevant.join(', ')}`,
+  };
+}
+
+function checkCaptionQuality(idea) {
+  const caption = idea.caption || '';
+  if (!caption) {
+    return {
+      id: 'captionQuality',
+      passed: true,
+      severity: 'minor',
+      gate: 'captionCommentPackage',
+      detail: 'No caption to check',
+    };
+  }
+  const issues = [];
+  const genericPhrases = [
+    'replace generic pinned comment',
+    'tag a parent who',
+    'what do you think',
+    'comment below',
+    'like and share',
+    'follow for more',
+  ];
+  const lowerCaption = caption.toLowerCase();
+  for (const phrase of genericPhrases) {
+    if (lowerCaption.includes(phrase)) {
+      issues.push(`Generic phrase: "${phrase}"`);
+    }
+  }
+  const hashtags = caption.match(/#[^\s#]+/g) || [];
+  if (hashtags.length > 5) issues.push(`Too many hashtags (${hashtags.length}, max 5)`);
+  if (hashtags.length < 3) issues.push(`Too few hashtags (${hashtags.length}, min 3)`);
+  if (caption.length > 300) issues.push(`Caption too long (${caption.length} chars)`);
+  return {
+    id: 'captionQuality',
+    passed: issues.length === 0,
+    severity: 'minor',
+    gate: 'captionCommentPackage',
+    detail: issues.length === 0 ? 'Caption quality is acceptable' : `Caption issues: ${issues.join('; ')}`,
+  };
+}
+
 function runAllChecks(idea, allIdeas = [], mode = 'offline') {
   const checks = [
     checkPlaceholderText(idea),
@@ -556,6 +627,8 @@ function runAllChecks(idea, allIdeas = [], mode = 'offline') {
     checkDuration(idea),
     checkRepeatedEndSlate(idea, allIdeas),
     checkHashtagCount(idea),
+    checkHashtagRelevance(idea),
+    checkCaptionQuality(idea),
     checkDuplicateSimilarity(idea, allIdeas, mode),
     checkSeasonality(idea),
     checkTypo(idea),
@@ -577,6 +650,8 @@ module.exports = {
   checkDuration,
   checkRepeatedEndSlate,
   checkHashtagCount,
+  checkHashtagRelevance,
+  checkCaptionQuality,
   checkDuplicateSimilarity,
   checkSeasonality,
   checkTypo,

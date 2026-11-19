@@ -280,15 +280,31 @@ const app = {
     });
   },
 
+  getPinnedCommentProblem(row) {
+    return this.getGroupedProblem(row, 'pinned');
+  },
+
+  getPinnedCommentSolution(row) {
+    return this.getGroupedSolution(row, 'pinned');
+  },
+
   getGroupedProblem(row, category) {
     const dimensionId = category === 'hook'
       ? 'hookStrength'
       : category === 'story'
         ? 'payoffRetention'
-        : 'captionCommentPackage';
+        : category === 'pinned'
+          ? 'captionCommentPackage'
+          : 'captionCommentPackage';
     const dimension = this.getDimension(row.rating, dimensionId);
     if (dimension?.needsImprovement) return dimension.needsImprovement;
     if (category === 'story') return row.idea.problem || 'No story problem identified.';
+    if (category === 'pinned') {
+      const finding = this.getRelevantFinding(row.rating, category);
+      if (finding?.explanation) return finding.explanation;
+      if (row.rating?.pinned_comment_problem) return row.rating.pinned_comment_problem;
+      return row.idea.pinnedComment || 'No pinned comment problem identified.';
+    }
     if (category === 'caption') {
       const finding = this.getRelevantFinding(row.rating, category);
       if (finding?.explanation) return finding.explanation;
@@ -306,7 +322,12 @@ const app = {
       if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
       return row.idea.opening || 'No hook solution identified.';
     }
-    if (category === 'story') return row.idea.lesson || 'No story solution identified.';
+    if (category === 'story') return row.rating?.storyImprovements || row.idea.lesson || 'No story solution identified.';
+    if (category === 'pinned') {
+      const rewrite = row.rating?.improvedPinnedComment;
+      if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+      return row.idea.pinnedComment || 'No pinned comment solution identified.';
+    }
     if (category === 'caption') {
       const rewrite = row.rating?.improvedCaption;
       if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
@@ -315,7 +336,7 @@ const app = {
     return category === 'hook'
       ? (row.idea.opening || 'No hook solution identified.')
       : category === 'story'
-        ? (row.idea.lesson || 'No story solution identified.')
+        ? row.rating?.storyImprovements || row.idea.lesson || 'No story solution identified.'
         : (row.idea.caption || 'No caption solution identified.');
   },
 
@@ -353,6 +374,8 @@ const app = {
       { label: 'story_solution', value: row => this.getStorySolution(row) },
       { label: 'caption_problem', value: row => this.getCaptionProblem(row) },
       { label: 'caption_solution', value: row => this.getCaptionSolution(row) },
+      { label: 'pinned_comment_problem', value: row => this.getPinnedCommentProblem(row) },
+      { label: 'pinned_comment_solution', value: row => this.getPinnedCommentSolution(row) },
     ];
     const csvCell = value => {
       let text = value == null ? '' : typeof value === 'string' ? value : JSON.stringify(value);
@@ -378,6 +401,8 @@ const app = {
       story_solution: this.getStorySolution(row),
       caption_problem: this.getCaptionProblem(row),
       caption_solution: this.getCaptionSolution(row),
+      pinned_comment_problem: this.getPinnedCommentProblem(row),
+      pinned_comment_solution: this.getPinnedCommentSolution(row),
     }));
     this.downloadBlob(JSON.stringify(rows, null, 2), 'content_ideas_problem_solution.json', 'application/json;charset=utf-8');
     this.showToast(`Exported ${rows.length} ideas to JSON.`, 'success');
@@ -679,24 +704,72 @@ const app = {
     }
 
     let improvementsHtml = '';
-    if (result.improvedHook || result.storyImprovements || result.improvedCaption) {
+    if (result.improvedHook || result.storyImprovements || result.improvedCaption || result.improvedPinnedComment) {
+      const statusBadge = (label, pass) => {
+        const cls = pass ? 'status-pass' : 'status-improve';
+        return `<span class="status-badge ${cls}">${pass ? 'PASS' : 'IMPROVE'}</span> ${label}`;
+      };
+      const hookStatus = result.rewrittenHook && !result.rewrittenHook.startsWith('PASS');
+      const storyStatus = result.storyImprovements && !result.storyImprovements.startsWith('PASS');
+      const captionStatus = result.improvedCaption && !result.improvedCaption.startsWith('PASS');
+      const pinnedStatus = result.improvedPinnedComment && !result.improvedPinnedComment.startsWith('PASS');
       improvementsHtml = `
-        <h4>Suggested Improvements (v1)</h4>
+        <h4>Section Status</h4>
+        <div class="status-grid">
+          <div class="status-item">${statusBadge('Hook', !hookStatus)}</div>
+          <div class="status-item">${statusBadge('Story', !storyStatus)}</div>
+          <div class="status-item">${statusBadge('Caption', !captionStatus)}</div>
+          <div class="status-item">${statusBadge('Pinned Comment', !pinnedStatus)}</div>
+        </div>
         <div class="suggestion-card">
+          ${!hookStatus ? '' : `
           <div class="suggestion-pair">
             <div class="suggestion-col">
-              <h5>Improved Hook</h5>
-              <p>${this.escapeHtml(result.improvedHook || '(none provided)')}</p>
+              <h5>Hook Problem</h5>
+              <p>${this.escapeHtml(result.rewrittenHook.startsWith('PASS') ? 'No hook problem identified.' : result.rewrittenHook)}</p>
             </div>
             <div class="suggestion-col">
-              <h5>Improved Caption</h5>
-              <p>${this.escapeHtml(result.improvedCaption || '(none provided)')}</p>
+              <h5>Hook Solution</h5>
+              <p>${this.escapeHtml(result.rewrittenHook)}</p>
             </div>
           </div>
-          <div class="suggestion-col" style="grid-column: 1 / -1;">
-            <h5>Story Improvements</h5>
-            <p>${this.escapeHtml(result.storyImprovements || '(none provided)')}</p>
+          `}
+          ${!storyStatus ? '' : `
+          <div class="suggestion-pair">
+            <div class="suggestion-col">
+              <h5>Story Problem</h5>
+              <p>${this.escapeHtml(result.storyImprovements.startsWith('PASS') ? 'No story problem identified.' : result.storyImprovements.slice(0, 200))}</p>
+            </div>
+            <div class="suggestion-col">
+              <h5>Story Solution</h5>
+              <p>${this.escapeHtml(result.storyImprovements)}</p>
+            </div>
           </div>
+          `}
+          ${!captionStatus ? '' : `
+          <div class="suggestion-pair">
+            <div class="suggestion-col">
+              <h5>Caption Problem</h5>
+              <p>${this.escapeHtml(result.improvedCaption.startsWith('PASS') ? 'No caption problem identified.' : result.improvedCaption.slice(0, 200))}</p>
+            </div>
+            <div class="suggestion-col">
+              <h5>Caption Solution</h5>
+              <p>${this.escapeHtml(result.improvedCaption)}</p>
+            </div>
+          </div>
+          `}
+          ${!pinnedStatus ? '' : `
+          <div class="suggestion-pair">
+            <div class="suggestion-col">
+              <h5>Pinned Comment Problem</h5>
+              <p>${this.escapeHtml(result.pinned_comment_problem || 'No pinned comment problem identified.')}</p>
+            </div>
+            <div class="suggestion-col">
+              <h5>Pinned Comment Solution</h5>
+              <p>${this.escapeHtml(result.improvedPinnedComment)}</p>
+            </div>
+          </div>
+          `}
         </div>
       `;
     }

@@ -653,6 +653,11 @@ app.get('/api/export/json', (_req, res) => {
         const finding = getFinding(category);
         if (finding?.explanation) return finding.explanation;
       }
+      if (category === 'pinned') {
+        const finding = getFinding(category);
+        if (finding?.explanation) return finding.explanation;
+        if (rating?.pinned_comment_problem) return rating.pinned_comment_problem;
+      }
       return category === 'hook' ? (idea.opening || 'No hook problem identified.')
         : category === 'story' ? (idea.storyDetail || 'No story problem identified.')
           : (idea.caption || 'No caption problem identified.');
@@ -663,14 +668,19 @@ app.get('/api/export/json', (_req, res) => {
         if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
         return idea.opening || 'No hook solution identified.';
       }
-      if (category === 'story') return idea.lesson || 'No story solution identified.';
+      if (category === 'story') return rating?.storyImprovements || idea.lesson || 'No story solution identified.';
       if (category === 'caption') {
         const rewrite = rating?.improvedCaption;
         if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
         return idea.caption || 'No caption solution identified.';
       }
+      if (category === 'pinned') {
+        const rewrite = rating?.improvedPinnedComment;
+        if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.pinnedComment || 'No pinned comment solution identified.';
+      }
       return category === 'hook' ? (idea.opening || 'No hook solution identified.')
-        : category === 'story' ? (idea.lesson || 'No story solution identified.')
+        : category === 'story' ? rating?.storyImprovements || idea.lesson || 'No story solution identified.'
           : (idea.caption || 'No caption solution identified.');
     };
     return {
@@ -681,6 +691,8 @@ app.get('/api/export/json', (_req, res) => {
       story_solution: solution('story'),
       caption_problem: problem('caption'),
       caption_solution: solution('caption'),
+      pinned_comment_problem: problem('pinned'),
+      pinned_comment_solution: solution('pinned'),
     };
   };
   const exported = ideas
@@ -691,7 +703,7 @@ app.get('/api/export/json', (_req, res) => {
 });
 
 app.get('/api/export/csv', (_req, res) => {
-  const headers = ['idea_id', 'hook_problem', 'hook_solution', 'story_problem', 'story_solution', 'caption_problem', 'caption_solution'];
+  const headers = ['idea_id', 'hook_problem', 'hook_solution', 'story_problem', 'story_solution', 'caption_problem', 'caption_solution', 'pinned_comment_problem', 'pinned_comment_solution'];
   let ideas = [];
   try {
     const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
@@ -738,6 +750,11 @@ app.get('/api/export/csv', (_req, res) => {
         const finding = getFinding(category);
         if (finding?.explanation) return finding.explanation;
       }
+      if (category === 'pinned') {
+        const finding = getFinding(category);
+        if (finding?.explanation) return finding.explanation;
+        if (rating?.pinned_comment_problem) return rating.pinned_comment_problem;
+      }
       return category === 'hook' ? (idea.opening || 'No hook problem identified.')
         : category === 'story' ? (idea.storyDetail || 'No story problem identified.')
           : (idea.caption || 'No caption problem identified.');
@@ -748,14 +765,19 @@ app.get('/api/export/csv', (_req, res) => {
         if (rewrite && !rewrite.includes('...?') && !rewrite.includes('\uFFFD')) return rewrite;
         return idea.opening || 'No hook solution identified.';
       }
-      if (category === 'story') return idea.lesson || 'No story solution identified.';
+      if (category === 'story') return rating?.storyImprovements || idea.lesson || 'No story solution identified.';
       if (category === 'caption') {
         const rewrite = rating?.improvedCaption;
         if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
         return idea.caption || 'No caption solution identified.';
       }
+      if (category === 'pinned') {
+        const rewrite = rating?.improvedPinnedComment;
+        if (rewrite && !rewrite.includes('\uFFFD')) return rewrite;
+        return idea.pinnedComment || 'No pinned comment solution identified.';
+      }
       return category === 'hook' ? (idea.opening || 'No hook solution identified.')
-        : category === 'story' ? (idea.lesson || 'No story solution identified.')
+        : category === 'story' ? rating?.storyImprovements || idea.lesson || 'No story solution identified.'
           : (idea.caption || 'No caption solution identified.');
     };
     const row = [
@@ -766,6 +788,8 @@ app.get('/api/export/csv', (_req, res) => {
       csvCell(solution('story')),
       csvCell(problem('caption')),
       csvCell(solution('caption')),
+      csvCell(problem('pinned')),
+      csvCell(solution('pinned')),
     ];
     lines.push(row.join(','));
   });
