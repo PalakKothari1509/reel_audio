@@ -364,10 +364,38 @@ test('offline evaluation does not cap when score <= 59 even with critical findin
 
 // ── Deterministic check regression tests ─────────────────────────────────
 
-test('idea_4 flagged for placeholder text (XXXXXXXXXX)', () => {
-  const idea = ideas.find(i => i.id === 'idea_4');
-  assert.ok(idea, 'idea_4 should exist');
-  const result = offlineEvaluate(idea, ideas);
+test('placeholder text detected in readyPrompt', () => {
+  const fixture = {
+    id: 'test_placeholder',
+    title: 'Test Placeholder',
+    category: 'Safety',
+    cover: 'Test Cover',
+    opening: 'Ria is playing with toys.',
+    problem: 'Ria does not want to share toys.',
+    lesson: 'Sharing is caring.',
+    openingHint: '',
+    storyDetail: 'Ria learns to share her toys with friends.',
+    setting: 'Playroom',
+    sceneDetail: 'Toys scattered on floor.',
+    dialogue: 'Can I play too?',
+    mess: 'Toys everywhere.',
+    innerThought: 'I want to keep them all.',
+    endingBeat: 'They play together.',
+    defaultCast: ['Ria'],
+    keepMoralOffScreen: false,
+    quote: 'Share with me.',
+    detail: 'Red ball.',
+    punchline: 'Sharing is fun.',
+    readyPrompt: 'XXXXXXXXXX This is a test prompt with placeholder text.',
+    forApp: true,
+    archived: false,
+    custom: false,
+    usedOn: '',
+    score: 0,
+    band: '',
+    reviewedOn: '',
+  };
+  const result = offlineEvaluate(fixture, [fixture]);
   const check = result.deterministicChecks.find(c => c.id === 'placeholderText');
   assert.ok(check, 'placeholderText check should exist');
   assert.equal(check.passed, false, 'Should fail placeholderText check');
@@ -383,10 +411,38 @@ test('idea_46 flagged for empty readyPrompt and archived placeholder', () => {
   assert.equal(check.passed, false, 'Should fail placeholderText check for Archived');
 });
 
-test('idea_1 flagged for opening cast mismatch (Uncle vs Daadi)', () => {
-  const idea = ideas.find(i => i.id === 'idea_1');
-  assert.ok(idea, 'idea_1 should exist');
-  const result = offlineEvaluate(idea, ideas);
+test('opening cast mismatch: Uncle not in defaultCast', () => {
+  const fixture = {
+    id: 'test_cast_mismatch',
+    title: 'Test Cast Mismatch',
+    category: 'Safety',
+    cover: 'Test Cover',
+    opening: 'Uncle is helping Ria with her homework.',
+    problem: 'Ria struggles with math.',
+    lesson: 'Practice makes perfect.',
+    openingHint: '',
+    storyDetail: 'Ria studies hard and improves her grades.',
+    setting: 'Study room',
+    sceneDetail: 'Books and pencils on desk.',
+    dialogue: 'This is hard!',
+    mess: 'Papers scattered.',
+    innerThought: 'I can do this.',
+    endingBeat: 'Ria succeeds.',
+    defaultCast: ['Ria', 'Mumma'],
+    keepMoralOffScreen: false,
+    quote: 'Study hard.',
+    detail: 'Math book.',
+    punchline: 'Hard work pays off.',
+    readyPrompt: 'Test prompt.',
+    forApp: true,
+    archived: false,
+    custom: false,
+    usedOn: '',
+    score: 0,
+    band: '',
+    reviewedOn: '',
+  };
+  const result = offlineEvaluate(fixture, [fixture]);
   const check = result.deterministicChecks.find(c => c.id === 'openingCastMismatch');
   assert.ok(check, 'openingCastMismatch check should exist');
   assert.equal(check.passed, false, 'Should fail openingCastMismatch check');
@@ -402,14 +458,48 @@ test('idea_5 and idea_6 flagged for pinned comment copied from another idea', ()
   }
 });
 
-test('ideas 2, 14, 15, 17 flagged for generic pinned comment', () => {
-  for (const id of ['idea_2', 'idea_14', 'idea_15', 'idea_17']) {
-    const idea = ideas.find(i => i.id === id);
-    assert.ok(idea, `${id} should exist`);
-    const result = offlineEvaluate(idea, ideas);
+test('generic pinned comment detected', () => {
+  const templates = [
+    'Isi concept ko real-life situation mein try karo',
+    'Har tip ko try karo aur comment mein batana',
+    'Tip: Time teller ke liye ek simple song ya rhyme banayein',
+  ];
+  for (const pinnedComment of templates) {
+    const fixture = {
+      id: 'test_generic_pinned',
+      title: 'Test Generic Pinned',
+      category: 'Safety',
+      cover: 'Test Cover',
+      opening: 'Ria is playing with toys.',
+      problem: 'Ria does not want to share toys.',
+      lesson: 'Sharing is caring.',
+      openingHint: '',
+      storyDetail: 'Ria learns to share her toys with friends.',
+      setting: 'Playroom',
+      sceneDetail: 'Toys scattered on floor.',
+      dialogue: 'Can I play too?',
+      mess: 'Toys everywhere.',
+      innerThought: 'I want to keep them all.',
+      endingBeat: 'They play together.',
+      defaultCast: ['Ria'],
+      keepMoralOffScreen: false,
+      quote: 'Share with me.',
+      detail: 'Red ball.',
+      punchline: 'Sharing is fun.',
+      pinnedComment,
+      readyPrompt: 'Test prompt.',
+      forApp: true,
+      archived: false,
+      custom: false,
+      usedOn: '',
+      score: 0,
+      band: '',
+      reviewedOn: '',
+    };
+    const result = offlineEvaluate(fixture, [fixture]);
     const check = result.deterministicChecks.find(c => c.id === 'genericPinnedComment');
     assert.ok(check, 'genericPinnedComment check should exist');
-    assert.equal(check.passed, false, `${id} should fail genericPinnedComment check`);
+    assert.equal(check.passed, false, `Should fail genericPinnedComment check for: "${pinnedComment}"`);
   }
 });
 
