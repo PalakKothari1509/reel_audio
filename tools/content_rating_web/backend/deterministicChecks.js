@@ -148,25 +148,27 @@ function checkPinnedCommentMismatch(idea) {
   if (!pinned) {
     return {
       id: 'pinnedCommentMismatch',
-      passed: true,
+      passed: false,
       severity: 'minor',
       gate: 'captionCommentPackage',
-      detail: 'No pinned comment to check',
+      detail: 'Missing pinned comment',
     };
   }
   const storyText = `${idea.title || ''} ${idea.problem || ''} ${idea.storyDetail || ''}`;
   const pinnedTokens = new Set(tokenize(pinned));
   const storyTokens = new Set(tokenize(storyText));
   const overlap = [...pinnedTokens].filter(t => storyTokens.has(t)).length;
-  const threshold = 3;
+  const hasQuestion = /\?/.test(pinned);
+  const threshold = 2;
+  const passed = overlap >= threshold && hasQuestion;
   return {
     id: 'pinnedCommentMismatch',
-    passed: overlap >= threshold,
+    passed,
     severity: 'minor',
     gate: 'captionCommentPackage',
-    detail: overlap >= threshold
-      ? `Pinned comment shares ${overlap} meaningful keyword(s) with story`
-      : `Pinned comment shares only ${overlap} meaningful keyword(s) with story (threshold: ${threshold})`,
+    detail: passed
+      ? `Pinned comment shares ${overlap} keyword(s) with story and asks a question`
+      : `Pinned comment shares ${overlap} keyword(s) with story (threshold: ${threshold}), question present: ${hasQuestion}`,
   };
 }
 
@@ -422,15 +424,15 @@ function checkHashtagCount(idea) {
   const caption = idea.caption || '';
   const hashtags = caption.match(/#[^\s#]+/g) || [];
   const count = hashtags.length;
-  const passed = count >= 3 && count <= 5;
+  const passed = count === 5;
   return {
     id: 'hashtagCount',
     passed,
     severity: 'minor',
     gate: 'captionCommentPackage',
     detail: passed
-      ? `Caption has ${count} hashtags (within 3-5 range)`
-      : `Caption has ${count} hashtags (expected 3-5)`,
+      ? `Caption has exactly 5 hashtags`
+      : `Caption has ${count} hashtags (expected exactly 5)`,
   };
 }
 
@@ -601,8 +603,7 @@ function checkCaptionQuality(idea) {
     }
   }
   const hashtags = caption.match(/#[^\s#]+/g) || [];
-  if (hashtags.length > 5) issues.push(`Too many hashtags (${hashtags.length}, max 5)`);
-  if (hashtags.length < 3) issues.push(`Too few hashtags (${hashtags.length}, min 3)`);
+  if (hashtags.length !== 5) issues.push(`Expected exactly 5 hashtags, found ${hashtags.length}`);
   if (caption.length > 300) issues.push(`Caption too long (${caption.length} chars)`);
   return {
     id: 'captionQuality',

@@ -178,51 +178,85 @@ function getRewrittenHook(idea, dimensionScores, gateResults, deterministicResul
   const isMissing = opening.length === 0;
   const isTitleLabel = opening === title || opening === idea.cover;
 
-  if (isMissing || isGenericOrInstructional || isTooLong || isTitleLabel || openingCastMismatch?.passed === false) {
-    const subject = cast.length > 0 ? cast[0] : 'the child';
-    const problemFirstSentence = problem.split(/[.!?]/)[0].trim();
-    let hookSubject = problemFirstSentence.length > 0 ? problemFirstSentence : problem.slice(0, 60);
-    if (hookSubject.length > 60) {
-      const lastSpace = hookSubject.lastIndexOf(' ', 60);
-      hookSubject = lastSpace > 0 ? hookSubject.slice(0, lastSpace) : hookSubject.slice(0, 60);
-    }
-    return `"${hookSubject}?"`;
-  }
-
-  return 'PASS — No change required.';
-}
-
-function getImprovedStory(idea, dimensionScores, findings) {
-  const storyScoreDim = findDimension(dimensionScores, 'payoffRetention');
-  const hasStory = (idea.storyDetail || '').trim().length > 0;
-  const hasTwist = /twist/i.test(idea.storyDetail || '');
-  const hasResolution = /resolution/i.test(idea.storyDetail || '');
-  const hasMoral = /moral/i.test(idea.storyDetail || '');
-  const hasEnding = (idea.endingBeat || '').trim().length > 0;
-
-  const missingParts = [];
-  if (!hasStory) missingParts.push('story detail');
-  if (!hasTwist) missingParts.push('twist');
-  if (!hasResolution) missingParts.push('resolution');
-  if (!hasMoral) missingParts.push('moral/lesson');
-  if (!hasEnding) missingParts.push('ending beat');
-
-  if (missingParts.length === 0 && storyScoreDim && storyScoreDim.score >= 7) {
+  if (!isMissing && !isGenericOrInstructional && !isTooLong && !isTitleLabel && openingCastMismatch?.passed !== false) {
     return 'PASS — No change required.';
   }
 
+  const mainChar = cast.length > 0 ? cast[0] : 'the child';
+  const firstSentence = problem.split(/[.!?]/)[0].trim();
+
+  const finishHook = (subject) => {
+    let clean = subject.trim();
+    const shortWords = ['a', 'an', 'the', 'to', 'of', 'in', 'on', 'at', 'for', 'or', 'and', 'but',
+      'under', 'over', 'with', 'from', 'by', 'about', 'across', 'along', 'around', 'before',
+      'after', 'during', 'without', 'within', 'beside', 'between', 'among', 'beneath', 'below',
+      'above', 'toward', 'towards', 'into', 'onto', 'upon', 'via', 'per'];
+    if (shortWords.includes(clean.split(/\s+/).pop() || '')) {
+      const earlierSpace = clean.lastIndexOf(' ', clean.length - 2);
+      clean = earlierSpace > 0 ? clean.slice(0, earlierSpace) : clean;
+    }
+    return clean.endsWith('?') ? clean : `${clean}?`;
+  };
+
+  if (firstSentence.length > 0) {
+    const truncated = firstSentence.slice(0, 70);
+    const lastSpace = truncated.lastIndexOf(' ');
+    const cleanSubject = lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated;
+    return `"${finishHook(cleanSubject)}"`;
+  }
+
+  const problemWords = problem.split(/\s+/).filter(w => w.length > 0);
+  const hookSubject = problemWords.slice(0, 10).join(' ');
+  return `"${finishHook(hookSubject)}"`;
+}
+
+function getImprovedStory(idea, dimensionScores, findings) {
+  const storyDetail = idea.storyDetail || '';
+  const endingBeat = idea.endingBeat || '';
   const problem = idea.problem || '';
   const lesson = idea.lesson || '';
   const title = idea.title || '';
   const cast = Array.isArray(idea.defaultCast) ? idea.defaultCast : [];
   const setting = idea.setting || '';
+  const sceneDetail = idea.sceneDetail || '';
+  const storyScoreDim = findDimension(dimensionScores, 'payoffRetention');
+
+  const hasStory = storyDetail.trim().length > 0;
+  const hasEnding = endingBeat.trim().length > 0;
+
+  const storyLower = storyDetail.toLowerCase();
+  const hasConflict = /conflict|challenge|problem|struggle|difficult|issue|refus|cry|cries|scared|afraid|worry|worried|sad|angry|mad|upset|fight|argue|disagree|mistake|error|wrong|fail|falls|break|broken|lost|lose|no|not|never|can.?t|won.?t|don.?t|doesn.?t|chubh|itch|uncomfort|nahi|nahin|pehnungi|refuse|stop|rant|tantrum|meltdown|hit|slap|push|shove|grab|snatch|scream|yell|shout|kick|bite|pinch|scratch|hurt|pain|ouch|oops|oops|oops|oh no|arre|arey|bapre|oh no|oh no|oh no/i.test(storyLower);
+  const hasTwist = /twist|unexpected|surprise|but|however|instead|actually|really|turn|realize|understand|remember|think|decide|chooses|chooses|switch|change|flip/i.test(storyLower);
+  const hasResolution = /resolution|resolv|solv|fix|solve|overcome|handle|manage|deal|succeed|success|finally|eventually|in the end|at last|learn|teach|show|demonstrate|practise|practice|try again|once more/i.test(storyLower);
+  const hasMoral = /moral|lesson|takeaway|learn|teach|should|must|always|never|important|remember|value|principle|rule|guide|help|safe|safety|careful|cautious/i.test(storyLower);
+  const hasVisualDetail = sceneDetail.trim().length > 0 || setting.trim().length > 0;
+  const hasDialogue = (idea.dialogue || '').trim().length > 0;
+
+  const missingParts = [];
+  if (!hasStory) missingParts.push('story detail');
+  if (!hasConflict) missingParts.push('conflict or challenge');
+  if (!hasTwist) missingParts.push('twist or turn');
+  if (!hasResolution) missingParts.push('logical resolution');
+  if (!hasMoral) missingParts.push('clear moral/takeaway');
+  if (!hasEnding) missingParts.push('ending beat');
+  if (!hasVisualDetail) missingParts.push('visual detail/setting');
+
+  if (missingParts.length === 0 && storyScoreDim && storyScoreDim.score >= 7) {
+    return 'PASS — No change required.';
+  }
 
   const mainChar = cast.length > 0 ? cast[0] : 'the child';
   const supportChar = cast.length > 1 ? cast[1] : 'a parent';
+  const settingText = setting || 'A familiar home setting.';
 
-  const storyText = `Story: ${mainChar} faces ${problem.toLowerCase()}. ${supportChar} guides them with patience. Twist: The obvious fix doesn't work — ${mainChar} must try something new. Resolution: ${mainChar} succeeds by staying calm and trying once more. Moral: ${lesson || 'Small steps and patience help children learn.'}
-Setting: ${setting || 'A familiar home setting.'}
-Dialogue: "${mainChar}: I can't do it!" "${supportChar}: Try one more time, I'm right here."`;
+  const conflictText = problem.split(/[.!?]/)[0] || problem.slice(0, 80);
+  const storyText = `Story: ${mainChar} faces ${conflictText.toLowerCase()}. ${supportChar} helps them understand the situation.
+Twist: The first instinct doesn't work — ${mainChar} must try a different approach.
+Resolution: ${mainChar} succeeds by staying calm and following ${supportChar.toLowerCase()}'s guidance.
+Moral: ${lesson || 'Small steps, patience, and adult guidance help children handle challenges.'}
+Setting: ${settingText}
+Scene: ${sceneDetail || 'Visible action with clear props and ending image.'}
+Dialogue: "${mainChar}: I need help!" "${supportChar}: I am right here, let us do it together."`;
 
   return storyText;
 }
@@ -241,16 +275,15 @@ function getImprovedCaption(idea, dimensionScores, findings) {
   );
 
   const isGeneric = /^(replace generic|tag a parent|what do you think|comment below|like and share|follow for more|check this out|tell us)/i.test(caption);
-  const hasHashtags = /#[^\s#]+/.test(caption);
   const hashtagCount = (caption.match(/#[^\s#]+/g) || []).length;
   const isTooLong = caption.length > 300;
 
-  if (!isGeneric && hasHashtags && hashtagCount >= 3 && hashtagCount <= 5 && !isTooLong && !captionCaptionMismatch) {
+  if (!isGeneric && hashtagCount === 5 && !isTooLong && !captionCaptionMismatch) {
     return 'PASS — No change required.';
   }
 
   const takeaway = lesson || problem.split(/[.!?]/)[0] || title;
-  const hashtags = '#ChildSafety #IndianParents #FunLearningWithPalak';
+  const hashtags = '#ChildSafety #IndianParents #FunLearningWithPalak #ParentingTips #ToddlerLife';
   const maxTakeawayLen = 300 - hashtags.length - 1;
   let captionText = `${takeaway.slice(0, maxTakeawayLen)} ${hashtags}`;
   return captionText;
@@ -279,12 +312,73 @@ function getImprovedPinnedComment(idea, dimensionScores, findings) {
     return 'PASS — No change required.';
   }
 
-  const questionTopic = lesson || problem.split(/[.!?]/)[0] || title;
-  const cleanTopic = questionTopic.replace(/[.,!?;:()\[\]{}"'“”‘’]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50);
-  return `What's your ${cleanTopic.toLowerCase()} experience?`;
+  if (!pinned || pinned.trim().length === 0) {
+    const topic = lesson || problem.split(/[.!?]/)[0] || title;
+    return `What do you do when ${topic.toLowerCase().slice(0, 60)}?`;
+  }
+
+  const lessonFirst = lesson.split(/[.!?]/)[0].trim();
+  const problemFirst = problem.split(/[.!?]/)[0].trim();
+  const topic = lessonFirst || problemFirst || title;
+  const cleanTopic = topic.replace(/[.,!?;:()\[\]{}"'“”‘’]/g, ' ').replace(/\s+/g, ' ').trim();
+  // Respect word boundaries when slicing to 60 chars
+  let topicSlice = cleanTopic.slice(0, 60);
+  const lastSpace = topicSlice.lastIndexOf(' ');
+  if (lastSpace > 0 && cleanTopic.length > 60) {
+    topicSlice = topicSlice.slice(0, lastSpace);
+  }
+  const lowerTopic = topicSlice.toLowerCase();
+
+  if (lowerTopic.includes('road') || lowerTopic.includes('ball') || lowerTopic.includes('chase')) {
+    return `Does your child stop at the road and call for help?`;
+  }
+  if (lowerTopic.includes('hug') || lowerTopic.includes('marzi') || lowerTopic.includes('consent') || lowerTopic.includes('touch')) {
+    return `Do you ask before hugging your child?`;
+  }
+  if (lowerTopic.includes('chocolate') || lowerTopic.includes('stranger') || lowerTopic.includes('unknown')) {
+    return `Does your child know not to accept treats from strangers?`;
+  }
+  if (lowerTopic.includes('separat') || lowerTopic.includes('crowd') || lowerTopic.includes('lost') || lowerTopic.includes('bheed')) {
+    return `Does your child know your phone number and full name?`;
+  }
+  if (lowerTopic.includes('kitchen') || lowerTopic.includes('gas') || lowerTopic.includes('cook')) {
+    return `Where does your child play while you cook?`;
+  }
+  if (lowerTopic.includes('shoe') || lowerTopic.includes('independence') || lowerTopic.includes('main khud')) {
+    return `What does your child insist on doing alone?`;
+  }
+  if (lowerTopic.includes('screen') || lowerTopic.includes('cartoon') || lowerTopic.includes('transition')) {
+    return `How do you help your child transition off screen time?`;
+  }
+  if (lowerTopic.includes('block') || lowerTopic.includes('tower') || lowerTopic.includes('frustrat')) {
+    return `What do you do when your child gets frustrated with a task?`;
+  }
+  if (lowerTopic.includes('toy') || lowerTopic.includes('tidy') || lowerTopic.includes('clean') || lowerTopic.includes('cuty')) {
+    return `Do you tidy up toys together with your child?`;
+  }
+  if (lowerTopic.includes('broccoli') || lowerTopic.includes('food') || lowerTopic.includes('eat') || lowerTopic.includes('plate')) {
+    return `How do you introduce new foods to your child?`;
+  }
+  if (lowerTopic.includes('park') || lowerTopic.includes('sibling') || lowerTopic.includes('slide')) {
+    return `Which park-exit reaction does your child have?`;
+  }
+  if (lowerTopic.includes('toddler') || lowerTopic.includes('habit') || lowerTopic.includes('number 8')) {
+    return `What is your toddler's funniest daily habit?`;
+  }
+  if (lowerTopic.includes('festival') || lowerTopic.includes('diwali') || lowerTopic.includes('outfit') || lowerTopic.includes('comfort')) {
+    return `What festive outfit does your child find most comfortable?`;
+  }
+  if (lowerTopic.includes('costume') || lowerTopic.includes('butterfly') || lowerTopic.includes('wings')) {
+    return `Which annual-day costume took the most preparation?`;
+  }
+
+  // Generic fallback: extract the core action from the topic
+  const actionWords = lowerTopic.split(/\s+/).filter(w => w.length > 3 && !['that','this','with','from','have','been','their','there','when','then','they','them','those','which','what','where','while','would','could','should','about','after','before','during','since','until','while','because','although','though','either','neither','both','all','any','each','every','other','another','such','only','own','same','so','too','also','even','still','yet','already','always','never','often','sometimes','usually','almost','about'].includes(w));
+  const actionPhrase = actionWords.length > 0 ? actionWords.slice(0, 4).join(' ') : lowerTopic;
+  return `What do you do when ${actionPhrase}?`;
 }
 
-function validateSolutionQuality(result) {
+function validateSolutionQuality(result, idea) {
   const issues = [];
 
   // Hook solution must actually be a hook (not an instruction or story summary)
@@ -303,6 +397,16 @@ function validateSolutionQuality(result) {
     // Hook should not be a story summary (>200 chars is likely a summary)
     if (hookSol.length > 200) {
       issues.push(`Hook solution is too long to be a hook (${hookSol.length} chars)`);
+    }
+    // Hook must end with proper punctuation (? or ! or .)
+    const trimmedHook = hookSol.trim();
+    if (!/[.!?]$/.test(trimmedHook.replace(/["]$/, ''))) {
+      issues.push(`Hook solution does not end with proper punctuation: "${trimmedHook.slice(0, 80)}"`);
+    }
+    // Hook must not have dangling incomplete words (ends with single letter or fragment)
+    const lastWord = trimmedHook.replace(/["?!.]$/, '').split(/\s+/).pop() || '';
+    if (lastWord.length <= 2 && /[a-zA-Z]/.test(lastWord)) {
+      issues.push(`Hook solution appears to end with a dangling word fragment: "${trimmedHook.slice(0, 80)}"`);
     }
   }
 
@@ -327,8 +431,9 @@ function validateSolutionQuality(result) {
   // Caption solution must be an actual caption
   const capSol = result.improvedCaption || '';
   if (capSol && !capSol.startsWith('PASS')) {
-    if (!/#\w/.test(capSol)) {
-      issues.push(`Caption solution has no hashtags`);
+    const hashtagCount = (capSol.match(/#[^\s#]+/g) || []).length;
+    if (hashtagCount !== 5) {
+      issues.push(`Caption solution does not have exactly 5 hashtags (found ${hashtagCount})`);
     }
     if (capSol.length > 300) {
       issues.push(`Caption solution is too long (${capSol.length} chars)`);
@@ -343,6 +448,10 @@ function validateSolutionQuality(result) {
     }
     if (pinnedSol === capSol) {
       issues.push(`Pinned comment solution duplicates caption solution`);
+    }
+    // Pinned comment should not be awkward "What's your X experience?"
+    if (/^what's your .* experience\?$/i.test(pinnedSol.trim())) {
+      issues.push(`Pinned comment solution uses generic template: "${pinnedSol.slice(0, 80)}"`);
     }
   }
 
@@ -374,7 +483,7 @@ function offlineEvaluate(idea, allIdeas = []) {
     storyImprovements,
     improvedCaption,
     improvedPinnedComment,
-  });
+  }, idea);
 
   return {
     ideaId: idea.id,
@@ -1063,7 +1172,7 @@ function buildOnlineResult(idea, geminiResponse, allIdeas = []) {
     storyImprovements,
     improvedCaption,
     improvedPinnedComment,
-  });
+  }, idea);
 
   return {
     ideaId: idea.id,
