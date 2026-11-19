@@ -256,6 +256,22 @@ body {
 .freshness-tag.status-stale { background: #ffeaa7; color: #d63031; }
 .freshness-tag.status-unevaluated { background: #f8f9fa; color: #6c757d; }
 
+/* Verdict badges */
+.verdict-badge { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 600; text-transform: uppercase; margin-left: 0.3rem; }
+.verdict-badge.verdict-ready-to-post { background: #d4edda; color: #155724; }
+.verdict-badge.verdict-needs-minor-fixes { background: #fff3cd; color: #856404; }
+.verdict-badge.verdict-needs-major-rewrite { background: #fde6ca; color: #8a5a00; }
+.verdict-badge.verdict-reject { background: #f8d7da; color: #721c24; }
+.verdict-badge.verdict-none { background: #f8f9fa; color: #6c757d; }
+
+/* Dimension score badges */
+.dim-badge { font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600; margin-left: 0.15rem; margin-top: 0.15rem; background: #e8e2d0; color: #2d2d2d; }
+.idea-dim-badges { margin-top: 0.4rem; }
+
+/* Duplicate badge */
+.dup-badge { font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600; margin-left: 0.15rem; margin-top: 0.15rem; background: #fde6ca; color: #8a5a00; cursor: pointer; }
+.dup-badge:hover { background: #f5b041; }
+
 /* Export */
 .export-card {
   background: var(--surface);

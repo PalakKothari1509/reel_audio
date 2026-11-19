@@ -6,6 +6,8 @@ const app = {
   ideas: [],
   ratings: [],
   freshness: [],
+  failedIdeas: new Set(),
+  sort: 'idAsc',
   selectedIdea: null,
   currentView: 'dashboard',
 
@@ -17,6 +19,18 @@ const app = {
     await this.loadFreshness();
     this.renderDashboard();
     this.showToast('Content Rating Tool loaded. Offline mode ready.', 'info');
+
+    // Escape key closes the topmost open modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const resultModal = document.getElementById('resultModal');
+      const ideaModal = document.getElementById('ideaModal');
+      if (resultModal.style.display === 'flex') {
+        this.closeResultModal();
+      } else if (ideaModal.style.display === 'flex') {
+        this.closeModal();
+      }
+    });
   },
 
   setupNavigation() {
@@ -49,6 +63,11 @@ const app = {
     verdict.addEventListener('change', () => this.renderLibrary());
     const status = document.getElementById('libStatus');
     status.addEventListener('change', () => this.renderLibrary());
+    const sort = document.getElementById('libSort');
+    sort.addEventListener('change', () => {
+      this.sort = sort.value;
+      this.renderLibrary();
+    });
   },
 
   async loadIdeas() {
@@ -96,6 +115,73 @@ const app = {
     return this.ratings.find(r => r.ideaId === ideaId);
   },
 
+  sortIdeas(filtered) {
+    const sorted = [...filtered];
+    const sort = this.sort || 'idAsc';
+
+    const verdictOrder = {
+      'Ready to Post': 0,
+      'Needs Minor Fixes': 1,
+      'Needs Major Rewrite': 2,
+      Reject: 3,
+    };
+
+    const freshnessOrder = {
+      CURRENT: 0,
+      NEEDS_REEVALUATION: 1,
+      LEGACY: 2,
+      NOT_EVALUATED: 3,
+    };
+
+    sorted.sort((a, b) => {
+      const ideaA = this.ideas.find(i => i.id === a.ideaId);
+      const ideaB = this.ideas.find(i => i.id === b.ideaId);
+      const ratingA = this.ratings.find(r => r.ideaId === a.ideaId);
+      const ratingB = this.ratings.find(r => r.ideaId === b.ideaId);
+
+      switch (sort) {
+        case 'scoreHigh': {
+          const scoreA = ratingA ? ratingA.overallScore : -1;
+          const scoreB = ratingB ? ratingB.overallScore : -1;
+          return scoreB - scoreA || a.ideaId.localeCompare(b.ideaId);
+        }
+        case 'scoreLow': {
+          const scoreA = ratingA ? ratingA.overallScore : 101;
+          const scoreB = ratingB ? ratingB.overallScore : 101;
+          return scoreA - scoreB || a.ideaId.localeCompare(b.ideaId);
+        }
+        case 'verdict': {
+          const va = verdictOrder[ratingA?.verdict] ?? 99;
+          const vb = verdictOrder[ratingB?.verdict] ?? 99;
+          return va - vb || a.ideaId.localeCompare(b.ideaId);
+        }
+        case 'freshness': {
+          const fa = freshnessOrder[a.status] ?? 99;
+          const fb = freshnessOrder[b.status] ?? 99;
+          return fa - fb || a.ideaId.localeCompare(b.ideaId);
+        }
+        case 'idDesc': {
+          return b.ideaId.localeCompare(a.ideaId);
+        }
+        case 'idAsc':
+        default:
+          return a.ideaId.localeCompare(b.ideaId);
+      }
+    });
+
+    return sorted;
+  },
+
+  clearAllFilters() {
+    document.getElementById('libSearch').value = '';
+    document.getElementById('libCategory').value = '';
+    document.getElementById('libVerdict').value = '';
+    document.getElementById('libStatus').value = '';
+    document.getElementById('libSort').value = 'idAsc';
+    this.sort = 'idAsc';
+    this.renderLibrary();
+  },
+
   renderDashboard() {
     const total = this.ideas.length;
     const current = this.freshness.filter(f => f.status === 'CURRENT').length;
@@ -107,6 +193,7 @@ const app = {
     const reject = this.freshness.filter(f => f.rating && f.rating.verdict === 'Reject').length;
 
     document.getElementById('statTotal').textContent = total;
+    document.getElementById('statEvaluated').textContent = this.ratings.length;
     document.getElementById('statCurrent').textContent = current;
     document.getElementById('statNeedsReevaluation').textContent = needsReevaluation;
     document.getElementById('statNotEvaluated').textContent = notEvaluated;
@@ -126,6 +213,16 @@ const app = {
       document.getElementById('libCategory').value = '';
       document.getElementById('libVerdict').value = '';
       document.getElementById('libStatus').value = '';
+      this.navigateTo('library');
+      this.renderLibrary();
+    };
+
+    // Evaluated → filter by evaluated status
+    document.getElementById('statEvaluated').parentElement.onclick = () => {
+      document.getElementById('libSearch').value = '';
+      document.getElementById('libCategory').value = '';
+      document.getElementById('libVerdict').value = '';
+      document.getElementById('libStatus').value = 'evaluated';
       this.navigateTo('library');
       this.renderLibrary();
     };
@@ -512,16 +609,19 @@ const app = {
         (status === 'needsReevaluation' && (f.status === 'NEEDS_REEVALUATION' || f.status === 'LEGACY')) ||
         (status === 'notEvaluated' && f.status === 'NOT_EVALUATED') ||
         (status === 'evaluated' && !!f.rating) ||
-        (status === 'unevaluated' && !f.rating);
+        (status === 'unevaluated' && !f.rating) ||
+        (status === 'failed' && this.failedIdeas.has(f.ideaId));
       return matchesSearch && matchesCat && matchesVerdict && matchesStatus;
     });
 
-    if (filtered.length === 0) {
+    let sorted = this.sortIdeas(filtered);
+
+    if (sorted.length === 0) {
       container.innerHTML = '<div class="empty-state"><h3>No ideas found</h3><p>Try adjusting your filters.</p></div>';
       return;
     }
 
-    filtered.forEach(f => {
+    sorted.forEach(f => {
       const idea = this.ideas.find(i => i.id === f.ideaId);
       const rating = f.rating;
       const card = document.createElement('div');
@@ -542,11 +642,48 @@ const app = {
         ? `<span class="stat-value-mini">${rating.overallScore}</span>`
         : '<span class="stat-value-mini">-</span>';
 
+      const verdictClass = rating
+        ? `verdict-badge verdict-${rating.verdict.toLowerCase().replace(' ', '-')}`
+        : 'verdict-badge verdict-none';
+      const verdictText = rating ? rating.verdict : 'Not Evaluated';
+
+      const dimShort = {
+        hookStrength: 'Hook',
+        relatabilityAudienceFit: 'Relatability',
+        payoffRetention: 'Payoff',
+        hinglishNaturalness: 'Hinglish',
+        visualFeasibility: 'Visual',
+        soundOffReadability: 'Sound-Off',
+        shareSaveTrigger: 'Share',
+        captionCommentPackage: 'Caption',
+        originality: 'Originality',
+        audioHook: 'Audio Hook',
+      };
+      const dimScores = rating?.dimensionScores || [];
+      const dimBadges = dimScores
+        .slice(0, 4)
+        .map(d => {
+          const label = dimShort[d.id] || d.id;
+          return `<span class="dim-badge" title="${d.id}: ${d.score}/10">${label} ${d.score}</span>`;
+        })
+        .join('');
+
+      const dupIds = rating?.duplicateOf || [];
+      const dupTitles = dupIds.map(id => {
+        const refIdea = this.ideas.find(i => i.id === id);
+        return refIdea ? `${id}: ${refIdea.title}` : id;
+      });
+      const dupBadge = dupIds.length > 0
+        ? `<span class="dup-badge" title="Duplicate of: ${dupTitles.join(', ')}">Dup: ${dupIds.length}</span>`
+        : '';
+
       card.innerHTML = `
         <div class="idea-card-header">
           <span class="idea-id">${idea.id}</span>
           <span class="status-tag ${statusClass}">${statusText}</span>
           <span class="freshness-tag ${freshnessClass}">${freshnessText}</span>
+          <span class="${verdictClass}">${verdictText}</span>
+          ${dupBadge}
         </div>
         <h3 class="idea-title">${this.escapeHtml(idea.title)}</h3>
         <div class="idea-category">${this.escapeHtml(idea.category)}</div>
@@ -555,6 +692,7 @@ const app = {
           <span>Cast: ${(idea.defaultCast || []).join(', ') || 'none'}</span>
           ${idea.archived ? '<span>Archived</span>' : ''}
         </div>
+        ${dimBadges ? `<div class="idea-dim-badges">${dimBadges}</div>` : ''}
       `;
       container.appendChild(card);
     });
@@ -582,7 +720,19 @@ const app = {
         <div class="idea-detail-field"><div class="field-label">Cast</div><div class="field-value">${(idea.defaultCast || []).join(', ') || 'none'}</div></div>
         <div class="idea-detail-field"><div class="field-label">Setting</div><div class="field-value">${this.escapeHtml(idea.setting)}</div></div>
         <div class="idea-detail-field"><div class="field-label">Story Detail</div><div class="field-value">${this.escapeHtml(idea.storyDetail)}</div></div>
+        <div class="idea-detail-field"><div class="field-label">Production Prompt</div><div class="field-value prompt-text" style="white-space: pre-wrap">${idea.readyPrompt ? this.escapeHtml(idea.readyPrompt) : '<em>No production prompt available.</em>'}</div><button class="btn btn-secondary" style="font-size:0.8rem;margin-top:0.25rem;" onclick="app.copyPrompt('${idea.id}')">Copy Prompt</button></div>
         <div class="idea-detail-field"><div class="field-label">Freshness</div><div class="field-value">${freshnessStatus}</div></div>
+        ${rating && rating.duplicateOf && rating.duplicateOf.length > 0 ? `
+        <div class="idea-detail-field"><div class="field-label">Duplicate Of</div><div class="field-value">
+          ${rating.duplicateOf.map(id => {
+            const refIdea = this.ideas.find(i => i.id === id);
+            if (refIdea) {
+              return `<span style="color:var(--primary);cursor:pointer;text-decoration:underline;" onclick="app.openIdeaModal(app.ideas.find(i => i.id === '${id}'))">${id}: ${refIdea.title}</span>`;
+            }
+            return id;
+          }).join(', ')}
+        </div></div>
+        ` : ''}
       </div>
       ${rating ? `
       <div class="idea-detail-section">
@@ -633,12 +783,14 @@ const app = {
       }
 
       const result = await res.json();
+      this.failedIdeas.delete(ideaId);
       await this.loadRatings();
       this.renderDashboard();
       this.renderLibrary();
       this.showResultModal(result);
       this.showToast('Evaluation complete.', 'success');
     } catch (e) {
+      this.failedIdeas.add(ideaId);
       this.showToast('Evaluation failed: ' + e.message, 'error');
     }
   },
@@ -993,6 +1145,21 @@ const app = {
     }
   },
 
+  async copyPrompt(ideaId) {
+    const idea = this.ideas.find(i => i.id === ideaId);
+    if (!idea || !idea.readyPrompt) {
+      this.showToast('No production prompt available.', 'error');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(idea.readyPrompt);
+      this.showToast('Production prompt copied to clipboard!', 'success');
+    } catch (e) {
+      console.error('Copy failed:', e);
+      this.showToast('Copy failed. Please try again.', 'error');
+    }
+  },
+
   async batchEvaluateAll() {
     if (!confirm(`Evaluate all ${this.ideas.length} ideas? This may take a while.`)) return;
     const unevaluated = this.ideas.filter(i => !this.getRatingForIdea(i.id));
@@ -1046,6 +1213,7 @@ const app = {
         throw new Error(err.error || `Re-evaluation failed (${res.status})`);
       }
       const result = await res.json();
+      this.failedIdeas.delete(ideaId);
       await this.loadRatings();
       await this.loadFreshness();
       this.renderDashboard();
@@ -1053,6 +1221,7 @@ const app = {
       this.showToast(`Re-evaluation complete: ${result.status}.`, 'success');
       return result;
     } catch (e) {
+      this.failedIdeas.add(ideaId);
       this.showToast('Re-evaluation failed: ' + e.message, 'error');
       throw e;
     }

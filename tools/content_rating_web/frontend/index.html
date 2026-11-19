@@ -50,6 +50,18 @@
           <div class="stat-label">Reject</div>
           <div class="stat-value" id="statReject">-</div>
         </div>
+        <div class="stat-card stat-current">
+          <div class="stat-label">Current</div>
+          <div class="stat-value" id="statCurrent">-</div>
+        </div>
+        <div class="stat-card stat-needs-reevaluation">
+          <div class="stat-label">Needs Re-evaluation</div>
+          <div class="stat-value" id="statNeedsReevaluation">-</div>
+        </div>
+        <div class="stat-card stat-not-evaluated">
+          <div class="stat-label">Not Evaluated</div>
+          <div class="stat-value" id="statNotEvaluated">-</div>
+        </div>
       </div>
       <div class="dashboard-actions">
         <button class="btn btn-primary" onclick="app.navigateTo('library')">Browse All Ideas</button>
@@ -99,7 +111,16 @@
             <option value="unevaluated">Not Evaluated</option>
             <option value="failed">Evaluation Failed</option>
           </select>
+          <select id="libSort">
+            <option value="idAsc">Sort: ID ascending</option>
+            <option value="idDesc">Sort: ID descending</option>
+            <option value="scoreHigh">Sort: Score high to low</option>
+            <option value="scoreLow">Sort: Score low to high</option>
+            <option value="verdict">Sort: Verdict priority</option>
+            <option value="freshness">Sort: Freshness status</option>
+          </select>
           <button class="btn btn-secondary" onclick="app.batchEvaluateUnevaluated()">Evaluate Unevaluated</button>
+          <button class="btn btn-secondary" onclick="app.clearAllFilters()">Clear All Filters</button>
         </div>
       </div>
       <div class="library-list" id="libList">
