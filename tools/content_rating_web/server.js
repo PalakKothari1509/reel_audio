@@ -8,7 +8,7 @@ const cors = require('cors');
 
 const { offlineEvaluate, onlineEvaluate, buildOnlineResult } = require('./backend/ratingEngine');
 const { validateGeminiResponse } = require('./backend/schemas');
-const { listRatings, getRating, saveRating, deleteRating, clearRatings, RATINGS_DIR, ensureDirs } = require('./backend/storage');
+const { listRatings, getRating, saveRating, deleteRating, clearRatings, RATINGS_DIR, ensureDirs, getSourceFingerprint, getRatingFreshness, getAllFreshness, invalidateContentCache } = require('./backend/storage');
 const { computeHashes, getCreativeHashFields, getProductionHashFields } = require('./backend/hash');
 const {
   openDb, closeDb, upsertContentItem, insertEvaluation, getLatestEvaluation,
@@ -150,7 +150,151 @@ app.post('/api/evaluate/:id', async (req, res) => {
   }
 
   const saved = saveRating(result);
+  invalidateContentCache();
   res.json(saved);
+});
+
+// Content fingerprint endpoint
+app.get('/api/fingerprint/:id', (req, res) => {
+  const fingerprint = getSourceFingerprint(req.params.id);
+  if (!fingerprint) {
+    return res.status(404).json({ error: 'Idea not found' });
+  }
+  res.json({ ideaId: req.params.id, ...fingerprint });
+});
+
+// Freshness status for all ideas
+app.get('/api/freshness', (_req, res) => {
+  invalidateContentCache();
+  const results = getAllFreshness();
+  const counts = results.reduce((acc, r) => {
+    acc[r.status] = (acc[r.status] || 0) + 1;
+    return acc;
+  }, {});
+  res.json({
+    total: results.length,
+    counts,
+    results,
+  });
+});
+
+// Freshness status for a single idea
+app.get('/api/freshness/:id', (req, res) => {
+  const result = getRatingFreshness(req.params.id);
+  const fingerprint = getSourceFingerprint(req.params.id);
+  res.json({
+    ideaId: req.params.id,
+    status: result.status,
+    rating: result.rating,
+    fingerprint: fingerprint || null,
+  });
+});
+
+// Bulk re-evaluate all ideas needing re-evaluation
+app.post('/api/reevaluate/batch', async (_req, res) => {
+  invalidateContentCache();
+  const results = getAllFreshness();
+  const needsReevaluation = results.filter(r => r.status === 'NEEDS_REEVALUATION' || r.status === 'LEGACY');
+
+  const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+  const data = JSON.parse(raw);
+  const ideasById = new Map(data.ideas.map(i => [i.id, i]));
+
+  const succeeded = [];
+  const failed = [];
+  const skipped = [];
+
+  for (const item of needsReevaluation) {
+    const idea = ideasById.get(item.ideaId);
+    if (!idea) {
+      skipped.push({ ideaId: item.ideaId, reason: 'Idea not found in source JSON' });
+      continue;
+    }
+
+    const previousRating = item.rating || null;
+
+    try {
+    const result = offlineEvaluate(idea, data.ideas);
+    const saved = saveRating(result, idea);
+    succeeded.push({
+        ideaId: item.ideaId,
+        previousStatus: item.status,
+        previousRating,
+        evaluation: saved,
+      });
+    } catch (e) {
+      // Preserve previous rating on failure (file already on disk, do not re-save)
+      failed.push({
+        ideaId: item.ideaId,
+        previousStatus: item.status,
+        error: e.message,
+      });
+    }
+  }
+
+  invalidateContentCache();
+  const updatedFreshness = getAllFreshness();
+  const updatedCounts = updatedFreshness.reduce((acc, r) => {
+    acc[r.status] = (acc[r.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  res.json({
+    totalProcessed: needsReevaluation.length,
+    succeeded: succeeded.length,
+    failed: failed.length,
+    skipped: skipped.length,
+    succeededItems: succeeded,
+    failedItems: failed,
+    skippedItems: skipped,
+    updatedCounts,
+  });
+});
+
+// Re-evaluate a single idea
+app.post('/api/reevaluate/:id', async (req, res) => {
+  const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+  const data = JSON.parse(raw);
+  const idea = data.ideas.find(i => i.id === req.params.id);
+  if (!idea) return res.status(404).json({ error: 'Idea not found' });
+
+  // Check if re-evaluation is needed
+  const freshness = getRatingFreshness(req.params.id);
+  if (freshness.status === 'CURRENT') {
+    return res.json({
+      ideaId: req.params.id,
+      status: 'CURRENT',
+      message: 'Evaluation is already current. No re-evaluation needed.',
+      evaluation: freshness.rating,
+    });
+  }
+
+  // Capture exact existing rating file contents before re-evaluation
+  const ratingPathFile = path.join(RATINGS_DIR, `${req.params.id}.json`);
+  let previousRatingRaw = null;
+  if (fs.existsSync(ratingPathFile)) {
+    previousRatingRaw = fs.readFileSync(ratingPathFile, 'utf8');
+  }
+
+  try {
+    const result = offlineEvaluate(idea, data.ideas);
+    const saved = saveRating(result, idea);
+    invalidateContentCache();
+
+    res.json({
+      ideaId: req.params.id,
+      status: 'REEVALUATED',
+      previousRating: previousRatingRaw ? JSON.parse(previousRatingRaw) : null,
+      evaluation: saved,
+    });
+  } catch (e) {
+    // Preserve previous rating exactly — restore original file contents
+    if (previousRatingRaw !== null) {
+      fs.writeFileSync(ratingPathFile, previousRatingRaw, 'utf8');
+    }
+    invalidateContentCache();
+    return res.status(500).json({ error: `Re-evaluation failed: ${e.message}` });
+  }
 });
 
 app.post(`${API_BASE_PATH}/evaluate`, authenticate, requireRole(), asyncHandler(async (req, res) => {

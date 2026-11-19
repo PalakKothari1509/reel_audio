@@ -5,6 +5,7 @@ const API_BASE = '';
 const app = {
   ideas: [],
   ratings: [],
+  freshness: [],
   selectedIdea: null,
   currentView: 'dashboard',
 
@@ -13,6 +14,7 @@ const app = {
     this.setupSearch();
     await this.loadIdeas();
     await this.loadRatings();
+    await this.loadFreshness();
     this.renderDashboard();
     this.showToast('Content Rating Tool loaded. Offline mode ready.', 'info');
   },
@@ -80,20 +82,34 @@ const app = {
     }
   },
 
+  async loadFreshness() {
+    try {
+      const res = await fetch(`${API_BASE}/api/freshness`);
+      const data = await res.json();
+      this.freshness = data.results || [];
+    } catch (e) {
+      this.showToast('Failed to load freshness: ' + e.message, 'error');
+    }
+  },
+
   getRatingForIdea(ideaId) {
     return this.ratings.find(r => r.ideaId === ideaId);
   },
 
   renderDashboard() {
     const total = this.ideas.length;
-    const evaluated = this.ratings.length;
-    const ready = this.ratings.filter(r => r.verdict === 'Ready to Post').length;
-    const minor = this.ratings.filter(r => r.verdict === 'Needs Minor Fixes').length;
-    const major = this.ratings.filter(r => r.verdict === 'Needs Major Rewrite').length;
-    const reject = this.ratings.filter(r => r.verdict === 'Reject').length;
+    const current = this.freshness.filter(f => f.status === 'CURRENT').length;
+    const needsReevaluation = this.freshness.filter(f => f.status === 'NEEDS_REEVALUATION' || f.status === 'LEGACY').length;
+    const notEvaluated = this.freshness.filter(f => f.status === 'NOT_EVALUATED').length;
+    const ready = this.freshness.filter(f => f.rating && f.rating.verdict === 'Ready to Post').length;
+    const minor = this.freshness.filter(f => f.rating && f.rating.verdict === 'Needs Minor Fixes').length;
+    const major = this.freshness.filter(f => f.rating && f.rating.verdict === 'Needs Major Rewrite').length;
+    const reject = this.freshness.filter(f => f.rating && f.rating.verdict === 'Reject').length;
 
     document.getElementById('statTotal').textContent = total;
-    document.getElementById('statEvaluated').textContent = evaluated;
+    document.getElementById('statCurrent').textContent = current;
+    document.getElementById('statNeedsReevaluation').textContent = needsReevaluation;
+    document.getElementById('statNotEvaluated').textContent = notEvaluated;
     document.getElementById('statReady').textContent = ready;
     document.getElementById('statMinor').textContent = minor;
     document.getElementById('statMajor').textContent = major;
@@ -114,12 +130,32 @@ const app = {
       this.renderLibrary();
     };
 
-    // Evaluated → filter by evaluated status
-    document.getElementById('statEvaluated').parentElement.onclick = () => {
+    // Current → filter by current status
+    document.getElementById('statCurrent').parentElement.onclick = () => {
       document.getElementById('libSearch').value = '';
       document.getElementById('libCategory').value = '';
       document.getElementById('libVerdict').value = '';
-      document.getElementById('libStatus').value = 'evaluated';
+      document.getElementById('libStatus').value = 'current';
+      this.navigateTo('library');
+      this.renderLibrary();
+    };
+
+    // Needs Re-evaluation → filter by stale status
+    document.getElementById('statNeedsReevaluation').parentElement.onclick = () => {
+      document.getElementById('libSearch').value = '';
+      document.getElementById('libCategory').value = '';
+      document.getElementById('libVerdict').value = '';
+      document.getElementById('libStatus').value = 'needsReevaluation';
+      this.navigateTo('library');
+      this.renderLibrary();
+    };
+
+    // Not Evaluated → filter by not evaluated status
+    document.getElementById('statNotEvaluated').parentElement.onclick = () => {
+      document.getElementById('libSearch').value = '';
+      document.getElementById('libCategory').value = '';
+      document.getElementById('libVerdict').value = '';
+      document.getElementById('libStatus').value = 'notEvaluated';
       this.navigateTo('library');
       this.renderLibrary();
     };
@@ -197,6 +233,10 @@ const app = {
       { key: 'ideaId', label: 'Idea ID', value: idea => idea.id },
       { key: 'title', label: 'Title', value: idea => idea.title },
       { key: 'category', label: 'Category', value: idea => idea.category },
+      { key: 'freshnessStatus', label: 'Freshness', value: (_idea, rating) => {
+        const f = this.freshness.find(x => x.ideaId === (_idea && _idea.id));
+        return f ? f.status : 'UNKNOWN';
+      } },
       { key: 'evaluationStatus', label: 'Evaluation Status', value: (_idea, rating) => rating ? 'Evaluated' : 'Not evaluated' },
       { key: 'overallScore', label: 'Overall Score', value: (_idea, rating) => rating?.overallScore },
       { key: 'rawScore', label: 'Raw Score', value: (_idea, rating) => rating?.rawScore },
@@ -459,17 +499,20 @@ const app = {
     const container = document.getElementById('libList');
     container.innerHTML = '';
 
-    let filtered = this.ideas.filter(i => {
-      const matchesSearch = i.title.toLowerCase().includes(search) ||
-        i.opening.toLowerCase().includes(search) ||
-        i.id.toLowerCase().includes(search);
-      const matchesCat = !cat || i.category === cat;
-      const rating = this.getRatingForIdea(i.id);
-      const matchesVerdict = !verdict || (rating && rating.verdict === verdict);
+    let filtered = this.freshness.filter(f => {
+      const idea = this.ideas.find(i => i.id === f.ideaId);
+      if (!idea) return false;
+      const matchesSearch = idea.title.toLowerCase().includes(search) ||
+        idea.opening.toLowerCase().includes(search) ||
+        idea.id.toLowerCase().includes(search);
+      const matchesCat = !cat || idea.category === cat;
+      const matchesVerdict = !verdict || (f.rating && f.rating.verdict === verdict);
       const matchesStatus = !status ||
-        (status === 'evaluated' && !!rating) ||
-        (status === 'unevaluated' && !rating) ||
-        (status === 'failed' && rating && rating.evaluationMode === 'failed');
+        (status === 'current' && f.status === 'CURRENT') ||
+        (status === 'needsReevaluation' && (f.status === 'NEEDS_REEVALUATION' || f.status === 'LEGACY')) ||
+        (status === 'notEvaluated' && f.status === 'NOT_EVALUATED') ||
+        (status === 'evaluated' && !!f.rating) ||
+        (status === 'unevaluated' && !f.rating);
       return matchesSearch && matchesCat && matchesVerdict && matchesStatus;
     });
 
@@ -478,11 +521,20 @@ const app = {
       return;
     }
 
-    filtered.forEach(idea => {
-      const rating = this.getRatingForIdea(idea.id);
+    filtered.forEach(f => {
+      const idea = this.ideas.find(i => i.id === f.ideaId);
+      const rating = f.rating;
       const card = document.createElement('div');
       card.className = 'idea-card';
       card.onclick = () => this.openIdeaModal(idea);
+
+      const freshnessClass = f.status === 'CURRENT' ? 'status-current'
+        : f.status === 'NOT_EVALUATED' ? 'status-unevaluated'
+        : 'status-stale';
+      const freshnessText = f.status === 'CURRENT' ? 'Current'
+        : f.status === 'NOT_EVALUATED' ? 'Not Evaluated'
+        : f.status === 'LEGACY' ? 'Legacy - Re-evaluate'
+        : 'Stale - Re-evaluate';
 
       const statusClass = rating ? 'status-evaluated' : 'status-unevaluated';
       const statusText = rating ? 'Evaluated' : 'Not Evaluated';
@@ -494,6 +546,7 @@ const app = {
         <div class="idea-card-header">
           <span class="idea-id">${idea.id}</span>
           <span class="status-tag ${statusClass}">${statusText}</span>
+          <span class="freshness-tag ${freshnessClass}">${freshnessText}</span>
         </div>
         <h3 class="idea-title">${this.escapeHtml(idea.title)}</h3>
         <div class="idea-category">${this.escapeHtml(idea.category)}</div>
@@ -510,6 +563,8 @@ const app = {
   async openIdeaModal(idea) {
     this.selectedIdea = idea;
     const rating = this.getRatingForIdea(idea.id);
+    const fresh = this.freshness.find(f => f.ideaId === idea.id);
+    const freshnessStatus = fresh ? fresh.status : 'UNKNOWN';
 
     const body = document.getElementById('modalBody');
     body.innerHTML = `
@@ -527,6 +582,7 @@ const app = {
         <div class="idea-detail-field"><div class="field-label">Cast</div><div class="field-value">${(idea.defaultCast || []).join(', ') || 'none'}</div></div>
         <div class="idea-detail-field"><div class="field-label">Setting</div><div class="field-value">${this.escapeHtml(idea.setting)}</div></div>
         <div class="idea-detail-field"><div class="field-label">Story Detail</div><div class="field-value">${this.escapeHtml(idea.storyDetail)}</div></div>
+        <div class="idea-detail-field"><div class="field-label">Freshness</div><div class="field-value">${freshnessStatus}</div></div>
       </div>
       ${rating ? `
       <div class="idea-detail-section">
@@ -537,8 +593,10 @@ const app = {
         <div class="idea-detail-field"><div class="field-label">Critical</div><div class="field-value">${rating.criticalFindings?.length || 0}</div></div>
         <div class="idea-detail-field"><div class="field-label">Major</div><div class="field-value">${rating.majorFindings?.length || 0}</div></div>
         <div class="idea-detail-field"><div class="field-label">Minor</div><div class="field-value">${rating.minorFindings?.length || 0}</div></div>
+        <div class="idea-detail-field"><div class="field-label">Content Hash</div><div class="field-value">${rating.contentHash || 'none'}</div></div>
+        ${freshnessStatus !== 'CURRENT' ? `<div class="idea-detail-field"><div class="field-label">Action</div><div class="field-value"><button onclick="app.reevaluateIdea('${idea.id}')">Re-evaluate</button></div></div>` : ''}
       </div>
-      ` : '<div class="idea-detail-section"><h3>Previous Evaluation</h3><p>This idea has not been evaluated yet.</p></div>'};
+      ` : '<div class="idea-detail-section"><h3>Previous Evaluation</h3><p>This idea has not been evaluated yet.</p><div class="idea-detail-field"><div class="field-label">Action</div><div class="field-value"><button onclick="app.reevaluateIdea(\'' + idea.id + '\')">Evaluate Now</button></div></div></div>'};
     `;
 
     document.getElementById('ideaModal').style.display = 'flex';
@@ -973,6 +1031,70 @@ const app = {
     this.renderDashboard();
     this.renderLibrary();
     this.showToast(`Batch complete: ${completed}/${total} evaluated.`, 'success');
+  },
+
+  async reevaluateIdea(ideaId) {
+    this.showToast(`Re-evaluating "${ideaId}"...`, 'info');
+    try {
+      const res = await fetch(`${API_BASE}/api/reevaluate/${ideaId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Re-evaluation failed (${res.status})`);
+      }
+      const result = await res.json();
+      await this.loadRatings();
+      await this.loadFreshness();
+      this.renderDashboard();
+      this.renderLibrary();
+      this.showToast(`Re-evaluation complete: ${result.status}.`, 'success');
+      return result;
+    } catch (e) {
+      this.showToast('Re-evaluation failed: ' + e.message, 'error');
+      throw e;
+    }
+  },
+
+  async batchReevaluateModified() {
+    const stale = this.freshness.filter(f =>
+      f.status === 'NEEDS_REEVALUATION' || f.status === 'LEGACY'
+    );
+    if (stale.length === 0) {
+      this.showToast('All evaluations are current.', 'info');
+      return;
+    }
+    if (!confirm(`Re-evaluate ${stale.length} modified idea(s)?`)) return;
+
+    const succeeded = [];
+    const failed = [];
+    for (const item of stale) {
+      try {
+        const res = await fetch(`${API_BASE}/api/reevaluate/${item.ideaId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          failed.push({ ideaId: item.ideaId, error: err.error || `Failed (${res.status})` });
+          continue;
+        }
+        const result = await res.json();
+        succeeded.push(result);
+      } catch (e) {
+        failed.push({ ideaId: item.ideaId, error: e.message });
+      }
+    }
+
+    await this.loadRatings();
+    await this.loadFreshness();
+    this.renderDashboard();
+    this.renderLibrary();
+    this.showToast(`Batch re-evaluation complete: ${succeeded.length} succeeded, ${failed.length} failed.`, 'success');
+    return { succeeded, failed };
   },
 
   async exportJson() {
