@@ -272,6 +272,93 @@ body {
 .dup-badge { font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600; margin-left: 0.15rem; margin-top: 0.15rem; background: #fde6ca; color: #8a5a00; cursor: pointer; }
 .dup-badge:hover { background: #f5b041; }
 
+/* Story structure sections */
+.story-section {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.story-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+}
+
+.story-section-title:hover {
+  color: var(--primaryHover);
+}
+
+.story-section-content {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Story completeness indicator */
+.story-completeness {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.completeness-count {
+  font-weight: 600;
+}
+
+.completeness-complete {
+  color: var(--success);
+}
+
+.completeness-missing {
+  color: var(--warning);
+}
+
+/* Story preview in library cards */
+.story-preview {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-style: italic;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.story-completeness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+}
+
+.story-completeness-badge .story-completeness-badge-inner {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.story-completeness-badge.story-complete .story-completeness-badge-inner {
+  background: #d4edda;
+  color: #155724;
+}
+
+.story-completeness-badge.story-partial .story-completeness-badge-inner {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.story-completeness-badge.story-missing-all .story-completeness-badge-inner {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
 /* Export */
 .export-card {
   background: var(--surface);

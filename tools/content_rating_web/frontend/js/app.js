@@ -399,6 +399,116 @@ const app = {
     return rating?.dimensionScores?.find(dimension => dimension.id === dimensionId);
   },
 
+  // ── Story parsing & completeness helpers ──
+
+  parseStoryDetail(storyDetail) {
+    const sections = { story: '', twist: '', resolution: '', moral: '' };
+    if (!storyDetail) return sections;
+
+    const lines = storyDetail.split(/\n/);
+    let currentSection = null;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const lower = trimmed.toLowerCase();
+
+      if (lower.startsWith('story:')) {
+        currentSection = 'story';
+        sections.story = trimmed.replace(/^story:\s*/i, '');
+      } else if (lower.startsWith('twist:')) {
+        currentSection = 'twist';
+        sections.twist = trimmed.replace(/^twist:\s*/i, '');
+      } else if (lower.startsWith('resolution:')) {
+        currentSection = 'resolution';
+        sections.resolution = trimmed.replace(/^resolution:\s*/i, '');
+      } else if (lower.startsWith('moral:')) {
+        currentSection = 'moral';
+        sections.moral = trimmed.replace(/^moral:\s*/i, '');
+      } else if (currentSection && trimmed) {
+        sections[currentSection] += (sections[currentSection] ? '\n' : '') + trimmed;
+      }
+    }
+
+    return sections;
+  },
+
+  getStoryCompleteness(storyDetail) {
+    const sections = this.parseStoryDetail(storyDetail);
+    const componentIds = ['story', 'twist', 'resolution', 'moral'];
+    const present = componentIds.filter(s => sections[s] && sections[s].trim().length > 0);
+    const missing = componentIds.filter(s => !sections[s] || !sections[s].trim());
+
+    return {
+      present: present.length,
+      total: 4,
+      missing: missing,
+      isComplete: present.length === 4,
+    };
+  },
+
+  renderStoryStructure(storyDetail) {
+    const sections = this.parseStoryDetail(storyDetail);
+    const completeness = this.getStoryCompleteness(storyDetail);
+    const sectionLabels = {
+      story: 'Story',
+      twist: 'Twist',
+      resolution: 'Resolution',
+      moral: 'Moral',
+    };
+
+    const completenessHtml = `
+      <div class="story-completeness">
+        <span class="completeness-count">${completeness.present}/${completeness.total} components present</span>
+        ${completeness.missing.length > 0
+          ? `<span class="completeness-missing">Missing: ${completeness.missing.join(', ')}</span>`
+          : `<span class="completeness-complete">All components present</span>`}
+      </div>
+    `;
+
+    const sectionsHtml = [
+      { id: 'story', label: 'Story' },
+      { id: 'twist', label: 'Twist' },
+      { id: 'resolution', label: 'Resolution' },
+      { id: 'moral', label: 'Moral' },
+    ].map(s => {
+      const content = sections[s.id] || '';
+      const hasContent = content && content.trim().length > 0;
+      return `
+        <div class="story-section" id="story-${s.id}">
+          <h4 class="story-section-title" data-section="${s.id}">${s.label}</h4>
+          <div class="story-section-content" style="white-space: pre-wrap">${hasContent ? this.escapeHtml(content) : '<em>Not provided</em>'}</div>
+        </div>
+      `;
+    }).join('');
+
+    return completenessHtml + sectionsHtml;
+  },
+
+  getStoryPreview(storyDetail) {
+    const sections = this.parseStoryDetail(storyDetail);
+    const storyText = sections.story || '';
+    if (!storyText) return '';
+    // Return first ~120 chars as a preview
+    const preview = storyText.trim().slice(0, 120);
+    return preview.length < storyText.trim().length ? preview + '…' : preview;
+  },
+
+  getStoryBadgeHtml(storyDetail) {
+    const completeness = this.getStoryCompleteness(storyDetail);
+    const present = completeness.present;
+    const total = completeness.total;
+
+    let badgeClass = 'story-complete';
+    if (present === 0) badgeClass = 'story-missing-all';
+    else if (present < total) badgeClass = 'story-partial';
+
+    return `
+      <span class="story-completeness-badge ${badgeClass}" title="${present}/${total} story components present (${completeness.missing.join(', ')})">
+        ${present}/${total}
+      </span>
+    `;
+  },
+
   getRelevantFinding(rating, category) {
     const collections = [
       rating?.criticalFindings,
@@ -693,6 +803,12 @@ const app = {
           ${idea.archived ? '<span>Archived</span>' : ''}
         </div>
         ${dimBadges ? `<div class="idea-dim-badges">${dimBadges}</div>` : ''}
+        <div class="idea-story-preview">
+          <div class="story-preview">${this.escapeHtml(this.getStoryPreview(idea.storyDetail))}</div>
+          <div class="story-completeness-badge">
+            ${this.getStoryBadgeHtml(idea.storyDetail)}
+          </div>
+        </div>
       `;
       container.appendChild(card);
     });
@@ -719,7 +835,12 @@ const app = {
         <div class="idea-detail-field"><div class="field-label">Caption</div><div class="field-value">${this.escapeHtml(idea.caption)}</div></div>
         <div class="idea-detail-field"><div class="field-label">Cast</div><div class="field-value">${(idea.defaultCast || []).join(', ') || 'none'}</div></div>
         <div class="idea-detail-field"><div class="field-label">Setting</div><div class="field-value">${this.escapeHtml(idea.setting)}</div></div>
-        <div class="idea-detail-field"><div class="field-label">Story Detail</div><div class="field-value">${this.escapeHtml(idea.storyDetail)}</div></div>
+        <div class="idea-detail-section-story">
+          <div class="idea-detail-field">
+            <div class="field-label">Story Structure</div>
+            <div class="field-value story-completeness" style="white-space: pre-wrap">${this.renderStoryStructure(idea.storyDetail)}</div>
+          </div>
+        </div>
         <div class="idea-detail-field"><div class="field-label">Production Prompt</div><div class="field-value prompt-text" style="white-space: pre-wrap">${idea.readyPrompt ? this.escapeHtml(idea.readyPrompt) : '<em>No production prompt available.</em>'}</div><button class="btn btn-secondary" style="font-size:0.8rem;margin-top:0.25rem;" onclick="app.copyPrompt('${idea.id}')">Copy Prompt</button></div>
         <div class="idea-detail-field"><div class="field-label">Freshness</div><div class="field-value">${freshnessStatus}</div></div>
         ${rating && rating.duplicateOf && rating.duplicateOf.length > 0 ? `
