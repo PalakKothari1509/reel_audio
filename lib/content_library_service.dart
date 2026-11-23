@@ -865,4 +865,12 @@ class ContentLibraryService {
     final json = jsonEncode(ideas.map((i) => i.toJson()).toList());
     await file.writeAsString(json);
   }
+
+  /// Look up a saved project by its ID.
+  ///
+  /// Used to restore previously saved projects (with their generated prompts)
+  /// when the user reopens them from Content Library.
+  static Future<Project?> getProjectById(String id) async {
+    return ProjectStore.getProject(id);
+  }
 }
