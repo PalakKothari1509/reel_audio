@@ -9,7 +9,7 @@ const cors = require('cors');
 const { offlineEvaluate, onlineEvaluate, buildOnlineResult } = require('./backend/ratingEngine');
 const { validateGeminiResponse } = require('./backend/schemas');
 const { listRatings, getRating, saveRating, deleteRating, clearRatings, RATINGS_DIR, ensureDirs, getSourceFingerprint, getRatingFreshness, getAllFreshness, invalidateContentCache } = require('./backend/storage');
-const { loadSourceIdeas, getIdeaById, isValidHookIdea, repairIdeaWithGemini, compareIdeas } = require('./backend/repairEngine');
+const { loadSourceIdeas, getIdeaById, isValidHookIdea, repairIdeaWithGemini, repairIdeaOffline, compareIdeas } = require('./backend/repairEngine');
 const { withLock, createBackup, saveRepairHistory, getRepairHistory, getRepairHistoryFile, saveRepairedIdeaToSource, validateCompleteJson, restoreIdeaFromBackup } = require('./backend/repairStore');
 const { computeHashes, getCreativeHashFields, getProductionHashFields } = require('./backend/hash');
 const {
@@ -115,7 +115,7 @@ app.get('/api/ideas/:id', (req, res) => {
 });
 
 // ── Idea Repair Routes ──
-// POST /api/ideas/:id/repair — Generate repaired idea via Gemini
+// POST /api/ideas/:id/repair — Generate repaired idea via Gemini (online) or deterministic rules (offline)
 app.post('/api/ideas/:id/repair', async (req, res) => {
   const { mode = 'offline' } = req.body || {};
   const ideaId = req.params.id;
@@ -125,34 +125,117 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
   const idea = data.ideas.find(i => i.id === ideaId);
   if (!idea) return res.status(404).json({ error: 'Idea not found' });
 
-  // Check if Gemini is available for online repair
+  // ── Online mode: Gemini-based repair ──
   if (mode === 'online') {
     if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
       return res.status(400).json({ error: 'Gemini API key not configured — AI repair requires an online Gemini connection' });
     }
-  } else {
-    return res.status(400).json({ error: 'AI repair requires online mode (mode=online). Offline evaluation cannot perform AI repairs.' });
+
+    // Get the latest evaluation for this idea (online)
+    let evaluation;
+    try {
+      const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY, data.ideas);
+      const validation = validateGeminiResponse(geminiResponse);
+      if (!validation.valid) {
+        return res.status(422).json({ error: validation.error, raw: geminiResponse });
+      }
+      evaluation = buildOnlineResult(idea, geminiResponse, data.ideas);
+    } catch (e) {
+      return res.status(502).json({ error: `Gemini evaluation failed: ${e.message}` });
+    }
+
+    // Generate the repaired idea using Gemini
+    let repairResult;
+    try {
+      repairResult = await repairIdeaWithGemini(idea, evaluation, GEMINI_API_KEY, null);
+    } catch (e) {
+      return res.status(502).json({ error: `AI repair failed: ${e.message}` });
+    }
+
+    const repairedIdea = repairResult.repairedIdea;
+
+    // Validate the repaired idea matches HookIdea schema
+    const schemaValidation = isValidHookIdea(repairedIdea);
+    if (!schemaValidation.valid) {
+      return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
+    }
+
+    // ID must match original
+    if (repairedIdea.id !== ideaId) {
+      return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
+    }
+
+    // Compare original vs repaired
+    const comparison = compareIdeas(idea, repairedIdea);
+
+    // Re-evaluate the repaired idea using the existing offline engine
+    let repairedEvaluation;
+    try {
+      repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+    } catch (e) {
+      return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+    }
+
+    // Check that all critical gates pass
+    const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
+    if (criticalGatesFailed.length > 0) {
+      return res.status(422).json({
+        error: 'Repaired idea still has unresolved critical safety gates',
+        criticalGatesFailed: criticalGatesFailed.map(g => ({ id: g.id, name: g.name, detail: g.detail })),
+        repairedIdea,
+        repairedEvaluation,
+        comparison,
+        canSave: false,
+        repairMode: 'online',
+      });
+    }
+
+    return res.json({
+      ideaId,
+      originalIdea: idea,
+      repairedIdea,
+      comparison,
+      originalEvaluation: {
+        overallScore: evaluation.overallScore,
+        verdict: evaluation.verdict,
+        criticalFindings: evaluation.criticalFindings,
+        majorFindings: evaluation.majorFindings,
+        minorFindings: evaluation.minorFindings,
+        suggestions: evaluation.suggestions,
+      },
+      repairedEvaluation: {
+        overallScore: repairedEvaluation.overallScore,
+        rawScore: repairedEvaluation.rawScore,
+        scoreCapped: repairedEvaluation.scoreCapped,
+        verdict: repairedEvaluation.verdict,
+        criticalFindings: repairedEvaluation.criticalFindings,
+        majorFindings: repairedEvaluation.majorFindings,
+        minorFindings: repairedEvaluation.minorFindings,
+        suggestions: repairedEvaluation.suggestions,
+        gateResults: repairedEvaluation.gateResults,
+        dimensionScores: repairedEvaluation.dimensionScores,
+      },
+      canSave: criticalGatesFailed.length === 0,
+      repairMode: 'online',
+      rawResponse: repairResult.rawResponse,
+    });
   }
 
-  // Get the latest evaluation for this idea
+  // ── Offline mode: Deterministic rule-based repair ──
+  // Use existing offline evaluation results
   let evaluation;
   try {
-    const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY, data.ideas);
-    const validation = validateGeminiResponse(geminiResponse);
-    if (!validation.valid) {
-      return res.status(422).json({ error: validation.error, raw: geminiResponse });
-    }
-    evaluation = buildOnlineResult(idea, geminiResponse, data.ideas);
+    evaluation = offlineEvaluate(idea, data.ideas);
   } catch (e) {
-    return res.status(502).json({ error: `Gemini evaluation failed: ${e.message}` });
+    return res.status(500).json({ error: `Offline evaluation failed: ${e.message}` });
   }
 
-  // Generate the repaired idea using Gemini
+  // Generate the repaired idea using deterministic rules
   let repairResult;
   try {
-    repairResult = await repairIdeaWithGemini(idea, evaluation, GEMINI_API_KEY, null);
+    repairResult = repairIdeaOffline(idea, evaluation);
   } catch (e) {
-    return res.status(502).json({ error: `AI repair failed: ${e.message}` });
+    return res.status(500).json({ error: `Offline repair failed: ${e.message}` });
   }
 
   const repairedIdea = repairResult.repairedIdea;
@@ -181,15 +264,6 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
 
   // Check that all critical gates pass
   const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
-  if (criticalGatesFailed.length > 0) {
-    return res.status(422).json({
-      error: 'Repaired idea still has unresolved critical safety gates',
-      criticalGatesFailed: criticalGatesFailed.map(g => ({ id: g.id, name: g.name, detail: g.detail })),
-      repairedIdea,
-      repairedEvaluation,
-      comparison,
-    });
-  }
 
   res.json({
     ideaId,
@@ -217,7 +291,9 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
       dimensionScores: repairedEvaluation.dimensionScores,
     },
     canSave: criticalGatesFailed.length === 0,
-    rawResponse: repairResult.rawResponse,
+    repairMode: 'offline',
+    fixedIssues: repairResult.fixedIssues || [],
+    unresolvedIssues: repairResult.unresolvedIssues || [],
   });
 });
 
@@ -279,7 +355,7 @@ app.post('/api/ideas/:id/repair/validate', async (req, res) => {
 // POST /api/ideas/:id/repair/save — Save approved repaired idea to content_ideas.json
 app.post('/api/ideas/:id/repair/save', async (req, res) => {
   const ideaId = req.params.id;
-  const { repairedIdea, originalEvaluation, repairedEvaluation, comparison } = req.body || {};
+  const { repairedIdea, originalEvaluation, repairedEvaluation, comparison, repairMode } = req.body || {};
 
   if (!repairedIdea || typeof repairedIdea !== 'object') {
     return res.status(400).json({ error: 'repairedIdea is required' });
@@ -342,7 +418,7 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
     changedFields: comparison?.changedFields ?? [],
     unchangedFields: comparison?.unchangedFields ?? [],
     backupPath,
-    evaluationMode: 'online',
+    evaluationMode: repairMode || 'offline',
   };
 
   try {

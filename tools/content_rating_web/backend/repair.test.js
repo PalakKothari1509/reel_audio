@@ -21,6 +21,7 @@ const {
   getIdeaById,
   HOOK_IDEA_FIELDS,
   CONTENT_JSON_PATH,
+  repairIdeaOffline,
 } = require('./repairEngine');
 const {
   ensureDirs,
@@ -452,4 +453,347 @@ test('withLock serializes writes', async () => {
   await withLock(slowWrite);
   await withLock(slowWrite);
   assert.equal(maxConcurrent, 1, 'Lock should prevent concurrent writes');
+});
+
+test('server module loads without syntax errors', () => {
+  // Requiring server.js should not throw a SyntaxError
+  // This catches duplicate declarations, missing brackets, etc.
+  assert.doesNotThrow(() => {
+    require.cache = {}; // Clear cache to force fresh load
+    // We don't actually start the server, just verify the module parses
+    const fs = require('fs');
+    const src = fs.readFileSync(path.resolve(__dirname, '..', 'server.js'), 'utf8');
+    // Just verify it parses - use Node's built-in syntax check
+    new Function(src); // This will throw SyntaxError if invalid
+  });
+});
+
+test('all repair API routes are registered on the app', () => {
+  // Verify the express app has the repair routes by checking the router stack
+  const { app } = require('../server.js');
+  const routePaths = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routePaths.push(middleware.route.path);
+    }
+  });
+  const repairRoutes = routePaths.filter(p => p.includes('/repair'));
+  assert.ok(repairRoutes.length >= 5, `Expected at least 5 repair routes, found ${repairRoutes.length}: ${repairRoutes.join(', ')}`);
+  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair'), 'Missing /api/ideas/:id/repair route');
+  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/validate'), 'Missing /api/ideas/:id/repair/validate route');
+  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/save'), 'Missing /api/ideas/:id/repair/save route');
+  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/history'), 'Missing /api/ideas/:id/repair/history route');
+  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/restore'), 'Missing /api/ideas/:id/repair/restore route');
+});
+
+// ── Offline Repair Tests ──
+test('repairIdeaOffline works without a Gemini API key', () => {
+  const evaluation = {
+    overallScore: 59,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [
+      { title: 'Character consistency', explanation: 'Uses unapproved name', suggestedFix: 'Use Ria', id: 'characterConsistency' },
+    ],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [
+      { id: 'characterConsistency', name: 'Character Consistency', passed: false, severityOnFail: 'major', detail: 'Unapproved character name found' },
+      { id: 'brandAndSafety', name: 'Brand & Safety', passed: true, severityOnFail: 'critical', detail: 'No blocked terms' },
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', passed: true, severityOnFail: 'critical', detail: 'Suitable for ages 1-4' },
+      { id: 'formatFit', name: 'Format Fit', passed: true, severityOnFail: 'critical', detail: 'Format matches' },
+    ],
+    dimensionScores: [
+      { id: 'hookStrength', name: 'Hook Strength', score: 5 },
+      { id: 'relatabilityAudienceFit', name: 'Relatability', score: 6 },
+      { id: 'payoffRetention', name: 'Payoff', score: 4 },
+      { id: 'hinglishNaturalness', name: 'Hinglish', score: 5 },
+      { id: 'visualFeasibility', name: 'Visual Feasibility', score: 5 },
+      { id: 'soundOffReadability', name: 'Sound-Off Readability', score: 4 },
+      { id: 'shareSaveTrigger', name: 'Share/Save Trigger', score: 4 },
+      { id: 'captionCommentPackage', name: 'Caption/Comment', score: 5 },
+      { id: 'originality', name: 'Originality', score: 6 },
+      { id: 'audioHook', name: 'Audio Hook', score: 5 },
+    ],
+  };
+
+  const repairedIdea = {
+    id: 'idea_1',
+    category: 'Safety',
+    title: 'Meri Marzi!',
+    cover: 'Meri Marzi!',
+    opening: 'Ria ne hug ke liye mana kiya',
+    problem: 'A relative insists on a hug.',
+    lesson: 'Consent matters.',
+    postFormat: 'Reel',
+    strategy: 'Safety',
+    caption: '',
+    pinnedComment: '',
+    forApp: true,
+    usedOn: '',
+    custom: false,
+    archived: false,
+    storyDetail: '',
+    setting: 'Daadi\'s living room',
+    sceneDetail: '',
+    dialogue: '',
+    mess: '',
+    innerThought: '',
+    endingBeat: '',
+    defaultCast: ['Riya', 'Mumma', 'Daadi'],
+    keepMoralOffScreen: false,
+    quote: '',
+    detail: '',
+    punchline: '',
+    readyPrompt: '',
+    score: 59,
+    band: 'Needs Major Rewrite',
+    reviewedOn: '2026-11-12T12:15:57.992Z',
+  };
+
+  const result = repairIdeaOffline(repairedIdea, evaluation);
+
+  assert.ok(result.repairedIdea, 'Should return repaired idea');
+  assert.equal(result.repairMode, 'offline', 'Repair mode should be offline');
+  assert.equal(result.repairedIdea.id, 'idea_1', 'ID should be preserved');
+  assert.equal(result.repairedIdea.category, 'Safety', 'Category should be preserved');
+  assert.equal(result.repairedIdea.archived, false, 'Archived status should be preserved');
+  assert.equal(result.repairedIdea.custom, false, 'Custom status should be preserved');
+  assert.ok(result.repairedIdea.readyPrompt.length > 0, 'Ready prompt should be generated');
+  assert.ok(result.repairedIdea.caption.length > 0, 'Caption should be generated');
+  assert.ok(result.repairedIdea.pinnedComment.length > 0, 'Pinned comment should be generated');
+  assert.ok(Array.isArray(result.repairedIdea.defaultCast), 'Default cast should be an array');
+});
+
+test('repairIdeaOffline preserves same idea ID', () => {
+  const evaluation = {
+    overallScore: 65,
+    verdict: 'Needs Minor Fixes',
+    criticalFindings: [],
+    majorFindings: [],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [
+      { id: 'characterConsistency', name: 'Character Consistency', passed: true, severityOnFail: 'major', detail: 'OK' },
+      { id: 'brandAndSafety', name: 'Brand & Safety', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'formatFit', name: 'Format Fit', passed: true, severityOnFail: 'critical', detail: 'OK' },
+    ],
+    dimensionScores: [],
+  };
+
+  const idea = { id: 'idea_42', category: 'Navratri', title: 'Test', cover: 'Test', opening: 'Open', problem: 'Prob', lesson: 'Les', postFormat: 'Reel', strategy: 'Test', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false, archived: true, storyDetail: '', setting: '', sceneDetail: '', dialogue: '', mess: '', innerThought: '', endingBeat: '', defaultCast: [], keepMoralOffScreen: false, quote: '', detail: '', punchline: '', readyPrompt: '', score: 65, band: '', reviewedOn: '' };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  assert.equal(result.repairedIdea.id, 'idea_42', 'ID must match original exactly');
+});
+
+test('repairIdeaOffline preserves unknown/custom fields', () => {
+  const evaluation = {
+    overallScore: 60,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [],
+    dimensionScores: [],
+  };
+
+  const idea = { id: 'idea_1', category: 'Safety', title: 'Test', cover: 'C', opening: 'O', problem: 'P', lesson: 'L', postFormat: 'Reel', strategy: 'S', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false, archived: false, storyDetail: '', setting: '', sceneDetail: '', dialogue: '', mess: '', innerThought: '', endingBeat: '', defaultCast: [], keepMoralOffScreen: false, quote: '', detail: '', punchline: '', readyPrompt: '', score: 60, band: '', reviewedOn: '' };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  assert.equal(result.repairedIdea.id, idea.id, 'ID preserved');
+  assert.equal(result.repairedIdea.category, idea.category, 'Category preserved');
+  assert.equal(result.repairedIdea.forApp, idea.forApp, 'forApp preserved');
+  assert.equal(result.repairedIdea.custom, idea.custom, 'custom preserved');
+  assert.equal(result.repairedIdea.archived, idea.archived, 'archived preserved');
+});
+
+test('repairIdeaOffline replaces unapproved character names', () => {
+  const evaluation = {
+    overallScore: 50,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [{ title: 'Character consistency', explanation: 'Uses Riya instead of Ria', suggestedFix: 'Use Ria', id: 'characterConsistency' }],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [
+      { id: 'characterConsistency', name: 'Character Consistency', passed: false, severityOnFail: 'major', detail: 'Unapproved name Riya found' },
+      { id: 'brandAndSafety', name: 'Brand & Safety', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'formatFit', name: 'Format Fit', passed: true, severityOnFail: 'critical', detail: 'OK' },
+    ],
+    dimensionScores: [],
+  };
+
+  const idea = {
+    id: 'idea_1', category: 'Safety', title: 'Riya Story', cover: 'C', opening: 'Riya hugs', problem: 'P', lesson: 'L',
+    postFormat: 'Reel', strategy: 'S', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false,
+    archived: false, storyDetail: 'Riya goes to school.', setting: '', sceneDetail: '',
+    dialogue: '"Hello" said Riya.', mess: '', innerThought: '', endingBeat: '',
+    defaultCast: ['Riya', 'Mummy', 'Bunny'],
+    keepMoralOffScreen: false, quote: '', detail: '', punchline: '', readyPrompt: '',
+    score: 50, band: '', reviewedOn: '',
+  };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  const ri = result.repairedIdea;
+  assert.ok(!ri.dialogue.includes('Riya'), 'Riya should be replaced with Ria in dialogue');
+  assert.ok(ri.dialogue.includes('Ria'), 'Ria should be in dialogue');
+  assert.ok(ri.defaultCast.includes('Ria'), 'Ria should be in defaultCast');
+  assert.ok(ri.defaultCast.includes('Mumma'), 'Mumma should be in defaultCast');
+  assert.ok(ri.defaultCast.includes('Cuty'), 'Cuty should be in defaultCast');
+  assert.ok(!ri.defaultCast.includes('Riya'), 'Riya should not be in defaultCast');
+  assert.ok(!ri.defaultCast.includes('Mummy'), 'Mummy should not be in defaultCast');
+  assert.ok(!ri.defaultCast.includes('Bunny'), 'Bunny should not be in defaultCast');
+});
+
+test('repairIdeaOffline removes brand names', () => {
+  const evaluation = {
+    overallScore: 55,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [{ title: 'Brand violation', explanation: 'Uses Maggi', suggestedFix: 'Remove brand', id: 'brandAndSafety' }],
+    majorFindings: [],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [
+      { id: 'brandAndSafety', name: 'Brand & Safety', passed: false, severityOnFail: 'critical', detail: 'Brand name Maggi found' },
+      { id: 'characterConsistency', name: 'Character Consistency', passed: true, severityOnFail: 'major', detail: 'OK' },
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'formatFit', name: 'Format Fit', passed: true, severityOnFail: 'critical', detail: 'OK' },
+    ],
+    dimensionScores: [],
+  };
+
+  const idea = {
+    id: 'idea_1', category: 'Safety', title: 'Maggi Time', cover: 'C', opening: 'Open', problem: 'P', lesson: 'L',
+    postFormat: 'Reel', strategy: 'S', caption: 'Try Maggi today!', pinnedComment: '', forApp: true, usedOn: '',
+    custom: false, archived: false, storyDetail: 'Eating Maggi.', setting: '', sceneDetail: '',
+    dialogue: 'I love Maggi.', mess: '', innerThought: '', endingBeat: '',
+    defaultCast: ['Ria'], keepMoralOffScreen: false, quote: '', detail: '', punchline: '',
+    readyPrompt: 'Maggi in 3D Pixar animation style.',
+    score: 55, band: '', reviewedOn: '',
+  };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  const ri = result.repairedIdea;
+  assert.ok(!ri.caption.includes('Maggi'), 'Maggi should be removed from caption');
+  assert.ok(!ri.storyDetail.includes('Maggi'), 'Maggi should be removed from storyDetail');
+  assert.ok(!ri.dialogue.includes('Maggi'), 'Maggi should be removed from dialogue');
+  assert.ok(!ri.readyPrompt.includes('Maggi'), 'Maggi should be removed from readyPrompt');
+});
+
+test('repairIdeaOffline generates readyPrompt with correct style', () => {
+  const evaluation = {
+    overallScore: 60,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [],
+    dimensionScores: [],
+  };
+
+  const idea = {
+    id: 'idea_1', category: 'Safety', title: 'Test', cover: 'C', opening: 'O', problem: 'Child safety issue', lesson: 'L',
+    postFormat: 'Reel', strategy: 'S', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false,
+    archived: false, storyDetail: '', setting: '', sceneDetail: '', dialogue: '', mess: '',
+    innerThought: '', endingBeat: '', defaultCast: ['Ria'], keepMoralOffScreen: false,
+    quote: '', detail: '', punchline: '', readyPrompt: '',
+    score: 60, band: '', reviewedOn: '',
+  };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  const ri = result.repairedIdea;
+  assert.ok(ri.readyPrompt.includes('3D Pixar animation style'), 'Ready prompt should use 3D Pixar animation style');
+  assert.ok(ri.readyPrompt.includes('vertical 9:16'), 'Ready prompt should mention vertical 9:16');
+  assert.ok(!ri.readyPrompt.includes('3D animated style'), 'Should not use 3D animated style variant');
+});
+
+test('repairIdeaOffline fixedIssues are reported', () => {
+  const evaluation = {
+    overallScore: 60,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [{ title: 'Character consistency', id: 'characterConsistency' }],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [
+      { id: 'characterConsistency', name: 'Character Consistency', passed: false, severityOnFail: 'major', detail: 'Unapproved name' },
+      { id: 'brandAndSafety', name: 'Brand & Safety', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'ageAppropriateness', name: 'Age Appropriateness', passed: true, severityOnFail: 'critical', detail: 'OK' },
+      { id: 'formatFit', name: 'Format Fit', passed: true, severityOnFail: 'critical', detail: 'OK' },
+    ],
+    dimensionScores: [],
+  };
+
+  const idea = {
+    id: 'idea_1', category: 'Safety', title: 'Riya Story', cover: 'C', opening: 'O', problem: 'P', lesson: 'L',
+    postFormat: 'Reel', strategy: 'S', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false,
+    archived: false, storyDetail: '', setting: '', sceneDetail: '', dialogue: 'Riya says hi.',
+    mess: '', innerThought: '', endingBeat: '', defaultCast: ['Riya'], keepMoralOffScreen: false,
+    quote: '', detail: '', punchline: '', readyPrompt: '',
+    score: 60, band: '', reviewedOn: '',
+  };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  assert.ok(Array.isArray(result.fixedIssues), 'fixedIssues should be an array');
+  assert.ok(result.fixedIssues.length > 0, 'Should report at least one fixed issue');
+  assert.ok(result.fixedIssues.some(f => f.includes('Character')), 'Should mention character consistency fix');
+});
+
+test('repaired idea passes schema validation', () => {
+  const evaluation = {
+    overallScore: 60,
+    verdict: 'Needs Major Rewrite',
+    criticalFindings: [],
+    majorFindings: [],
+    minorFindings: [],
+    suggestions: [],
+    gateResults: [],
+    dimensionScores: [],
+  };
+
+  const idea = {
+    id: 'idea_1', category: 'Safety', title: 'Test', cover: 'C', opening: 'O', problem: 'P', lesson: 'L',
+    postFormat: 'Reel', strategy: 'S', caption: '', pinnedComment: '', forApp: true, usedOn: '', custom: false,
+    archived: false, storyDetail: '', setting: '', sceneDetail: '', dialogue: '', mess: '',
+    innerThought: '', endingBeat: '', defaultCast: ['Ria'], keepMoralOffScreen: false,
+    quote: '', detail: '', punchline: '', readyPrompt: '',
+    score: 60, band: '', reviewedOn: '',
+  };
+
+  const result = repairIdeaOffline(idea, evaluation);
+  const validation = isValidHookIdea(result.repairedIdea);
+  assert.equal(validation.valid, true, `Repaired idea should pass schema validation: ${validation.error}`);
+});
+
+test('offline repair does not create duplicate ideas', () => {
+  const data = JSON.parse(fs.readFileSync(CONTENT_JSON_PATH, 'utf8'));
+  const originalCount = data.ideas.length;
+  const ids = new Set(data.ideas.map(i => i.id));
+  const originalIdCount = ids.size;
+
+  // Simulate saving a repaired idea (replace in place)
+  const ideaToRepair = data.ideas[0];
+  const evaluation = {
+    overallScore: 60, verdict: 'Needs Major Rewrite',
+    criticalFindings: [], majorFindings: [], minorFindings: [], suggestions: [],
+    gateResults: [], dimensionScores: [],
+  };
+  const result = repairIdeaOffline(ideaToRepair, evaluation);
+  const repaired = result.repairedIdea;
+
+  // Replace in place at same index (preserving order)
+  const updatedIdeas = [...data.ideas];
+  const idx = updatedIdeas.findIndex(i => i.id === repaired.id);
+  assert.ok(idx !== -1, 'Original idea should be found');
+  updatedIdeas[idx] = repaired;
+  const updatedData = { ...data, ideas: updatedIdeas };
+
+  assert.equal(updatedData.ideas.length, originalCount, 'Idea count should not change');
+  assert.equal(new Set(updatedData.ideas.map(i => i.id)).size, originalIdCount, 'No duplicate IDs should be created');
+  assert.equal(updatedIdeas[idx].id, repaired.id, 'Same ID should be at same position');
 });

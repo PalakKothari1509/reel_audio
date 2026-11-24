@@ -877,8 +877,9 @@ const app = {
           <div class="field-value">
             ${freshnessStatus !== 'CURRENT' ? `<button onclick="app.reevaluateIdea('${idea.id}')">Re-evaluate</button>` : ''}
             ${rating && (rating.criticalFindings?.length > 0 || rating.majorFindings?.length > 0 || rating.minorFindings?.length > 0 || rating.suggestions?.length > 0)
-              ? `<button class="btn btn-primary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.repairIdea('${idea.id}')">Fix All Issues &amp; Update Idea</button>`
+              ? `<button class="btn btn-primary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.repairIdea('${idea.id}', 'online')">Fix All Issues &amp; Update Idea (AI)</button>`
               : ''}
+            ${rating ? `<button class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.repairIdea('${idea.id}', 'offline')">Fix All Issues &amp; Update Idea (Offline)</button>` : ''}
             <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.showRepairHistory('${idea.id}')">Repair History</button>
           </div>
         </div>
@@ -1438,7 +1439,7 @@ const app = {
   // ── Idea Repair ──
   repairState: null,
 
-  async repairIdea(ideaId) {
+  async repairIdea(ideaId, mode = 'offline') {
     const idea = this.ideas.find(i => i.id === ideaId);
     if (!idea) return;
 
@@ -1458,28 +1459,35 @@ const app = {
       return;
     }
 
+    const modeLabel = mode === 'online' ? 'AI (Gemini)' : 'Offline Rule-Based';
+    const modeNotice = mode === 'offline'
+      ? '\n\nThis will use deterministic rule-based repair (no API key or internet needed).'
+      : '\n\nThis will use Gemini AI repair (requires API key and internet connection).';
+
     const confirmed = confirm(
       `Fix All Issues & Update Idea for "${idea.title}"?\n\n` +
+      `Mode: ${modeLabel}\n` +
       `Current Score: ${rating.overallScore}/100 (${rating.verdict})\n` +
-      `Issues: ${criticalCount} Critical, ${majorCount} Major, ${minorCount} Minor, ${suggestionCount} Suggestions\n\n` +
-      `This will use Gemini (online) to repair the idea. The repaired version will be shown for your review before saving.\n\n` +
+      `Issues: ${criticalCount} Critical, ${majorCount} Major, ${minorCount} Minor, ${suggestionCount} Suggestions${modeNotice}\n\n` +
+      `The repaired version will be shown for your review before saving.\n\n` +
       `Continue?`
     );
     if (!confirmed) return;
 
-    this.repairState = { ideaId, idea, originalRating: rating, status: 'loading' };
+    this.repairState = { ideaId, idea, originalRating: rating, status: 'loading', repairMode: mode };
     this.showRepairModal({
       ideaId,
       idea,
       originalRating: rating,
       status: 'loading',
+      repairMode: mode,
     });
 
     try {
       const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'online' }),
+        body: JSON.stringify({ mode }),
       });
 
       if (!res.ok) {
@@ -1490,7 +1498,7 @@ const app = {
       const result = await res.json();
       this.repairState = { ...this.repairState, status: 'complete', result };
       this.showRepairModal(result);
-      this.showToast('AI repair complete. Review the changes below.', 'success');
+      this.showToast('Repair complete. Review the changes below.', 'success');
     } catch (e) {
       this.repairState = { ...this.repairState, status: 'error', error: e.message };
       this.showRepairModal({
@@ -1499,6 +1507,7 @@ const app = {
         originalRating: rating,
         status: 'error',
         error: e.message,
+        repairMode: mode,
       });
       this.showToast('Repair failed: ' + e.message, 'error');
     }
@@ -1542,6 +1551,10 @@ const app = {
     const orig = data.originalEvaluation || {};
     const rep = data.repairedEvaluation || {};
     const comp = data.comparison || { changedFields: [], unchangedFields: [] };
+    const repairMode = data.repairMode || 'offline';
+    const modeLabel = repairMode === 'online' ? 'AI (Gemini)' : 'Offline Rule-Based';
+    const fixedIssues = data.fixedIssues || [];
+    const unresolvedIssues = data.unresolvedIssues || [];
 
     const scoreChange = rep.overallScore - (orig.overallScore || 0);
     const scoreChangeClass = scoreChange > 0 ? 'repair-score-improved' : scoreChange < 0 ? 'repair-score-declined' : '';
@@ -1644,10 +1657,34 @@ const app = {
 
     const canSave = data.canSave !== false;
     const saveButton = canSave
-      ? `<button class="btn btn-primary" onclick="app.saveRepairedIdea()">Save Repaired Idea</button>`
+      ? `<button class="btn btn-primary" onclick="app.saveRepairedIdea('${repairMode}')">Save Repaired Idea</button>`
       : `<button class="btn btn-primary" disabled style="opacity:0.6;cursor:not-allowed;">Cannot Save — Critical Issues Remain</button>`;
 
+    const fixedIssuesHtml = fixedIssues.length > 0
+      ? `<div class="repair-issues-list">
+        <h4 style="color:var(--success);">Issues Fixed (${repairMode} mode)</h4>
+        ${fixedIssues.map(f => `<div class="repair-issue resolved">
+          <div class="repair-issue-detail">${this.escapeHtml(f)}</div>
+        </div>`).join('')}
+      </div>`
+      : '';
+
+    const unresolvedIssuesHtml = unresolvedIssues.length > 0
+      ? `<div class="repair-issues-list">
+        <h4 style="color:var(--warning);">Issues Still Unresolved</h4>
+        ${unresolvedIssues.map(f => `<div class="repair-issue remaining">
+          <div class="repair-issue-detail">${this.escapeHtml(f)}</div>
+        </div>`).join('')}
+      </div>`
+      : '';
+
     body.innerHTML = `
+      <div class="repair-state ${canSave ? 'success' : 'confirm'}">
+        <strong>Repair Mode:</strong> ${modeLabel} | <strong>Changed fields:</strong> ${comp.changedFields.length} | <strong>Unchanged fields:</strong> ${comp.unchangedFields.length}<br>
+        ${canSave ? 'All critical safety gates pass. Ready to save.' : 'Cannot save — critical safety gates still fail. Review and repair again.'}
+      </div>
+      ${fixedIssuesHtml}
+      ${unresolvedIssuesHtml}
       <div class="repair-comparison">
         <div class="repair-column original">
           <h4>Original Idea</h4>
@@ -1676,11 +1713,6 @@ const app = {
       </div>
       <h4 style="margin-top:1rem;">Field-by-Field Comparison</h4>
       ${fieldsHtml}
-      ${issuesHtml}
-      <div class="repair-state ${canSave ? 'success' : 'confirm'}">
-        <strong>Changed fields:</strong> ${comp.changedFields.length} | <strong>Unchanged fields:</strong> ${comp.unchangedFields.length}<br>
-        ${canSave ? 'All critical safety gates pass. Ready to save.' : 'Cannot save — critical safety gates still fail. Review and repair again.'}
-      </div>
     `;
 
     footer.innerHTML = `
@@ -1697,7 +1729,7 @@ const app = {
     this.repairState = null;
   },
 
-  async saveRepairedIdea() {
+  async saveRepairedIdea(repairMode = 'offline') {
     if (!this.repairModalData || !this.repairModalData.repairedIdea) return;
 
     const { ideaId, repairedIdea, originalEvaluation, repairedEvaluation, comparison } = this.repairModalData;
@@ -1711,6 +1743,7 @@ const app = {
           originalEvaluation,
           repairedEvaluation,
           comparison,
+          repairMode,
         }),
       });
 
