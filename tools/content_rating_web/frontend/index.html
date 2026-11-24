@@ -179,6 +179,38 @@
     </div>
   </div>
 
+  <!-- Repair Preview Modal -->
+  <div id="repairModal" class="modal">
+    <div class="modal-content result-modal" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2 id="repairTitle">Fix All Issues &amp; Update Idea</h2>
+        <button class="close-btn" onclick="app.closeRepairModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="repairBody" style="max-height: 75vh; overflow-y: auto;">
+        <!-- Repair content injected by JS -->
+      </div>
+      <div class="modal-footer" id="repairFooter">
+        <!-- Repair action buttons injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Repair History Modal -->
+  <div id="repairHistoryModal" class="modal">
+    <div class="modal-content result-modal" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2 id="repairHistoryTitle">Repair History</h2>
+        <button class="close-btn" onclick="app.closeRepairHistoryModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="repairHistoryBody" style="max-height: 60vh; overflow-y: auto;">
+        <!-- History content injected by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeRepairHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div id="toast" class="toast"></div>
 

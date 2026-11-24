@@ -32,6 +32,7 @@ import 'content_ideas.dart';
 import 'models/quick_idea.dart';
 import 'plan_data.dart';
 import 'idea_inbox_store.dart';
+import 'projects.dart';
 
 /// A single normalized idea that unifies HookIdea and QuickIdea.
 ///

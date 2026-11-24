@@ -9,6 +9,8 @@ const cors = require('cors');
 const { offlineEvaluate, onlineEvaluate, buildOnlineResult } = require('./backend/ratingEngine');
 const { validateGeminiResponse } = require('./backend/schemas');
 const { listRatings, getRating, saveRating, deleteRating, clearRatings, RATINGS_DIR, ensureDirs, getSourceFingerprint, getRatingFreshness, getAllFreshness, invalidateContentCache } = require('./backend/storage');
+const { loadSourceIdeas, getIdeaById, isValidHookIdea, repairIdeaWithGemini, compareIdeas } = require('./backend/repairEngine');
+const { withLock, createBackup, saveRepairHistory, getRepairHistory, getRepairHistoryFile, saveRepairedIdeaToSource, validateCompleteJson, restoreIdeaFromBackup } = require('./backend/repairStore');
 const { computeHashes, getCreativeHashFields, getProductionHashFields } = require('./backend/hash');
 const {
   openDb, closeDb, upsertContentItem, insertEvaluation, getLatestEvaluation,
@@ -111,6 +113,318 @@ app.get('/api/ideas/:id', (req, res) => {
   if (!idea) return res.status(404).json({ error: 'Idea not found' });
   res.json(idea);
 });
+
+// ── Idea Repair Routes ──
+// POST /api/ideas/:id/repair — Generate repaired idea via Gemini
+app.post('/api/ideas/:id/repair', async (req, res) => {
+  const { mode = 'offline' } = req.body || {};
+  const ideaId = req.params.id;
+
+  const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+  const data = JSON.parse(raw);
+  const idea = data.ideas.find(i => i.id === ideaId);
+  if (!idea) return res.status(404).json({ error: 'Idea not found' });
+
+  // Check if Gemini is available for online repair
+  if (mode === 'online') {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      return res.status(400).json({ error: 'Gemini API key not configured — AI repair requires an online Gemini connection' });
+    }
+  } else {
+    return res.status(400).json({ error: 'AI repair requires online mode (mode=online). Offline evaluation cannot perform AI repairs.' });
+  }
+
+  // Get the latest evaluation for this idea
+  let evaluation;
+  try {
+    const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY, data.ideas);
+    const validation = validateGeminiResponse(geminiResponse);
+    if (!validation.valid) {
+      return res.status(422).json({ error: validation.error, raw: geminiResponse });
+    }
+    evaluation = buildOnlineResult(idea, geminiResponse, data.ideas);
+  } catch (e) {
+    return res.status(502).json({ error: `Gemini evaluation failed: ${e.message}` });
+  }
+
+  // Generate the repaired idea using Gemini
+  let repairResult;
+  try {
+    repairResult = await repairIdeaWithGemini(idea, evaluation, GEMINI_API_KEY, null);
+  } catch (e) {
+    return res.status(502).json({ error: `AI repair failed: ${e.message}` });
+  }
+
+  const repairedIdea = repairResult.repairedIdea;
+
+  // Validate the repaired idea matches HookIdea schema
+  const schemaValidation = isValidHookIdea(repairedIdea);
+  if (!schemaValidation.valid) {
+    return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
+  }
+
+  // ID must match original
+  if (repairedIdea.id !== ideaId) {
+    return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
+  }
+
+  // Compare original vs repaired
+  const comparison = compareIdeas(idea, repairedIdea);
+
+  // Re-evaluate the repaired idea using the existing offline engine
+  let repairedEvaluation;
+  try {
+    repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+  }
+
+  // Check that all critical gates pass
+  const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
+  if (criticalGatesFailed.length > 0) {
+    return res.status(422).json({
+      error: 'Repaired idea still has unresolved critical safety gates',
+      criticalGatesFailed: criticalGatesFailed.map(g => ({ id: g.id, name: g.name, detail: g.detail })),
+      repairedIdea,
+      repairedEvaluation,
+      comparison,
+    });
+  }
+
+  res.json({
+    ideaId,
+    originalIdea: idea,
+    repairedIdea,
+    comparison,
+    originalEvaluation: {
+      overallScore: evaluation.overallScore,
+      verdict: evaluation.verdict,
+      criticalFindings: evaluation.criticalFindings,
+      majorFindings: evaluation.majorFindings,
+      minorFindings: evaluation.minorFindings,
+      suggestions: evaluation.suggestions,
+    },
+    repairedEvaluation: {
+      overallScore: repairedEvaluation.overallScore,
+      rawScore: repairedEvaluation.rawScore,
+      scoreCapped: repairedEvaluation.scoreCapped,
+      verdict: repairedEvaluation.verdict,
+      criticalFindings: repairedEvaluation.criticalFindings,
+      majorFindings: repairedEvaluation.majorFindings,
+      minorFindings: repairedEvaluation.minorFindings,
+      suggestions: repairedEvaluation.suggestions,
+      gateResults: repairedEvaluation.gateResults,
+      dimensionScores: repairedEvaluation.dimensionScores,
+    },
+    canSave: criticalGatesFailed.length === 0,
+    rawResponse: repairResult.rawResponse,
+  });
+});
+
+// POST /api/ideas/:id/repair/validate — Validate a repaired idea (client-submitted)
+app.post('/api/ideas/:id/repair/validate', async (req, res) => {
+  const ideaId = req.params.id;
+  const { repairedIdea } = req.body || {};
+
+  const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+  const data = JSON.parse(raw);
+  const idea = data.ideas.find(i => i.id === ideaId);
+  if (!idea) return res.status(404).json({ error: 'Idea not found' });
+
+  if (!repairedIdea || typeof repairedIdea !== 'object') {
+    return res.status(400).json({ error: 'repairedIdea is required' });
+  }
+
+  const schemaValidation = isValidHookIdea(repairedIdea);
+  if (!schemaValidation.valid) {
+    return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
+  }
+
+  if (repairedIdea.id !== ideaId) {
+    return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
+  }
+
+  const comparison = compareIdeas(idea, repairedIdea);
+
+  let repairedEvaluation;
+  try {
+    repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+  }
+
+  const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
+
+  res.json({
+    ideaId,
+    originalIdea: idea,
+    repairedIdea,
+    comparison,
+    repairedEvaluation: {
+      overallScore: repairedEvaluation.overallScore,
+      rawScore: repairedEvaluation.rawScore,
+      scoreCapped: repairedEvaluation.scoreCapped,
+      verdict: repairedEvaluation.verdict,
+      criticalFindings: repairedEvaluation.criticalFindings,
+      majorFindings: repairedEvaluation.majorFindings,
+      minorFindings: repairedEvaluation.minorFindings,
+      suggestions: repairedEvaluation.suggestions,
+      gateResults: repairedEvaluation.gateResults,
+      dimensionScores: repairedEvaluation.dimensionScores,
+    },
+    canSave: criticalGatesFailed.length === 0,
+  });
+});
+
+// POST /api/ideas/:id/repair/save — Save approved repaired idea to content_ideas.json
+app.post('/api/ideas/:id/repair/save', async (req, res) => {
+  const ideaId = req.params.id;
+  const { repairedIdea, originalEvaluation, repairedEvaluation, comparison } = req.body || {};
+
+  if (!repairedIdea || typeof repairedIdea !== 'object') {
+    return res.status(400).json({ error: 'repairedIdea is required' });
+  }
+
+  const raw = fs.readFileSync(CONTENT_JSON_PATH, 'utf8');
+  const data = JSON.parse(raw);
+  const idea = data.ideas.find(i => i.id === ideaId);
+  if (!idea) return res.status(404).json({ error: 'Idea not found' });
+
+  const schemaValidation = isValidHookIdea(repairedIdea);
+  if (!schemaValidation.valid) {
+    return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
+  }
+
+  if (repairedIdea.id !== ideaId) {
+    return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
+  }
+
+  // Re-evaluate to confirm critical gates still pass
+  let finalEvaluation;
+  try {
+    finalEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+  }
+
+  const criticalGatesFailed = (finalEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
+  if (criticalGatesFailed.length > 0) {
+    return res.status(422).json({
+      error: 'Cannot save: repaired idea still has unresolved critical safety gates',
+      criticalGatesFailed: criticalGatesFailed.map(g => ({ id: g.id, name: g.name, detail: g.detail })),
+    });
+  }
+
+  // Create backup, save repair history, then write atomically
+  let backupPath;
+  try {
+    backupPath = await withLock(() => createBackup());
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to create backup: ${e.message}` });
+  }
+
+  try {
+    await withLock(() => saveRepairedIdeaToSource(repairedIdea));
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to save repaired idea: ${e.message}` });
+  }
+
+  // Save repair history
+  const historyRecord = {
+    ideaId,
+    repairTimestamp: new Date().toISOString(),
+    originalIdea: idea,
+    repairedIdea,
+    originalScore: originalEvaluation?.overallScore ?? (() => { const ev = offlineEvaluate(idea, data.ideas); return ev.overallScore; })(),
+    repairedScore: finalEvaluation.overallScore,
+    originalVerdict: originalEvaluation?.verdict ?? 'Not Evaluated',
+    repairedVerdict: finalEvaluation.verdict,
+    changedFields: comparison?.changedFields ?? [],
+    unchangedFields: comparison?.unchangedFields ?? [],
+    backupPath,
+    evaluationMode: 'online',
+  };
+
+  try {
+    await withLock(() => saveRepairHistory(historyRecord));
+  } catch (e) {
+    // History save failure should not roll back the idea save, but report it
+    console.error(`Failed to save repair history for ${ideaId}: ${e.message}`);
+  }
+
+  invalidateContentCache();
+
+  res.json({
+    ok: true,
+    ideaId,
+    message: 'Repaired idea saved to content_ideas.json',
+    backupPath,
+    originalScore: historyRecord.originalScore,
+    repairedScore: historyRecord.repairedScore,
+    originalVerdict: historyRecord.originalVerdict,
+    repairedVerdict: historyRecord.repairedVerdict,
+  });
+});
+
+// GET /api/ideas/:id/repair/history — Get repair history for an idea
+app.get('/api/ideas/:id/repair/history', (_req, res) => {
+  const ideaId = _req.params.id;
+  const history = getRepairHistory(ideaId);
+  res.json({ ideaId, history });
+});
+
+// POST /api/ideas/:id/repair/restore — Restore a previous version from backup/history
+app.post('/api/ideas/:id/repair/restore', async (_req, res) => {
+  const ideaId = _req.params.id;
+  const { backupPath, historyTimestamp } = _req.body || {};
+
+  if (!backupPath && !historyTimestamp) {
+    return res.status(400).json({ error: 'backupPath or historyTimestamp is required' });
+  }
+
+  let data;
+  if (backupPath) {
+    // Security: only allow paths within the backup directory
+    const resolvedBackup = path.resolve(backupPath);
+    const allowedBackupDir = path.resolve(process.cwd(), 'tools/content_rating_web/data/backups');
+    if (!resolvedBackup.startsWith(allowedBackupDir + path.sep) && resolvedBackup !== allowedBackupDir) {
+      return res.status(403).json({ error: 'Invalid backup path' });
+    }
+    data = restoreIdeaFromBackup(resolvedBackup);
+  } else if (historyTimestamp) {
+    const record = getRepairHistoryFile(ideaId, historyTimestamp);
+    if (!record) {
+      return res.status(404).json({ error: 'Repair history record not found' });
+    }
+    // Restore the original idea snapshot from history into the full JSON
+    const raw = fs.readFileSync(SOURCE_JSON_PATH, 'utf8');
+    const sourceData = JSON.parse(raw);
+    const ideaIndex = sourceData.ideas.findIndex(i => i.id === ideaId);
+    if (ideaIndex === -1) {
+      return res.status(404).json({ error: `Idea ${ideaId} not found in source JSON` });
+    }
+    const updatedIdeas = [...sourceData.ideas];
+    updatedIdeas[ideaIndex] = record.originalIdea;
+    const updatedData = { ...sourceData, ideas: updatedIdeas };
+    const validation = validateCompleteJson(updatedData);
+    if (!validation.valid) {
+      return res.status(422).json({ error: `Restore validation failed: ${validation.error}` });
+    }
+    await withLock(() => atomicWriteJson(SOURCE_JSON_PATH, updatedData));
+    data = updatedData;
+  }
+
+  invalidateContentCache();
+
+  res.json({
+    ok: true,
+    ideaId,
+    message: 'Previous version restored',
+    totalIdeas: data.ideas.length,
+  });
+});
+
+// ── End of Idea Repair Routes ──
 
 app.get('/api/ratings', (_req, res) => {
   const ratings = listRatings();

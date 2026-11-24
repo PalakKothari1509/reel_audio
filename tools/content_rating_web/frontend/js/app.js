@@ -25,8 +25,14 @@ const app = {
       if (e.key !== 'Escape') return;
       const resultModal = document.getElementById('resultModal');
       const ideaModal = document.getElementById('ideaModal');
+      const repairModal = document.getElementById('repairModal');
+      const repairHistoryModal = document.getElementById('repairHistoryModal');
       if (resultModal.style.display === 'flex') {
         this.closeResultModal();
+      } else if (repairModal.style.display === 'flex') {
+        this.closeRepairModal();
+      } else if (repairHistoryModal.style.display === 'flex') {
+        this.closeRepairHistoryModal();
       } else if (ideaModal.style.display === 'flex') {
         this.closeModal();
       }
@@ -864,8 +870,18 @@ const app = {
         <div class="idea-detail-field"><div class="field-label">Critical</div><div class="field-value">${rating.criticalFindings?.length || 0}</div></div>
         <div class="idea-detail-field"><div class="field-label">Major</div><div class="field-value">${rating.majorFindings?.length || 0}</div></div>
         <div class="idea-detail-field"><div class="field-label">Minor</div><div class="field-value">${rating.minorFindings?.length || 0}</div></div>
+        <div class="idea-detail-field"><div class="field-label">Suggestions</div><div class="field-value">${rating.suggestions?.length || 0}</div></div>
         <div class="idea-detail-field"><div class="field-label">Content Hash</div><div class="field-value">${rating.contentHash || 'none'}</div></div>
-        ${freshnessStatus !== 'CURRENT' ? `<div class="idea-detail-field"><div class="field-label">Action</div><div class="field-value"><button onclick="app.reevaluateIdea('${idea.id}')">Re-evaluate</button></div></div>` : ''}
+        <div class="idea-detail-field">
+          <div class="field-label">Actions</div>
+          <div class="field-value">
+            ${freshnessStatus !== 'CURRENT' ? `<button onclick="app.reevaluateIdea('${idea.id}')">Re-evaluate</button>` : ''}
+            ${rating && (rating.criticalFindings?.length > 0 || rating.majorFindings?.length > 0 || rating.minorFindings?.length > 0 || rating.suggestions?.length > 0)
+              ? `<button class="btn btn-primary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.repairIdea('${idea.id}')">Fix All Issues &amp; Update Idea</button>`
+              : ''}
+            <button class="btn btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.8rem;margin:0.25rem 0.25rem 0 0;" onclick="app.showRepairHistory('${idea.id}')">Repair History</button>
+          </div>
+        </div>
       </div>
       ` : '<div class="idea-detail-section"><h3>Previous Evaluation</h3><p>This idea has not been evaluated yet.</p><div class="idea-detail-field"><div class="field-label">Action</div><div class="field-value"><button onclick="app.reevaluateIdea(\'' + idea.id + '\')">Evaluate Now</button></div></div></div>'};
     `;
@@ -1417,6 +1433,388 @@ const app = {
     this.renderDashboard();
     this.renderLibrary();
     this.showToast(`Cleared ${data.cleared} ratings.`, 'success');
+  },
+
+  // ── Idea Repair ──
+  repairState: null,
+
+  async repairIdea(ideaId) {
+    const idea = this.ideas.find(i => i.id === ideaId);
+    if (!idea) return;
+
+    const rating = this.getRatingForIdea(ideaId);
+    if (!rating) {
+      this.showToast('Idea must be evaluated before repair.', 'error');
+      return;
+    }
+
+    const criticalCount = rating.criticalFindings?.length || 0;
+    const majorCount = rating.majorFindings?.length || 0;
+    const minorCount = rating.minorFindings?.length || 0;
+    const suggestionCount = rating.suggestions?.length || 0;
+
+    if (criticalCount === 0 && majorCount === 0 && minorCount === 0 && suggestionCount === 0) {
+      this.showToast('No issues found to repair.', 'info');
+      return;
+    }
+
+    const confirmed = confirm(
+      `Fix All Issues & Update Idea for "${idea.title}"?\n\n` +
+      `Current Score: ${rating.overallScore}/100 (${rating.verdict})\n` +
+      `Issues: ${criticalCount} Critical, ${majorCount} Major, ${minorCount} Minor, ${suggestionCount} Suggestions\n\n` +
+      `This will use Gemini (online) to repair the idea. The repaired version will be shown for your review before saving.\n\n` +
+      `Continue?`
+    );
+    if (!confirmed) return;
+
+    this.repairState = { ideaId, idea, originalRating: rating, status: 'loading' };
+    this.showRepairModal({
+      ideaId,
+      idea,
+      originalRating: rating,
+      status: 'loading',
+    });
+
+    try {
+      const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'online' }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Repair failed (${res.status})`);
+      }
+
+      const result = await res.json();
+      this.repairState = { ...this.repairState, status: 'complete', result };
+      this.showRepairModal(result);
+      this.showToast('AI repair complete. Review the changes below.', 'success');
+    } catch (e) {
+      this.repairState = { ...this.repairState, status: 'error', error: e.message };
+      this.showRepairModal({
+        ideaId,
+        idea,
+        originalRating: rating,
+        status: 'error',
+        error: e.message,
+      });
+      this.showToast('Repair failed: ' + e.message, 'error');
+    }
+  },
+
+  showRepairModal(data) {
+    this.repairModalData = data;
+    const body = document.getElementById('repairBody');
+    const footer = document.getElementById('repairFooter');
+    const title = document.getElementById('repairTitle');
+
+    if (data.status === 'loading') {
+      title.textContent = 'Fix All Issues & Update Idea — Processing';
+      body.innerHTML = `
+        <div class="repair-state loading">
+          <span class="repair-spinner"></span>
+          <strong>AI is repairing the idea...</strong><br>
+          This may take a moment. Please do not click the repair button again.
+        </div>
+      `;
+      footer.innerHTML = `<button class="btn btn-secondary" onclick="app.closeRepairModal()">Cancel</button>`;
+      document.getElementById('repairModal').style.display = 'flex';
+      return;
+    }
+
+    if (data.status === 'error') {
+      title.textContent = 'Repair Failed';
+      body.innerHTML = `
+        <div class="repair-state error">
+          <strong>Repair failed:</strong> ${this.escapeHtml(data.error || 'Unknown error')}<br>
+          The original idea has not been modified.
+        </div>
+      `;
+      footer.innerHTML = `<button class="btn btn-secondary" onclick="app.closeRepairModal()">Close</button>`;
+      document.getElementById('repairModal').style.display = 'flex';
+      return;
+    }
+
+    // status === 'complete'
+    title.textContent = `Fix All Issues & Update Idea — ${data.idea.title}`;
+    const orig = data.originalEvaluation || {};
+    const rep = data.repairedEvaluation || {};
+    const comp = data.comparison || { changedFields: [], unchangedFields: [] };
+
+    const scoreChange = rep.overallScore - (orig.overallScore || 0);
+    const scoreChangeClass = scoreChange > 0 ? 'repair-score-improved' : scoreChange < 0 ? 'repair-score-declined' : '';
+    const scoreChangeSign = scoreChange > 0 ? '+' : '';
+
+    // Build before/after field comparison
+    const fieldLabels = {
+      id: 'ID', category: 'Category', title: 'Title', cover: 'Cover',
+      opening: 'Opening Hook', problem: 'Problem', lesson: 'Lesson',
+      postFormat: 'Post Format', strategy: 'Strategy', caption: 'Caption',
+      pinnedComment: 'Pinned Comment', forApp: 'For App', usedOn: 'Used On',
+      custom: 'Custom', archived: 'Archived', storyDetail: 'Story Detail',
+      setting: 'Setting', sceneDetail: 'Scene Detail', dialogue: 'Dialogue',
+      mess: 'Mess', innerThought: 'Inner Thought', endingBeat: 'Ending Beat',
+      defaultCast: 'Default Cast', keepMoralOffScreen: 'Keep Moral Off Screen',
+      quote: 'Quote', detail: 'Detail', punchline: 'Punchline',
+      readyPrompt: 'Ready Prompt', score: 'Score', band: 'Band', reviewedOn: 'Reviewed On',
+    };
+
+    const originalIdea = data.originalIdea || data.idea;
+    const repairedIdea = data.repairedIdea;
+
+    let fieldsHtml = '';
+    const allKeys = new Set([...Object.keys(originalIdea), ...Object.keys(repairedIdea)]);
+    for (const key of allKeys) {
+      const isChanged = comp.changedFields.includes(key);
+      const origVal = originalIdea[key];
+      const repVal = repairedIdea[key];
+      const origDisplay = Array.isArray(origVal) ? JSON.stringify(origVal) : String(origVal || '');
+      const repDisplay = Array.isArray(repVal) ? JSON.stringify(repVal) : String(repVal || '');
+      fieldsHtml += `
+        <div class="repair-field ${isChanged ? 'changed' : 'unchanged'}">
+          <div class="repair-field-label">
+            ${fieldLabels[key] || key}
+            <span class="repair-field-badge ${isChanged ? 'badge-changed' : 'badge-unchanged'}">
+              ${isChanged ? 'CHANGED' : 'UNCHANGED'}
+            </span>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <div style="flex:1;">
+              <div style="font-size:0.7rem;color:var(--text-muted);">Original</div>
+              <div class="repair-field-value">${this.escapeHtml(origDisplay)}</div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:0.7rem;color:var(--text-muted);">Repaired</div>
+              <div class="repair-field-value">${this.escapeHtml(repDisplay)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Issues resolved / remaining
+    const orig = data.originalEvaluation || {};
+    const rep = data.repairedEvaluation || {};
+    const comp = data.comparison || { changedFields: [], unchangedFields: [] };
+
+    const origCritical = orig.criticalFindings || [];
+    const origMajor = orig.majorFindings || [];
+    const origMinor = orig.minorFindings || [];
+    const origSuggestions = orig.suggestions || [];
+    const repCritical = rep.criticalFindings || [];
+    const repMajor = rep.majorFindings || [];
+    const repMinor = rep.minorFindings || [];
+    const repSuggestions = rep.suggestions || [];
+
+    const scoreChange = rep.overallScore - (orig.overallScore || 0);
+    const scoreChangeClass = scoreChange > 0 ? 'repair-score-improved' : scoreChange < 0 ? 'repair-score-declined' : '';
+    const scoreChangeSign = scoreChange > 0 ? '+' : '';
+
+    const issuesHtml = `
+      <div class="repair-issues-list">
+        <h4>Issues Summary</h4>
+        <div class="repair-issue resolved">
+          <div class="repair-issue-header">
+            <span class="repair-issue-title">Critical Issues</span>
+            <span class="repair-issue-severity sev-critical-badge">Critical</span>
+          </div>
+          <div class="repair-issue-detail">Original: ${origCritical.length} → Repaired: ${repCritical.length}</div>
+          <div class="repair-issue-status">${repCritical.length === 0 ? 'All resolved' : repCritical.length + ' remaining'}</div>
+        </div>
+        <div class="repair-issue ${repMajor.length === 0 ? 'resolved' : 'remaining'}">
+          <div class="repair-issue-header">
+            <span class="repair-issue-title">Major Issues</span>
+            <span class="repair-issue-severity sev-major-badge">Major</span>
+          </div>
+          <div class="repair-issue-detail">Original: ${origMajor.length} → Repaired: ${repMajor.length}</div>
+          <div class="repair-issue-status">${repMajor.length === 0 ? 'All resolved' : repMajor.length + ' remaining'}</div>
+        </div>
+        <div class="repair-issue ${repMinor.length === 0 ? 'resolved' : 'remaining'}">
+          <div class="repair-issue-header">
+            <span class="repair-issue-title">Minor Issues</span>
+            <span class="repair-issue-severity sev-minor-badge">Minor</span>
+          </div>
+          <div class="repair-issue-detail">Original: ${origMinor.length} → Repaired: ${repMinor.length}</div>
+          <div class="repair-issue-status">${repMinor.length === 0 ? 'All resolved' : repMinor.length + ' remaining'}</div>
+        </div>
+        <div class="repair-issue ${repSuggestions.length === 0 ? 'resolved' : 'remaining'}">
+          <div class="repair-issue-header">
+            <span class="repair-issue-title">Suggestions</span>
+            <span class="repair-issue-severity sev-suggestion-badge">Suggestion</span>
+          </div>
+          <div class="repair-issue-detail">Original: ${origSuggestions.length} → Repaired: ${repSuggestions.length}</div>
+          <div class="repair-issue-status">${repSuggestions.length === 0 ? 'All resolved' : repSuggestions.length + ' remaining'}</div>
+        </div>
+      </div>
+    `;
+
+    const canSave = data.canSave !== false;
+    const saveButton = canSave
+      ? `<button class="btn btn-primary" onclick="app.saveRepairedIdea()">Save Repaired Idea</button>`
+      : `<button class="btn btn-primary" disabled style="opacity:0.6;cursor:not-allowed;">Cannot Save — Critical Issues Remain</button>`;
+
+    body.innerHTML = `
+      <div class="repair-comparison">
+        <div class="repair-column original">
+          <h4>Original Idea</h4>
+          <div class="repair-score-table">
+            <tr><th>Metric</th><th>Original</th></tr>
+            <tr><td>Overall Score</td><td>${orig.overallScore || 'N/A'}/100</td></tr>
+            <tr><td>Verdict</td><td>${orig.verdict || 'N/A'}</td></tr>
+            <tr><td>Critical</td><td>${origCritical.length}</td></tr>
+            <tr><td>Major</td><td>${origMajor.length}</td></tr>
+            <tr><td>Minor</td><td>${origMinor.length}</td></tr>
+            <tr><td>Suggestions</td><td>${origSuggestions.length}</td></tr>
+          </div>
+        </div>
+        <div class="repair-column repaired">
+          <h4>AI-Repaired Idea</h4>
+          <div class="repair-score-table">
+            <tr><th>Metric</th><th>Repaired</th></tr>
+            <tr><td>Overall Score</td><td><span class="repair-score-change ${scoreChangeClass}">${scoreChangeSign}${rep.overallScore || 'N/A'}</span>/100</td></tr>
+            <tr><td>Verdict</td><td>${rep.verdict || 'N/A'}</td></tr>
+            <tr><td>Critical</td><td>${repCritical.length}</td></tr>
+            <tr><td>Major</td><td>${repMajor.length}</td></tr>
+            <tr><td>Minor</td><td>${repMinor.length}</td></tr>
+            <tr><td>Suggestions</td><td>${repSuggestions.length}</td></tr>
+          </div>
+        </div>
+      </div>
+      <h4 style="margin-top:1rem;">Field-by-Field Comparison</h4>
+      ${fieldsHtml}
+      ${issuesHtml}
+      <div class="repair-state ${canSave ? 'success' : 'confirm'}">
+        <strong>Changed fields:</strong> ${comp.changedFields.length} | <strong>Unchanged fields:</strong> ${comp.unchangedFields.length}<br>
+        ${canSave ? 'All critical safety gates pass. Ready to save.' : 'Cannot save — critical safety gates still fail. Review and repair again.'}
+      </div>
+    `;
+
+    footer.innerHTML = `
+      ${saveButton}
+      <button class="btn btn-secondary" onclick="app.discardRepair()">Discard Changes</button>
+    `;
+
+    document.getElementById('repairModal').style.display = 'flex';
+  },
+
+  closeRepairModal() {
+    document.getElementById('repairModal').style.display = 'none';
+    this.repairModalData = null;
+    this.repairState = null;
+  },
+
+  async saveRepairedIdea() {
+    if (!this.repairModalData || !this.repairModalData.repairedIdea) return;
+
+    const { ideaId, repairedIdea, originalEvaluation, repairedEvaluation, comparison } = this.repairModalData;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repairedIdea,
+          originalEvaluation,
+          repairedEvaluation,
+          comparison,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Save failed (${res.status})`);
+      }
+
+      const result = await res.json();
+      this.closeRepairModal();
+      this.showToast(result.message, 'success');
+
+      // Refresh data from the updated JSON
+      await this.loadIdeas();
+      await this.loadRatings();
+      await this.loadFreshness();
+      this.renderDashboard();
+      this.renderLibrary();
+    } catch (e) {
+      this.showToast('Save failed: ' + e.message, 'error');
+    }
+  },
+
+  discardRepair() {
+    this.closeRepairModal();
+    this.showToast('Repair discarded. Original idea unchanged.', 'info');
+  },
+
+  async showRepairHistory(ideaId) {
+    try {
+      const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/history`);
+      if (!res.ok) throw new Error('Failed to load repair history');
+      const data = await res.json();
+
+      const body = document.getElementById('repairHistoryBody');
+      if (data.history.length === 0) {
+        body.innerHTML = '<p>No repair history for this idea.</p>';
+      } else {
+        body.innerHTML = `
+          <ul class="repair-history-list">
+            ${data.history.map(h => `
+              <li class="repair-history-item">
+                <div class="repair-history-header">
+                  <span class="repair-history-date">${new Date(h.repairTimestamp).toLocaleString()}</span>
+                  <span class="repair-history-score">${h.originalScore} → ${h.repairedScore}</span>
+                </div>
+                <div style="font-size:0.85rem; margin-bottom:0.5rem;">
+                  <strong>Verdict:</strong> ${h.originalVerdict} → ${h.repairedVerdict}<br>
+                  <strong>Changed fields:</strong> ${h.changedFields?.length || 0}
+                </div>
+                <div class="repair-history-actions">
+                  <button class="btn btn-secondary" onclick="app.restoreFromHistory('${ideaId}', '${h.repairTimestamp}')">Restore This Version</button>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+
+      document.getElementById('repairHistoryModal').style.display = 'flex';
+    } catch (e) {
+      this.showToast('Failed to load repair history: ' + e.message, 'error');
+    }
+  },
+
+  closeRepairHistoryModal() {
+    document.getElementById('repairHistoryModal').style.display = 'none';
+  },
+
+  async restoreFromHistory(ideaId, timestamp) {
+    if (!confirm('Restore this previous version? This will overwrite the current idea in content_ideas.json.')) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/restore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ historyTimestamp: timestamp }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Restore failed (${res.status})`);
+      }
+
+      const result = await res.json();
+      this.closeRepairHistoryModal();
+      this.showToast(result.message, 'success');
+
+      await this.loadIdeas();
+      await this.loadRatings();
+      await this.loadFreshness();
+      this.renderDashboard();
+      this.renderLibrary();
+    } catch (e) {
+      this.showToast('Restore failed: ' + e.message, 'error');
+    }
   },
 
   showToast(message, type = 'info') {

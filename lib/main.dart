@@ -512,6 +512,26 @@ Future<void> main() async {
                 _appNavigatorKey.currentContext!,
                 MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
               ),
+              onOpenProject: (p) {
+                final lines = parseScript(p.script.join('\n'));
+                Navigator.push(
+                  _appNavigatorKey.currentContext!,
+                  MaterialPageRoute(
+                    builder: (_) => TimedScriptScreen(
+                      style: p.style.isEmpty ? 'Heartwarming' : p.style,
+                      language: p.language.isEmpty ? 'Hinglish' : p.language,
+                      videoFile: null,
+                      initialLines: lines,
+                      storyDescription: p.story,
+                      seconds: p.seconds,
+                      projectId: p.id,
+                    ),
+                  ),
+                );
+              },
+              onDeleteProject: (p) async {
+                await ProjectStore.delete(p.id);
+              },
             ),
           ),
         ),
@@ -545,6 +565,26 @@ Future<void> main() async {
                 _appNavigatorKey.currentContext!,
                 MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
               ),
+              onOpenProject: (p) {
+                final lines = parseScript(p.script.join('\n'));
+                Navigator.push(
+                  _appNavigatorKey.currentContext!,
+                  MaterialPageRoute(
+                    builder: (_) => TimedScriptScreen(
+                      style: p.style.isEmpty ? 'Heartwarming' : p.style,
+                      language: p.language.isEmpty ? 'Hinglish' : p.language,
+                      videoFile: null,
+                      initialLines: lines,
+                      storyDescription: p.story,
+                      seconds: p.seconds,
+                      projectId: p.id,
+                    ),
+                  ),
+                );
+              },
+              onDeleteProject: (p) async {
+                await ProjectStore.delete(p.id);
+              },
             ),
           ),
         ),
@@ -938,7 +978,7 @@ class _StoryScreenState extends State<StoryScreen> {
             ..clear()
             ..addAll(result.parts.map((p) => p.promptText));
         } catch (_) {
-          // Ignore parse errors — saved prompts may be from an older format.
+          // Ignore parse errors â€” saved prompts may be from an older format.
         }
       }
     });

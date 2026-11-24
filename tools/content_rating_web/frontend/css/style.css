@@ -693,6 +693,269 @@ body {
 }
 
 /* Toast */
+
+/* Repair Modal */
+.repair-state {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.repair-state.loading {
+  background: #f3f0e8;
+  border-color: var(--info);
+}
+
+.repair-state.confirm {
+  background: #fff3cd;
+  border-color: var(--warning);
+}
+
+.repair-state.error {
+  background: #f8d7da;
+  border-color: var(--danger);
+}
+
+.repair-state.success {
+  background: #d4edda;
+  border-color: var(--success);
+}
+
+.repair-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-muted);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.repair-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .repair-comparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+.repair-column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.repair-column.original { border-left: 4px solid var(--secondary); }
+.repair-column.repaired { border-left: 4px solid var(--primary); }
+
+.repair-column h4 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.25rem;
+}
+
+.repair-field {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: #faf9f5;
+}
+
+.repair-field.changed {
+  background: #fff3cd;
+  border: 1px solid var(--warning);
+}
+
+.repair-field.unchanged {
+  opacity: 0.85;
+}
+
+.repair-field-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.repair-field-value {
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.repair-field-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.badge-changed {
+  background: var(--warning);
+  color: #000;
+}
+
+.badge-unchanged {
+  background: #e8e2d0;
+  color: #2d2d2d;
+}
+
+.repair-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: var(--surface);
+}
+
+.repair-score-table th,
+.repair-score-table td {
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.repair-score-table th {
+  background: #f3f0e8;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.repair-score-table tr:nth-child(even) {
+  background: #faf9f5;
+}
+
+.repair-score-change {
+  font-weight: 700;
+}
+
+.repair-score-improved { color: var(--success); }
+.repair-score-declined { color: var(--danger); }
+
+.repair-issues-list {
+  margin: 1rem 0;
+}
+
+.repair-issues-list h4 {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.repair-issue {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.repair-issue.resolved {
+  border-left: 4px solid var(--success);
+}
+
+.repair-issue.remaining {
+  border-left: 4px solid var(--warning);
+}
+
+.repair-issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.repair-issue-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.repair-issue-severity {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sev-critical-badge { background: #f8d7da; color: #721c24; }
+.sev-major-badge { background: #fde6ca; color: #8a5a00; }
+.sev-minor-badge { background: #fff3cd; color: #856404; }
+.sev-suggestion-badge { background: #d1ecf1; color: #0c5460; }
+
+.repair-issue-detail {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.repair-issue-status {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.repair-history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.repair-history-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.repair-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.repair-history-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.repair-history-score {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.repair-history-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.repair-history-actions .btn {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+}
+
 .toast {
   position: fixed;
   bottom: 2rem;
@@ -707,6 +970,7 @@ body {
   transition: opacity 0.3s;
   z-index: 2000;
 }
+
 
 .toast.show { opacity: 1; }
 

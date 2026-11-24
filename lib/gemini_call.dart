@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -121,6 +122,9 @@ Future<void> _rememberMissing(String model) async {
 ///
 /// Times out rather than retrying on a timeout: a request that took too long once will
 /// usually take too long again, and the caller already explains that case properly.
+///
+/// Connection errors (SocketException, ClientException, HttpException) are retried
+/// with backoff, since a transient network hiccup should not abort the whole request.
 Future<http.Response> geminiPost({
   required String model,
   required String apiKey,
@@ -135,7 +139,11 @@ Future<http.Response> geminiPost({
   String? fallbackModel,
   /// Called between tries, so a wait does not look like a hang.
   void Function(String message)? onWait,
+  /// HTTP client used for the request. Defaults to a real [http.Client].
+  /// Pass a [http_testing.MockClient] in tests to simulate connection errors.
+  http.Client? httpClient,
 }) async {
+  final client = httpClient ?? http.Client();
   await _loadMissing();
   var chosen = model;
   if (_missingModels.containsKey(chosen) && fallbackModel != null) {
@@ -154,15 +162,42 @@ Future<http.Response> geminiPost({
   Uri urlFor(String m) => Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta/models/$m:generateContent');
 
+  /// Posts with retry on connection errors (network abort, DNS, TLS, etc.).
+  ///
+  /// Transient connection failures are retried with backoff rather than surfaced
+  /// as a hard failure, matching how HTTP status retries are handled.
+  Future<http.Response> _postWithConnectionRetry(Uri url, int attempt) async {
+    try {
+      return await client.post(url, headers: headers, body: body).timeout(timeout);
+    } on SocketException catch (_) {
+      if (attempt >= backoffDurations.length) rethrow;
+      onWait?.call('Connection lost — retrying in ${backoffDurations[attempt].inSeconds}s...');
+      await Future<void>.delayed(backoffDurations[attempt]);
+      return _postWithConnectionRetry(url, attempt + 1);
+    } on HttpException catch (_) {
+      if (attempt >= backoffDurations.length) rethrow;
+      onWait?.call('HTTP error — retrying in ${backoffDurations[attempt].inSeconds}s...');
+      await Future<void>.delayed(backoffDurations[attempt]);
+      return _postWithConnectionRetry(url, attempt + 1);
+    } on TimeoutException catch (_) {
+      // A timeout is not a connection error — do not retry, surface it as-is.
+      rethrow;
+    } catch (_) {
+      if (attempt >= backoffDurations.length) rethrow;
+      onWait?.call('Connection error — retrying in ${backoffDurations[attempt].inSeconds}s...');
+      await Future<void>.delayed(backoffDurations[attempt]);
+      return _postWithConnectionRetry(url, attempt + 1);
+    }
+  }
+
   var url = urlFor(chosen);
-  http.Response response =
-      await http.post(url, headers: headers, body: body).timeout(timeout);
+  http.Response response = await _postWithConnectionRetry(url, 0);
 
   if (response.statusCode == 404 && fallbackModel != null && chosen != fallbackModel) {
     await _rememberMissing(chosen);
     chosen = fallbackModel;
     url = urlFor(chosen);
-    response = await http.post(url, headers: headers, body: body).timeout(timeout);
+    response = await _postWithConnectionRetry(url, 0);
   }
 
   for (var i = 0; i < backoffDurations.length; i++) {
@@ -183,7 +218,7 @@ Future<http.Response> geminiPost({
       await Future<void>.delayed(const Duration(seconds: 1));
     }
 
-    response = await http.post(url, headers: headers, body: body).timeout(timeout);
+    response = await _postWithConnectionRetry(url, i);
   }
 
   return response;
