@@ -14,42 +14,28 @@ class ContentStudioHome extends StatefulWidget {
   final CreateCallback onCreateReel;
   final NavCallback onSettings;
 
-  /// New simplified callbacks.
-  final NavCallback onContentLibrary;
+  final NavCallback? onContentLibrary;
   final NavCallback? onInstagramWorkflows;
-  final NavCallback? onReviewAllIdeas;
   final NavCallback? onAddNewIdea;
   final CreateCallback? onCreateContent;
 
   /// Legacy support — if provided, these appear as additional Create options.
   final NavCallback? onImagePrompt;
   final NavCallback? onCarouselPrompts;
-  final NavCallback? onGeminiVideo;
 
-  /// Optional offline story generator.
-  final NavCallback? onOfflineStory;
   final NavCallback? onPromoComments;
-
-  /// Assets and character browsing.
-  final NavCallback? onAssets;
-  final NavCallback? onCharacterLibrary;
 
   const ContentStudioHome({
     super.key,
     required this.onCreateReel,
     required this.onSettings,
-    required this.onContentLibrary,
+    this.onContentLibrary,
     this.onInstagramWorkflows,
-    this.onReviewAllIdeas,
     this.onAddNewIdea,
     this.onCreateContent,
     this.onImagePrompt,
     this.onCarouselPrompts,
-    this.onGeminiVideo,
-    this.onOfflineStory,
     this.onPromoComments,
-    this.onAssets,
-    this.onCharacterLibrary,
   });
 
   @override
@@ -105,37 +91,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         ),
       ]);
     }
-    if (widget.onGeminiVideo != null) {
-      createActions.addAll([
-        const SizedBox(height: 10),
-        _PrimaryAction(
-          icon: Icons.smart_display_outlined,
-          title: 'Gemini Story Video',
-          subtitle: 'Connected 10-second video prompts with continuity lock',
-          onTap: widget.onGeminiVideo!,
-        ),
-      ]);
-    }
-    if (widget.onOfflineStory != null) {
-      createActions.addAll([
-        const SizedBox(height: 10),
-        _PrimaryAction(
-          icon: Icons.offline_bolt,
-          title: 'Offline Story Generator',
-          subtitle: 'Generate stories, video prompts, and captions without API',
-          onTap: widget.onOfflineStory!,
-        ),
-      ]);
-    }
 
     final goToActions = <Widget>[
-      _NavCard(
-        icon: Icons.library_books,
-        iconColor: AppColors.primary,
-        title: 'Content Library',
-        subtitle: 'Browse, search, review, and edit every idea',
-        onTap: widget.onContentLibrary,
-      ),
     ];
 
     if (widget.onInstagramWorkflows != null) {
@@ -161,45 +118,6 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
           title: 'Promotion Comments',
           subtitle: 'Copy and organize reusable profile replies',
           onTap: widget.onPromoComments!,
-        ),
-      ]);
-    }
-
-    if (widget.onAssets != null) {
-      goToActions.addAll([
-        const SizedBox(height: 10),
-        _NavCard(
-          icon: Icons.folder_outlined,
-          iconColor: AppColors.primary,
-          title: 'Assets',
-          subtitle: 'Character images and saved project pictures',
-          onTap: widget.onAssets!,
-        ),
-      ]);
-    }
-
-    if (widget.onCharacterLibrary != null) {
-      goToActions.addAll([
-        const SizedBox(height: 10),
-        _NavCard(
-          icon: Icons.group_outlined,
-          iconColor: AppColors.primary,
-          title: 'Character Library',
-          subtitle: 'View all character definitions and appearances',
-          onTap: widget.onCharacterLibrary!,
-        ),
-      ]);
-    }
-
-    if (widget.onReviewAllIdeas != null) {
-      goToActions.addAll([
-        const SizedBox(height: 10),
-        _NavCard(
-          icon: Icons.visibility_outlined,
-          iconColor: AppColors.warning,
-          title: 'Review All Ideas',
-          subtitle: 'Dashboard quick-filter for ideas needing attention',
-          onTap: widget.onReviewAllIdeas!,
         ),
       ]);
     }

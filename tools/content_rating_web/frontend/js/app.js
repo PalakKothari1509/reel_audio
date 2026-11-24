@@ -1547,7 +1547,7 @@ const app = {
     }
 
     // status === 'complete'
-    title.textContent = `Fix All Issues & Update Idea — ${data.idea.title}`;
+    title.textContent = `Fix All Issues & Update Idea — ${(data.originalIdea || data.idea || {}).title}`;
     const orig = data.originalEvaluation || {};
     const rep = data.repairedEvaluation || {};
     const comp = data.comparison || { changedFields: [], unchangedFields: [] };

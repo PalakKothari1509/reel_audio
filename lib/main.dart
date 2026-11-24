@@ -716,27 +716,9 @@ Future<void> main() async {
             builder: (_) => CarouselPromptsScreen(keyStore: _keyStore!),
           ),
         ),
-        onGeminiVideo: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => GeminiVideoScreen(keyStore: _keyStore!),
-          ),
-        ),
-        onOfflineStory: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => OfflineStoryMakerScreen()),
-        ),
         onPromoComments: () => Navigator.push(
           _appNavigatorKey.currentContext!,
           MaterialPageRoute(builder: (_) => const PromoCommentVaultScreen()),
-        ),
-        onAssets: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const AssetsScreen()),
-        ),
-        onCharacterLibrary: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(builder: (_) => const CharacterLibraryScreen()),
         ),
       ),
     ),
@@ -1730,8 +1712,10 @@ actions: [
             icon: const Icon(Icons.folder_open, size: 21),
             onPressed: _isGenerating ? null : _openSaved,
           ),
-          // Generate Video button — navigates to GeminiVideoScreen with the loaded HookIdea
-          if (_loadedIdea != null)
+          // Generate Video button — navigates to GeminiVideoScreen with the current story.
+          // Available whenever there is story text, so users can access video prompt
+          // generation from inside Create Content without returning to the dashboard.
+          if (_descCtrl.text.trim().isNotEmpty)
             IconButton(
               tooltip: 'Generate Video',
               icon: const Icon(Icons.videocam_outlined, size: 21),
@@ -1742,10 +1726,8 @@ actions: [
                         MaterialPageRoute(
                           builder: (_) => GeminiVideoScreen(
                             keyStore: _keyStore!,
-                            preSelectedHook: _loadedIdea!,
-                            initialStoryText: _descCtrl.text.trim().isNotEmpty
-                                ? _descCtrl.text.trim()
-                                : null,
+                            preSelectedHook: _loadedIdea,
+                            initialStoryText: _descCtrl.text.trim(),
                             projectId: _project?.id,
                           ),
                         ),
