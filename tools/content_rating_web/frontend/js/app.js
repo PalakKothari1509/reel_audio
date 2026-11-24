@@ -1595,10 +1595,6 @@ const app = {
     }
 
     // Issues resolved / remaining
-    const orig = data.originalEvaluation || {};
-    const rep = data.repairedEvaluation || {};
-    const comp = data.comparison || { changedFields: [], unchangedFields: [] };
-
     const origCritical = orig.criticalFindings || [];
     const origMajor = orig.majorFindings || [];
     const origMinor = orig.minorFindings || [];
@@ -1607,10 +1603,6 @@ const app = {
     const repMajor = rep.majorFindings || [];
     const repMinor = rep.minorFindings || [];
     const repSuggestions = rep.suggestions || [];
-
-    const scoreChange = rep.overallScore - (orig.overallScore || 0);
-    const scoreChangeClass = scoreChange > 0 ? 'repair-score-improved' : scoreChange < 0 ? 'repair-score-declined' : '';
-    const scoreChangeSign = scoreChange > 0 ? '+' : '';
 
     const issuesHtml = `
       <div class="repair-issues-list">

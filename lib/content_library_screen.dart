@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'content_axes.dart';
 import 'content_collections.dart';
-import 'content_ideas.dart';
 import 'content_library_service.dart';
 import 'projects.dart';
 import 'theme.dart';
@@ -29,9 +28,18 @@ class ContentLibraryScreen extends StatefulWidget {
   /// Optional callback when the user taps "Add New Idea".
   final VoidCallback? onAddNewIdea;
 
-  /// Optional callback when the user taps a saved project to open it.
+  /// Optional callback when the user taps "Continue working on it" on a saved project.
   /// Receives the [Project]; the host screen decides where to navigate.
   final void Function(Project project)? onOpenProject;
+
+  /// Optional callback when the user taps "Open the reel" on a saved project.
+  final void Function(Project project)? onOpenReel;
+
+  /// Optional callback when the user taps "Caption & comments" on a saved project.
+  final void Function(Project project)? onShowPostingKit;
+
+  /// Optional callback when the user taps "Edit the story text" on a saved project.
+  final void Function(Project project)? onEditStory;
 
   /// Optional callback when the user deletes a saved project.
   /// Receives the [Project]; the host screen decides how to persist the deletion.
@@ -42,6 +50,9 @@ class ContentLibraryScreen extends StatefulWidget {
     this.onCreateContent,
     this.onAddNewIdea,
     this.onOpenProject,
+    this.onOpenReel,
+    this.onShowPostingKit,
+    this.onEditStory,
     this.onDeleteProject,
   });
 
@@ -214,10 +225,10 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
               ListTile(
                 leading: const Icon(Icons.play_circle, color: AppColors.primary),
                 title: const Text('Open the reel'),
-                subtitle: const Text('Already made — opens straight away'),
+                subtitle: const Text('Already made opens straight away'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  widget.onOpenProject?.call(p);
+                  widget.onOpenReel?.call(p);
                 },
               ),
             if (p.promptsJson.isNotEmpty)
@@ -227,7 +238,7 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
                 subtitle: const Text('Posting kit for this story'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  widget.onOpenProject?.call(p);
+                  widget.onShowPostingKit?.call(p);
                 },
               ),
             ListTile(
@@ -235,7 +246,7 @@ class _ContentLibraryScreenState extends State<ContentLibraryScreen> {
               title: const Text('Edit the story text'),
               onTap: () {
                 Navigator.pop(ctx);
-                widget.onOpenProject?.call(p);
+                widget.onEditStory?.call(p);
               },
             ),
             ListTile(

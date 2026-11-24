@@ -30,6 +30,10 @@ class ContentStudioHome extends StatefulWidget {
   final NavCallback? onOfflineStory;
   final NavCallback? onPromoComments;
 
+  /// Assets and character browsing.
+  final NavCallback? onAssets;
+  final NavCallback? onCharacterLibrary;
+
   const ContentStudioHome({
     super.key,
     required this.onCreateReel,
@@ -44,6 +48,8 @@ class ContentStudioHome extends StatefulWidget {
     this.onGeminiVideo,
     this.onOfflineStory,
     this.onPromoComments,
+    this.onAssets,
+    this.onCharacterLibrary,
   });
 
   @override
@@ -155,6 +161,32 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
           title: 'Promotion Comments',
           subtitle: 'Copy and organize reusable profile replies',
           onTap: widget.onPromoComments!,
+        ),
+      ]);
+    }
+
+    if (widget.onAssets != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.folder_outlined,
+          iconColor: AppColors.primary,
+          title: 'Assets',
+          subtitle: 'Character images and saved project pictures',
+          onTap: widget.onAssets!,
+        ),
+      ]);
+    }
+
+    if (widget.onCharacterLibrary != null) {
+      goToActions.addAll([
+        const SizedBox(height: 10),
+        _NavCard(
+          icon: Icons.group_outlined,
+          iconColor: AppColors.primary,
+          title: 'Character Library',
+          subtitle: 'View all character definitions and appearances',
+          onTap: widget.onCharacterLibrary!,
         ),
       ]);
     }
