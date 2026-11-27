@@ -160,6 +160,21 @@ test('all ideas table has direct Fix and Save action', () => {
   assert.match(appSource, /repairedIdea: repairData\.repairedIdea/);
 });
 
+test('Fix and Save refreshes ideas, ratings, freshness, and dashboard', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  const fixBlock = appSource.slice(
+    appSource.indexOf('async fixAndSaveIdea'),
+    appSource.indexOf('async repairIdea', appSource.indexOf('async fixAndSaveIdea')),
+  );
+  assert.match(fixBlock, /await this\.loadIdeas\(\)/);
+  assert.match(fixBlock, /await this\.loadRatings\(\)/);
+  assert.match(fixBlock, /await this\.loadFreshness\(\)/);
+  assert.match(fixBlock, /this\.renderDashboard\(\)/);
+});
+
 test('evaluated count is zero when no ratings exist', () => {
   const ratings = [];
   const evaluatedCount = ratings.filter(r => r.verdict).length;

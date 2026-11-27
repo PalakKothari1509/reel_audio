@@ -436,6 +436,23 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
     return res.status(500).json({ error: `Failed to save repaired idea: ${e.message}` });
   }
 
+  // Persist the freshly recalculated evaluation so the dashboard/table
+  // immediately reflects the repaired score and verdict.
+  let savedRating;
+  try {
+    invalidateContentCache();
+    savedRating = saveRating({
+      ...finalEvaluation,
+      ideaId,
+    }, finalIdea);
+  } catch (e) {
+    return res.status(500).json({
+      error: `Idea was saved, but its fresh evaluation could not be saved: ${e.message}`,
+      ideaSaved: true,
+      ideaId,
+    });
+  }
+
   // Save repair history
   const historyRecord = {
     ideaId,
@@ -481,6 +498,8 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
     repairedVerdict: historyRecord.repairedVerdict,
     repairedIdea: finalIdea,
     repairedEvaluation: finalEvaluation,
+    rating: savedRating,
+    evaluationCounted: true,
   });
 });
 

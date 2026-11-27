@@ -161,6 +161,18 @@ test('idea_113 repair preview recalculates gates, capped score, and verdict', as
   assert.match(source.body.readyPrompt, /Pixar/i);
 });
 
+test('repair save route persists a fresh rating for table evaluation counts', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const serverSource = fs.readFileSync(
+    path.resolve(__dirname, '..', 'server.js'),
+    'utf8',
+  );
+  assert.match(serverSource, /savedRating\s*=\s*saveRating/);
+  assert.match(serverSource, /invalidateContentCache\(\)/);
+  assert.match(serverSource, /evaluationCounted:\s*true/);
+});
+
 test('legacy POST /api/evaluate/:id works for built-in', async () => {
   const res = await post('/api/evaluate/idea_1', { mode: 'offline' });
   assert.equal(res.status, 200);
