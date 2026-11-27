@@ -47,14 +47,9 @@ import 'settings_screen.dart';
 import 'character_definitions.dart';
 import 'content_ideas.dart';
 import 'add_idea_screen.dart';
-import 'content_studio_screens.dart'
-    hide HookChoice, CarouselPromptsScreen, GeminiVideoScreen, ImagePromptScreen, GeminiVideoResult;
 import 'content_generation_screens.dart';
-import 'offline_story_maker_screen.dart';
 import 'quick_content.dart';
 import 'instagram_workflow_screen.dart';
-import 'assets_screen.dart';
-import 'character_library_screen.dart';
 import 'content_studio_service.dart';
 
 /// Android side of saving a finished reel.
@@ -602,92 +597,6 @@ Future<void> main() async {
                   characterIds: characterIds,
                 );
                 return lines.map((line) => line.text).join('\n');
-              },
-            ),
-          ),
-        ),
-        onReviewAllIdeas: () => Navigator.push(
-          _appNavigatorKey.currentContext!,
-          MaterialPageRoute(
-            builder: (_) => ContentLibraryScreen(
-              onAddNewIdea: () => Navigator.push(
-                _appNavigatorKey.currentContext!,
-                MaterialPageRoute(builder: (_) => const AddIdeaScreen()),
-              ),
-              onCreateContent: (ideaId) => Navigator.push(
-                _appNavigatorKey.currentContext!,
-                MaterialPageRoute(builder: (_) => StoryScreen(ideaId: ideaId)),
-              ),
-              onOpenProject: (p) {
-                final lines = parseScript(p.script.join('\n'));
-                Navigator.push(
-                  _appNavigatorKey.currentContext!,
-                  MaterialPageRoute(
-                    builder: (_) => TimedScriptScreen(
-                      style: p.style.isEmpty ? 'Heartwarming' : p.style,
-                      language: p.language.isEmpty ? 'Hinglish' : p.language,
-                      videoFile: null,
-                      initialLines: lines,
-                      storyDescription: p.story,
-                      seconds: p.seconds,
-                      projectId: p.id,
-                    ),
-                  ),
-                );
-              },
-              onOpenReel: (p) {
-                if (p.reelPath.isNotEmpty) {
-                  Navigator.push(
-                    _appNavigatorKey.currentContext!,
-                    MaterialPageRoute(
-                      builder: (_) => PreviewMergedScreen(
-                        mergedFile: File(p.reelPath),
-                        projectId: p.id,
-                      ),
-                    ),
-                  );
-                }
-              },
-              onShowPostingKit: (p) {
-                showDialog<void>(
-                  context: _appNavigatorKey.currentContext!,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Caption & Comments'),
-                    content: SingleChildScrollView(
-                      child: SelectableText(
-                        p.promptsJson.isNotEmpty
-                            ? p.promptsJson
-                            : 'No captions saved for this project.',
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Close'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              onEditStory: (p) {
-                final lines = parseScript(p.script.join('\n'));
-                Navigator.push(
-                  _appNavigatorKey.currentContext!,
-                  MaterialPageRoute(
-                    builder: (_) => TimedScriptScreen(
-                      style: p.style.isEmpty ? 'Heartwarming' : p.style,
-                      language: p.language.isEmpty ? 'Hinglish' : p.language,
-                      videoFile: null,
-                      initialLines: lines,
-                      storyDescription: p.story,
-                      seconds: p.seconds,
-                      projectId: p.id,
-                    ),
-                  ),
-                );
-              },
-              onDeleteProject: (p) async {
-                await ProjectStore.delete(p.id);
               },
             ),
           ),

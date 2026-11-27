@@ -157,6 +157,7 @@ test('all ideas table has direct Fix and Save action', () => {
   assert.match(appSource, /fixAndSaveIdea/);
   assert.match(appSource, /assets\/data\/content_ideas\.json/);
   assert.match(appSource, /api\/ideas\/\$\{ideaId\}\/repair\/save/);
+  assert.match(appSource, /repairedIdea: repairData\.repairedIdea/);
 });
 
 test('evaluated count is zero when no ratings exist', () => {

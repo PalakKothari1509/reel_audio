@@ -466,6 +466,15 @@ test('strategy cleaning preserves ordinary strategy text with evaluation-like wo
   assert.equal(cleanStrategyField(idea), idea);
 });
 
+test('Fix and Save submits the complete repaired object', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /repairedIdea: repairData\.repairedIdea/);
+  assert.doesNotMatch(appSource, /directFieldsOnly/);
+});
+
 test('online repair prompt receives content strategy, not legacy evaluation metadata', () => {
   const { original } = repairedIdea113();
   const prompt = buildRepairPrompt(original, { overallScore: 59, verdict: 'Needs Major Rewrite' });

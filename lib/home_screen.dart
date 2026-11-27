@@ -48,8 +48,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
     final createActions = <Widget>[
       _PrimaryAction(
         icon: Icons.auto_awesome,
-        title: 'Create Content',
-        subtitle: 'Select an idea from the library to generate story, script, prompts',
+        title: 'Reel',
+        subtitle: 'Generate story, script, and video prompts',
         onTap: () {
           final cb = widget.onCreateContent ?? widget.onCreateReel;
           cb(null);
@@ -62,8 +62,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         const SizedBox(height: 10),
         _PrimaryAction(
           icon: Icons.add,
-          title: 'Add New Idea',
-          subtitle: 'Write a new idea directly into the Content Library',
+          title: 'Add Idea',
+          subtitle: 'Add a new idea to your library',
           onTap: widget.onAddNewIdea!,
         ),
       ]);
@@ -73,9 +73,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         const SizedBox(height: 10),
         _PrimaryAction(
           icon: Icons.image_outlined,
-          title: 'Image Generation Prompt',
-          subtitle:
-              'One detailed prompt ready to paste into an image generator',
+          title: 'Image',
+          subtitle: 'One detailed prompt to paste into an image generator',
           onTap: widget.onImagePrompt!,
         ),
       ]);
@@ -85,8 +84,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         const SizedBox(height: 10),
         _PrimaryAction(
           icon: Icons.view_carousel_outlined,
-          title: 'Carousel Generation',
-          subtitle: 'Full set of slide prompts for a carousel post',
+          title: 'Carousel',
+          subtitle: 'Slide prompts for a carousel post',
           onTap: widget.onCarouselPrompts!,
         ),
       ]);
@@ -101,9 +100,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         _NavCard(
           icon: Icons.insights_outlined,
           iconColor: AppColors.primary,
-          title: 'Instagram Workflows',
-          subtitle:
-              'Growth planning, Reels, carousels, captions, hashtags, Stories',
+          title: 'Instagram',
+          subtitle: 'Reels, carousels, captions, hashtags',
           onTap: widget.onInstagramWorkflows!,
         ),
       ]);
@@ -115,8 +113,8 @@ class _ContentStudioHomeState extends State<ContentStudioHome> {
         _NavCard(
           icon: Icons.forum_outlined,
           iconColor: AppColors.primary,
-          title: 'Promotion Comments',
-          subtitle: 'Copy and organize reusable profile replies',
+          title: 'Comments',
+          subtitle: 'Reusable profile replies',
           onTap: widget.onPromoComments!,
         ),
       ]);
