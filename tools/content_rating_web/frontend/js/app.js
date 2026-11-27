@@ -1396,49 +1396,101 @@ const app = {
   // ── Idea Repair ──
   repairState: null,
 
+  async repairAndSaveIdea(ideaId) {
+    const repairRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'offline' }),
+    });
+    const repairData = await repairRes.json().catch(() => ({}));
+    if (!repairRes.ok) {
+      throw new Error(repairData.error || `Repair failed (${repairRes.status})`);
+    }
+    if (repairData.canSave === false) {
+      throw new Error('Critical safety gates still fail.');
+    }
+
+    const saveRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        repairedIdea: repairData.repairedIdea,
+        originalEvaluation: repairData.originalEvaluation,
+        repairedEvaluation: repairData.repairedEvaluation,
+        comparison: repairData.comparison,
+        repairMode: 'offline',
+      }),
+    });
+    const saveData = await saveRes.json().catch(() => ({}));
+    if (!saveRes.ok) {
+      throw new Error(saveData.error || `Save failed (${saveRes.status})`);
+    }
+    return saveData;
+  },
+
+  async refreshAfterRepair() {
+    await this.loadIdeas();
+    await this.loadRatings();
+    await this.loadFreshness();
+    this.renderDashboard();
+    this.renderLibrary();
+  },
+
   async fixAndSaveIdea(ideaId) {
     const idea = this.ideas.find(item => item.id === ideaId);
     if (!idea) return;
     if (!confirm(`Fix and save "${idea.title}" directly to assets/data/content_ideas.json?`)) return;
 
     try {
-      const repairRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'offline' }),
-      });
-      const repairData = await repairRes.json().catch(() => ({}));
-      if (!repairRes.ok) {
-        throw new Error(repairData.error || `Repair failed (${repairRes.status})`);
-      }
-      if (repairData.canSave === false) {
-        throw new Error('Cannot save because critical safety gates still fail.');
-      }
-
-      const saveRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          repairedIdea: repairData.repairedIdea,
-          originalEvaluation: repairData.originalEvaluation,
-          repairedEvaluation: repairData.repairedEvaluation,
-          comparison: repairData.comparison,
-          repairMode: 'offline',
-        }),
-      });
-      const saveData = await saveRes.json().catch(() => ({}));
-      if (!saveRes.ok) {
-        throw new Error(saveData.error || `Save failed (${saveRes.status})`);
-      }
-
-      await this.loadIdeas();
-      await this.loadRatings();
-      await this.loadFreshness();
-      this.renderDashboard();
-      this.renderLibrary();
+      const saveData = await this.repairAndSaveIdea(ideaId);
+      await this.refreshAfterRepair();
       this.showToast(`${ideaId} fixed and saved. Score: ${saveData.repairedScore}/100 (${saveData.repairedVerdict})`, 'success');
     } catch (e) {
       this.showToast(`Fix & Save failed: ${e.message}`, 'error');
+    }
+  },
+
+  async fixAllIdeas() {
+    const ratingsById = new Map(this.ratings.map(rating => [rating.ideaId, rating]));
+    const ideasToFix = [...this.ideas]
+      .filter(idea => ratingsById.get(idea.id)?.verdict !== 'Ready to Post')
+      .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
+    if (ideasToFix.length === 0) {
+      this.showToast('All ideas are already Ready to Post.', 'info');
+      return;
+    }
+    if (!confirm(`Fix and save ${ideasToFix.length} ideas one at a time? Ideas marked Ready to Post will be skipped.`)) return;
+
+    const button = document.getElementById('fixAllIdeasButton');
+    const originalLabel = button.textContent;
+    const failures = [];
+    let savedCount = 0;
+    button.disabled = true;
+
+    try {
+      for (let index = 0; index < ideasToFix.length; index++) {
+        const idea = ideasToFix[index];
+        button.textContent = `Fixing ${index + 1}/${ideasToFix.length}…`;
+        try {
+          await this.repairAndSaveIdea(idea.id);
+          savedCount++;
+        } catch (error) {
+          failures.push(`${idea.id}: ${error.message}`);
+          console.error(`Fix All failed for ${idea.id}:`, error);
+        }
+      }
+
+      await this.refreshAfterRepair();
+      const failureSummary = failures.length > 0
+        ? ` Failed (${failures.length}): ${failures.slice(0, 3).join('; ')}${failures.length > 3 ? '; …' : ''}`
+        : '';
+      this.showToast(`Fix All complete: ${savedCount}/${ideasToFix.length} saved.${failureSummary}`, failures.length ? 'error' : 'success');
+    } catch (error) {
+      this.showToast(`Fix All could not refresh the idea list: ${error.message}`, 'error');
+    } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
     }
   },
 

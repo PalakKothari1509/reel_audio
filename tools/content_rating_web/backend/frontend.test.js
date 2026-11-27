@@ -176,12 +176,32 @@ test('Fix and Save refreshes ideas, ratings, freshness, and dashboard', () => {
   );
   const fixBlock = appSource.slice(
     appSource.indexOf('async fixAndSaveIdea'),
-    appSource.indexOf('async repairIdea', appSource.indexOf('async fixAndSaveIdea')),
+    appSource.indexOf('async fixAllIdeas', appSource.indexOf('async fixAndSaveIdea')),
   );
-  assert.match(fixBlock, /await this\.loadIdeas\(\)/);
-  assert.match(fixBlock, /await this\.loadRatings\(\)/);
-  assert.match(fixBlock, /await this\.loadFreshness\(\)/);
-  assert.match(fixBlock, /this\.renderDashboard\(\)/);
+  assert.match(fixBlock, /await this\.refreshAfterRepair\(\)/);
+  const refreshBlock = appSource.slice(
+    appSource.indexOf('async refreshAfterRepair'),
+    appSource.indexOf('async fixAndSaveIdea', appSource.indexOf('async refreshAfterRepair')),
+  );
+  assert.match(refreshBlock, /await this\.loadIdeas\(\)/);
+  assert.match(refreshBlock, /await this\.loadRatings\(\)/);
+  assert.match(refreshBlock, /await this\.loadFreshness\(\)/);
+  assert.match(refreshBlock, /this\.renderDashboard\(\)/);
+});
+
+test('Fix All processes non-ready ideas sequentially and skips Ready to Post', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  const fixAllBlock = appSource.slice(
+    appSource.indexOf('async fixAllIdeas'),
+    appSource.indexOf('async repairIdea', appSource.indexOf('async fixAllIdeas')),
+  );
+  assert.match(fixAllBlock, /verdict !== 'Ready to Post'/);
+  assert.match(fixAllBlock, /for \(let index = 0; index < ideasToFix\.length; index\+\+\)/);
+  assert.match(fixAllBlock, /await this\.repairAndSaveIdea\(idea\.id\)/);
+  assert.match(fixAllBlock, /await this\.refreshAfterRepair\(\)/);
 });
 
 test('evaluated count is zero when no ratings exist', () => {
