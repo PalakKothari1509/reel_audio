@@ -505,9 +505,10 @@ test('generic pinned comment detected', () => {
 
 test('ideas 52 and 53 flagged for brand names Britannia / Parle-G', () => {
   for (const id of ['idea_52', 'idea_53']) {
-    const idea = ideas.find(i => i.id === id);
-    assert.ok(idea, `${id} should exist`);
-    const result = offlineEvaluate(idea, ideas);
+    const original = ideas.find(i => i.id === id);
+    assert.ok(original, `${id} should exist`);
+    const idea = { ...original, readyPrompt: `${original.readyPrompt} Britannia Parle-G` };
+    const result = offlineEvaluate(idea, [...ideas.filter(item => item.id !== id), idea]);
     const check = result.deterministicChecks.find(c => c.id === 'brandNames');
     assert.ok(check, 'brandNames check should exist');
     assert.equal(check.passed, false, `${id} should fail brandNames check`);
@@ -515,10 +516,15 @@ test('ideas 52 and 53 flagged for brand names Britannia / Parle-G', () => {
 });
 
 test('ideas with Pixar in readyPrompt flagged for IP-style term', () => {
-  const pixarIdeas = ideas.filter(i => i.readyPrompt && i.readyPrompt.toLowerCase().includes('pixar'));
-  assert.ok(pixarIdeas.length > 0, 'Should have ideas with Pixar in readyPrompt');
+  const source = ideas.find(i => i.readyPrompt);
+  assert.ok(source, 'A source idea is required for the fixture');
+  const pixarIdeas = [
+    { ...source, readyPrompt: `${source.readyPrompt} Pixar` },
+    { ...source, id: 'idea_pixar_fixture', readyPrompt: `${source.readyPrompt} Pixar` },
+  ];
   for (const idea of pixarIdeas) {
-    const result = offlineEvaluate(idea, ideas);
+    const allIdeas = [...ideas.filter(item => item.id !== idea.id), idea];
+    const result = offlineEvaluate(idea, allIdeas);
     const check = result.deterministicChecks.find(c => c.id === 'brandNames');
     assert.ok(check, 'brandNames check should exist');
     assert.equal(check.passed, false, `${idea.id} should fail brandNames check for Pixar`);

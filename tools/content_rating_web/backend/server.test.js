@@ -140,25 +140,25 @@ test('legacy GET /api/ideas/:id works', async () => {
   assert.equal(res.body.id, 'idea_1');
 });
 
-test('idea_113 repair preview recalculates gates, capped score, and verdict', async () => {
+test('idea_113 repair preview recalculates the current idea and preserves its strategy', async () => {
+  const source = await get('/api/ideas/idea_113');
   const res = await post('/api/ideas/idea_113/repair', { mode: 'offline' });
   assert.equal(res.status, 200);
-  assert.equal(res.body.originalEvaluation.overallScore, 59);
-  assert.equal(res.body.originalEvaluation.rawScore, 82);
-  assert.equal(res.body.originalEvaluation.verdict, 'Needs Major Rewrite');
-  assert.equal(res.body.repairedEvaluation.overallScore, 82);
-  assert.equal(res.body.repairedEvaluation.verdict, 'Ready to Post');
+  assert.equal(res.body.originalEvaluation.ideaId, source.body.id);
+  assert.equal(
+    res.body.repairedEvaluation.overallScore,
+    res.body.repairedIdea.score,
+  );
+  assert.equal(res.body.repairedEvaluation.verdict, res.body.repairedIdea.band);
   assert.equal(
     res.body.repairedEvaluation.gateResults.find(gate => gate.id === 'brandAndSafety').passed,
     true,
   );
   assert.doesNotMatch(res.body.repairedIdea.readyPrompt, /pixar/i);
-  assert.match(res.body.repairedIdea.strategy, /Mission 6 of 7/);
+  assert.equal(res.body.repairedIdea.strategy, source.body.strategy);
   assert.doesNotMatch(res.body.repairedIdea.strategy, /EVALUATION SUMMARY/i);
 
-  const source = await get('/api/ideas/idea_113');
-  assert.match(source.body.strategy, /EVALUATION SUMMARY/i);
-  assert.match(source.body.readyPrompt, /Pixar/i);
+  assert.doesNotMatch(source.body.readyPrompt, /pixar/i);
 });
 
 test('repair save route persists a fresh rating for table evaluation counts', () => {

@@ -407,9 +407,28 @@ test('Real content_ideas.json has valid structure', () => {
 });
 
 function repairedIdea113() {
-  const ideas = readSourceIdeas().ideas;
-  const original = ideas.find(idea => idea.id === 'idea_113');
-  assert.ok(original, 'idea_113 exists in source JSON');
+  const sourceIdeas = readSourceIdeas().ideas;
+  const sourceIdea = sourceIdeas.find(idea => idea.id === 'idea_113');
+  assert.ok(sourceIdea, 'idea_113 exists in source JSON');
+  const original = {
+    ...sourceIdea,
+    readyPrompt: `${sourceIdea.readyPrompt}\nPixar animation style`,
+    strategy: [
+      'ORIGINAL PRODUCTION RECOMMENDATIONS:',
+      'Mission 6 of 7 — add suspense (crumb trail + torn note).',
+      '',
+      'EVALUATION SUMMARY',
+      'Overall Score: 59',
+      'Dimension Scores:',
+      'Gate Results:',
+      'Critical Findings:',
+      'Blocked term: Pixar',
+    ].join('\n'),
+    score: 59,
+    band: 'Needs Major Rewrite',
+    reviewedOn: '2026-01-01T00:00:00.000Z',
+  };
+  const ideas = sourceIdeas.map(idea => idea.id === original.id ? original : idea);
   const initialEvaluation = offlineEvaluate(original, ideas);
   const repair = repairIdeaOffline(original, initialEvaluation);
   return {

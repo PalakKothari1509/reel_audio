@@ -3,15 +3,36 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const { offlineEvaluate } = require('./ratingEngine');
+const { runAllChecks } = require('./deterministicChecks');
 
 const ideasPath = path.resolve(__dirname, '../../../assets/data/content_ideas.json');
 const ideas = JSON.parse(fs.readFileSync(ideasPath, 'utf8')).ideas;
 
-test('idea_30 is not flagged for the substring "hit" in "white"', () => {
-  const idea = ideas.find(item => item.id === 'idea_30');
-  assert.ok(idea, 'idea_30 should exist in the content ideas data');
+test('opening cast check ignores sentence-initial prose in repaired ideas', () => {
+  for (const ideaId of ['idea_106', 'idea_107', 'idea_108', 'idea_114', 'idea_121']) {
+    const idea = ideas.find(item => item.id === ideaId);
+    const check = runAllChecks(idea, ideas, 'offline').find(item => item.id === 'openingCastMismatch');
+    assert.equal(check.passed, true, `${ideaId} should not treat ordinary opening words as character names`);
+  }
+});
 
-  const result = offlineEvaluate(idea, ideas);
+test('opening cast and pronoun checks still catch actual character inconsistencies', () => {
+  const mismatchedCast = ideas.find(item => item.id === 'idea_3');
+  const castCheck = runAllChecks(mismatchedCast, ideas, 'offline').find(item => item.id === 'openingCastMismatch');
+  assert.equal(castCheck.passed, false);
+  assert.match(castCheck.detail, /Ria/);
+
+  const validPronouns = ideas.find(item => item.id === 'idea_32');
+  const nameCheck = runAllChecks(validPronouns, ideas, 'offline').find(item => item.id === 'unapprovedCharacterName');
+  assert.doesNotMatch(nameCheck.detail, /Pronoun mismatch for Mumma/);
+});
+
+test('idea_30 is not flagged for the substring "hit" in "white"', () => {
+  const original = ideas.find(item => item.id === 'idea_30');
+  assert.ok(original, 'idea_30 should exist in the content ideas data');
+  const idea = { ...original, readyPrompt: `${original.readyPrompt} Pixar` };
+
+  const result = offlineEvaluate(idea, [...ideas.filter(item => item.id !== idea.id), idea]);
   // v2: brandNames check flags "pixar" in readyPrompt as critical finding
   const brandNameFinding = result.criticalFindings.find(f => f.title === 'Brand Names');
   assert.ok(brandNameFinding, 'Should have critical finding for brand name (pixar)');
@@ -121,10 +142,11 @@ test('character consistency gate identifies unapproved names', () => {
 });
 
 test('complete ideas do not receive generic unchanged suggestions or boilerplate feedback', () => {
-  const idea = ideas.find(item => item.id === 'idea_74');
-  assert.ok(idea, 'idea_74 should exist in the content ideas data');
+  const original = ideas.find(item => item.id === 'idea_74');
+  assert.ok(original, 'idea_74 should exist in the content ideas data');
+  const idea = { ...original, readyPrompt: `${original.readyPrompt} Pixar` };
 
-  const result = offlineEvaluate(idea, ideas);
+  const result = offlineEvaluate(idea, [...ideas.filter(item => item.id !== idea.id), idea]);
   // v2: suggestions should not contain generic/boilerplate feedback
   assert.equal(result.suggestions.some(suggestion => suggestion.original === suggestion.suggested), false);
   // v2: idea_74 has "pixar" in readyPrompt which triggers brandNames critical finding

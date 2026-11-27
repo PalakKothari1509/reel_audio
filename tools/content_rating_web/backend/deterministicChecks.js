@@ -264,18 +264,23 @@ function checkOpeningCastMismatch(idea) {
   const defaultCast = new Set((idea.defaultCast || []).map(c => c.toLowerCase()));
   const storyDetail = (idea.storyDetail || '').toLowerCase();
   const words = opening.match(/\b[A-Z][a-z]+\b/g) || [];
-  const relationshipWords = ['Uncle', 'Aunty', 'Dada', 'Dadi', 'Nana', 'Nani', 'Chacha', 'Chachi', 'Mama', 'Mami', 'Bhaiya', 'Didi'];
+  const relationshipWords = new Set([
+    'uncle', 'aunt', 'aunty', 'dada', 'dadi', 'daadi', 'nana', 'nani',
+    'chacha', 'chachi', 'mama', 'mami', 'bhaiya', 'didi',
+  ]);
   const hindiInterjections = ['Arre', 'Are', 'Achha', 'Accha', 'Theek', 'Bas', 'Chalo', 'Ji', 'Haan', 'Ha', 'Nahi', 'Nahin', 'Oye', 'Hey', 'Wah', 'Vah', 'Oho', 'Arey', 'Arre', 'Bapre', 'Hai', 'Kya', 'Kaise', 'Kahan', 'Kab', 'Kyun', 'Kaun', 'Chal', 'Chalo', 'Ruko', 'Suno', 'Dekho', 'Chal', 'Ja', 'Aa', 'Chalna', 'Rukna', 'Sunna', 'Dekhna'];
   const found = [];
   for (const word of words) {
     const lower = word.toLowerCase();
-    if (relationshipWords.some(r => r.toLowerCase() === lower)) {
-      if (!defaultCast.has(lower) && !storyDetail.includes(lower)) {
-        found.push(word);
-      }
-    } else if (hindiInterjections.some(h => h.toLowerCase() === lower)) {
+    if (hindiInterjections.some(h => h.toLowerCase() === lower)) {
       continue; // Skip common Hindi interjections
-    } else if (!defaultCast.has(lower) && !storyDetail.includes(lower)) {
+    }
+
+    const isRelationship = relationshipWords.has(lower);
+    if (!isRelationship && !APPROVED_NAMES.has(word)) {
+      continue;
+    }
+    if (!defaultCast.has(lower) && !new RegExp(`\\b${lower}\\b`, 'i').test(storyDetail)) {
       found.push(word);
     }
   }
@@ -301,11 +306,16 @@ function checkUnapprovedCharacterName(idea) {
     if (lowerText.includes(lower)) {
       const expectedPronoun = PRONOUNS[name];
       if (expectedPronoun !== 'any') {
-        const pronounRegex = new RegExp(`\\b${lower}\\s+(?:said|asked|replied|answered|thought|felt|knew|decided|chose|grabbed|took|held|dropped|threw|caught|pushed|pulled|touched|tapped|patted|hugged|kissed|hit|slapped|punched|kicked|bit|scratched|pinched|looked|glanced|stared|gazed|watched|observed|noticed|saw|heard|listened)\\b.*\\b(he|she|it|his|her|its)\\b`, 'gi');
+        const pronounRegex = new RegExp(`\\b${lower}\\s+(?:said|asked|replied|answered|thought|felt|knew|decided|chose|grabbed|took|held|dropped|threw|caught|pushed|pulled|touched|tapped|patted|hugged|kissed|hit|slapped|punched|kicked|bit|scratched|pinched|looked|glanced|stared|gazed|watched|observed|noticed|saw|heard|listened)\\b.*\\b(he|she|it|him|his|her|its)\\b`, 'gi');
         const matches = text.matchAll(pronounRegex);
         for (const match of matches) {
           const pronoun = match[1].toLowerCase();
-          if (pronoun !== expectedPronoun && expectedPronoun !== 'any') {
+          const validForms = {
+            she: ['she', 'her'],
+            he: ['he', 'him', 'his'],
+            it: ['it', 'its'],
+          }[expectedPronoun] || [expectedPronoun];
+          if (!validForms.includes(pronoun) && expectedPronoun !== 'any') {
             found.push(`Pronoun mismatch for ${name}: expected "${expectedPronoun}", found "${pronoun}"`);
           }
         }
