@@ -9,7 +9,10 @@ const cors = require('cors');
 const { offlineEvaluate, onlineEvaluate, buildOnlineResult } = require('./backend/ratingEngine');
 const { validateGeminiResponse } = require('./backend/schemas');
 const { listRatings, getRating, saveRating, deleteRating, clearRatings, RATINGS_DIR, ensureDirs, getSourceFingerprint, getRatingFreshness, getAllFreshness, invalidateContentCache } = require('./backend/storage');
-const { loadSourceIdeas, getIdeaById, isValidHookIdea, repairIdeaWithGemini, repairIdeaOffline, compareIdeas } = require('./backend/repairEngine');
+const {
+  loadSourceIdeas, getIdeaById, isValidHookIdea, repairIdeaWithGemini,
+  repairIdeaOffline, finalizeRepairedIdea, compareIdeas, cleanStrategyField,
+} = require('./backend/repairEngine');
 const { withLock, createBackup, saveRepairHistory, getRepairHistory, getRepairHistoryFile, saveRepairedIdeaToSource, validateCompleteJson, restoreIdeaFromBackup } = require('./backend/repairStore');
 const { computeHashes, getCreativeHashFields, getProductionHashFields } = require('./backend/hash');
 const {
@@ -133,13 +136,14 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
 
     // Get the latest evaluation for this idea (online)
     let evaluation;
+    const contentIdea = cleanStrategyField(idea);
     try {
-      const geminiResponse = await onlineEvaluate(idea, GEMINI_API_KEY, data.ideas);
+      const geminiResponse = await onlineEvaluate(contentIdea, GEMINI_API_KEY, data.ideas);
       const validation = validateGeminiResponse(geminiResponse);
       if (!validation.valid) {
         return res.status(422).json({ error: validation.error, raw: geminiResponse });
       }
-      evaluation = buildOnlineResult(idea, geminiResponse, data.ideas);
+      evaluation = buildOnlineResult(contentIdea, geminiResponse, data.ideas);
     } catch (e) {
       return res.status(502).json({ error: `Gemini evaluation failed: ${e.message}` });
     }
@@ -147,12 +151,18 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
     // Generate the repaired idea using Gemini
     let repairResult;
     try {
-      repairResult = await repairIdeaWithGemini(idea, evaluation, GEMINI_API_KEY, null);
+      repairResult = await repairIdeaWithGemini(contentIdea, evaluation, GEMINI_API_KEY, null);
     } catch (e) {
       return res.status(502).json({ error: `AI repair failed: ${e.message}` });
     }
 
-    const repairedIdea = repairResult.repairedIdea;
+    let finalized;
+    try {
+      finalized = finalizeRepairedIdea(idea, repairResult.repairedIdea, data.ideas);
+    } catch (e) {
+      return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+    }
+    const repairedIdea = finalized.repairedIdea;
 
     // Validate the repaired idea matches HookIdea schema
     const schemaValidation = isValidHookIdea(repairedIdea);
@@ -165,16 +175,15 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
       return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
     }
 
-    // Compare original vs repaired
-    const comparison = compareIdeas(idea, repairedIdea);
-
-    // Re-evaluate the repaired idea using the existing offline engine
-    let repairedEvaluation;
+    // Use the authoritative offline engine for both displayed scores.
+    let originalRating;
     try {
-      repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+      originalRating = offlineEvaluate(cleanStrategyField(idea), data.ideas);
     } catch (e) {
-      return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+      return res.status(500).json({ error: `Failed to evaluate original idea: ${e.message}` });
     }
+    const repairedEvaluation = finalized.evaluation;
+    const comparison = compareIdeas(cleanStrategyField(idea), repairedIdea);
 
     // Check that all critical gates pass
     const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
@@ -192,16 +201,20 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
 
     return res.json({
       ideaId,
-      originalIdea: idea,
+      originalIdea: cleanStrategyField(idea),
       repairedIdea,
       comparison,
       originalEvaluation: {
-        overallScore: evaluation.overallScore,
-        verdict: evaluation.verdict,
-        criticalFindings: evaluation.criticalFindings,
-        majorFindings: evaluation.majorFindings,
-        minorFindings: evaluation.minorFindings,
-        suggestions: evaluation.suggestions,
+        overallScore: originalRating.overallScore,
+        rawScore: originalRating.rawScore,
+        scoreCapped: originalRating.scoreCapped,
+        verdict: originalRating.verdict,
+        criticalFindings: originalRating.criticalFindings,
+        majorFindings: originalRating.majorFindings,
+        minorFindings: originalRating.minorFindings,
+        suggestions: originalRating.suggestions,
+        gateResults: originalRating.gateResults,
+        dimensionScores: originalRating.dimensionScores,
       },
       repairedEvaluation: {
         overallScore: repairedEvaluation.overallScore,
@@ -238,7 +251,13 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
     return res.status(500).json({ error: `Offline repair failed: ${e.message}` });
   }
 
-  const repairedIdea = repairResult.repairedIdea;
+  let finalized;
+  try {
+    finalized = finalizeRepairedIdea(idea, repairResult.repairedIdea, data.ideas);
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+  }
+  const repairedIdea = finalized.repairedIdea;
 
   // Validate the repaired idea matches HookIdea schema
   const schemaValidation = isValidHookIdea(repairedIdea);
@@ -251,32 +270,32 @@ app.post('/api/ideas/:id/repair', async (req, res) => {
     return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
   }
 
-  // Compare original vs repaired
-  const comparison = compareIdeas(idea, repairedIdea);
-
-  // Re-evaluate the repaired idea using the existing offline engine
-  let repairedEvaluation;
+  let originalEvaluation;
   try {
-    repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+    originalEvaluation = offlineEvaluate(cleanStrategyField(idea), data.ideas);
   } catch (e) {
-    return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
+    return res.status(500).json({ error: `Failed to evaluate original idea: ${e.message}` });
   }
+  const repairedEvaluation = finalized.evaluation;
+  const comparison = compareIdeas(cleanStrategyField(idea), repairedIdea);
 
   // Check that all critical gates pass
   const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
 
   res.json({
     ideaId,
-    originalIdea: idea,
+    originalIdea: cleanStrategyField(idea),
     repairedIdea,
     comparison,
     originalEvaluation: {
-      overallScore: evaluation.overallScore,
-      verdict: evaluation.verdict,
-      criticalFindings: evaluation.criticalFindings,
-      majorFindings: evaluation.majorFindings,
-      minorFindings: evaluation.minorFindings,
-      suggestions: evaluation.suggestions,
+      overallScore: originalEvaluation.overallScore,
+      rawScore: originalEvaluation.rawScore,
+      scoreCapped: originalEvaluation.scoreCapped,
+      verdict: originalEvaluation.verdict,
+      criticalFindings: originalEvaluation.criticalFindings,
+      majorFindings: originalEvaluation.majorFindings,
+      minorFindings: originalEvaluation.minorFindings,
+      suggestions: originalEvaluation.suggestions,
     },
     repairedEvaluation: {
       overallScore: repairedEvaluation.overallScore,
@@ -320,21 +339,21 @@ app.post('/api/ideas/:id/repair/validate', async (req, res) => {
     return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
   }
 
-  const comparison = compareIdeas(idea, repairedIdea);
-
-  let repairedEvaluation;
+  let finalized;
   try {
-    repairedEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+    finalized = finalizeRepairedIdea(idea, repairedIdea, data.ideas);
   } catch (e) {
     return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
   }
+  const comparison = compareIdeas(cleanStrategyField(idea), finalized.repairedIdea);
+  const repairedEvaluation = finalized.evaluation;
 
   const criticalGatesFailed = (repairedEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
 
   res.json({
     ideaId,
-    originalIdea: idea,
-    repairedIdea,
+    originalIdea: cleanStrategyField(idea),
+    repairedIdea: finalized.repairedIdea,
     comparison,
     repairedEvaluation: {
       overallScore: repairedEvaluation.overallScore,
@@ -355,7 +374,9 @@ app.post('/api/ideas/:id/repair/validate', async (req, res) => {
 // POST /api/ideas/:id/repair/save — Save approved repaired idea to content_ideas.json
 app.post('/api/ideas/:id/repair/save', async (req, res) => {
   const ideaId = req.params.id;
-  const { repairedIdea, originalEvaluation, repairedEvaluation, comparison, repairMode } = req.body || {};
+  const { repairedIdea, repairMode } = req.body || {};
+
+  console.log(`[REPAIR SAVE] ideaId=${ideaId} targetFile=${CONTENT_JSON_PATH}`);
 
   if (!repairedIdea || typeof repairedIdea !== 'object') {
     return res.status(400).json({ error: 'repairedIdea is required' });
@@ -366,22 +387,29 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
   const idea = data.ideas.find(i => i.id === ideaId);
   if (!idea) return res.status(404).json({ error: 'Idea not found' });
 
-  const schemaValidation = isValidHookIdea(repairedIdea);
-  if (!schemaValidation.valid) {
-    return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
-  }
-
   if (repairedIdea.id !== ideaId) {
     return res.status(422).json({ error: `Repaired idea ID mismatch: expected ${ideaId}, got ${repairedIdea.id}` });
   }
 
-  // Re-evaluate to confirm critical gates still pass
-  let finalEvaluation;
+  let finalized;
   try {
-    finalEvaluation = offlineEvaluate(repairedIdea, data.ideas);
+    finalized = finalizeRepairedIdea(idea, repairedIdea, data.ideas);
   } catch (e) {
     return res.status(500).json({ error: `Failed to re-evaluate repaired idea: ${e.message}` });
   }
+  const finalIdea = finalized.repairedIdea;
+  const finalEvaluation = finalized.evaluation;
+  const schemaValidation = isValidHookIdea(finalIdea);
+  if (!schemaValidation.valid) {
+    return res.status(422).json({ error: `Repaired idea failed schema validation: ${schemaValidation.error}` });
+  }
+  let originalRating;
+  try {
+    originalRating = offlineEvaluate(cleanStrategyField(idea), data.ideas);
+  } catch (e) {
+    return res.status(500).json({ error: `Failed to evaluate original idea: ${e.message}` });
+  }
+  const finalComparison = compareIdeas(cleanStrategyField(idea), finalIdea);
 
   const criticalGatesFailed = (finalEvaluation.gateResults || []).filter(g => !g.passed && g.severityOnFail === 'critical');
   if (criticalGatesFailed.length > 0) {
@@ -400,7 +428,10 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
   }
 
   try {
-    await withLock(() => saveRepairedIdeaToSource(repairedIdea));
+    const savedData = await withLock(() => saveRepairedIdeaToSource(finalIdea));
+    if (!savedData.ideas.some(item => item.id === ideaId)) {
+      throw new Error(`Read-back verification failed for ${ideaId}`);
+    }
   } catch (e) {
     return res.status(500).json({ error: `Failed to save repaired idea: ${e.message}` });
   }
@@ -410,13 +441,17 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
     ideaId,
     repairTimestamp: new Date().toISOString(),
     originalIdea: idea,
-    repairedIdea,
-    originalScore: originalEvaluation?.overallScore ?? (() => { const ev = offlineEvaluate(idea, data.ideas); return ev.overallScore; })(),
+    repairedIdea: finalIdea,
+    originalEvaluation: originalRating,
+    repairedEvaluation: finalEvaluation,
+    originalScore: originalRating.overallScore,
     repairedScore: finalEvaluation.overallScore,
-    originalVerdict: originalEvaluation?.verdict ?? 'Not Evaluated',
+    originalVerdict: originalRating.verdict,
     repairedVerdict: finalEvaluation.verdict,
-    changedFields: comparison?.changedFields ?? [],
-    unchangedFields: comparison?.unchangedFields ?? [],
+    changedFields: finalComparison.changedFields,
+    unchangedFields: finalComparison.unchangedFields,
+    metadataChanged: finalComparison.metadataChanged,
+    metadataUnchanged: finalComparison.metadataUnchanged,
     backupPath,
     evaluationMode: repairMode || 'offline',
   };
@@ -424,8 +459,13 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
   try {
     await withLock(() => saveRepairHistory(historyRecord));
   } catch (e) {
-    // History save failure should not roll back the idea save, but report it
     console.error(`Failed to save repair history for ${ideaId}: ${e.message}`);
+    invalidateContentCache();
+    return res.status(500).json({
+      error: `Idea was saved, but repair history could not be saved: ${e.message}`,
+      ideaSaved: true,
+      backupPath,
+    });
   }
 
   invalidateContentCache();
@@ -439,6 +479,8 @@ app.post('/api/ideas/:id/repair/save', async (req, res) => {
     repairedScore: historyRecord.repairedScore,
     originalVerdict: historyRecord.originalVerdict,
     repairedVerdict: historyRecord.repairedVerdict,
+    repairedIdea: finalIdea,
+    repairedEvaluation: finalEvaluation,
   });
 });
 
@@ -669,9 +711,11 @@ app.post('/api/reevaluate/:id', async (req, res) => {
   try {
     const result = offlineEvaluate(idea, data.ideas);
     const saved = saveRating(result, idea);
-    invalidateContentCache();
+  invalidateContentCache();
 
-    res.json({
+  console.log(`[REPAIR SAVE] ideaId=${ideaId} saved to ${CONTENT_JSON_PATH} backup=${backupPath}`);
+
+  res.json({
       ideaId: req.params.id,
       status: 'REEVALUATED',
       previousRating: previousRatingRaw ? JSON.parse(previousRatingRaw) : null,

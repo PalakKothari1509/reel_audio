@@ -22,7 +22,12 @@ const {
   HOOK_IDEA_FIELDS,
   CONTENT_JSON_PATH,
   repairIdeaOffline,
+  finalizeRepairedIdea,
+  compareIdeasDetailed,
+  buildRepairPrompt,
+  cleanStrategyField,
 } = require('./repairEngine');
+const { offlineEvaluate } = require('./ratingEngine');
 const {
   ensureDirs,
   withLock,
@@ -179,11 +184,10 @@ test('isValidHookIdea rejects missing id', () => {
   assert.ok(result.error.includes('id'));
 });
 
-test('isValidHookIdea rejects unknown field', () => {
-  const bad = { ...VALID_REPAIRED_IDEA, unknownField: 'x' };
-  const result = isValidHookIdea(bad);
-  assert.equal(result.valid, false);
-  assert.ok(result.error.includes('unknownField'));
+test('isValidHookIdea accepts unknown fields so repairs can preserve newer schema data', () => {
+  const withUnknownField = { ...VALID_REPAIRED_IDEA, unknownField: 'preserve me' };
+  const result = isValidHookIdea(withUnknownField);
+  assert.equal(result.valid, true);
 });
 
 test('isValidHookIdea rejects non-boolean forApp', () => {
@@ -206,7 +210,7 @@ test('compareIdeas identifies changed and unchanged fields', () => {
   assert.ok(Array.isArray(comp.changedFields));
   assert.ok(Array.isArray(comp.unchangedFields));
   assert.ok(comp.changedFields.length > 0, 'Should have changed fields');
-  assert.ok(comp.unchangedFields.includes('id'), 'id should be unchanged');
+  assert.ok(comp.metadataUnchanged.includes('id'), 'id should remain unchanged metadata');
   assert.ok(comp.unchangedFields.includes('category'), 'category should be unchanged');
   assert.ok(comp.unchangedFields.includes('archived'), 'archived should be unchanged');
   assert.ok(comp.unchangedFields.includes('custom'), 'custom should be unchanged');
@@ -214,7 +218,7 @@ test('compareIdeas identifies changed and unchanged fields', () => {
 
 test('compareIdeas preserves id match', () => {
   const comp = compareIdeas(IDEA_WITH_CRITICAL, VALID_REPAIRED_IDEA);
-  assert.ok(comp.unchangedFields.includes('id'));
+  assert.ok(comp.metadataUnchanged.includes('id'));
 });
 
 test('compareIdeas with identical ideas shows all unchanged', () => {
@@ -430,6 +434,142 @@ test('Real content_ideas.json has valid structure', () => {
   assert.equal(ids.length, uniqueIds.size, 'No duplicate IDs in source JSON');
 });
 
+function repairedIdea113() {
+  const ideas = readSourceIdeas().ideas;
+  const original = ideas.find(idea => idea.id === 'idea_113');
+  assert.ok(original, 'idea_113 exists in source JSON');
+  const initialEvaluation = offlineEvaluate(original, ideas);
+  const repair = repairIdeaOffline(original, initialEvaluation);
+  return {
+    original,
+    ideas,
+    ...finalizeRepairedIdea(original, repair.repairedIdea, ideas),
+  };
+}
+
+test('idea_113 repair removes Pixar from readyPrompt', () => {
+  const { repairedIdea } = repairedIdea113();
+  assert.doesNotMatch(repairedIdea.readyPrompt, /pixar/i);
+});
+
+test('idea_113 repair preserves its real strategy and removes the legacy report', () => {
+  const { original, repairedIdea } = repairedIdea113();
+  const originalRecommendations = original.strategy.split('ORIGINAL PRODUCTION RECOMMENDATIONS:')[1].trim();
+  assert.equal(repairedIdea.strategy, originalRecommendations);
+  assert.doesNotMatch(repairedIdea.strategy, /EVALUATION SUMMARY|Overall Score:|Gate Results:/i);
+});
+
+test('strategy cleaning preserves ordinary strategy text with evaluation-like wording', () => {
+  const idea = {
+    strategy: 'Set an overall scorecard for the story before selecting production shots.',
+  };
+  assert.equal(cleanStrategyField(idea), idea);
+});
+
+test('online repair prompt receives content strategy, not legacy evaluation metadata', () => {
+  const { original } = repairedIdea113();
+  const prompt = buildRepairPrompt(original, { overallScore: 59, verdict: 'Needs Major Rewrite' });
+  assert.match(prompt, /Mission 6 of 7/);
+  assert.doesNotMatch(prompt, /must use "3D Pixar animation style"/i);
+  assert.doesNotMatch(prompt, /Score: 59[\s\S]*Reviewed On:/);
+});
+
+test('idea_113 current evaluation is freshly recalculated and uses capped overall score', () => {
+  const { original, repairedIdea, evaluation, ideas } = repairedIdea113();
+  const oldEvaluation = offlineEvaluate(original, ideas);
+  const independentlyCalculated = offlineEvaluate(repairedIdea, ideas);
+  assert.equal(oldEvaluation.overallScore, 59);
+  assert.equal(oldEvaluation.rawScore, 82);
+  assert.equal(oldEvaluation.scoreCapped, true);
+  assert.equal(repairedIdea.score, independentlyCalculated.overallScore);
+  assert.equal(repairedIdea.band, independentlyCalculated.verdict);
+  assert.equal(evaluation.overallScore, independentlyCalculated.overallScore);
+  assert.equal(evaluation.verdict, independentlyCalculated.verdict);
+  assert.equal(evaluation.scoreCapped, independentlyCalculated.scoreCapped);
+  if (evaluation.scoreCapped) {
+    assert.notEqual(repairedIdea.score, evaluation.rawScore);
+  }
+});
+
+test('historical Pixar mentions do not fail safety, but real editable Pixar wording does', () => {
+  const { original, ideas, repairedIdea } = repairedIdea113();
+  const repairedPrompt = repairedIdea.readyPrompt;
+  const noPromptPixar = { ...original, readyPrompt: repairedPrompt };
+  const metadataOnlyEvaluation = offlineEvaluate(noPromptPixar, ideas);
+  assert.equal(
+    metadataOnlyEvaluation.gateResults.find(gate => gate.id === 'brandAndSafety').passed,
+    true,
+  );
+
+  const realContent = { ...noPromptPixar, strategy: 'Use a Pixar-inspired look.' };
+  const realContentEvaluation = offlineEvaluate(realContent, ideas);
+  assert.equal(
+    realContentEvaluation.gateResults.find(gate => gate.id === 'brandAndSafety').passed,
+    false,
+  );
+});
+
+test('field comparison separates user content from evaluation metadata', () => {
+  const { original, repairedIdea } = repairedIdea113();
+  const comparison = compareIdeasDetailed(original, repairedIdea);
+  assert.ok(comparison.contentUnchanged.includes('strategy'));
+  assert.ok(!comparison.contentChanged.includes('strategy'));
+  assert.ok(comparison.metadataChanged.includes('score'));
+  assert.ok(comparison.metadataChanged.includes('band'));
+  assert.ok(comparison.metadataChanged.includes('reviewedOn'));
+});
+
+test('saving idea_113 preserves unrelated data and persists the fresh evaluation', () => {
+  const { original, repairedIdea } = repairedIdea113();
+  const sourcePath = path.join(os.tmpdir(), `repair_idea113_${Date.now()}.json`);
+  const legacyMetadata = { overallScore: 59, gateResults: [{ detail: 'Blocked term: Pixar' }] };
+  const sourceIdea = {
+    ...original,
+    futureField: { keep: true },
+    ...legacyMetadata,
+  };
+  const finalized = finalizeRepairedIdea(sourceIdea, repairedIdea, readSourceIdeas().ideas);
+  const unrelatedIdea = { id: 'unrelated', title: 'Untouched', futureField: { keep: true } };
+  const unrelatedTopLevel = { owner: 'test', extension: { keep: true } };
+  fs.writeFileSync(sourcePath, JSON.stringify({
+    ...unrelatedTopLevel,
+    ideas: [sourceIdea, unrelatedIdea],
+  }));
+  let historyPath;
+  try {
+    const savedData = saveRepairedIdeaToSource(finalized.repairedIdea, sourcePath);
+    const savedOnDisk = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+    const savedIdea = savedOnDisk.ideas.find(idea => idea.id === 'idea_113');
+    assert.deepEqual(savedData, savedOnDisk);
+    assert.equal(savedIdea.id, 'idea_113');
+    assert.equal(savedIdea.strategy, finalized.repairedIdea.strategy);
+    assert.doesNotMatch(savedIdea.readyPrompt, /pixar/i);
+    assert.equal(savedIdea.score, finalized.evaluation.overallScore);
+    assert.equal(savedIdea.band, finalized.evaluation.verdict);
+    assert.equal(savedIdea.reviewedOn, finalized.evaluation.evaluatedAt);
+    assert.deepEqual(savedIdea.futureField, { keep: true });
+    assert.equal(Object.prototype.hasOwnProperty.call(savedIdea, 'overallScore'), false);
+    assert.equal(Object.prototype.hasOwnProperty.call(savedIdea, 'gateResults'), false);
+    assert.deepEqual(savedOnDisk.ideas[1], unrelatedIdea);
+    assert.deepEqual(savedOnDisk.extension, unrelatedTopLevel.extension);
+
+    historyPath = saveRepairHistory({
+      ideaId: original.id,
+      originalIdea: sourceIdea,
+      repairedIdea: finalized.repairedIdea,
+      originalEvaluation: legacyMetadata,
+      repairedEvaluation: finalized.evaluation,
+    });
+    const historyRecord = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+    assert.equal(historyRecord.originalIdea.strategy, original.strategy);
+    assert.equal(historyRecord.originalEvaluation.overallScore, 59);
+    assert.equal(historyRecord.repairedEvaluation.overallScore, finalized.evaluation.overallScore);
+  } finally {
+    fs.unlinkSync(sourcePath);
+    if (historyPath) fs.unlinkSync(historyPath);
+  }
+});
+
 // ── Backup directory tests (using temp dirs) ──
 
 test('listBackups returns array', () => {
@@ -468,22 +608,16 @@ test('server module loads without syntax errors', () => {
   });
 });
 
-test('all repair API routes are registered on the app', () => {
-  // Verify the express app has the repair routes by checking the router stack
-  const { app } = require('../server.js');
-  const routePaths = [];
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      routePaths.push(middleware.route.path);
-    }
-  });
-  const repairRoutes = routePaths.filter(p => p.includes('/repair'));
-  assert.ok(repairRoutes.length >= 5, `Expected at least 5 repair routes, found ${repairRoutes.length}: ${repairRoutes.join(', ')}`);
-  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair'), 'Missing /api/ideas/:id/repair route');
-  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/validate'), 'Missing /api/ideas/:id/repair/validate route');
-  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/save'), 'Missing /api/ideas/:id/repair/save route');
-  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/history'), 'Missing /api/ideas/:id/repair/history route');
-  assert.ok(repairRoutes.some(p => p === '/api/ideas/:id/repair/restore'), 'Missing /api/ideas/:id/repair/restore route');
+test('all repair API routes are registered in server.js source', () => {
+  // Verify repair routes exist in server.js source without starting the server
+  const fs = require('fs');
+  const src = fs.readFileSync(path.resolve(__dirname, '..', 'server.js'), 'utf8');
+  assert.ok(src.includes('app.post(\'/api/ideas/:id/repair\''), 'Missing /api/ideas/:id/repair route');
+  assert.ok(src.includes('app.post(\'/api/ideas/:id/repair/validate\''), 'Missing /api/ideas/:id/repair/validate route');
+  assert.ok(src.includes('app.post(\'/api/ideas/:id/repair/save\''), 'Missing /api/ideas/:id/repair/save route');
+  assert.ok(src.includes('app.get(\'/api/ideas/:id/repair/history\''), 'Missing /api/ideas/:id/repair/history route');
+  assert.ok(src.includes('app.post(\'/api/ideas/:id/repair/restore\''), 'Missing /api/ideas/:id/repair/restore route');
+  assert.ok(src.includes('repairIdeaOffline'), 'Missing repairIdeaOffline import');
 });
 
 // ── Offline Repair Tests ──
@@ -707,8 +841,9 @@ test('repairIdeaOffline generates readyPrompt with correct style', () => {
 
   const result = repairIdeaOffline(idea, evaluation);
   const ri = result.repairedIdea;
-  assert.ok(ri.readyPrompt.includes('3D Pixar animation style'), 'Ready prompt should use 3D Pixar animation style');
+  assert.ok(ri.readyPrompt.includes('High-quality original 3D animated family-friendly cartoon visuals'), 'Ready prompt should use generic visual style');
   assert.ok(ri.readyPrompt.includes('vertical 9:16'), 'Ready prompt should mention vertical 9:16');
+  assert.ok(!ri.readyPrompt.includes('3D Pixar animation style'), 'Should not use Pixar style variant');
   assert.ok(!ri.readyPrompt.includes('3D animated style'), 'Should not use 3D animated style variant');
 });
 

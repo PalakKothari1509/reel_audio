@@ -140,6 +140,27 @@ test('legacy GET /api/ideas/:id works', async () => {
   assert.equal(res.body.id, 'idea_1');
 });
 
+test('idea_113 repair preview recalculates gates, capped score, and verdict', async () => {
+  const res = await post('/api/ideas/idea_113/repair', { mode: 'offline' });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.originalEvaluation.overallScore, 59);
+  assert.equal(res.body.originalEvaluation.rawScore, 82);
+  assert.equal(res.body.originalEvaluation.verdict, 'Needs Major Rewrite');
+  assert.equal(res.body.repairedEvaluation.overallScore, 82);
+  assert.equal(res.body.repairedEvaluation.verdict, 'Ready to Post');
+  assert.equal(
+    res.body.repairedEvaluation.gateResults.find(gate => gate.id === 'brandAndSafety').passed,
+    true,
+  );
+  assert.doesNotMatch(res.body.repairedIdea.readyPrompt, /pixar/i);
+  assert.match(res.body.repairedIdea.strategy, /Mission 6 of 7/);
+  assert.doesNotMatch(res.body.repairedIdea.strategy, /EVALUATION SUMMARY/i);
+
+  const source = await get('/api/ideas/idea_113');
+  assert.match(source.body.strategy, /EVALUATION SUMMARY/i);
+  assert.match(source.body.readyPrompt, /Pixar/i);
+});
+
 test('legacy POST /api/evaluate/:id works for built-in', async () => {
   const res = await post('/api/evaluate/idea_1', { mode: 'offline' });
   assert.equal(res.status, 200);

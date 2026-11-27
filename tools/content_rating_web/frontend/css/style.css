@@ -272,6 +272,14 @@ body {
 .dup-badge { font-size: 0.65rem; padding: 0.1rem 0.35rem; border-radius: 3px; font-weight: 600; margin-left: 0.15rem; margin-top: 0.15rem; background: #fde6ca; color: #8a5a00; cursor: pointer; }
 .dup-badge:hover { background: #f5b041; }
 
+/* Idea card action buttons */
+.idea-card-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+
 /* Story structure sections */
 .story-section {
   margin-bottom: 1rem;

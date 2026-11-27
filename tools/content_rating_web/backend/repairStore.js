@@ -3,6 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { isDeepStrictEqual } = require('util');
+const { EVALUATION_METADATA_FIELDS } = require('./contentFields');
 
 const ROOT = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'data');
@@ -131,16 +133,22 @@ function atomicWriteJson(filePath, data) {
   fs.renameSync(tmpPath, filePath);
 }
 
-function saveRepairedIdeaToSource(repairedIdea) {
-  const data = JSON.parse(fs.readFileSync(SOURCE_JSON_PATH, 'utf8'));
+function saveRepairedIdeaToSource(repairedIdea, sourcePath = SOURCE_JSON_PATH) {
+  const data = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
   const ideaIndex = data.ideas.findIndex(i => i.id === repairedIdea.id);
   if (ideaIndex === -1) {
     throw new Error(`Idea ${repairedIdea.id} not found in source JSON`);
   }
 
-  // Preserve ordering — replace in place at same index
+  // Keep fields added by newer schema versions when an older repair client submits data.
   const updatedIdeas = [...data.ideas];
-  updatedIdeas[ideaIndex] = repairedIdea;
+  updatedIdeas[ideaIndex] = { ...updatedIdeas[ideaIndex], ...repairedIdea };
+  for (const field of EVALUATION_METADATA_FIELDS) {
+    if (!['score', 'band', 'reviewedOn'].includes(field)
+      && !Object.prototype.hasOwnProperty.call(repairedIdea, field)) {
+      delete updatedIdeas[ideaIndex][field];
+    }
+  }
 
   const updatedData = {
     ...data,
@@ -153,8 +161,13 @@ function saveRepairedIdeaToSource(repairedIdea) {
     throw new Error(`Resulting JSON validation failed: ${validation.error}`);
   }
 
-  atomicWriteJson(SOURCE_JSON_PATH, updatedData);
-  return updatedData;
+  atomicWriteJson(sourcePath, updatedData);
+  const savedData = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
+  const savedIdea = savedData.ideas.find(i => i.id === repairedIdea.id);
+  if (!isDeepStrictEqual(savedIdea, updatedIdeas[ideaIndex])) {
+    throw new Error(`Saved idea ${repairedIdea.id} did not match the repaired version on disk`);
+  }
+  return savedData;
 }
 
 function validateCompleteJson(data) {

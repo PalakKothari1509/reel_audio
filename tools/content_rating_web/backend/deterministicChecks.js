@@ -7,6 +7,7 @@ const approvedCharacters = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'app
 const brandAndIpBlocklist = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'brandAndIpBlocklist.json'), 'utf8'));
 const genericPinnedComments = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'genericPinnedComments.json'), 'utf8'));
 const festivalCalendar = JSON.parse(fs.readFileSync(path.join(CONFIG_DIR, 'festivalCalendar.json'), 'utf8'));
+const { CONTENT_FIELDS, extractContentStrategy } = require('./contentFields');
 
 const APPROVED_NAMES = new Set(approvedCharacters.names);
 const PRONOUNS = approvedCharacters.pronouns;
@@ -19,6 +20,56 @@ const STOPWORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their', 'mine', 'yours', 'hers', 'ours', 'theirs',
   'hai', 'hain', 'nahi', 'nahin', 'haan', 'beti', 'beta', 'dekho', 'sun', 'jao', 'chalo', 'kyun', 'kaise', 'kya', 'kaunsa', 'karein', 'mujhe', 'tum', 'tumhein', 'aaj', 'mera', 'meri', 'chahiye', 'accha', 'achha', 'theek', 'bas', 'phir', 'ab', 'yeh', 'woh', 'kar', 'karo', 'gaya', 'gayi', 'ho', 'ek', 'aur', 'ko', 'ke', 'ki', 'ka', 'se', 'mein', 'par', 'pe', 'ne', 'ko', 'ka', 'ke', 'ki', 'to', 'bhi', 'bhi', 'hi', 'hi', 'to', 'to', 'ya', 'ya', 'na', 'na', 'kya', 'kya', 'kaun', 'kaun', 'kahan', 'kahan', 'kab', 'kab', 'kyun', 'kyun', 'kaise', 'kaise'
 ]);
+
+// Hinglish concept dictionary: maps Hindi/Hinglish tokens to canonical concept IDs
+// Used for caption-story mismatch checking to recognize equivalent expressions
+const CONCEPT_MAP = new Map([
+  // Child / girl / boy
+  ['ria', 'child'], ['रिया', 'child'], ['बेटी', 'child'], ['बच्ची', 'child'], ['बच्चा', 'child'], ['बच्चे', 'child'], ['बच्चों', 'child'],
+  ['मुम्मा', 'mother'], ['मम्मी', 'mother'], ['माँ', 'mother'], ['माँमा', 'mother'], ['मम', 'mother'],
+  ['मुम्मा', 'mother'], ['मम्मा', 'mother'], ['मम्मी', 'mother'],
+  ['पापा', 'father'], ['पिता', 'father'], ['डैड', 'father'], ['डैडी', 'father'],
+  ['दाadi', 'grandmother'], ['दाadi', 'grandmother'], ['नानी', 'grandmother'], ['दादी', 'grandmother'],
+  ['टीचर', 'teacher'], ['गुरु', 'teacher'], ['मास्टर', 'teacher'],
+  // Hug / affection / physical contact
+  ['हग', 'hug'], ['गले लगाना', 'hug'], ['पप्पी', 'hug'], ['प्यार', 'affection'], ['प्यार', 'love'], ['अपनापन', 'affection'],
+  // Refuse / no / consent
+  ['मना', 'refuse'], ['मना की', 'refuse'], ['नहीं', 'refuse'], ['नही', 'refuse'], ['मना किया', 'refuse'], ['इनकार', 'refuse'],
+  ['ना', 'refuse'], ['न', 'refuse'], ['mana', 'refuse'],
+  ['मार्जी', 'choice'], ['मर्जी', 'choice'], ['पसंद', 'choice'], ['choice', 'choice'], ['अधिकार', 'right'],
+  ['सम्मान', 'respect'], ['इज़्ज़त', 'respect'], ['इज्जत', 'respect'],
+  // Body / touch
+  ['टच', 'touch'], ['छूना', 'touch'], ['शरीर', 'body'], ['बॉडी', 'body'],
+  // Love / affection
+  ['प्यार', 'love'], ['अपनापन', 'affection'], ['pyaar', 'love'],
+  // Child / girl / boy (additional)
+  ['बच्चा', 'child'], ['बच्ची', 'child'], ['बच्चों', 'child'], ['बेटा', 'child'], ['बेटी', 'child'],
+  // Ask / permission
+  ['पूछो', 'ask'], ['पूछ', 'ask'], ['पूछो', 'ask'], ['पूछें', 'ask'], ['अनुमति', 'permission'],
+  // Safe / unsafe
+  ['सुरक्षित', 'safe'], ['असुरक्षित', 'unsafe'],
+  // Adult / parent / trusted
+  ['एडल्ट', 'adult'], ['अडल्ट', 'adult'], ['बड़ा', 'adult'], ['बड़ा', 'adult'], ['बड़ा व्यक्ति', 'adult'],
+  ['ट्रस्टेड', 'trusted'], ['भरोसेमंद', 'trusted'],
+  // English character names (from story text)
+  ['mumma', 'mother'], ['mummy', 'mother'], ['mamma', 'mother'],
+  ['papa', 'father'], ['daddy', 'father'], ['dad', 'father'],
+  ['ria', 'child'],
+  ['daadi', 'grandmother'], ['dadi', 'grandmother'],
+  ['teacher', 'teacher'],
+  ['adults', 'adult'], ['adult', 'adult'],
+  // Related concepts
+  ['touch', 'hug'], ['hug', 'hug'], ['kiss', 'hug'],
+  ['marzi', 'choice'], ['मरजी', 'choice'], ['मर्जी', 'choice'],
+]);
+
+function tokenToConcept(token) {
+  return CONCEPT_MAP.get(token) || token;
+}
+
+function tokensToConcepts(tokens) {
+  return new Set([...tokens].map(t => tokenToConcept(t)));
+}
 
 function normalizeText(text) {
   if (!text) return '';
@@ -184,10 +235,10 @@ function checkCaptionStoryMismatch(idea) {
     };
   }
   const storyText = `${idea.title || ''} ${idea.problem || ''} ${idea.storyDetail || ''}`;
-  const captionTokens = new Set(tokenize(caption));
-  const storyTokens = new Set(tokenize(storyText));
-  const overlap = [...captionTokens].filter(t => storyTokens.has(t)).length;
-  const threshold = Math.max(3, Math.ceil(storyTokens.size * 0.10));
+  const captionConcepts = tokensToConcepts(tokenize(caption));
+  const storyConcepts = tokensToConcepts(tokenize(storyText));
+  const overlap = [...captionConcepts].filter(t => storyConcepts.has(t)).length;
+  const threshold = Math.max(3, Math.ceil(storyConcepts.size * 0.10));
   return {
     id: 'captionStoryMismatch',
     passed: overlap >= threshold,
@@ -283,8 +334,12 @@ function checkUnapprovedCharacterName(idea) {
 }
 
 function checkBrandNames(idea) {
-  const fields = ['readyPrompt', 'caption', 'pinnedComment', 'storyDetail'];
-  const text = fields.map(f => idea[f] || '').join(' ').toLowerCase();
+  const text = CONTENT_FIELDS
+    .map(field => field === 'strategy' ? extractContentStrategy(idea[field]) : idea[field])
+    .flat()
+    .filter(value => typeof value === 'string')
+    .join(' ')
+    .toLowerCase();
   const found = [];
   for (const brand of BRAND_BLOCKLIST) {
     if (text.includes(brand)) {
@@ -515,9 +570,21 @@ function checkTypo(idea) {
     'bhaiya', 'didi', 'bhai', 'behen', 'choti', 'badi', 'chota', 'bada', 'accha', 'achha', 'theek', 'bas',
     'chalo', 'jao', 'dekho', 'suno', 'karo', 'mat', 'nahi', 'nahin', 'haan', 'ji', 'ok', 'okay', 'arre',
     'bacha', 'bachi', 'bacche', 'baccha', 'bacchi', 'chhota', 'chhoti', 'bade', 'badi', 'naya', 'nayi',
-    'purana', 'purani', 'ghar', 'ghar', 'school', 'park', 'market', 'shop', 'dukaan', 'gaadi', 'cycle',
+    'purana', 'purani', 'ghar', 'school', 'park', 'market', 'shop', 'dukaan', 'gaadi', 'cycle',
     'ball', 'toy', 'khilona', 'khel', 'khelna', 'padhna', 'likhna', 'khana', 'peena', 'sona', 'uthna',
-    'baithna', 'chalna', 'daudna', 'nachna', 'gaana', 'sunna', 'dekhna', 'bolna', 'samajhna', 'jaanna'
+    'baithna', 'chalna', 'daudna', 'nachna', 'gaana', 'sunna', 'dekhna', 'bolna', 'samajhna', 'jaanna',
+    // Production / visual style terminology (valid English, not typos)
+    'animation', 'animated', 'animator', 'animations', 'vertical', 'horizontal', 'style', 'styling',
+    'living', 'room', 'bedroom', 'livingroom', 'family', 'families', 'gathered', 'gathering',
+    'prompt', 'prompts', 'production', 'produce', 'produced', 'visual', 'visually', 'visuals',
+    'expressive', 'expression', 'warm', 'warmth', 'detailed', 'detail', 'details',
+    'environment', 'environments', 'consistent', 'consistency', 'character', 'characters',
+    'cartoon', 'cartoons', '3d', 'on-screen', 'screen', 'text', 'texts', 'beat', 'beats',
+    'part', 'parts', 'outro', 'intro', 'follow', 'family-friendly', 'friendly',
+    'audio', 'dialogue', 'dialogues', 'narration', 'overlay', 'overlays',
+    'frame', 'frames', 'shot', 'shots', 'scene', 'scenes', 'setting', 'settings',
+    'lighting', 'light', 'lights', 'color', 'colors', 'colour', 'colours',
+    'camera', 'cameras', 'shot', 'shotlist', 'storyboard', 'storyboards',
   ]);
   const fields = ['readyPrompt', 'caption', 'pinnedComment', 'storyDetail', 'dialogue'];
   const text = fields.map(f => idea[f] || '').join(' ');
@@ -663,6 +730,9 @@ module.exports = {
   GENERIC_TEMPLATES,
   FESTIVALS,
   STOPWORDS,
+  CONCEPT_MAP,
+  tokenToConcept,
+  tokensToConcepts,
   normalizeText,
   tokenize,
   jaccardSimilarity,

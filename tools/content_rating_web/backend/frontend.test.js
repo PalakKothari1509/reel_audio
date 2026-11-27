@@ -8,6 +8,8 @@
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // ── Helper: escape HTML ──
 function escapeHtml(text) {
@@ -105,6 +107,56 @@ test('evaluated count accuracy: ratings with verdicts are counted', () => {
   ];
   const evaluatedCount = ratings.filter(r => r.verdict).length;
   assert.equal(evaluatedCount, 3);
+});
+
+test('repair preview renders overall scores and score change as separate metrics', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /Original Overall Score/);
+  assert.match(appSource, /Repaired Overall Score/);
+  assert.match(appSource, /Score Change/);
+  assert.match(appSource, /Original Verdict/);
+  assert.match(appSource, /Repaired Verdict/);
+  assert.doesNotMatch(appSource, /\$\{scoreChangeSign\}\$\{rep\.overallScore/);
+});
+
+test('repair preview labels system metadata separately from content fields', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /System Metadata Changes/);
+  assert.match(appSource, /strategy: 'Strategy'/);
+  assert.doesNotMatch(appSource, /reviewedOn: 'Reviewed On'/);
+});
+
+test('all ideas table contains only the requested summary columns', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /label: 'Idea ID'/);
+  assert.match(appSource, /label: 'Title'/);
+  assert.match(appSource, /label: 'Category'/);
+  assert.match(appSource, /label: 'Score'/);
+  assert.match(appSource, /label: 'Verdict'/);
+  assert.match(appSource, /label: 'Action'/);
+  assert.doesNotMatch(appSource, /Expand cell details to read full text/);
+  assert.doesNotMatch(appSource, /label: 'Gate Results'/);
+  assert.doesNotMatch(appSource, /label: 'Complete Idea Data/);
+});
+
+test('all ideas table has direct Fix and Save action', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /Fix &amp; Save/);
+  assert.match(appSource, /fixAndSaveIdea/);
+  assert.match(appSource, /assets\/data\/content_ideas\.json/);
+  assert.match(appSource, /api\/ideas\/\$\{ideaId\}\/repair\/save/);
 });
 
 test('evaluated count is zero when no ratings exist', () => {

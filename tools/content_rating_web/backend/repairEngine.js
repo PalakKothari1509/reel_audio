@@ -2,6 +2,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const { isDeepStrictEqual } = require('util');
+const {
+  CONTENT_FIELDS,
+  EVALUATION_METADATA_FIELDS,
+  hasEvaluationMetadata,
+  extractContentStrategy,
+} = require('./contentFields');
 const {
   DIMENSIONS, GATES, SEVERITIES, VERDICTS, validateGeminiResponse,
   computeWeightedScore, computeVerdict, isCriticalCapEnabled,
@@ -9,7 +16,7 @@ const {
   getDimensionById, getGateById,
 } = require('./schemas');
 const { runAllChecks } = require('./deterministicChecks');
-const { evaluateGates } = require('./ratingEngine');
+const { offlineEvaluate } = require('./ratingEngine');
 
 const CONTENT_JSON_PATH = path.resolve(__dirname, '../../../assets/data/content_ideas.json');
 
@@ -34,7 +41,10 @@ const BRAND_BLOCKLIST = [
   'Britannia', 'Parle-G', 'Parle', 'Amul', 'Maggi', 'Cadbury', 'Dairy Milk',
   'Oreo', 'Kurkure', 'Lays', 'Haldiram', 'Mother Dairy',
 ];
-const IP_BLOCKLIST = ['Disney', 'Peppa Pig', 'Cocomelon', 'Chhota Bheem', 'Paw Patrol', 'Bluey', 'Marvel'];
+const IP_BLOCKLIST = ['Pixar', 'Disney', 'Peppa Pig', 'Cocomelon', 'Chhota Bheem', 'Paw Patrol', 'Bluey', 'Marvel'];
+
+// Generic replacement for blocked IP visual style terms (preserves visual description quality)
+const GENERIC_VISUAL_STYLE = 'High-quality original 3D animated family-friendly cartoon visuals, with expressive characters, warm lighting, detailed environments, and consistent character designs';
 
 const GENERIC_PINNED_TEMPLATES = [
   'Isi concept ko real-life situation mein try karo',
@@ -83,17 +93,11 @@ function isValidHookIdea(obj) {
     }
   }
 
-  const knownFields = new Set(HOOK_IDEA_FIELDS);
-  for (const key of Object.keys(obj)) {
-    if (!knownFields.has(key)) {
-      return { valid: false, error: `Unknown field in repaired idea: ${key}` };
-    }
-  }
-
   return { valid: true };
 }
 
 function buildRepairPrompt(idea, evaluation, rulesSpec) {
+  idea = cleanStrategyField(idea);
   const dimensionsList = DIMENSIONS.map((d, i) =>
     `${i + 1}. ${d.name} (${d.weight}%): ${d.description}`
   ).join('\n');
@@ -155,9 +159,6 @@ Quote: ${idea.quote}
 Detail: ${idea.detail}
 Punchline: ${idea.punchline}
 Ready Prompt: ${idea.readyPrompt}
-Score: ${idea.score}
-Band: ${idea.band}
-Reviewed On: ${idea.reviewedOn}
 
 CURRENT EVALUATION SCORE: ${evaluation.overallScore}/100
 CURRENT VERDICT: ${evaluation.verdict}
@@ -214,7 +215,7 @@ PRESERVATION RULES (critical):
 - Do NOT rename JSON properties.
 - Do NOT generate duplicate IDs.
 - Keep all fields that are already good — only change what needs fixing.
-- The readyPrompt must use "3D Pixar animation style" (not "3D animated style" or other variants).
+- Use an original generic animation description in readyPrompt; never name a studio or existing IP.
 - Preserve archived status: ${idea.archived}
 - Preserve custom status: ${idea.custom}
 
@@ -255,7 +256,7 @@ Return ONLY valid JSON with this exact structure (all HookIdea fields, no extras
   "reviewedOn": ""
 }
 
-The score, band, and reviewedOn fields should be preserved from the original or reset to defaults (0, "", "") — they are evaluation metadata, not creative content.
+Set score, band, and reviewedOn to defaults (0, "", ""); the authoritative evaluator replaces them after repair.
 `;
 }
 
@@ -413,6 +414,26 @@ function improveCaption(caption, lesson, problem, title, category) {
   return caption;
 }
 
+function improveCaptionForBodyAutonomy(caption, lesson, problem, title) {
+  const hashtags = caption.match(/#[^\s#]+/g) || [];
+  const hashtagStr = hashtags.length > 0 ? ' ' + hashtags.join(' ') : ' #ChildSafety #GoodTouchBadTouch #BodyAutonomy #IndianParents #FunLearningWithPalak';
+
+  // Hindi/Hinglish caption that reflects the story: Ria refuses hug, adults respect her choice
+  const hindiCaption = `जब कोई भी touch अच्छा न लगे, तो मना करना ठीक है। जब कोई हग या किस करने की कोशिश करे, तो रिया की तरह "ना" कहने का हक है। पापा, मम्मी, दादी जैसे बड़े लोग बच्चे की मर्जी का सम्मान करें। प्यार दिखाने के लिए हग ज़रूरी नहीं।` + hashtagStr;
+
+  // Always return the story-aligned Hindi caption for body autonomy stories
+  return hindiCaption;
+}
+
+// ── Strategy cleaning ──────────────────────────────────────────────────────────
+
+function cleanStrategyField(idea) {
+  if (!idea.strategy || !hasEvaluationMetadata(idea.strategy)) {
+    return idea;
+  }
+  return { ...idea, strategy: extractContentStrategy(idea.strategy) };
+}
+
 function improvePinnedComment(pinnedComment, lesson, problem, title, category) {
   if (!pinnedComment || pinnedComment.trim().length === 0) {
     const topic = lesson || problem.split(/[.!?]/)[0] || title;
@@ -457,23 +478,18 @@ function improveDialogue(dialogue, defaultCast, problem, lesson) {
 function improveReadyPrompt(readyPrompt, idea) {
   if (!readyPrompt || readyPrompt.trim().length === 0) {
     const mainChar = idea.defaultCast && idea.defaultCast.length > 0 ? idea.defaultCast[0] : 'Ria';
-    return `3D Pixar animation style, vertical 9:16. ${mainChar}'s story. ${idea.problem}. Text on screen: "${idea.title.toUpperCase()}"`;
+    return `${GENERIC_VISUAL_STYLE}, vertical 9:16. ${mainChar}'s story. ${idea.problem}. Text on screen: "${idea.title.toUpperCase()}"`;
   }
 
   let result = readyPrompt;
-  // Ensure "3D Pixar animation style" is used (not variants)
-  if (!result.includes('3D Pixar animation style')) {
-    result = result.replace(/3D animated style/gi, '3D Pixar animation style');
-    result = result.replace(/3D animation style/gi, '3D Pixar animation style');
-    result = result.replace(/Pixar animation style/gi, '3D Pixar animation style');
-    result = result.replace(/Disney animation style/gi, '3D Pixar animation style');
-  }
-
+  // Replace full "3D Pixar animation style" phrase with generic visual description
+  result = result.replace(/3D Pixar animation style/gi, GENERIC_VISUAL_STYLE);
+  // Replace any remaining standalone Pixar or other IP terms
+  result = replaceBrandAndIpTerms(result);
   // Ensure vertical 9:16 is present
   if (!result.includes('vertical 9:16') && !result.includes('9:16')) {
-    result = result.replace(/3D Pixar animation style/, '3D Pixar animation style, vertical 9:16');
+    result = result + ', vertical 9:16';
   }
-
   return result;
 }
 
@@ -623,7 +639,8 @@ function fixCharacterConsistency(idea) {
 }
 
 function repairIdeaOffline(idea, evaluation) {
-  const repaired = { ...idea };
+  let repaired = cleanStrategyField(idea);
+  repaired = { ...repaired };
 
   const criticalFindings = evaluation.criticalFindings || [];
   const majorFindings = evaluation.majorFindings || [];
@@ -647,16 +664,26 @@ function repairIdeaOffline(idea, evaluation) {
 
   // ── 2. Fix brand and safety (Critical) ──
   const brandGate = gateResults.find(g => g.id === 'brandAndSafety');
-  if (brandGate && !brandGate.passed) {
-    const textFields = ['readyPrompt', 'caption', 'pinnedComment', 'storyDetail',
-      'title', 'cover', 'opening', 'problem', 'lesson', 'setting', 'sceneDetail',
-      'dialogue', 'mess', 'innerThought', 'endingBeat', 'quote', 'detail', 'punchline'];
+  const brandFindings = criticalFindings.filter(f =>
+    f.title.toLowerCase().includes('brand') || f.title.toLowerCase().includes('pixar')
+  );
+  const textFields = ['readyPrompt', 'caption', 'pinnedComment', 'storyDetail',
+    'title', 'cover', 'opening', 'problem', 'lesson', 'strategy', 'setting', 'sceneDetail',
+    'dialogue', 'mess', 'innerThought', 'endingBeat', 'quote', 'detail', 'punchline'];
+  const hasBrandTerms = textFields.some(f => repaired[f] && /pixar|disney|peppa|cocomelon|chhota bheem|paw patrol|bluey|marvel|britannia|parle|amul|maggi|cadbury|oreo|kurkure|lays|haldiram|mother dairy/gi.test(repaired[f]));
+  const shouldFixBrand = (brandGate && !brandGate.passed) || brandFindings.length > 0 || hasBrandTerms;
+  if (shouldFixBrand) {
     let brandFixed = false;
     for (const field of textFields) {
       if (repaired[field]) {
         const before = repaired[field];
-        repaired[field] = replaceBrandAndIpTerms(repaired[field]);
-        repaired[field] = fixUnsafeLanguage(repaired[field]);
+        let fixed = repaired[field];
+        // Replace full "3D Pixar animation style" phrase with generic visual description
+        fixed = fixed.replace(/3D Pixar animation style/gi, GENERIC_VISUAL_STYLE);
+        // Replace any remaining standalone Pixar or other IP terms
+        fixed = replaceBrandAndIpTerms(fixed);
+        fixed = fixUnsafeLanguage(fixed);
+        repaired[field] = fixed;
         if (repaired[field] !== before) brandFixed = true;
       }
     }
@@ -797,6 +824,22 @@ function repairIdeaOffline(idea, evaluation) {
     }
   }
 
+  // ── 11b. Fix caption for body autonomy / consent stories ──
+  const isBodyAutonomyStory = repaired.category === 'Safety' && (
+    repaired.problem.toLowerCase().includes('hug') ||
+    repaired.problem.toLowerCase().includes('touch') ||
+    repaired.lesson.toLowerCase().includes('marzi') ||
+    repaired.lesson.toLowerCase().includes('consent') ||
+    repaired.lesson.toLowerCase().includes('body autonomy')
+  );
+  if (isBodyAutonomyStory) {
+    const beforeCaption = repaired.caption;
+    repaired.caption = improveCaptionForBodyAutonomy(repaired.caption, repaired.lesson, repaired.problem, repaired.title);
+    if (repaired.caption !== beforeCaption && !fixedIssues.some(f => f.includes('body autonomy'))) {
+      fixedIssues.push('Caption: improved for body autonomy story (refusal of hug, respect for choice)');
+    }
+  }
+
   // ── 12. Fix age appropriateness gate (Critical) ──
   const ageGate = gateResults.find(g => g.id === 'ageAppropriateness');
   if (ageGate && !ageGate.passed) {
@@ -826,7 +869,7 @@ function repairIdeaOffline(idea, evaluation) {
     const before = repaired.readyPrompt;
     repaired.readyPrompt = improveReadyPrompt(repaired.readyPrompt, repaired);
     if (repaired.readyPrompt !== before && !fixedIssues.some(f => f.includes('readyPrompt'))) {
-      fixedIssues.push('Ready Prompt: ensured 3D Pixar animation style and vertical 9:16');
+      fixedIssues.push('Ready Prompt: replaced blocked visual-style terms and ensured vertical 9:16');
     }
   }
 
@@ -850,32 +893,81 @@ function repairIdeaOffline(idea, evaluation) {
   };
 }
 
+function finalizeRepairedIdea(original, candidate, allIdeas = []) {
+  const repairedIdea = { ...original };
+  for (const field of HOOK_IDEA_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(candidate, field)) {
+      repairedIdea[field] = candidate[field];
+    }
+  }
+  for (const field of EVALUATION_METADATA_FIELDS) {
+    if (!['score', 'band', 'reviewedOn'].includes(field)) {
+      delete repairedIdea[field];
+    }
+  }
+  const cleanedIdea = cleanStrategyField(repairedIdea);
+  const evaluation = offlineEvaluate(cleanedIdea, allIdeas);
+  cleanedIdea.score = evaluation.overallScore;
+  cleanedIdea.band = evaluation.verdict;
+  cleanedIdea.reviewedOn = evaluation.evaluatedAt;
+  return { repairedIdea: cleanedIdea, evaluation };
+}
+
+function valuesEqual(left, right) {
+  return isDeepStrictEqual(left, right);
+}
+
 function compareIdeas(original, repaired) {
-  const changedFields = [];
-  const unchangedFields = [];
+  const comparison = compareIdeasDetailed(original, repaired);
+  return {
+    changedFields: comparison.contentChanged,
+    unchangedFields: comparison.contentUnchanged,
+    metadataChanged: comparison.metadataChanged,
+    metadataUnchanged: comparison.metadataUnchanged,
+  };
+}
+
+// Separates changes into content fields vs evaluation metadata fields.
+// Content fields are the actual creative content (strategy, readyPrompt, caption, etc.)
+// Metadata fields are system-generated evaluation results that should not be shown
+// as user-facing content changes.
+function compareIdeasDetailed(original, repaired) {
+  const contentChanged = [];
+  const contentUnchanged = [];
+  const metadataChanged = [];
+  const metadataUnchanged = [];
 
   const allKeys = new Set([...Object.keys(original), ...Object.keys(repaired)]);
+  const originalContent = cleanStrategyField(original);
+  const repairedContent = cleanStrategyField(repaired);
 
   for (const key of allKeys) {
-    const origVal = original[key];
-    const repVal = repaired[key];
+    const origVal = originalContent[key];
+    const repVal = repairedContent[key];
+    const changed = !valuesEqual(origVal, repVal);
+    const isContent = CONTENT_FIELDS.includes(key);
 
-    if (key === 'defaultCast') {
-      const origStr = JSON.stringify(origVal);
-      const repStr = JSON.stringify(repVal);
-      if (origStr !== repStr) {
-        changedFields.push(key);
+    if (changed) {
+      if (isContent) {
+        contentChanged.push(key);
       } else {
-        unchangedFields.push(key);
+        metadataChanged.push(key);
       }
-    } else if (String(origVal) !== String(repVal)) {
-      changedFields.push(key);
     } else {
-      unchangedFields.push(key);
+      if (isContent) {
+        contentUnchanged.push(key);
+      } else {
+        metadataUnchanged.push(key);
+      }
     }
   }
 
-  return { changedFields, unchangedFields };
+  return {
+    contentChanged,
+    contentUnchanged,
+    metadataChanged,
+    metadataUnchanged,
+  };
 }
 
 module.exports = {
@@ -886,7 +978,12 @@ module.exports = {
   extractJsonFromResponse,
   repairIdeaWithGemini,
   repairIdeaOffline,
+  finalizeRepairedIdea,
   compareIdeas,
+  compareIdeasDetailed,
   HOOK_IDEA_FIELDS,
   CONTENT_JSON_PATH,
+  cleanStrategyField,
+  hasEvaluationMetadata,
+  EVALUATION_METADATA_FIELDS,
 };

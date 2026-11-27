@@ -312,13 +312,12 @@ const app = {
     const columns = this.getFullTableColumns();
     const rows = this.getAllIdeaRows();
 
-    description.textContent = `${rows.length} ideas · ${this.ratings.length} evaluated · Expand cell details to read full text.`;
+    description.textContent = `${rows.length} ideas · ${this.ratings.length} evaluated`;
     tableHead.innerHTML = `<tr>${columns.map(column => `<th>${this.escapeHtml(column.label)}</th>`).join('')}</tr>`;
     tableBody.innerHTML = rows.map(({ idea, rating }) => `<tr>${columns.map(column => {
       const value = column.value(idea, rating);
-      if (column.expandable && value) {
-        const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-        return `<td class="full-data-cell"><details><summary>View (${text.length} chars)</summary><pre>${this.escapeHtml(text)}</pre></details></td>`;
+      if (typeof value === 'string' && value.includes('<button')) {
+        return `<td>${value}</td>`;
       }
       return `<td>${this.escapeHtml(value == null ? '' : String(value))}</td>`;
     }).join('')}</tr>`).join('');
@@ -332,73 +331,18 @@ const app = {
   },
 
   getFullTableColumns() {
-    const columns = [
+    return [
       { key: 'ideaId', label: 'Idea ID', value: idea => idea.id },
       { key: 'title', label: 'Title', value: idea => idea.title },
       { key: 'category', label: 'Category', value: idea => idea.category },
-      { key: 'freshnessStatus', label: 'Freshness', value: (_idea, rating) => {
-        const f = this.freshness.find(x => x.ideaId === (_idea && _idea.id));
-        return f ? f.status : 'UNKNOWN';
-      } },
-      { key: 'evaluationStatus', label: 'Evaluation Status', value: (_idea, rating) => rating ? 'Evaluated' : 'Not evaluated' },
-      { key: 'overallScore', label: 'Overall Score', value: (_idea, rating) => rating?.overallScore },
-      { key: 'rawScore', label: 'Raw Score', value: (_idea, rating) => rating?.rawScore },
+      { key: 'overallScore', label: 'Score', value: (_idea, rating) => rating?.overallScore },
       { key: 'verdict', label: 'Verdict', value: (_idea, rating) => rating?.verdict },
-      { key: 'scoreCapped', label: 'Score Capped', value: (_idea, rating) => rating ? rating.scoreCapped : '' },
-      { key: 'evaluationVersion', label: 'Version', value: (_idea, rating) => rating?.evaluationVersion },
-    ];
-
-    const dimensionIds = [
-      'hookStrength', 'relatabilityAudienceFit', 'payoffRetention', 'hinglishNaturalness',
-      'visualFeasibility', 'soundOffReadability', 'shareSaveTrigger', 'captionCommentPackage',
-      'originality', 'audioHook',
-    ];
-    dimensionIds.forEach(id => {
-      columns.push({
-        key: `${id}_score`,
-        label: `${id} Score`,
-        value: (_idea, rating) => rating?.dimensionScores?.find(dimension => dimension.id === id)?.score,
-      });
-    });
-
-    columns.push(
-      { key: 'opening', label: 'Opening', value: idea => idea.opening, expandable: true },
-      { key: 'problem', label: 'Problem', value: idea => idea.problem, expandable: true },
-      { key: 'lesson', label: 'Lesson', value: idea => idea.lesson, expandable: true },
-      { key: 'storyDetail', label: 'Story Detail', value: idea => idea.storyDetail, expandable: true },
-      { key: 'endingBeat', label: 'Ending Beat', value: idea => idea.endingBeat, expandable: true },
-      { key: 'caption', label: 'Caption', value: idea => idea.caption, expandable: true },
-      { key: 'pinnedComment', label: 'Pinned Comment', value: idea => idea.pinnedComment, expandable: true },
-      { key: 'setting', label: 'Setting', value: idea => idea.setting, expandable: true },
-      { key: 'sceneDetail', label: 'Scene Detail', value: idea => idea.sceneDetail, expandable: true },
-      { key: 'dialogue', label: 'Dialogue', value: idea => idea.dialogue, expandable: true },
-      { key: 'defaultCast', label: 'Default Cast', value: idea => idea.defaultCast },
       {
-        key: 'dimensionFeedback',
-        label: 'Dimension Feedback (explanation / works / improvement)',
-        value: (_idea, rating) => rating?.dimensionScores,
-        expandable: true,
+        key: 'action',
+        label: 'Action',
+        value: idea => `<button class="btn btn-primary" style="font-size:0.8rem;padding:0.35rem 0.7rem;" onclick="event.stopPropagation(); app.fixAndSaveIdea('${idea.id}')">Fix &amp; Save</button>`,
       },
-      { key: 'gateResults', label: 'Gate Results', value: (_idea, rating) => rating?.gateResults, expandable: true },
-      { key: 'criticalFindings', label: 'Critical Findings', value: (_idea, rating) => rating?.criticalFindings, expandable: true },
-      { key: 'majorFindings', label: 'Major Findings', value: (_idea, rating) => rating?.majorFindings, expandable: true },
-      { key: 'minorFindings', label: 'Minor Findings', value: (_idea, rating) => rating?.minorFindings, expandable: true },
-      { key: 'suggestions', label: 'Suggestions', value: (_idea, rating) => rating?.suggestions, expandable: true },
-      { key: 'fixesToReach10', label: 'Fixes to Reach 100', value: (_idea, rating) => rating?.fixesToReach10, expandable: true },
-      { key: 'potentialScore', label: 'Potential Score', value: (_idea, rating) => rating?.potentialScore },
-      { key: 'rewrittenHook', label: 'Rewritten Hook', value: (_idea, rating) => rating?.rewrittenHook, expandable: true },
-      { key: 'duplicateOf', label: 'Duplicate Of', value: (_idea, rating) => rating?.duplicateOf },
-      { key: 'recommendedFormat', label: 'Recommended Format', value: (_idea, rating) => rating?.recommendedFormat },
-      { key: 'seasonTag', label: 'Season Tag', value: (_idea, rating) => rating?.seasonTag },
-      { key: 'deterministicChecks', label: 'Deterministic Checks', value: (_idea, rating) => rating?.deterministicChecks, expandable: true },
-      { key: 'confidence', label: 'Confidence', value: (_idea, rating) => rating?.confidence },
-      { key: 'evaluationMode', label: 'Evaluation Mode', value: (_idea, rating) => rating?.evaluationMode },
-      { key: 'evaluatedAt', label: 'Evaluated At', value: (_idea, rating) => rating?.evaluatedAt },
-      { key: 'evaluationVersion', label: 'Evaluation Version', value: (_idea, rating) => rating?.evaluationVersion },
-      { key: 'allIdeaData', label: 'Complete Idea Data (JSON)', value: idea => idea, expandable: true },
-      { key: 'allRatingData', label: 'Complete Rating Data (JSON)', value: (_idea, rating) => rating, expandable: true },
-    );
-    return columns;
+    ];
   },
 
   getDimension(rating, dimensionId) {
@@ -815,6 +759,17 @@ const app = {
             ${this.getStoryBadgeHtml(idea.storyDetail)}
           </div>
         </div>
+        ${rating && (rating.criticalFindings?.length > 0 || rating.majorFindings?.length > 0 || rating.minorFindings?.length > 0 || rating.suggestions?.length > 0)
+          ? `<div class="idea-card-actions">
+            <button class="btn btn-secondary" style="font-size:0.8rem;padding:0.35rem 0.7rem;" onclick="event.stopPropagation(); app.repairIdea('${idea.id}', 'offline')">Fix All Issues (Offline)</button>
+           </div>`
+          : rating ? `<div class="idea-card-actions">
+            <button class="btn btn-secondary" style="font-size:0.8rem;padding:0.35rem 0.7rem;" onclick="event.stopPropagation(); app.repairIdea('${idea.id}', 'offline')" disabled style="opacity:0.6;cursor:not-allowed;">No Issues Found</button>
+           </div>`
+          : `<div class="idea-card-actions">
+            <button class="btn btn-secondary" style="font-size:0.8rem;padding:0.35rem 0.7rem;" onclick="event.stopPropagation(); app.reevaluateIdea('${idea.id}')">Evaluate First</button>
+           </div>`
+        }
       `;
       container.appendChild(card);
     });
@@ -1439,6 +1394,52 @@ const app = {
   // ── Idea Repair ──
   repairState: null,
 
+  async fixAndSaveIdea(ideaId) {
+    const idea = this.ideas.find(item => item.id === ideaId);
+    if (!idea) return;
+    if (!confirm(`Fix and save "${idea.title}" directly to assets/data/content_ideas.json?`)) return;
+
+    try {
+      const repairRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'offline' }),
+      });
+      const repairData = await repairRes.json().catch(() => ({}));
+      if (!repairRes.ok) {
+        throw new Error(repairData.error || `Repair failed (${repairRes.status})`);
+      }
+      if (repairData.canSave === false) {
+        throw new Error('Cannot save because critical safety gates still fail.');
+      }
+
+      const saveRes = await fetch(`${API_BASE}/api/ideas/${ideaId}/repair/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repairedIdea: repairData.repairedIdea,
+          originalEvaluation: repairData.originalEvaluation,
+          repairedEvaluation: repairData.repairedEvaluation,
+          comparison: repairData.comparison,
+          repairMode: 'offline',
+        }),
+      });
+      const saveData = await saveRes.json().catch(() => ({}));
+      if (!saveRes.ok) {
+        throw new Error(saveData.error || `Save failed (${saveRes.status})`);
+      }
+
+      await this.loadIdeas();
+      await this.loadRatings();
+      await this.loadFreshness();
+      this.renderDashboard();
+      this.renderLibrary();
+      this.showToast(`${ideaId} fixed and saved. Score: ${saveData.repairedScore}/100 (${saveData.repairedVerdict})`, 'success');
+    } catch (e) {
+      this.showToast(`Fix & Save failed: ${e.message}`, 'error');
+    }
+  },
+
   async repairIdea(ideaId, mode = 'offline') {
     const idea = this.ideas.find(i => i.id === ideaId);
     if (!idea) return;
@@ -1556,39 +1557,51 @@ const app = {
     const fixedIssues = data.fixedIssues || [];
     const unresolvedIssues = data.unresolvedIssues || [];
 
-    const scoreChange = rep.overallScore - (orig.overallScore || 0);
+    const originalScore = Number.isFinite(Number(orig.overallScore)) ? Number(orig.overallScore) : null;
+    const repairedScore = Number.isFinite(Number(rep.overallScore)) ? Number(rep.overallScore) : null;
+    const scoreChange = originalScore !== null && repairedScore !== null
+      ? repairedScore - originalScore
+      : null;
     const scoreChangeClass = scoreChange > 0 ? 'repair-score-improved' : scoreChange < 0 ? 'repair-score-declined' : '';
     const scoreChangeSign = scoreChange > 0 ? '+' : '';
 
-    // Build before/after field comparison
+    // Keep diagnostic metadata separate from user-facing creative content.
     const fieldLabels = {
-      id: 'ID', category: 'Category', title: 'Title', cover: 'Cover',
-      opening: 'Opening Hook', problem: 'Problem', lesson: 'Lesson',
-      postFormat: 'Post Format', strategy: 'Strategy', caption: 'Caption',
-      pinnedComment: 'Pinned Comment', forApp: 'For App', usedOn: 'Used On',
-      custom: 'Custom', archived: 'Archived', storyDetail: 'Story Detail',
-      setting: 'Setting', sceneDetail: 'Scene Detail', dialogue: 'Dialogue',
-      mess: 'Mess', innerThought: 'Inner Thought', endingBeat: 'Ending Beat',
-      defaultCast: 'Default Cast', keepMoralOffScreen: 'Keep Moral Off Screen',
-      quote: 'Quote', detail: 'Detail', punchline: 'Punchline',
-      readyPrompt: 'Ready Prompt', score: 'Score', band: 'Band', reviewedOn: 'Reviewed On',
+      title: 'Title', category: 'Category', opening: 'Opening Hook', problem: 'Problem',
+      lesson: 'Lesson', caption: 'Caption', pinnedComment: 'Pinned Comment',
+      storyDetail: 'Story Detail', setting: 'Setting', sceneDetail: 'Scene Detail',
+      dialogue: 'Dialogue', mess: 'Mess', innerThought: 'Inner Thought',
+      endingBeat: 'Ending Beat', defaultCast: 'Default Cast', readyPrompt: 'Ready Prompt',
+      strategy: 'Strategy', cover: 'Cover', postFormat: 'Post Format',
+      forApp: 'For App', usedOn: 'Used On', custom: 'Custom', archived: 'Archived',
+      keepMoralOffScreen: 'Keep Moral Off Screen', quote: 'Quote',
+      detail: 'Detail', punchline: 'Punchline',
+    };
+    const metadataLabels = {
+      score: 'Stored Score', band: 'Stored Verdict', reviewedOn: 'Last Reviewed',
+      overallScore: 'Overall Score', rawScore: 'Raw Score', scoreCapped: 'Score Capped',
+      verdict: 'Verdict', gateResults: 'Gate Results', dimensionScores: 'Dimension Scores',
+      criticalFindings: 'Critical Findings', majorFindings: 'Major Findings',
+      minorFindings: 'Minor Findings', evaluatedAt: 'Evaluated At',
     };
 
     const originalIdea = data.originalIdea || data.idea;
     const repairedIdea = data.repairedIdea;
 
-    let fieldsHtml = '';
-    const allKeys = new Set([...Object.keys(originalIdea), ...Object.keys(repairedIdea)]);
-    for (const key of allKeys) {
-      const isChanged = comp.changedFields.includes(key);
+    const contentChanged = comp.contentChanged || comp.changedFields || [];
+    const contentUnchanged = comp.contentUnchanged || comp.unchangedFields || [];
+    const contentKeys = [...new Set([...contentChanged, ...contentUnchanged])]
+      .filter(key => fieldLabels[key]);
+    let fieldsHtml = contentKeys.map(key => {
+      const isChanged = contentChanged.includes(key);
       const origVal = originalIdea[key];
       const repVal = repairedIdea[key];
-      const origDisplay = Array.isArray(origVal) ? JSON.stringify(origVal) : String(origVal || '');
-      const repDisplay = Array.isArray(repVal) ? JSON.stringify(repVal) : String(repVal || '');
-      fieldsHtml += `
+      const origDisplay = Array.isArray(origVal) ? JSON.stringify(origVal) : String(origVal ?? '');
+      const repDisplay = Array.isArray(repVal) ? JSON.stringify(repVal) : String(repVal ?? '');
+      return `
         <div class="repair-field ${isChanged ? 'changed' : 'unchanged'}">
           <div class="repair-field-label">
-            ${fieldLabels[key] || key}
+            ${fieldLabels[key]}
             <span class="repair-field-badge ${isChanged ? 'badge-changed' : 'badge-unchanged'}">
               ${isChanged ? 'CHANGED' : 'UNCHANGED'}
             </span>
@@ -1605,7 +1618,24 @@ const app = {
           </div>
         </div>
       `;
-    }
+    }).join('');
+
+    const metadataChanged = comp.metadataChanged || [];
+    const metadataHtml = metadataChanged.length > 0
+      ? `<h4 style="margin-top:1rem;">System Metadata Changes</h4>${metadataChanged.map(key => {
+        const originalValue = originalIdea[key];
+        const repairedValue = repairedIdea[key];
+        const originalDisplay = Array.isArray(originalValue) ? JSON.stringify(originalValue) : String(originalValue ?? '');
+        const repairedDisplay = Array.isArray(repairedValue) ? JSON.stringify(repairedValue) : String(repairedValue ?? '');
+        return `<div class="repair-field changed">
+          <div class="repair-field-label">${metadataLabels[key] || this.escapeHtml(key)} <span class="repair-field-badge badge-changed">CHANGED</span></div>
+          <div style="display:flex; gap:0.5rem;">
+            <div style="flex:1;"><div style="font-size:0.7rem;color:var(--text-muted);">Original</div><div class="repair-field-value">${this.escapeHtml(originalDisplay)}</div></div>
+            <div style="flex:1;"><div style="font-size:0.7rem;color:var(--text-muted);">Repaired</div><div class="repair-field-value">${this.escapeHtml(repairedDisplay)}</div></div>
+          </div>
+        </div>`;
+      }).join('')}`
+      : '';
 
     // Issues resolved / remaining
     const origCritical = orig.criticalFindings || [];
@@ -1690,8 +1720,8 @@ const app = {
           <h4>Original Idea</h4>
           <div class="repair-score-table">
             <tr><th>Metric</th><th>Original</th></tr>
-            <tr><td>Overall Score</td><td>${orig.overallScore || 'N/A'}/100</td></tr>
-            <tr><td>Verdict</td><td>${orig.verdict || 'N/A'}</td></tr>
+            <tr><td>Original Overall Score</td><td>${originalScore === null ? 'N/A' : `${originalScore}/100`}</td></tr>
+            <tr><td>Original Verdict</td><td>${orig.verdict || 'N/A'}</td></tr>
             <tr><td>Critical</td><td>${origCritical.length}</td></tr>
             <tr><td>Major</td><td>${origMajor.length}</td></tr>
             <tr><td>Minor</td><td>${origMinor.length}</td></tr>
@@ -1702,8 +1732,9 @@ const app = {
           <h4>AI-Repaired Idea</h4>
           <div class="repair-score-table">
             <tr><th>Metric</th><th>Repaired</th></tr>
-            <tr><td>Overall Score</td><td><span class="repair-score-change ${scoreChangeClass}">${scoreChangeSign}${rep.overallScore || 'N/A'}</span>/100</td></tr>
-            <tr><td>Verdict</td><td>${rep.verdict || 'N/A'}</td></tr>
+            <tr><td>Repaired Overall Score</td><td>${repairedScore === null ? 'N/A' : `${repairedScore}/100`}</td></tr>
+            <tr><td>Score Change</td><td><span class="repair-score-change ${scoreChangeClass}">${scoreChange === null ? 'N/A' : `${scoreChangeSign}${scoreChange} points`}</span></td></tr>
+            <tr><td>Repaired Verdict</td><td>${rep.verdict || 'N/A'}</td></tr>
             <tr><td>Critical</td><td>${repCritical.length}</td></tr>
             <tr><td>Major</td><td>${repMajor.length}</td></tr>
             <tr><td>Minor</td><td>${repMinor.length}</td></tr>
@@ -1713,6 +1744,7 @@ const app = {
       </div>
       <h4 style="margin-top:1rem;">Field-by-Field Comparison</h4>
       ${fieldsHtml}
+      ${metadataHtml}
     `;
 
     footer.innerHTML = `
