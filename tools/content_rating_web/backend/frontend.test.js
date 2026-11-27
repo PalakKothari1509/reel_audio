@@ -160,6 +160,15 @@ test('all ideas table has direct Fix and Save action', () => {
   assert.match(appSource, /repairedIdea: repairData\.repairedIdea/);
 });
 
+test('Fix and Save action is hidden for Ready to Post ideas', () => {
+  const appSource = fs.readFileSync(
+    path.resolve(__dirname, '../frontend/js/app.js'),
+    'utf8',
+  );
+  assert.match(appSource, /rating\?\.verdict\s*===\s*'Ready to Post'/);
+  assert.match(appSource, /\?\s*''\s*:/);
+});
+
 test('Fix and Save refreshes ideas, ratings, freshness, and dashboard', () => {
   const appSource = fs.readFileSync(
     path.resolve(__dirname, '../frontend/js/app.js'),
