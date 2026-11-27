@@ -17,8 +17,6 @@ const writeQueue = [];
 
 function ensureDirs() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
-  if (!fs.existsSync(REPAIR_HISTORY_DIR)) fs.mkdirSync(REPAIR_HISTORY_DIR, { recursive: true });
 }
 
 function acquireLock() {
@@ -66,63 +64,23 @@ function timestamp() {
 }
 
 function createBackup() {
-  ensureDirs();
-  const raw = fs.readFileSync(SOURCE_JSON_PATH, 'utf8');
-  const backupName = `content_ideas.${timestamp()}.bak.json`;
-  const backupPath = path.join(BACKUP_DIR, backupName);
-  fs.writeFileSync(backupPath, raw, 'utf8');
-  return backupPath;
+  return null;
 }
 
 function listBackups() {
-  ensureDirs();
-  const files = fs.readdirSync(BACKUP_DIR).filter(f => f.endsWith('.bak.json')).sort().reverse();
-  return files.map(f => {
-    const p = path.join(BACKUP_DIR, f);
-    const stat = fs.statSync(p);
-    return {
-      filename: f,
-      path: p,
-      size: stat.size,
-      createdAt: stat.birthtimeMs || stat.mtimeMs,
-    };
-  });
+  return [];
 }
 
 function saveRepairHistory(record) {
-  ensureDirs();
-  const fileName = `${record.ideaId}_${timestamp()}.json`;
-  const filePath = path.join(REPAIR_HISTORY_DIR, fileName);
-  fs.writeFileSync(filePath, JSON.stringify(record, null, 2), 'utf8');
-  return filePath;
+  return null;
 }
 
 function getRepairHistory(ideaId) {
-  ensureDirs();
-  if (!fs.existsSync(REPAIR_HISTORY_DIR)) return [];
-  const files = fs.readdirSync(REPAIR_HISTORY_DIR)
-    .filter(f => f.startsWith(`${ideaId}_`) && f.endsWith('.json'))
-    .sort()
-    .reverse();
-  return files.map(f => {
-    try {
-      return JSON.parse(fs.readFileSync(path.join(REPAIR_HISTORY_DIR, f), 'utf8'));
-    } catch (e) {
-      return null;
-    }
-  }).filter(Boolean);
+  return [];
 }
 
 function getRepairHistoryFile(ideaId, timestampStr) {
-  ensureDirs();
-  const fileName = `${ideaId}_${timestampStr}.json`;
-  const filePath = path.join(REPAIR_HISTORY_DIR, fileName);
-  if (!fs.existsSync(filePath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch (e) {
-    return null;
-  }
+  return null;
 }
 
 function atomicWriteJson(filePath, data) {

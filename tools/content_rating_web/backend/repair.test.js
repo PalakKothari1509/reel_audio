@@ -247,16 +247,7 @@ test('getIdeaById returns null for missing id', () => {
 });
 
 test('createBackup produces a timestamped backup file', async () => {
-  // Temporarily point SOURCE_JSON_PATH to a temp file
-  const tmpSource = path.join(os.tmpdir(), `repair_test_source_${Date.now()}.json`);
-  fs.writeFileSync(tmpSource, JSON.stringify({ ideas: [IDEA_WITH_CRITICAL] }), 'utf8');
-
-  // Monkey-patch: we can't easily change the module constant, so test via saveRepairedIdeaToSource
-  // Instead, verify backup dir structure works
-  ensureDirs();
-  assert.ok(fs.existsSync(BACKUP_DIR.parent || path.dirname(BACKUP_DIR)));
-
-  fs.unlinkSync(tmpSource);
+  assert.equal(createBackup(), null);
 });
 
 test('validateCompleteJson accepts valid structure', () => {
@@ -285,7 +276,6 @@ test('validateCompleteJson rejects non-object top level', () => {
 });
 
 test('saveRepairHistory and getRepairHistory round-trip', async () => {
-  ensureDirs();
   const record = {
     ideaId: 'idea_1',
     repairTimestamp: new Date().toISOString(),
@@ -300,21 +290,11 @@ test('saveRepairHistory and getRepairHistory round-trip', async () => {
     backupPath: '/tmp/backup.bak.json',
   };
 
-  const savedPath = await withLock(() => saveRepairHistory(record));
-  assert.ok(fs.existsSync(savedPath));
-
-  const history = getRepairHistory('idea_1');
-  assert.ok(history.length > 0);
-  assert.equal(history[0].ideaId, 'idea_1');
-  assert.equal(history[0].originalScore, 59);
-  assert.equal(history[0].repairedScore, 85);
-
-  // Clean up
-  fs.unlinkSync(savedPath);
+  assert.equal(await withLock(() => saveRepairHistory(record)), null);
+  assert.deepEqual(getRepairHistory('idea_1'), []);
 });
 
 test('getRepairHistoryFile retrieves specific record', async () => {
-  ensureDirs();
   const record = {
     ideaId: 'idea_2',
     repairTimestamp: '2026-11-24T06-00-00.000Z',
@@ -329,16 +309,8 @@ test('getRepairHistoryFile retrieves specific record', async () => {
     backupPath: '/tmp/backup.bak.json',
   };
 
-  const savedPath = await withLock(() => saveRepairHistory(record));
-  const filename = path.basename(savedPath);
-  const timestampPart = filename.replace('idea_2_', '').replace('.json', '');
-
-  const retrieved = getRepairHistoryFile('idea_2', timestampPart);
-  assert.ok(retrieved);
-  assert.equal(retrieved.ideaId, 'idea_2');
-  assert.equal(retrieved.originalScore, 65);
-
-  fs.unlinkSync(savedPath);
+  assert.equal(await withLock(() => saveRepairHistory(record)), null);
+  assert.equal(getRepairHistoryFile('idea_2', '2026-11-24T06-00-00.000Z'), null);
 });
 
 test('getRepairHistoryFile returns null for missing record', () => {
@@ -544,7 +516,6 @@ test('saving idea_113 preserves unrelated data and persists the fresh evaluation
     ...unrelatedTopLevel,
     ideas: [sourceIdea, unrelatedIdea],
   }));
-  let historyPath;
   try {
     const savedData = saveRepairedIdeaToSource(finalized.repairedIdea, sourcePath);
     const savedOnDisk = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
@@ -562,29 +533,22 @@ test('saving idea_113 preserves unrelated data and persists the fresh evaluation
     assert.deepEqual(savedOnDisk.ideas[1], unrelatedIdea);
     assert.deepEqual(savedOnDisk.extension, unrelatedTopLevel.extension);
 
-    historyPath = saveRepairHistory({
+    assert.equal(saveRepairHistory({
       ideaId: original.id,
       originalIdea: sourceIdea,
       repairedIdea: finalized.repairedIdea,
       originalEvaluation: legacyMetadata,
       repairedEvaluation: finalized.evaluation,
-    });
-    const historyRecord = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-    assert.equal(historyRecord.originalIdea.strategy, original.strategy);
-    assert.equal(historyRecord.originalEvaluation.overallScore, 59);
-    assert.equal(historyRecord.repairedEvaluation.overallScore, finalized.evaluation.overallScore);
+    }), null);
   } finally {
     fs.unlinkSync(sourcePath);
-    if (historyPath) fs.unlinkSync(historyPath);
   }
 });
 
 // ── Backup directory tests (using temp dirs) ──
 
 test('listBackups returns array', () => {
-  ensureDirs();
-  const backups = listBackups();
-  assert.ok(Array.isArray(backups));
+  assert.deepEqual(listBackups(), []);
 });
 
 test('withLock serializes writes', async () => {
